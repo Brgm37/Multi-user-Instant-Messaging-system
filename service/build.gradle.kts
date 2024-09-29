@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":repository"))
     testImplementation(kotlin("test"))
 }
 
