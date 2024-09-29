@@ -8,7 +8,7 @@ package model
  * @throws IllegalArgumentException if the username is empty.
  */
 data class UserInfo(
-	val uId: UInt? = null,
+	val uId: UInt,
 	val username: String,
 ) {
 	init {

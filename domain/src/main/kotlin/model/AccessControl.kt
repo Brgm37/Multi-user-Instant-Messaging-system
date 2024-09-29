@@ -8,6 +8,6 @@ package model
  * @property READ_WRITE Users can read and write messages in the channel.
  */
 enum class AccessControl {
-    READ_ONLY,
-    READ_WRITE,
+    READ_ONLY { override fun toString() = "READ_ONLY" },
+    READ_WRITE { override fun toString() = "READ_WRITE" },
 }

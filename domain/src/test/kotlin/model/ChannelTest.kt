@@ -11,7 +11,7 @@ class ChannelTest {
 	fun `successful channel instantiation test`() {
 		Channel.Public(
 			id = 1u,
-			owner = UserInfo(username = "username"),
+			owner = UserInfo(uId = 1u, username = "username"),
 			name = ChannelName(name = "channelName", ownerName = "ownerName"),
 			accessControl = READ_WRITE
 		)
@@ -22,7 +22,7 @@ class ChannelTest {
 		assertFailsWith<IllegalArgumentException> {
 			Channel.Private(
 				id = 1u,
-				owner = UserInfo(username = "username"),
+				owner = UserInfo(uId = 1u, username = "username"),
 				name = ChannelName(name = "", ownerName = "ownerName"),
 				accessControl = READ_WRITE
 			)
@@ -33,7 +33,7 @@ class ChannelTest {
 	fun `successful channel instantiation test with null id`() {
 		Channel.Private(
 			id = null,
-			owner = UserInfo(username = "username"),
+			owner = UserInfo(uId = 1u, username = "username"),
 			name = ChannelName(name = "channelName", ownerName = "ownerName"),
 			accessControl = READ_ONLY
 		)

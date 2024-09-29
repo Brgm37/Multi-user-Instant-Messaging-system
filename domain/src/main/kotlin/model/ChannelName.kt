@@ -20,3 +20,14 @@ data class ChannelName(
     val fullName: String
         get() = "@$ownerName/$name"
 }
+
+/**
+ * Converts a string to a channel name.
+ *
+ * @receiver The string to convert.
+ * @return The channel name.
+ */
+fun String.toChannelName(): ChannelName {
+	val (ownerName, name) = this.split("/")
+	return ChannelName(name.drop(1), ownerName)
+}

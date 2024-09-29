@@ -8,15 +8,15 @@ interface Repository<T> {
      * @param id The ID of the entity to retrieve
      * @return The entity with the given ID or null if it does not exist
      */
-    fun findById(id: Int): T?
+    fun findById(id: UInt): T?
 
     /**
      * Retrieves all entities
      * @return A list with all entities
      */
-    fun findAll(): List<T>
+    fun findAll(): Sequence<T>
 
-    /**
+	/**
      * Saves a new or existing entity
      * @param entity The entity to save
      */
@@ -26,5 +26,5 @@ interface Repository<T> {
      * Deletes an entity
      * @param id The entity to delete
      */
-    fun deleteById(id: Int)   // Delete an entity by its ID
+    fun deleteById(id: UInt)   // Delete an entity by its ID
 }
