@@ -1,4 +1,0 @@
-package jpadb
-
-class ChannelJPA {
-}
