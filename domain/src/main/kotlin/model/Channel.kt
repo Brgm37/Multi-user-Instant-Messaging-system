@@ -9,7 +9,7 @@ package org.example.model
  * @property accessControl The access control settings of the channel.
  */
 sealed interface Channel {
-    val id: Int
+    val id: UInt
     val owner: User
     val name: ChannelName
     val accessControl: AccessControl
@@ -23,7 +23,7 @@ sealed interface Channel {
      * @property accessControl The access control settings of the channel.
      */
     data class Public(
-        override val id: Int,
+        override val id: UInt,
         override val owner: User,
         override val name: ChannelName,
         override val accessControl: AccessControl,
@@ -39,7 +39,7 @@ sealed interface Channel {
      * @property accessControl The access control settings of the channel.
      */
     data class Private(
-        override val id: Int,
+        override val id: UInt,
         override val owner: User,
         override val name: ChannelName,
         override val accessControl: AccessControl,
