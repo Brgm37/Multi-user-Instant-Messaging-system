@@ -1,5 +1,6 @@
+package model
+
 import org.eclipse.jetty.util.security.Password
-import org.example.model.User
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 

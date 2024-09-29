@@ -1,7 +1,7 @@
 package jpadb
 
 import UserRepositoryInterface
-import org.example.model.User
+import model.User
 
 class UserRepository() : UserRepositoryInterface {
 

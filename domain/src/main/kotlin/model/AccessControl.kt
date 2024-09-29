@@ -1,4 +1,4 @@
-package org.example.model
+package model
 
 /**
  * The access control settings of a channel.

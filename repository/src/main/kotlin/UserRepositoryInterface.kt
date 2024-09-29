@@ -1,4 +1,4 @@
-import org.example.model.User
+import model.User
 
 interface UserRepositoryInterface: Repository<User> {
 
