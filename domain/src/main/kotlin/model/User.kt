@@ -22,5 +22,4 @@ data class User(
         require(username.isNotBlank()) { "Username must not be blank." }
 
     }
-
 }
