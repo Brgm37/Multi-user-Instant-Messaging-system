@@ -12,7 +12,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
 	implementation(project(":domain"))
-	implementation(project(":service"))
+	implementation(project(":repository"))
 	implementation(group = "org.postgresql", name = "postgresql", version = "42.+")
 }
 
