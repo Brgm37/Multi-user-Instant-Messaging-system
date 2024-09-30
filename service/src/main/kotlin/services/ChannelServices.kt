@@ -60,7 +60,7 @@ class ChannelServices(
 		return channelRepo.findAll()
 	}
 
-	override fun lastMessages(id: UInt, quantity: Int): Sequence<Message> {
+	override fun latestMessages(id: UInt, quantity: Int): Sequence<Message> {
 		TODO("Not yet implemented")
 	}
 }

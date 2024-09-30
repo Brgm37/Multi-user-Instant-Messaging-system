@@ -14,6 +14,7 @@ dependencies {
 	implementation(project(":domain"))
 	implementation(project(":repository"))
 	implementation(group = "org.postgresql", name = "postgresql", version = "42.+")
+	implementation("org.eclipse.jetty:jetty-util:9.4.43.v20210629")
 }
 
 tasks.test {

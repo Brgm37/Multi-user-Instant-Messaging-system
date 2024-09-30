@@ -46,7 +46,7 @@ interface ChannelServicesInterface {
 	): Channel
 
 	/**
-	 * Gets all channels.
+	 * Gets all channels that are owned by owner.
 	 * @param owner The owner of the channels.
 	 */
 	fun getChannels(
@@ -59,11 +59,11 @@ interface ChannelServicesInterface {
 	fun getChannels(): Sequence<Channel>
 
 	/**
-	 * Gets the last messages of a channel.
+	 * Gets the latest messages of a channel.
 	 * @param id The id of the channel.
 	 * @param quantity The quantity of messages to get.
 	 */
-	fun lastMessages(
+	fun latestMessages(
 		id: UInt,
 		quantity: Int
 	): Sequence<Message>

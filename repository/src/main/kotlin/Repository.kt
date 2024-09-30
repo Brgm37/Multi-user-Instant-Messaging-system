@@ -26,5 +26,5 @@ interface Repository<T> {
      * Deletes an entity
      * @param id The entity to delete
      */
-    fun deleteById(id: UInt)   // Delete an entity by its ID
+    fun deleteById(id: UInt)
 }

@@ -41,7 +41,7 @@ class ChannelServicesTest {
 	}
 
 	@Test
-	fun `fail to creat a channel due to blank name`() {
+	fun `fail to create a channel due to blank name`() {
 		val initialList = mutableListOf<Channel>()
 		val id = 1u
 		val channelServices = ChannelServices(ChannelDataBaseMock(id, initialList))
@@ -55,7 +55,7 @@ class ChannelServicesTest {
 	}
 
 	@Test
-	fun `fail to creat a channel due to blank access control`() {
+	fun `fail to create a channel due to blank access control`() {
 		val initialList = mutableListOf<Channel>()
 		val id = 1u
 		val channelServices = ChannelServices(ChannelDataBaseMock(id, initialList))
@@ -69,7 +69,7 @@ class ChannelServicesTest {
 	}
 
 	@Test
-	fun `fail to creat a channel due to blank visibility`() {
+	fun `fail to create a channel due to blank visibility`() {
 		val initialList = mutableListOf<Channel>()
 		val id = 1u
 		val channelServices = ChannelServices(ChannelDataBaseMock(id, initialList))
