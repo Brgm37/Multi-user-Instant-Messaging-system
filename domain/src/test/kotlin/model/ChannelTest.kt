@@ -38,4 +38,16 @@ class ChannelTest {
 			accessControl = READ_ONLY
 		)
 	}
+
+	@Test
+	fun `createChannel test`() {
+		val channel = Channel.createChannel(
+			id = 1u,
+			owner = UserInfo(uId = 1u, username = "username"),
+			name = ChannelName(name = "channelName", ownerName = "ownerName"),
+			accessControl = READ_WRITE,
+			visibility = "public"
+		)
+		assert(channel is Channel.Public)
+	}
 }

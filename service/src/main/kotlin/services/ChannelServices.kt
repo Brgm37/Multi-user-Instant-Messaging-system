@@ -26,21 +26,12 @@ class ChannelServices(
 		require(visibility.isNotBlank()) { "Channel visibility cannot be blank" }
 		require(ownerId > 0u) { "Owner id must be greater than 0" }
 		require(ownerName.isNotBlank()) { "Owner username cannot be blank" }
-		val channel =
-			if (visibility.uppercase() == "PUBLIC") {
-				Channel.Public(
-					owner = UserInfo(ownerId, ownerName),
-					name = ChannelName(name, ownerName),
-					accessControl = AccessControl.valueOf(accessControl.uppercase())
-				)
-			}
-			else {
-				Channel.Private(
-					owner = UserInfo(ownerId, ownerName),
-					name = ChannelName(name, ownerName),
-					accessControl = AccessControl.valueOf(accessControl.uppercase())
-				)
-			}
+		val channel = Channel.createChannel(
+			owner = UserInfo(ownerId, ownerName),
+			name = ChannelName(name, ownerName),
+			accessControl = AccessControl.valueOf(accessControl),
+			visibility = visibility
+		)
 		return channelRepo.createChannel(channel)
 	}
 

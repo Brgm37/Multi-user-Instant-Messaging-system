@@ -8,11 +8,11 @@ package model
  * @property name The name of the channel.
  * @property accessControl The access control settings of the channel.
  */
-sealed interface Channel {
-    val id: UInt?
-    val owner: UserInfo
-    val name: ChannelName
-    val accessControl: AccessControl
+sealed class Channel {
+    abstract val id: UInt?
+    abstract val owner: UserInfo
+    abstract val name: ChannelName
+    abstract val accessControl: AccessControl
 
     /**
      * A public channel is visible to all users.
@@ -22,12 +22,12 @@ sealed interface Channel {
      * @property name The name of the channel.
      * @property accessControl The access control settings of the channel.
      */
-    data class Public(
+    data class Public internal constructor(
         override val id: UInt? = null,
         override val owner: UserInfo,
         override val name: ChannelName,
         override val accessControl: AccessControl,
-    ) : Channel
+    ) : Channel()
 
     /**
      * A private channel is only visible to the owner
@@ -38,10 +38,36 @@ sealed interface Channel {
      * @property name The name of the channel.
      * @property accessControl The access control settings of the channel.
      */
-    data class Private(
+    data class Private internal constructor(
         override val id: UInt? = null,
         override val owner: UserInfo,
         override val name: ChannelName,
         override val accessControl: AccessControl,
-    ) : Channel
+    ) : Channel()
+
+	companion object {
+		/**
+		 * Creates a new channel.
+		 *
+		 * @param id The unique identifier of the channel.
+		 * @param owner The user that created the channel.
+		 * @param name The name of the channel.
+		 * @param accessControl The access control settings of the channel.
+		 * @param visibility The visibility of the channel. Must be either "PUBLIC" or "PRIVATE".
+		 * @return A new channel.
+		 */
+		fun createChannel(
+			id: UInt? = null,
+			owner: UserInfo,
+			name: ChannelName,
+			accessControl: AccessControl,
+			visibility: String
+		): Channel {
+			return when (visibility.uppercase()) {
+				"PUBLIC" -> Public(id, owner, name, accessControl)
+				"PRIVATE" -> Private(id, owner, name, accessControl)
+				else -> throw IllegalArgumentException("Invalid visibility: $visibility")
+			}
+		}
+	}
 }

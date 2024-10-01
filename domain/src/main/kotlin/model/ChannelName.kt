@@ -2,7 +2,8 @@ package model
 
 /**
  * The name of a channel.
- * The channel name is unique, and it is composed of the name of the user that created the channel.
+ * The channel name is unique.
+ * It is composed of the name of the user that created the channel and the channel's name.
  *
  * @property name The name of the channel.
  * @property ownerName The name of the user that created the channel.

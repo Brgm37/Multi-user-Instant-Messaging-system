@@ -23,11 +23,14 @@ class ChannelJDBC(
 		)
 		val name = getString("channel_name").toChannelName()
 		val accessControl = AccessControl.valueOf(getString("channel_accessControl"))
-		return when (getString("channel_visibility")) {
-			PUBLIC_CHANNEL -> Channel.Public(id, owner, name, accessControl)
-			PRIVATE_CHANNEL -> Channel.Private(id, owner, name, accessControl)
-			else -> throw SQLException("Invalid channel visibility")
-		}
+		val visibility = getString("channel_visibility")
+		return Channel.createChannel(
+			id = id,
+			owner = owner,
+			name = name,
+			accessControl = accessControl,
+			visibility = visibility
+		)
 	}
 
 	override fun createChannel(channel: Channel): Channel {
@@ -39,7 +42,7 @@ class ChannelJDBC(
 			val stm = connection.prepareStatement(insertQuery)
 			var idx = 1
 			stm.setString(idx++, channel.owner.username)
-			stm.setString(idx++, channel.name.name)
+			stm.setString(idx++, channel.name.fullName)
 			stm.setString(idx++, channel.accessControl.toString())
 			when (channel) {
 				is Channel.Public -> { stm.setString(idx, PUBLIC_CHANNEL) }
