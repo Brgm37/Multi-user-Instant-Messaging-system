@@ -42,7 +42,7 @@ class UserJDBC(
 	override fun joinChannel(uId: UInt, channelId: UInt) {
 		return connect { connection ->
 			val insertQuery = """
-				INSERT INTO user_channels (user_id, channel_id)
+				INSERT INTO channel_members (user_id, channel_id)
 				VALUES (?, ?)
 			""".trimIndent()
 			val stm = connection.prepareStatement(insertQuery)
