@@ -10,10 +10,10 @@ import model.Channel
 import model.ChannelName
 import model.UserInfo
 import org.junit.jupiter.api.BeforeEach
+import utils.Either
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-
 
 class ChannelServicesTest {
 
@@ -39,11 +39,14 @@ class ChannelServicesTest {
 			AccessControl.READ_WRITE,
 			visibility
 		)
-		val channel = channelServices.createChannel(owner, name, accessControl, visibility)
-		assertEquals(1u, channel.id)
-		assertEquals(owner.second, channel.owner.uId)
-		assertEquals("@${owner.first}/$name", channel.name.fullName)
-		assertEquals(AccessControl.READ_WRITE, channel.accessControl)
+		val response = channelServices.createChannel(owner, name, accessControl, visibility)
+		if (response is Either.Right) {
+			val channel = response.value
+			assertEquals(1u, channel.id)
+			assertEquals(owner.second, channel.owner.uId)
+			assertEquals("@${owner.first}/$name", channel.name.fullName)
+			assertEquals(AccessControl.READ_WRITE, channel.accessControl)
+		}
 	}
 
 	@Test

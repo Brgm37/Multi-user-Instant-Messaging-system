@@ -2,7 +2,7 @@ package services
 
 import ChannelRepositoryInterface
 import errors.ChannelError
-import errors.Error
+import errors.ChannelError.ChannelNotFound
 import interfaces.ChannelServicesInterface
 import interfaces.ownerInfo
 import model.AccessControl
@@ -11,9 +11,12 @@ import model.ChannelName
 import model.Message
 import model.UserInfo
 import utils.Either
+import utils.failure
+import utils.success
 
-//TODO: Improve the implementation of the class
-//TODO: Better error handling
+//TODO: Class implementation must be improved
+//TODO: Improve the error handling
+
 class ChannelServices(
 	private val channelRepo: ChannelRepositoryInterface
 ): ChannelServicesInterface {
@@ -22,8 +25,9 @@ class ChannelServices(
 		name: String,
 		accessControl: String,
 		visibility: String,
-	): Either<Error.UnableToCreateChannel, Channel> {
+	): Either<ChannelError, Channel> {
 		val (ownerName, ownerId) = owner
+		//TODO: Add a try-catch block to handle the exception
 		require(name.isNotBlank()) { "Channel name cannot be blank" }
 		require(accessControl.isNotBlank()) { "Channel access control cannot be blank" }
 		require(visibility.isNotBlank()) { "Channel visibility cannot be blank" }
@@ -35,23 +39,32 @@ class ChannelServices(
 			accessControl = AccessControl.valueOf(accessControl),
 			visibility = visibility
 		)
-		return channelRepo.createChannel(channel)
+		//TODO: Add error case
+		return success(channelRepo.createChannel(channel))
 	}
 
-	override fun deleteChannel(id: UInt): Either<ChannelError.UnableToDeleteChannel, Unit> {
+	override fun deleteChannel(id: UInt): Either<ChannelError, Unit> {
+		//TODO: Add error case
 		channelRepo.deleteById(id)
+		return success(Unit)
 	}
 
-	override fun getChannel(id: UInt): Either<ChannelError.UnableToGetChannel, Channel> {
-		return channelRepo.findById(id) ?: throw NoSuchElementException("Channel not found.")
+	override fun getChannel(id: UInt): Either<ChannelError, Channel> {
+		val channel = channelRepo.findById(id)
+		return if (channel != null) {
+			success(channel)
+		} else {
+			failure(ChannelNotFound)
+		}
 	}
 
 	override fun getChannels(owner: UInt): Either<ChannelError.UnableToGetChannel, Sequence<Channel>> {
 		TODO("Not yet implemented")
 	}
 
-	override fun getChannels(): Either<ChannelError.UnableToGetChannel, Sequence<Channel>> {
-		return channelRepo.findAll()
+	override fun getChannels(): Either<ChannelError, Sequence<Channel>> {
+		//TODO: Add error case
+		return success(channelRepo.findAll())
 	}
 
 	override fun latestMessages(id: UInt, quantity: Int): Sequence<Message> {
