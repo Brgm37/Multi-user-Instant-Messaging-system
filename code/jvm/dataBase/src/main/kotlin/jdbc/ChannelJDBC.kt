@@ -1,6 +1,7 @@
 package jdbc
 
 import ChannelRepositoryInterface
+import jakarta.inject.Named
 import model.AccessControl
 import model.Channel
 import model.UserInfo
@@ -11,6 +12,7 @@ import java.sql.SQLException
 private const val PUBLIC_CHANNEL = "PUBLIC"
 private const val PRIVATE_CHANNEL = "PRIVATE"
 
+@Named("ChannelJDBC")
 class ChannelJDBC(
 	envName: String
 ) : ChannelRepositoryInterface, JDBC(envName) {

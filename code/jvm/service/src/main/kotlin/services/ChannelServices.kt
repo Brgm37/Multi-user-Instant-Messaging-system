@@ -5,6 +5,7 @@ import errors.ChannelError
 import errors.ChannelError.ChannelNotFound
 import interfaces.ChannelServicesInterface
 import interfaces.ownerInfo
+import jakarta.inject.Named
 import model.AccessControl
 import model.Channel
 import model.ChannelName
@@ -16,7 +17,7 @@ import utils.success
 
 //TODO: Class implementation must be improved
 //TODO: Improve the error handling
-
+@Named("ChannelServices")
 class ChannelServices(
 	private val channelRepo: ChannelRepositoryInterface
 ): ChannelServicesInterface {
