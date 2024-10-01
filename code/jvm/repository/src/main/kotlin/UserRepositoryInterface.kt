@@ -1,3 +1,5 @@
+import errors.Error
+import utils.Either
 import model.User
 
 interface UserRepositoryInterface: Repository<User> {
