@@ -3,7 +3,8 @@ package services
 import io.mockk.*
 import ChannelRepositoryInterface
 import UserRepositoryInterface
-import errors.Error
+import errors.ChannelError
+import errors.UserError
 import model.*
 import org.eclipse.jetty.util.security.Password
 import org.junit.jupiter.api.BeforeEach
@@ -56,7 +57,7 @@ class UserServicesTest {
 		val userCreated = userServices.createUser(user) as Either.Left
 		val error = userCreated.value
 
-		assertEquals(Error.UserAlreadyExists, error)
+		assertEquals(UserError.UserAlreadyExists, error)
 
 		verify { userRepo.createUser(user) }
 	}
@@ -88,7 +89,7 @@ class UserServicesTest {
 		val result = userServices.joinChannel(userId, channelId) as Either.Left
 		val error = result.value
 
-		assertEquals(Error.UserNotFound, error)
+		assertEquals(UserError.UserNotFound, error)
 
 		verify { userRepo.findById(userId) }
 	}
@@ -103,7 +104,7 @@ class UserServicesTest {
 		val result = userServices.joinChannel(userId, channelId) as Either.Left
 		val error = result.value
 
-		assertEquals(Error.ChannelNotFound, error)
+		assertEquals(ChannelError.ChannelNotFound, error)
 
 		verify { userRepo.findById(userId) }
 		verify { channelRepo.findById(channelId) }
