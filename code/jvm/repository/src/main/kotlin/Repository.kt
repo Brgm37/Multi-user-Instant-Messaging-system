@@ -1,6 +1,7 @@
 /**
  * Generic repository interface for basic CRUD operations
  */
+//TODO: Check if is reasonable to return a sequence of entities in findAll method
 interface Repository<T> {
 
     /**
