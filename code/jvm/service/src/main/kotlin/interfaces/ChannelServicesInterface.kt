@@ -3,14 +3,8 @@ package interfaces
 import errors.ChannelError
 import model.Channel
 import model.Message
+import services.param.OwnerInfoParam
 import utils.Either
-
-/**
- * - Represents the owner of a channel.
- * - The first element is the username of the owner.
- * - The second element is the id of the owner.
- */
-typealias ownerInfo = Pair<String, UInt>
 
 /**
  * Represents the services available for the channel entity.
@@ -25,7 +19,7 @@ interface ChannelServicesInterface {
 	 * @return The created [Channel].
 	 */
 	fun createChannel(
-		owner: ownerInfo,
+		owner: OwnerInfoParam,
 		name: String,
 		accessControl: String,
 		visibility: String

@@ -1,92 +1,113 @@
 package services
 
-import ChannelRepositoryInterface
+import errors.ChannelError
 import interfaces.ChannelServicesInterface
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import model.AccessControl
-import model.Channel
-import model.ChannelName
-import model.UserInfo
+import model.*
+import org.example.transactionManager.TransactionManager
 import org.junit.jupiter.api.BeforeEach
-import utils.Either
+import services.param.OwnerInfoParam
+import utils.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
+import kotlin.test.assertIs
 
 class ChannelServicesTest {
 
-	private lateinit var channelRepository: ChannelRepositoryInterface
+	private lateinit var transactionManager: TransactionManager
 	private lateinit var channelServices: ChannelServicesInterface
 
 	@BeforeEach
 	fun setup() {
-		channelRepository = mockk()
-		channelServices = ChannelServices(channelRepository)
+		transactionManager = mockk()
+		channelServices = ChannelServices(transactionManager)
 	}
 
 	@Test
 	fun `create a new channel`() {
-		val owner = "owner" to 1u
+		val owner = OwnerInfoParam("owner", 1u)
 		val name = "name"
 		val accessControl = "READ_WRITE"
 		val visibility = "PUBLIC"
-		every { channelRepository.createChannel(any()) } returns Channel.createChannel(
-			1u,
-			UserInfo(owner.second, owner.first),
-			ChannelName(name, owner.first),
-			AccessControl.READ_WRITE,
-			visibility
+		every { transactionManager.run<Either<Channel, Channel>>(any(), any()) } returns success(
+			Channel.createChannel(
+				1u,
+				UserInfo(owner.id, owner.username),
+				ChannelName(name, owner.username),
+				AccessControl.valueOf(accessControl),
+				Visibility.valueOf(visibility)
+			)
 		)
 		val response = channelServices.createChannel(owner, name, accessControl, visibility)
-		if (response is Either.Right) {
-			val channel = response.value
-			assertEquals(1u, channel.id)
-			assertEquals(owner.second, channel.owner.uId)
-			assertEquals("@${owner.first}/$name", channel.name.fullName)
-			assertEquals(AccessControl.READ_WRITE, channel.accessControl)
-		}
+		verify { transactionManager.run<Either<Channel, Channel>>(any(), any()) }
+		assertIs<Success<Channel>>(response)
+		val channel = response.value
+		assertEquals(1u, channel.id)
+		assertEquals(owner.id, channel.owner.uId)
+		assertEquals("@${owner.username}/$name", channel.name.fullName)
+		assertEquals(AccessControl.READ_WRITE, channel.accessControl)
 	}
 
 	@Test
 	fun `delete a channel`() {
 		val id = 1u
-		every { channelRepository.deleteById(id) } returns Unit
+		every { transactionManager.run<Either<ChannelError, Unit>>(any(), any()) } returns success(Unit)
 		channelServices.deleteChannel(id)
-		verify { channelRepository.deleteById(id) }
+		verify { transactionManager.run<Either<ChannelError, Unit>>(any(), any()) }
 	}
 
 	@Test
 	fun `fail to create a channel due to blank name`() {
-		val owner = "owner" to 1u
+		val owner = OwnerInfoParam("owner", 1u)
 		val name = ""
 		val accessControl = "READ_WRITE"
 		val visibility = "PUBLIC"
-		assertFailsWith<IllegalArgumentException> {
-			channelServices.createChannel(owner, name, accessControl, visibility)
-		}
+		every { transactionManager.run<Either<ChannelError, Channel>>(any(), any()) } returns
+			failure(ChannelError.InvalidChannelInfo)
+		val response = channelServices.createChannel(owner, name, accessControl, visibility)
+		verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any(), any()) }
+		assertIs<Failure<ChannelError>>(response)
 	}
 
 	@Test
 	fun `fail to create a channel due to blank access control`() {
-		val owner = "owner" to 1u
+//		val owner = "owner" to 1u
+//		val name = "name"
+//		val accessControl = ""
+//		val visibility = "PUBLIC"
+//		assertFailsWith<IllegalArgumentException> {
+//			channelServices.createChannel(owner, name, accessControl, visibility)
+//		}
+		val owner = OwnerInfoParam("owner", 1u)
 		val name = "name"
 		val accessControl = ""
 		val visibility = "PUBLIC"
-		assertFailsWith<IllegalArgumentException> {
-			channelServices.createChannel(owner, name, accessControl, visibility)
-		}
+		every { transactionManager.run<Either<ChannelError, Channel>>(any(), any()) } returns
+			failure(ChannelError.InvalidChannelInfo)
+		val response = channelServices.createChannel(owner, name, accessControl, visibility)
+		verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any(), any()) }
+		assertIs<Failure<ChannelError>>(response)
 	}
 
 	@Test
 	fun `fail to create a channel due to blank visibility`() {
-		val owner = "owner" to 1u
+//		val owner = "owner" to 1u
+//		val name = "name"
+//		val accessControl = "READ_WRITE"
+//		val visibility = ""
+//		assertFailsWith<IllegalArgumentException> {
+//			channelServices.createChannel(owner, name, accessControl, visibility)
+//		}
+		val owner = OwnerInfoParam("owner", 1u)
 		val name = "name"
 		val accessControl = "READ_WRITE"
 		val visibility = ""
-		assertFailsWith<IllegalArgumentException> {
-			channelServices.createChannel(owner, name, accessControl, visibility)
-		}
+		every { transactionManager.run<Either<ChannelError, Channel>>(any(), any()) } returns
+			failure(ChannelError.InvalidChannelInfo)
+		val response = channelServices.createChannel(owner, name, accessControl, visibility)
+		verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any(), any()) }
+		assertIs<Failure<ChannelError>>(response)
 	}
 }

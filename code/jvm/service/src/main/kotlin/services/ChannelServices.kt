@@ -1,72 +1,74 @@
 package services
 
-import ChannelRepositoryInterface
 import errors.ChannelError
-import errors.ChannelError.ChannelNotFound
+import errors.ChannelError.*
 import interfaces.ChannelServicesInterface
-import interfaces.ownerInfo
 import jakarta.inject.Named
-import model.AccessControl
-import model.Channel
-import model.ChannelName
-import model.Message
-import model.UserInfo
+import model.*
+import org.example.transactionManager.TransactionManager
+import services.param.OwnerInfoParam
 import utils.Either
 import utils.failure
 import utils.success
 
-//TODO: Class implementation must be improved
-//TODO: Improve the error handling
 @Named("ChannelServices")
 class ChannelServices(
-	private val channelRepo: ChannelRepositoryInterface
+	private val repoManager: TransactionManager,
 ): ChannelServicesInterface {
 	override fun createChannel(
-		owner: ownerInfo,
+		owner: OwnerInfoParam,
 		name: String,
 		accessControl: String,
 		visibility: String,
 	): Either<ChannelError, Channel> {
-		val (ownerName, ownerId) = owner
-		//TODO: Add a try-catch block to handle the exception
-		require(name.isNotBlank()) { "Channel name cannot be blank" }
-		require(accessControl.isNotBlank()) { "Channel access control cannot be blank" }
-		require(visibility.isNotBlank()) { "Channel visibility cannot be blank" }
-		require(ownerId > 0u) { "Owner id must be greater than 0" }
-		require(ownerName.isNotBlank()) { "Owner username cannot be blank" }
+		val (username, ownerId) = owner
+		if (username.isEmpty() || name.isEmpty() || accessControl.isEmpty() || visibility.isEmpty()) {
+			return failure(InvalidChannelInfo)
+		}
+		if (accessControl.uppercase() !in AccessControl.entries.map(AccessControl::name)) {
+			return failure(InvalidChannelInfo)
+		}
+		if (visibility.uppercase() !in Visibility.entries.map(Visibility::name)) {
+			return failure(InvalidChannelInfo)
+		}
 		val channel = Channel.createChannel(
-			owner = UserInfo(ownerId, ownerName),
-			name = ChannelName(name, ownerName),
-			accessControl = AccessControl.valueOf(accessControl),
-			visibility = visibility
+			owner = UserInfo(ownerId, username),
+			name = ChannelName(name, username),
+			accessControl = AccessControl.valueOf(accessControl.uppercase()),
+			visibility = Visibility.valueOf(visibility.uppercase())
 		)
-		//TODO: Add error case
-		return success(channelRepo.createChannel(channel))
-	}
-
-	override fun deleteChannel(id: UInt): Either<ChannelError, Unit> {
-		//TODO: Add error case
-		channelRepo.deleteById(id)
-		return success(Unit)
-	}
-
-	override fun getChannel(id: UInt): Either<ChannelError, Channel> {
-		val channel = channelRepo.findById(id)
-		return if (channel != null) {
-			success(channel)
-		} else {
-			failure(ChannelNotFound)
+		return repoManager.run(failure(UnableToCreateChannel)) {
+			userRepo.findById(ownerId) ?: failure(OwnerNotFound)
+			val newChannel = channelRepo.createChannel(channel)
+			success(newChannel)
 		}
 	}
 
-	override fun getChannels(owner: UInt): Either<ChannelError.UnableToGetChannel, Sequence<Channel>> {
+	override fun deleteChannel(id: UInt): Either<ChannelError, Unit> =
+		repoManager
+			.run(failure(UnableToDeleteChannel)) {
+				channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
+				channelRepo.deleteById(id)
+				success(Unit)
+			}
+
+	override fun getChannel(id: UInt): Either<ChannelError, Channel> =
+		repoManager
+			.run(failure(UnableToGetChannel)) {
+				val channel = channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
+				success(channel)
+			}
+
+	override fun getChannels(owner: UInt): Either<UnableToGetChannel, Sequence<Channel>> {
 		TODO("Not yet implemented")
 	}
 
-	override fun getChannels(): Either<ChannelError, Sequence<Channel>> {
-		//TODO: Add error case
-		return success(channelRepo.findAll())
-	}
+	override fun getChannels(): Either<ChannelError, Sequence<Channel>> =
+		repoManager
+			.run(failure(UnableToGetChannel)) {
+				val channels = channelRepo.findAll()
+				success(channels)
+			}
 
 	override fun latestMessages(id: UInt, quantity: Int): Sequence<Message> {
 		TODO("Not yet implemented")
