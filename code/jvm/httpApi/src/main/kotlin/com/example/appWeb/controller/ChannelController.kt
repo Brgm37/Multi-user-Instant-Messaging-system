@@ -21,8 +21,8 @@ import utils.Failure
 import utils.Success
 
 @Controller
-class ChannelController(
-	@Inject @Named("ChannelServices") private val channelService: ChannelServicesInterface
+class ChannelController @Inject constructor(
+	@Named("ChannelServices") private val channelService: ChannelServicesInterface
 ) {
 
 	@GetMapping("/channel/{id}")

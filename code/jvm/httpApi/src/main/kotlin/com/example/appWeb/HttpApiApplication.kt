@@ -2,15 +2,12 @@ package com.example.appWeb
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.ComponentScan
 
 @SpringBootApplication
-class AppWebApplication {
-//	@Bean
-//	fun channelServiceBuilder(): ChannelServicesInterface {
-//		return ChannelServices()
-//	}
-}
+@ComponentScan(basePackages = ["transactionManager", "services"])
+class HttpApiApplication
 
 fun main(args: Array<String>) {
-	runApplication<AppWebApplication>(*args)
+	runApplication<HttpApiApplication>(*args)
 }
