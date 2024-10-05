@@ -2,6 +2,8 @@ package org.example.transactionManager.jdbc
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import jakarta.inject.Inject
+import jakarta.inject.Named
 import org.example.transaction.Transaction
 import org.example.transaction.jdbc.TransactionJDBC
 import org.example.transactionManager.TransactionManager
@@ -10,28 +12,21 @@ import javax.sql.DataSource
 
 /**
  * TransactionManager implementation using JDBC
- * @param dbUrlEnvName Environment variable name for the database URL. Non-optional.
- * @param dbUserEnvName Environment variable name for the database user. Non-optional.
- * @param dbPasswordEnvName Environment variable name for the database password. Non-optional.
- * @param pollSizeEnvName Environment variable name for the connection pool size
- * @throws IllegalArgumentException If any of the non-optional environment variables are missing.
+ * @param dbUrl The connection URL for the database.
+ * @param dbUser The username for the database.
+ * @param dbPassword The password for the database.
+ * @param poolSize The maximum number of connections to keep in the pool.
  */
-class TransactionManagerJDBC(
-	dbUrlEnvName: String,
-	dbUserEnvName: String,
-	dbPasswordEnvName: String,
-	pollSizeEnvName: String
+@Named("TransactionMangerJDBC")
+class TransactionManagerJDBC @Inject constructor(
+	@Named("DB_URL") dbUrl: String,
+	@Named("DB_USER") dbUser: String,
+	@Named("DB_PASSWORD") dbPassword: String,
+	@Named("POOL_SIZE") poolSize: Int? = null
 ): TransactionManager {
 	private val dataSource: DataSource
 
 	init {
-	    val dbUrl = System.getenv(dbUrlEnvName)
-		val dbUser = System.getenv(dbUserEnvName)
-		val dbPassword = System.getenv(dbPasswordEnvName)
-		val poolSize = System.getenv(pollSizeEnvName)?.toIntOrNull()
-		if (dbUrl == null || dbUser == null || dbPassword == null) {
-			throw IllegalArgumentException("Missing environment variables")
-		}
 		val config = HikariConfig().apply {
 			jdbcUrl = dbUrl
 			username = dbUser

@@ -3,6 +3,7 @@ package services
 import errors.ChannelError
 import errors.ChannelError.*
 import interfaces.ChannelServicesInterface
+import jakarta.inject.Inject
 import jakarta.inject.Named
 import model.*
 import org.example.transactionManager.TransactionManager
@@ -13,7 +14,7 @@ import utils.success
 
 @Named("ChannelServices")
 class ChannelServices(
-	private val repoManager: TransactionManager,
+	@Inject @Named("TransactionManagerJDBC") private val repoManager: TransactionManager,
 ): ChannelServicesInterface {
 	override fun createChannel(
 		owner: OwnerInfoParam,

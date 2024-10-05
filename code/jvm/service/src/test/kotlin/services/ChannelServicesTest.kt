@@ -73,13 +73,6 @@ class ChannelServicesTest {
 
 	@Test
 	fun `fail to create a channel due to blank access control`() {
-//		val owner = "owner" to 1u
-//		val name = "name"
-//		val accessControl = ""
-//		val visibility = "PUBLIC"
-//		assertFailsWith<IllegalArgumentException> {
-//			channelServices.createChannel(owner, name, accessControl, visibility)
-//		}
 		val owner = OwnerInfoParam("owner", 1u)
 		val name = "name"
 		val accessControl = ""
@@ -93,13 +86,6 @@ class ChannelServicesTest {
 
 	@Test
 	fun `fail to create a channel due to blank visibility`() {
-//		val owner = "owner" to 1u
-//		val name = "name"
-//		val accessControl = "READ_WRITE"
-//		val visibility = ""
-//		assertFailsWith<IllegalArgumentException> {
-//			channelServices.createChannel(owner, name, accessControl, visibility)
-//		}
 		val owner = OwnerInfoParam("owner", 1u)
 		val name = "name"
 		val accessControl = "READ_WRITE"
