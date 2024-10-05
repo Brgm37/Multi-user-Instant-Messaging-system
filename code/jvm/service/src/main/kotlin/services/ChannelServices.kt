@@ -7,7 +7,6 @@ import jakarta.inject.Inject
 import jakarta.inject.Named
 import model.*
 import org.example.transactionManager.TransactionManager
-import services.param.OwnerInfoParam
 import utils.Either
 import utils.failure
 import utils.success
@@ -17,13 +16,12 @@ class ChannelServices(
 	@Inject @Named("TransactionManagerJDBC") private val repoManager: TransactionManager,
 ): ChannelServicesInterface {
 	override fun createChannel(
-		owner: OwnerInfoParam,
+		owner: UInt,
 		name: String,
 		accessControl: String,
 		visibility: String,
 	): Either<ChannelError, Channel> {
-		val (username, ownerId) = owner
-		if (username.isEmpty() || name.isEmpty() || accessControl.isEmpty() || visibility.isEmpty()) {
+		if (name.isEmpty() || accessControl.isEmpty() || visibility.isEmpty()) {
 			return failure(InvalidChannelInfo)
 		}
 		if (accessControl.uppercase() !in AccessControl.entries.map(AccessControl::name)) {
@@ -32,16 +30,16 @@ class ChannelServices(
 		if (visibility.uppercase() !in Visibility.entries.map(Visibility::name)) {
 			return failure(InvalidChannelInfo)
 		}
-		val channel = Channel.createChannel(
-			owner = UserInfo(ownerId, username),
-			name = ChannelName(name, username),
-			accessControl = AccessControl.valueOf(accessControl.uppercase()),
-			visibility = Visibility.valueOf(visibility.uppercase())
-		)
 		return repoManager.run(failure(UnableToCreateChannel)) {
-			userRepo.findById(ownerId) ?: failure(OwnerNotFound)
-			val newChannel = channelRepo.createChannel(channel)
-			success(newChannel)
+			val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
+			val id = requireNotNull(user.uId) { "User id is null" }
+			val channel = Channel.createChannel(
+				owner = UserInfo(id, user.username),
+				name = ChannelName(name, user.username),
+				accessControl = AccessControl.valueOf(accessControl.uppercase()),
+				visibility = Visibility.valueOf(visibility.uppercase())
+			)
+			success(channelRepo.createChannel(channel))
 		}
 	}
 

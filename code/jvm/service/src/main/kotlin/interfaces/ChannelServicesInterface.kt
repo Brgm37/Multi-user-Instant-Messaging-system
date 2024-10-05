@@ -3,7 +3,6 @@ package interfaces
 import errors.ChannelError
 import model.Channel
 import model.Message
-import services.param.OwnerInfoParam
 import utils.Either
 
 /**
@@ -19,7 +18,7 @@ interface ChannelServicesInterface {
 	 * @return The created [Channel].
 	 */
 	fun createChannel(
-		owner: OwnerInfoParam,
+		owner: UInt,
 		name: String,
 		accessControl: String,
 		visibility: String
@@ -42,7 +41,7 @@ interface ChannelServicesInterface {
 	): Either<ChannelError, Channel>
 
 	/**
-	 * Gets all channels that are owned by owner.
+	 * Gets all channels that owner owns.
 	 * @param owner The owner of the channels.
 	 */
 	fun getChannels(

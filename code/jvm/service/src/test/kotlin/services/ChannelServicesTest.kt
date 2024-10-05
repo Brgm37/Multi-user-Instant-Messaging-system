@@ -8,7 +8,6 @@ import io.mockk.verify
 import model.*
 import org.example.transactionManager.TransactionManager
 import org.junit.jupiter.api.BeforeEach
-import services.param.OwnerInfoParam
 import utils.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -27,15 +26,16 @@ class ChannelServicesTest {
 
 	@Test
 	fun `create a new channel`() {
-		val owner = OwnerInfoParam("owner", 1u)
+		val owner = 1u
+		val ownerName = "owner"
 		val name = "name"
 		val accessControl = "READ_WRITE"
 		val visibility = "PUBLIC"
 		every { transactionManager.run<Either<Channel, Channel>>(any(), any()) } returns success(
 			Channel.createChannel(
 				1u,
-				UserInfo(owner.id, owner.username),
-				ChannelName(name, owner.username),
+				UserInfo(owner, ownerName),
+				ChannelName(name, ownerName),
 				AccessControl.valueOf(accessControl),
 				Visibility.valueOf(visibility)
 			)
@@ -45,8 +45,8 @@ class ChannelServicesTest {
 		assertIs<Success<Channel>>(response)
 		val channel = response.value
 		assertEquals(1u, channel.id)
-		assertEquals(owner.id, channel.owner.uId)
-		assertEquals("@${owner.username}/$name", channel.name.fullName)
+		assertEquals(owner, channel.owner.uId)
+		assertEquals("@${ownerName}/$name", channel.name.fullName)
 		assertEquals(AccessControl.READ_WRITE, channel.accessControl)
 	}
 
@@ -60,7 +60,7 @@ class ChannelServicesTest {
 
 	@Test
 	fun `fail to create a channel due to blank name`() {
-		val owner = OwnerInfoParam("owner", 1u)
+		val owner = 1u
 		val name = ""
 		val accessControl = "READ_WRITE"
 		val visibility = "PUBLIC"
@@ -73,7 +73,7 @@ class ChannelServicesTest {
 
 	@Test
 	fun `fail to create a channel due to blank access control`() {
-		val owner = OwnerInfoParam("owner", 1u)
+		val owner = 1u
 		val name = "name"
 		val accessControl = ""
 		val visibility = "PUBLIC"
@@ -86,7 +86,7 @@ class ChannelServicesTest {
 
 	@Test
 	fun `fail to create a channel due to blank visibility`() {
-		val owner = OwnerInfoParam("owner", 1u)
+		val owner = 1u
 		val name = "name"
 		val accessControl = "READ_WRITE"
 		val visibility = ""
