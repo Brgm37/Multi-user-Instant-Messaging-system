@@ -1,4 +1,4 @@
-package com.example.appWeb.model.dto
+package com.example.appWeb.model.dto.output
 
 import model.ChannelName
 
