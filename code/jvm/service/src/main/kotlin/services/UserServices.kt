@@ -2,6 +2,7 @@ package services
 
 import ChannelRepositoryInterface
 import UserRepositoryInterface
+import errors.ChannelError
 import errors.Error
 import interfaces.UserServicesInterface
 import utils.Either
@@ -30,7 +31,7 @@ class UserServices(
 
 	override fun joinChannel(userId: UInt, channelId: UInt): Either<Error, String> {
 		val user = userRepo.findById(userId) ?: return failure(Error.UserNotFound)
-		val channel = channelRepo.findById(channelId) ?: return failure(Error.ChannelNotFound)
+		val channel = channelRepo.findById(channelId) ?: return failure(ChannelError.ChannelNotFound)
 		user.uId?.let { uId -> channel.id?.let { cId -> userRepo.joinChannel(uId, cId) } }
 		return success("User joined channel successfully")
 	}

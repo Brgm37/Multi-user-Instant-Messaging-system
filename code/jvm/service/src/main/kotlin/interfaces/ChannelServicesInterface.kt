@@ -1,14 +1,9 @@
 package interfaces
 
+import errors.ChannelError
 import model.Channel
 import model.Message
-
-/**
- * - Represents the owner of a channel.
- * - The first element is the username of the owner.
- * - The second element is the id of the owner.
- */
-typealias ownerInfo = Pair<String, UInt>
+import utils.Either
 
 /**
  * Represents the services available for the channel entity.
@@ -23,11 +18,11 @@ interface ChannelServicesInterface {
 	 * @return The created [Channel].
 	 */
 	fun createChannel(
-		owner: ownerInfo,
+		owner: UInt,
 		name: String,
 		accessControl: String,
 		visibility: String
-	): Channel
+	): Either<ChannelError, Channel>
 
 	/**
 	 * Deletes a channel.
@@ -35,7 +30,7 @@ interface ChannelServicesInterface {
 	 */
 	fun deleteChannel(
 		id: UInt
-	)
+	): Either<ChannelError, Unit>
 
 	/**
 	 * Gets a channel by its id.
@@ -43,20 +38,20 @@ interface ChannelServicesInterface {
 	 */
 	fun getChannel(
 		id: UInt
-	): Channel
+	): Either<ChannelError, Channel>
 
 	/**
-	 * Gets all channels that are owned by owner.
+	 * Gets all channels that owner owns.
 	 * @param owner The owner of the channels.
 	 */
 	fun getChannels(
 		owner: UInt
-	): Sequence<Channel>
+	): Either<ChannelError, Sequence<Channel>>
 
 	/**
 	 * Gets all channels.
 	 */
-	fun getChannels(): Sequence<Channel>
+	fun getChannels(): Either<ChannelError, Sequence<Channel>>
 
 	/**
 	 * Gets the latest messages of a channel.

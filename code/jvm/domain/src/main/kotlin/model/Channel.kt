@@ -61,12 +61,11 @@ sealed class Channel {
 			owner: UserInfo,
 			name: ChannelName,
 			accessControl: AccessControl,
-			visibility: String
+			visibility: Visibility
 		): Channel {
-			return when (visibility.uppercase()) {
-				"PUBLIC" -> Public(id, owner, name, accessControl)
-				"PRIVATE" -> Private(id, owner, name, accessControl)
-				else -> throw IllegalArgumentException("Invalid visibility: $visibility")
+			return when (visibility) {
+				Visibility.PUBLIC -> Public(id, owner, name, accessControl)
+				Visibility.PRIVATE -> Private(id, owner, name, accessControl)
 			}
 		}
 	}

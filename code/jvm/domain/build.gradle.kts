@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
 	testImplementation(kotlin("test"))
-	implementation("org.eclipse.jetty:jetty-util:9.4.43.v20210629")
+	api("org.eclipse.jetty:jetty-security:12.0.10")
 }
 
 tasks.test {

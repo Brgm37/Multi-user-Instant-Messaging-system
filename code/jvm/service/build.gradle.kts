@@ -10,11 +10,13 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":domain"))
-    implementation(project(":repository"))
+    api(project(":domain"))
+    implementation(project(":transactionManager"))
     testImplementation(kotlin("test"))
 	testImplementation("io.mockk:mockk:1.13.12")
-	implementation("org.eclipse.jetty:jetty-util:9.4.43.v20210629")
+	testImplementation("org.slf4j:slf4j-simple:1.7.32")
+	testImplementation("ch.qos.logback:logback-classic:1.5.8")
+	api("jakarta.inject:jakarta.inject-api:2.0.1")
 }
 
 tasks.test {

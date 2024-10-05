@@ -3,6 +3,7 @@ package services
 import io.mockk.*
 import ChannelRepositoryInterface
 import UserRepositoryInterface
+import errors.ChannelError.ChannelNotFound
 import errors.Error
 import model.*
 import org.eclipse.jetty.util.security.Password
@@ -103,7 +104,7 @@ class UserServicesTest {
 		val result = userServices.joinChannel(userId, channelId) as Either.Left
 		val error = result.value
 
-		assertEquals(Error.ChannelNotFound, error)
+		assertEquals(ChannelNotFound, error)
 
 		verify { userRepo.findById(userId) }
 		verify { channelRepo.findById(channelId) }
