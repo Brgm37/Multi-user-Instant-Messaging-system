@@ -31,7 +31,7 @@ class ChannelServicesTest {
 		val name = "name"
 		val accessControl = "READ_WRITE"
 		val visibility = "PUBLIC"
-		every { transactionManager.run<Either<Channel, Channel>>(any(), any()) } returns success(
+		every { transactionManager.run<Either<Channel, Channel>>(any()) } returns success(
 			Channel.createChannel(
 				1u,
 				UserInfo(owner, ownerName),
@@ -41,7 +41,7 @@ class ChannelServicesTest {
 			)
 		)
 		val response = channelServices.createChannel(owner, name, accessControl, visibility)
-		verify { transactionManager.run<Either<Channel, Channel>>(any(), any()) }
+		verify { transactionManager.run<Either<Channel, Channel>>(any()) }
 		assertIs<Success<Channel>>(response)
 		val channel = response.value
 		assertEquals(1u, channel.id)
@@ -53,9 +53,9 @@ class ChannelServicesTest {
 	@Test
 	fun `delete a channel`() {
 		val id = 1u
-		every { transactionManager.run<Either<ChannelError, Unit>>(any(), any()) } returns success(Unit)
+		every { transactionManager.run<Either<ChannelError, Unit>>(any()) } returns success(Unit)
 		channelServices.deleteChannel(id)
-		verify { transactionManager.run<Either<ChannelError, Unit>>(any(), any()) }
+		verify { transactionManager.run<Either<ChannelError, Unit>>(any()) }
 	}
 
 	@Test
@@ -64,10 +64,10 @@ class ChannelServicesTest {
 		val name = ""
 		val accessControl = "READ_WRITE"
 		val visibility = "PUBLIC"
-		every { transactionManager.run<Either<ChannelError, Channel>>(any(), any()) } returns
+		every { transactionManager.run<Either<ChannelError, Channel>>(any()) } returns
 			failure(ChannelError.InvalidChannelInfo)
 		val response = channelServices.createChannel(owner, name, accessControl, visibility)
-		verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any(), any()) }
+		verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any()) }
 		assertIs<Failure<ChannelError>>(response)
 	}
 
@@ -77,10 +77,10 @@ class ChannelServicesTest {
 		val name = "name"
 		val accessControl = ""
 		val visibility = "PUBLIC"
-		every { transactionManager.run<Either<ChannelError, Channel>>(any(), any()) } returns
+		every { transactionManager.run<Either<ChannelError, Channel>>(any()) } returns
 			failure(ChannelError.InvalidChannelInfo)
 		val response = channelServices.createChannel(owner, name, accessControl, visibility)
-		verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any(), any()) }
+		verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any()) }
 		assertIs<Failure<ChannelError>>(response)
 	}
 
@@ -90,10 +90,10 @@ class ChannelServicesTest {
 		val name = "name"
 		val accessControl = "READ_WRITE"
 		val visibility = ""
-		every { transactionManager.run<Either<ChannelError, Channel>>(any(), any()) } returns
+		every { transactionManager.run<Either<ChannelError, Channel>>(any()) } returns
 			failure(ChannelError.InvalidChannelInfo)
 		val response = channelServices.createChannel(owner, name, accessControl, visibility)
-		verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any(), any()) }
+		verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any()) }
 		assertIs<Failure<ChannelError>>(response)
 	}
 }

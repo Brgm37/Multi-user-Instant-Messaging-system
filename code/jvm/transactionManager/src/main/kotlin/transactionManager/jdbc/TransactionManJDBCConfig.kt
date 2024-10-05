@@ -13,7 +13,7 @@ import jakarta.inject.Named
  * @see TransactionManJDBCConfig.provideDBUser
  * @see TransactionManJDBCConfig.provideDBPassword
  * @see TransactionManJDBCConfig.providePoolSize
- * @throws IllegalArgumentException If the environment variables are not set.
+ * @throws IllegalArgumentException If the non-optional environment variables are not set.
  */
 @ApplicationScoped
 class TransactionManJDBCConfig {
@@ -21,7 +21,7 @@ class TransactionManJDBCConfig {
 	/**
 	 * Provides the database URL from the environment.
 	 *
-	 * - It uses the environment variable `DB_URL` if set.
+	 * - It uses the environment variable `DB_URL`.
 	 */
 	@Produces
 	@Named("DB_URL")
@@ -31,7 +31,7 @@ class TransactionManJDBCConfig {
 	/**
 	 * Provides the database user from the environment.
 	 *
-	 * - It uses the environment variable `DB_USER` if set.
+	 * - It uses the environment variable `DB_USER`.
 	 */
 	@Produces
 	@Named("DB_USER")
@@ -41,7 +41,7 @@ class TransactionManJDBCConfig {
 	/**
 	 * Provides the database password from the environment.
 	 *
-	 * - It uses the environment variable `DB_PASSWORD` if set.
+	 * - It uses the environment variable `DB_PASSWORD`.
 	 */
 	@Produces
 	@Named("DB_PASSWORD")

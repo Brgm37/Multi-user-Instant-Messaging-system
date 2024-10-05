@@ -17,7 +17,7 @@ import javax.sql.DataSource
  * @param dbPassword The password for the database.
  * @param poolSize The maximum number of connections to keep in the pool.
  */
-@Named("TransactionMangerJDBC")
+@Named("TransactionManagerJDBC")
 class TransactionManagerJDBC @Inject constructor(
 	@Named("DB_URL") dbUrl: String,
 	@Named("DB_USER") dbUser: String,
@@ -37,7 +37,7 @@ class TransactionManagerJDBC @Inject constructor(
 		dataSource = HikariDataSource(config)
 	}
 
-	override fun <R> run(onError: R, block: Transaction.() -> R): R {
+	override fun <R> run(block: Transaction.() -> R): R {
 		dataSource.connection.use { connection ->
 			connection.autoCommit = false
 			val transaction = TransactionJDBC(connection)
@@ -46,9 +46,7 @@ class TransactionManagerJDBC @Inject constructor(
 				connection.commit()
 				result
 			} catch (e: SQLException) {
-				transaction.rollback(onError)
-			} catch (e: Exception) {
-				connection.rollback()
+				transaction.rollback()
 				throw e
 			}
 		}

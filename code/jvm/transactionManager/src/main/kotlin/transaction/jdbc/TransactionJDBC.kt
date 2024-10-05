@@ -12,8 +12,7 @@ class TransactionJDBC(
 	//TODO: Should be injected? Or is it fine to create it here?
 	override val channelRepo: ChannelRepositoryInterface = ChannelJDBC(connection)
 	override val userRepo: UserRepositoryInterface = UserJDBC(connection)
-	override fun <R> rollback(error: R): R {
+	override fun rollback() {
 		connection.rollback()
-		return error
 	}
 }

@@ -12,8 +12,8 @@ import utils.failure
 import utils.success
 
 @Named("ChannelServices")
-class ChannelServices(
-	@Inject @Named("TransactionManagerJDBC") private val repoManager: TransactionManager,
+class ChannelServices @Inject constructor(
+	@Named("TransactionManagerJDBC") private val repoManager: TransactionManager,
 ): ChannelServicesInterface {
 	override fun createChannel(
 		owner: UInt,
@@ -30,7 +30,7 @@ class ChannelServices(
 		if (visibility.uppercase() !in Visibility.entries.map(Visibility::name)) {
 			return failure(InvalidChannelInfo)
 		}
-		return repoManager.run(failure(UnableToCreateChannel)) {
+		return repoManager.run {
 			val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
 			val id = requireNotNull(user.uId) { "User id is null" }
 			val channel = Channel.createChannel(
@@ -45,7 +45,7 @@ class ChannelServices(
 
 	override fun deleteChannel(id: UInt): Either<ChannelError, Unit> =
 		repoManager
-			.run(failure(UnableToDeleteChannel)) {
+			.run {
 				channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
 				channelRepo.deleteById(id)
 				success(Unit)
@@ -53,7 +53,7 @@ class ChannelServices(
 
 	override fun getChannel(id: UInt): Either<ChannelError, Channel> =
 		repoManager
-			.run(failure(UnableToGetChannel)) {
+			.run {
 				val channel = channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
 				success(channel)
 			}
@@ -64,7 +64,7 @@ class ChannelServices(
 
 	override fun getChannels(): Either<ChannelError, Sequence<Channel>> =
 		repoManager
-			.run(failure(UnableToGetChannel)) {
+			.run {
 				val channels = channelRepo.findAll()
 				success(channels)
 			}
