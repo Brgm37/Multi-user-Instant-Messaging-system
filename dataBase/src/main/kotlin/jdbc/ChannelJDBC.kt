@@ -39,7 +39,7 @@ class ChannelJDBC(
 			val stm = connection.prepareStatement(insertQuery)
 			var idx = 1
 			stm.setString(idx++, channel.owner.username)
-			stm.setString(idx++, channel.name.name)
+			stm.setString(idx++, channel.name.fullName)
 			stm.setString(idx++, channel.accessControl.toString())
 			when (channel) {
 				is Channel.Public -> { stm.setString(idx, PUBLIC_CHANNEL) }
