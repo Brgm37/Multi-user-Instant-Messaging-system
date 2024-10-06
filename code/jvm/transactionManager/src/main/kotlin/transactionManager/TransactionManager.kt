@@ -1,4 +1,4 @@
-package org.example.transactionManager
+package transactionManager
 
 import org.example.transaction.Transaction
 

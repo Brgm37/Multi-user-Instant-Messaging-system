@@ -8,7 +8,7 @@ import jakarta.inject.Inject
 import jakarta.inject.Named
 import utils.Either
 import model.User
-import org.example.transactionManager.TransactionManager
+import transactionManager.TransactionManager
 import utils.failure
 import utils.success
 

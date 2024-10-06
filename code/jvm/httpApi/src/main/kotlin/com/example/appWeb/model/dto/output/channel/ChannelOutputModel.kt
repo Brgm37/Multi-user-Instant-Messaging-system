@@ -1,4 +1,4 @@
-package com.example.appWeb.model.dto.output
+package com.example.appWeb.model.dto.output.channel
 
 import model.Channel
 import model.Visibility.PRIVATE

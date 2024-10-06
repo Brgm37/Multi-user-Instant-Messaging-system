@@ -1,7 +1,7 @@
 package com.example.appWeb.controller
 
-import com.example.appWeb.model.dto.input.ChannelInputModel
-import com.example.appWeb.model.dto.output.ChannelOutputModel
+import com.example.appWeb.model.dto.input.channel.ChannelInputModel
+import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import com.example.appWeb.model.problem.Problem
 import errors.ChannelError.InvalidChannelInfo
 import errors.ChannelError.UserNotFound
@@ -20,12 +20,16 @@ import org.springframework.web.bind.annotation.RequestBody
 import utils.Failure
 import utils.Success
 
+/**
+ * Represents the controller for the channel
+ * @param channelService The channel service
+ */
 @Controller
 class ChannelController @Inject constructor(
 	@Named("ChannelServices") private val channelService: ChannelServicesInterface
 ) {
 
-	@GetMapping("/channel/{id}")
+	@GetMapping("/channels/{id}")
 	fun getChannel(@PathVariable id: UInt) {
 		when (val response = channelService.getChannel(id)) {
 			is Success -> {
@@ -37,7 +41,7 @@ class ChannelController @Inject constructor(
 		}
 	}
 
-	@PostMapping("/channel/{id}")
+	@PostMapping("/channels/{id}")
 	fun createChannel(
 		@PathVariable id: UInt,
 		@Valid @RequestBody channel: ChannelInputModel

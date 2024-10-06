@@ -1,4 +1,4 @@
-package org.example.transactionManager.jdbc
+package transactionManager.jdbc
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -6,7 +6,7 @@ import jakarta.inject.Inject
 import jakarta.inject.Named
 import org.example.transaction.Transaction
 import org.example.transaction.jdbc.TransactionJDBC
-import org.example.transactionManager.TransactionManager
+import transactionManager.TransactionManager
 import java.sql.SQLException
 import javax.sql.DataSource
 

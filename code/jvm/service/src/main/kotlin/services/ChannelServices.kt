@@ -6,7 +6,7 @@ import interfaces.ChannelServicesInterface
 import jakarta.inject.Inject
 import jakarta.inject.Named
 import model.*
-import org.example.transactionManager.TransactionManager
+import transactionManager.TransactionManager
 import utils.Either
 import utils.failure
 import utils.success
