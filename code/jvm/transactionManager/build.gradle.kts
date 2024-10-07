@@ -12,7 +12,7 @@ repositories {
 dependencies {
 	api(project(":repository"))
 	implementation(project(":dataBase"))
-	implementation("com.zaxxer:HikariCP:5.0.1")
+	implementation("com.zaxxer:HikariCP:5.1.0")
 	implementation("org.postgresql:postgresql:42.7.3")
     testImplementation(kotlin("test"))
 	implementation("jakarta.inject:jakarta.inject-api:2.0.1")
