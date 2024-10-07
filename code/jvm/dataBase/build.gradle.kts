@@ -14,7 +14,6 @@ dependencies {
 	api(project(":domain"))
 	implementation(project(":repository"))
 	implementation(group = "org.postgresql", name = "postgresql", version = "42.+")
-	implementation("jakarta.inject:jakarta.inject-api:2.0.1")
 }
 
 tasks.test {
