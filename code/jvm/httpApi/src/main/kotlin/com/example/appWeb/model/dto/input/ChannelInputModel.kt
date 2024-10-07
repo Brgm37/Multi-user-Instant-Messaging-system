@@ -13,7 +13,6 @@ import model.Visibility
  * @property name The name of the channel.
  * @property visibility The visibility of the channel.
  * @property accessControl The access control of the channel.
- * @throws IllegalArgumentException If any of the properties are invalid.
  */
 data class ChannelInputModel(
 	@get:Positive val owner: UInt,
