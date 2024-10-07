@@ -37,13 +37,12 @@ class ChannelController @Inject constructor(
 		}
 	}
 
-	@PostMapping("/channel/{id}")
+	@PostMapping("/channel")
 	fun createChannel(
-		@PathVariable id: UInt,
 		@Valid @RequestBody channel: ChannelInputModel
 	) {
 		val response = channelService.createChannel(
-			owner = id,
+			owner = channel.owner,
 			name = channel.name,
 			accessControl = channel.accessControl,
 			visibility = channel.visibility

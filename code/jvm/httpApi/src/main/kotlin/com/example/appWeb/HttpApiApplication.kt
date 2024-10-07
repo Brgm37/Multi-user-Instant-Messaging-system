@@ -5,7 +5,7 @@ import org.springframework.boot.runApplication
 import org.springframework.context.annotation.ComponentScan
 
 @SpringBootApplication
-@ComponentScan(basePackages = ["transactionMan", "services"])
+@ComponentScan(basePackages = ["transactionManager.jdbc", "services"])
 class HttpApiApplication
 
 fun main(args: Array<String>) {
