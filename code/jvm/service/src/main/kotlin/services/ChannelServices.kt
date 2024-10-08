@@ -6,14 +6,14 @@ import interfaces.ChannelServicesInterface
 import jakarta.inject.Inject
 import jakarta.inject.Named
 import model.*
-import transactionManager.TransactionManager
+import TransactionManager
 import utils.Either
 import utils.failure
 import utils.success
 
 @Named("ChannelServices")
 class ChannelServices @Inject constructor(
-	@Named("TransactionManagerJDBC") private val repoManager: TransactionManager,
+	private val repoManager: TransactionManager,
 ): ChannelServicesInterface {
 	override fun createChannel(
 		owner: UInt,

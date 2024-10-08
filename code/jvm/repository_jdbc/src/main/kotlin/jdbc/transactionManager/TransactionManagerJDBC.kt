@@ -1,38 +1,27 @@
-package transactionManager.jdbc
+package jdbc.transactionManager
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import jakarta.inject.Inject
 import jakarta.inject.Named
-import org.example.transaction.Transaction
-import org.example.transaction.jdbc.TransactionJDBC
-import transactionManager.TransactionManager
+import Transaction
+import TransactionManager
 import java.sql.SQLException
 import javax.sql.DataSource
 
 /**
  * TransactionManager implementation using JDBC
- * @param dbUrl The connection URL for the database.
- * @param dbUser The username for the database.
- * @param dbPassword The password for the database.
- * @param poolSize The maximum number of connections to keep in the pool.
  */
 @Named("TransactionManagerJDBC")
-class TransactionManagerJDBC @Inject constructor(
-	@Named("DB_URL") dbUrl: String,
-	@Named("DB_USER") dbUser: String,
-	@Named("DB_PASSWORD") dbPassword: String,
-	@Named("POOL_SIZE") poolSize: Int? = null
-): TransactionManager {
+class TransactionManagerJDBC: TransactionManager {
 	private val dataSource: DataSource
 
 	init {
 		val config = HikariConfig().apply {
-			jdbcUrl = dbUrl
-			username = dbUser
-			password = dbPassword
+			jdbcUrl = System.getenv("DB_URL")
+			username = System.getenv("DB_USER")
+			password = System.getenv("DB_PASSWORD")
 			driverClassName = "org.postgresql.Driver"
-			maximumPoolSize = poolSize ?: 10
+			maximumPoolSize = System.getenv("POOL_SIZE")?.toInt() ?: 10
 		}
 		dataSource = HikariDataSource(config)
 	}
