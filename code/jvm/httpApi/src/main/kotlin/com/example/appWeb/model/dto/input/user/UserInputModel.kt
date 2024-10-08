@@ -1,6 +1,7 @@
 package com.example.appWeb.model.dto.input.user
 
-import jakarta.annotation.PostConstruct
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
 import model.Password
 
 /**
@@ -9,11 +10,7 @@ import model.Password
  * @param password The password
  */
 data class UserInputModel(
-	val username: String,
-	val password: Password,
-) {
-	@PostConstruct
-	fun validate() {
-		require(username.isNotBlank()) { "Username cannot be blank" }
-	}
-}
+	@get:NotBlank val username: String,
+	@get:NotBlank @get:Pattern(regexp = Password.PASSWORD_PATTERN)
+	val password: String,
+)

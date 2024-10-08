@@ -40,7 +40,7 @@ class UserController @Inject constructor(
 	) {
 		val response = userService.createUser(
 			username = user.username,
-			password = user.password.value
+			password = user.password
 		)
 		when (response) {
 			is Success -> {
