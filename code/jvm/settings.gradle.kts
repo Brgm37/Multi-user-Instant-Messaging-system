@@ -6,5 +6,5 @@ rootProject.name = "2024-daw-leic52d-im-i52d-2425-g04"
 include("domain")
 include("service")
 include("repository")
-include("appWeb")
-include("dataBase")
+include("httpApi")
+include("repository_jdbc")

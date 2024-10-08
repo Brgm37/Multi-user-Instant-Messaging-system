@@ -1,6 +1,7 @@
 /**
  * Generic repository interface for basic CRUD operations
  */
+//TODO: Check if is reasonable to return a sequence of entities in findAll method
 interface Repository<T> {
 
     /**
@@ -14,7 +15,7 @@ interface Repository<T> {
      * Retrieves all entities
      * @return A list with all entities
      */
-    fun findAll(): Sequence<T>
+    fun findAll(): List<T>
 
 	/**
      * Saves a new or existing entity

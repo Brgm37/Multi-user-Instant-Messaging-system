@@ -1,57 +1,75 @@
 package services
 
-import ChannelRepositoryInterface
+import errors.ChannelError
+import errors.ChannelError.*
 import interfaces.ChannelServicesInterface
-import interfaces.ownerInfo
-import model.AccessControl
-import model.Channel
-import model.ChannelName
-import model.Message
-import model.UserInfo
+import jakarta.inject.Inject
+import jakarta.inject.Named
+import model.*
+import TransactionManager
+import utils.Either
+import utils.failure
+import utils.success
 
-//TODO: Improve the implementation of the class
-//TODO: Better error handling
-class ChannelServices(
-	private val channelRepo: ChannelRepositoryInterface
+@Named("ChannelServices")
+class ChannelServices @Inject constructor(
+	@Named("TransactionManagerJDBC") private val repoManager: TransactionManager,
 ): ChannelServicesInterface {
 	override fun createChannel(
-		owner: ownerInfo,
+		owner: UInt,
 		name: String,
 		accessControl: String,
 		visibility: String,
-	): Channel {
-		val (ownerName, ownerId) = owner
-		require(name.isNotBlank()) { "Channel name cannot be blank" }
-		require(accessControl.isNotBlank()) { "Channel access control cannot be blank" }
-		require(visibility.isNotBlank()) { "Channel visibility cannot be blank" }
-		require(ownerId > 0u) { "Owner id must be greater than 0" }
-		require(ownerName.isNotBlank()) { "Owner username cannot be blank" }
-		val channel = Channel.createChannel(
-			owner = UserInfo(ownerId, ownerName),
-			name = ChannelName(name, ownerName),
-			accessControl = AccessControl.valueOf(accessControl),
-			visibility = visibility
-		)
-		return channelRepo.createChannel(channel)
+	): Either<ChannelError, Channel> {
+		if (name.isEmpty() || accessControl.isEmpty() || visibility.isEmpty()) {
+			return failure(InvalidChannelInfo)
+		}
+		if (accessControl.uppercase() !in AccessControl.entries.map(AccessControl::name)) {
+			return failure(InvalidChannelInfo)
+		}
+		if (visibility.uppercase() !in Visibility.entries.map(Visibility::name)) {
+			return failure(InvalidChannelInfo)
+		}
+		return repoManager.run {
+			val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
+			val id = requireNotNull(user.uId) { "User id is null" }
+			val channel = Channel.createChannel(
+				owner = UserInfo(id, user.username),
+				name = ChannelName(name, user.username),
+				accessControl = AccessControl.valueOf(accessControl.uppercase()),
+				visibility = Visibility.valueOf(visibility.uppercase())
+			)
+			success(channelRepo.createChannel(channel))
+		}
 	}
 
-	override fun deleteChannel(id: UInt) {
-		channelRepo.deleteById(id)
-	}
+	override fun deleteChannel(id: UInt): Either<ChannelError, Unit> =
+		repoManager
+			.run {
+				channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
+				channelRepo.deleteById(id)
+				success(Unit)
+			}
 
-	override fun getChannel(id: UInt): Channel {
-		return channelRepo.findById(id) ?: throw NoSuchElementException("Channel not found.")
-	}
+	override fun getChannel(id: UInt): Either<ChannelError, Channel> =
+		repoManager
+			.run {
+				val channel = channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
+				success(channel)
+			}
 
-	override fun getChannels(owner: UInt): Sequence<Channel> {
+	override fun getChannels(owner: UInt): Either<UnableToGetChannel, Sequence<Channel>> {
 		TODO("Not yet implemented")
 	}
 
-	override fun getChannels(): Sequence<Channel> {
-		return channelRepo.findAll()
-	}
+	override fun getChannels(): Either<ChannelError, List<Channel>> =
+		repoManager
+			.run {
+				val channels = channelRepo.findAll()
+				success(channels)
+			}
 
-	override fun latestMessages(id: UInt, quantity: Int): Sequence<Message> {
+	override fun latestMessages(id: UInt, quantity: Int): Either<ChannelError, List<Message>> {
 		TODO("Not yet implemented")
 	}
 }

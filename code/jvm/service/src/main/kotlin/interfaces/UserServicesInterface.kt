@@ -1,6 +1,7 @@
 package interfaces
 
 import errors.Error
+import errors.UserError
 import model.User
 import utils.Either
 
@@ -16,7 +17,7 @@ interface UserServicesInterface {
 	 */
 	fun createUser(
 		user: User
-	): Either<Error, User>
+	): Either<UserError, User>
 
 	/**
 	 * Deletes a user.
@@ -24,7 +25,7 @@ interface UserServicesInterface {
 	 */
 	fun deleteUser(
 		id: UInt
-	): Either<Error, String>
+	): Either<UserError, Unit>
 
 	/**
 	 * Gets a user by its id.
@@ -32,7 +33,7 @@ interface UserServicesInterface {
 	 */
 	fun getUser(
 		id: UInt
-	): Either<Error, User>
+	): Either<UserError, User>
 
 	/**
 	 * Associates a user to a channel.
@@ -42,5 +43,5 @@ interface UserServicesInterface {
 	fun joinChannel(
 		userId: UInt,
 		channelId: UInt
-	): Either<Error, String>
+	): Either<Error, Unit>
 }

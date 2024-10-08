@@ -2,6 +2,7 @@ package model
 
 import model.AccessControl.READ_ONLY
 import model.AccessControl.READ_WRITE
+import model.Visibility.PUBLIC
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
@@ -46,7 +47,7 @@ class ChannelTest {
 			owner = UserInfo(uId = 1u, username = "username"),
 			name = ChannelName(name = "channelName", ownerName = "ownerName"),
 			accessControl = READ_WRITE,
-			visibility = "public"
+			visibility = PUBLIC
 		)
 		assert(channel is Channel.Public)
 	}

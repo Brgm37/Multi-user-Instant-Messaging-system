@@ -1,20 +1,22 @@
 package services
 
+import TransactionManager
+import errors.ChannelError
 import io.mockk.*
-import ChannelRepositoryInterface
-import UserRepositoryInterface
-import errors.Error
+import errors.ChannelError.ChannelNotFound
+import errors.UserError
 import model.*
 import org.eclipse.jetty.util.security.Password
 import org.junit.jupiter.api.BeforeEach
 import utils.Either
+import utils.failure
+import utils.success
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class UserServicesTest {
 
-	private lateinit var userRepo: UserRepositoryInterface
-	private lateinit var channelRepo: ChannelRepositoryInterface
+	private lateinit var tm: TransactionManager
 	private lateinit var userServices: UserServices
 
 	private val passwordDefault = Password("password")
@@ -30,82 +32,75 @@ class UserServicesTest {
 
 	@BeforeEach
 	fun setup() {
-		userRepo = mockk()
-		channelRepo = mockk()
-		userServices = UserServices(userRepo, channelRepo)
+		tm = mockk()
+		userServices = UserServices(tm)
 	}
 
 	@Test
 	fun `create a new user should return the user created with uID attribute`() {
 		val user = userDefault
-		every { userRepo.createUser(user) } returns userWithIdDefault
+		every { tm.run<Either<UserError, User>>(any()) } returns success(userWithIdDefault)
 
-		val userCreated = userServices.createUser(user) as Either.Right
-		val userId = userCreated.value.uId
+			val userCreated = userServices.createUser(user) as Either.Right
+			val userId = userCreated.value.uId
 
-		assertEquals(uIdDefault, userId)
+			assertEquals(uIdDefault, userId)
 
-		verify { userRepo.createUser(user) }
+			verify { tm.run<Either<UserError, User>>(any()) }
 	}
 
 	@Test
 	fun `trying to create a user that already exists should return an error`() {
 		val user = userDefault
-		every { userRepo.createUser(user) } returns null
+		every { tm.run<Either<UserError, User>>(any()) } returns failure(UserError.UserAlreadyExists)
 
 		val userCreated = userServices.createUser(user) as Either.Left
 		val error = userCreated.value
 
-		assertEquals(Error.UserAlreadyExists, error)
+		assertEquals(UserError.UserAlreadyExists, error)
 
-		verify { userRepo.createUser(user) }
+		verify { tm.run<Either<UserError, User>>(any()) }
 	}
 
 	@Test
 	fun `successfully joining a channel should return a success message`() {
 		val userId = uIdDefault
 		val channelId = cIdDefault
-		every { userRepo.findById(userId) } returns userWithIdDefault
-		every { channelRepo.findById(channelId) } returns channelDefault
-		every { userRepo.joinChannel(userId, channelId) } just Runs
+		every { tm.run<Either<UserError, Unit>>(any()) } returns success(Unit)
 
 		val result = userServices.joinChannel(userId, channelId) as Either.Right
 		val message = result.value
 
-		assertEquals("User joined channel successfully", message)
+		assertEquals(Unit , message)
 
-		verify { userRepo.findById(userId) }
-		verify { channelRepo.findById(channelId) }
-		verify { userRepo.joinChannel(userId, channelId) }
+		verify { tm.run<Either<UserError, Unit>>(any()) }
 	}
 
 	@Test
 	fun `trying to join a channel with a user that does not exist should return an error`() {
 		val userId = uIdDefault
 		val channelId = cIdDefault
-		every { userRepo.findById(userId) } returns null
+		every { tm.run<Either<UserError, Unit>>(any()) } returns failure(UserError.UserNotFound)
 
 		val result = userServices.joinChannel(userId, channelId) as Either.Left
 		val error = result.value
 
-		assertEquals(Error.UserNotFound, error)
+		assertEquals(UserError.UserNotFound, error)
 
-		verify { userRepo.findById(userId) }
+		verify { tm.run<Either<UserError, Unit>>(any()) }
 	}
 
 	@Test
 	fun `trying to join a channel that does not exist should return an error`() {
 		val userId = uIdDefault
 		val channelId = cIdDefault
-		every { userRepo.findById(userId) } returns userWithIdDefault
-		every { channelRepo.findById(channelId) } returns null
+		every { tm.run<Either<ChannelError, Unit>>(any()) } returns failure(ChannelNotFound)
 
 		val result = userServices.joinChannel(userId, channelId) as Either.Left
 		val error = result.value
 
-		assertEquals(Error.ChannelNotFound, error)
+		assertEquals(ChannelNotFound, error)
 
-		verify { userRepo.findById(userId) }
-		verify { channelRepo.findById(channelId) }
+		verify { tm.run<Either<ChannelError, Unit>>(any()) }
 	}
 }
