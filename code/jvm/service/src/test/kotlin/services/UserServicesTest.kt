@@ -1,12 +1,12 @@
 package services
 
+import TransactionManager
 import errors.ChannelError
 import io.mockk.*
 import errors.ChannelError.ChannelNotFound
 import errors.UserError
 import model.*
 import org.eclipse.jetty.util.security.Password
-import transactionManager.TransactionManager
 import org.junit.jupiter.api.BeforeEach
 import utils.Either
 import utils.failure
