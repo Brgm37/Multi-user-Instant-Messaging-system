@@ -1,12 +1,12 @@
 package model
 
-import org.eclipse.jetty.util.security.Password
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
 class UserTest {
     private val uId: UInt = 1u
-    private val passwordTest = Password("password")
+	private val validPassword = "Password123"
+    private val passwordTest = Password(validPassword)
     private val usernameTest = "username"
     private val blankUsername = ""
     @Test

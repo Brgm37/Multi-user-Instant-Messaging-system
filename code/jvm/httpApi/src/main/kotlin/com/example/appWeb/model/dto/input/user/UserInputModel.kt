@@ -1,7 +1,7 @@
 package com.example.appWeb.model.dto.input.user
 
 import jakarta.annotation.PostConstruct
-import org.eclipse.jetty.util.security.Password
+import model.Password
 
 /**
  * Represents the input model for a user

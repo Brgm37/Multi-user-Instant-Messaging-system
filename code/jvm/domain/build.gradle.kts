@@ -12,8 +12,6 @@ repositories {
 
 dependencies {
 	testImplementation(kotlin("test"))
-	api("org.eclipse.jetty:jetty-security:12.0.10")
-	api(group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.5.+")
 }
 
 tasks.test {

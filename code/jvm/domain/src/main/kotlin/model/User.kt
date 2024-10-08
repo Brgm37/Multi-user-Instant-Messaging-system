@@ -1,6 +1,5 @@
 package model
 
-import org.eclipse.jetty.util.security.Password
 import java.util.*
 
 /**
