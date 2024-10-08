@@ -10,13 +10,12 @@ repositories {
 }
 
 dependencies {
-	api(project(":repository"))
-	implementation(project(":dataBase"))
-	implementation("com.zaxxer:HikariCP:5.0.1")
-	implementation("org.postgresql:postgresql:42.7.3")
     testImplementation(kotlin("test"))
+	api(project(":domain"))
+	implementation(project(":repository"))
+	implementation("com.zaxxer:HikariCP:5.1.0")
 	implementation("jakarta.inject:jakarta.inject-api:2.0.1")
-	implementation("jakarta.enterprise:jakarta.enterprise.cdi-api:4.0.1")
+	implementation(group = "org.postgresql", name = "postgresql", version = "42.+")
 }
 
 tasks.test {

@@ -25,9 +25,9 @@ class ChannelController @Inject constructor(
 	@Named("ChannelServices") private val channelService: ChannelServicesInterface
 ) {
 
-	@GetMapping("/channel/{id}")
-	fun getChannel(@PathVariable id: UInt) {
-		when (val response = channelService.getChannel(id)) {
+	@GetMapping(CHANNEL_ID_URL)
+	fun getChannel(@PathVariable channelId: UInt) {
+		when (val response = channelService.getChannel(channelId)) {
 			is Success -> {
 				ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
 			}
@@ -37,13 +37,12 @@ class ChannelController @Inject constructor(
 		}
 	}
 
-	@PostMapping("/channel/{id}")
+	@PostMapping(CHANNEL_BASE_URL)
 	fun createChannel(
-		@PathVariable id: UInt,
 		@Valid @RequestBody channel: ChannelInputModel
 	) {
 		val response = channelService.createChannel(
-			owner = id,
+			owner = channel.owner,
 			name = channel.name,
 			accessControl = channel.accessControl,
 			visibility = channel.visibility
@@ -60,5 +59,16 @@ class ChannelController @Inject constructor(
 				}
 			}
 		}
+	}
+
+	companion object {
+		/**
+		 * The base URL for the channel endpoints.
+		 */
+		const val CHANNEL_BASE_URL = "/channels"
+		/**
+		 * The URL for the channel with the given id.
+		 */
+		const val CHANNEL_ID_URL = "$CHANNEL_BASE_URL/{channelId}"
 	}
 }

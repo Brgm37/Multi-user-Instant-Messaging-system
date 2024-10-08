@@ -6,7 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import model.*
-import org.example.transactionManager.TransactionManager
+import TransactionManager
 import org.junit.jupiter.api.BeforeEach
 import utils.*
 import kotlin.test.Test
