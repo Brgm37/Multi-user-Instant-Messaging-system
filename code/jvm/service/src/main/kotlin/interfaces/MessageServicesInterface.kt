@@ -35,5 +35,5 @@ interface MessageServicesInterface {
 		id: UInt
 	): Either<Error, Message>
 
-	TODO(relocate get latest messages)
+	//TODO(relocate get latest messages)
 }

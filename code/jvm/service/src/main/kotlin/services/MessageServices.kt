@@ -17,7 +17,7 @@ class MessageServices(
 	override fun createMessage(msg: Message): Either<Error, Message> {
 		require(msg.msg.isNotBlank()) { "msg cannot be blank" }
 		require(msg.user.username.isNotBlank()) { "username cannot be blank" }
-		require(msg.channel.name.isNotBlank()) { "channel name cannot be blank" }
+		require(msg.channel.channelname.fullName.isNotBlank()) { "channel name cannot be blank" }
 		val createdMessage = messageRepo.createMessage(msg)
 		return success(createdMessage)	}
 
