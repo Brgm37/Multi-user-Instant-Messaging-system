@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     api(project(":domain"))
-    implementation(project(":transactionManager"))
+    api(project(":repository"))
     testImplementation(kotlin("test"))
 	testImplementation("io.mockk:mockk:1.13.12")
 	testImplementation("org.slf4j:slf4j-simple:1.7.32")
