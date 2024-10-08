@@ -65,18 +65,18 @@ class UserJDBC(
 		}
 	}
 
-	override fun findAll(): Sequence<User> {
+	override fun findAll(): List<User> {
 		val selectQuery = """
 				SELECT id, name, password, token
 				FROM users
 			""".trimIndent()
 		val stm = connection.prepareStatement(selectQuery)
 		val rs = stm.executeQuery()
-		return sequence {
-			while (rs.next()) {
-				yield(rs.toUser())
-			}
+		val users = mutableListOf<User>()
+		while (rs.next()) {
+			users.add(rs.toUser())
 		}
+		return users
 	}
 
 	override fun save(entity: User) {

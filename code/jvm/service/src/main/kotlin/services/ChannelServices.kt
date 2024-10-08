@@ -62,14 +62,14 @@ class ChannelServices @Inject constructor(
 		TODO("Not yet implemented")
 	}
 
-	override fun getChannels(): Either<ChannelError, Sequence<Channel>> =
+	override fun getChannels(): Either<ChannelError, List<Channel>> =
 		repoManager
 			.run {
 				val channels = channelRepo.findAll()
 				success(channels)
 			}
 
-	override fun latestMessages(id: UInt, quantity: Int): Sequence<Message> {
+	override fun latestMessages(id: UInt, quantity: Int): Either<ChannelError, List<Message>> {
 		TODO("Not yet implemented")
 	}
 }

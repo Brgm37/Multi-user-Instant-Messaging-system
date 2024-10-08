@@ -196,7 +196,7 @@ class ChannelJDBC(
 		}
 	}
 
-	override fun findAll(): Sequence<Channel> {
+	override fun findAll(): List<Channel> {
 		val selectQuery = """
 				SELECT 
 					channel_id, channel_name, channel_owner, channel_accessControl,
@@ -206,11 +206,11 @@ class ChannelJDBC(
 			""".trimIndent()
 		val stm = connection.prepareStatement(selectQuery)
 		val rs = stm.executeQuery()
-		return sequence {
-			while (rs.next()) {
-				yield(rs.toChannel())
-			}
+		val channels = mutableListOf<Channel>()
+		while (rs.next()) {
+			channels.add(rs.toChannel())
 		}
+		return channels
 	}
 
 	override fun save(entity: Channel) {

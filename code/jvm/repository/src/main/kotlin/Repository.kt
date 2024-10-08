@@ -15,7 +15,7 @@ interface Repository<T> {
      * Retrieves all entities
      * @return A list with all entities
      */
-    fun findAll(): Sequence<T>
+    fun findAll(): List<T>
 
 	/**
      * Saves a new or existing entity

@@ -51,7 +51,7 @@ interface ChannelServicesInterface {
 	/**
 	 * Gets all channels.
 	 */
-	fun getChannels(): Either<ChannelError, Sequence<Channel>>
+	fun getChannels(): Either<ChannelError, List<Channel>>
 
 	/**
 	 * Gets the latest messages of a channel.
@@ -61,5 +61,5 @@ interface ChannelServicesInterface {
 	fun latestMessages(
 		id: UInt,
 		quantity: Int
-	): Sequence<Message>
+	): Either<ChannelError, List<Message>>
 }
