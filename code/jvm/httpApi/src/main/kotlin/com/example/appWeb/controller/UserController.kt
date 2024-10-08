@@ -34,21 +34,18 @@ class UserController @Inject constructor(
 	@Named("UserServices") private val userService: UserServicesInterface
 ) {
 
-	@PostMapping("/users")
+	@PostMapping(USER_BASE_URL)
 	fun createUser(
 		@Valid @RequestBody user: UserInputModel
 	) {
 		val response = userService.createUser(
-			User(
-				username = user.username,
-				password = user.password
-			)
+			username = user.username,
+			password = user.password.value
 		)
 		when (response) {
 			is Success -> {
 				ResponseEntity.ok(UserAuthenticationOutputModel.fromDomain(response.value))
 			}
-
 			is Failure -> {
 				when (response.value) {
 					InvalidUserInfo -> Problem.InvalidUserInfo.response(BAD_REQUEST)
@@ -59,12 +56,13 @@ class UserController @Inject constructor(
 		}
 	}
 
-	@GetMapping("/users/{id}")
-	fun getUser(@PathVariable id: UInt) {
-		when (val response = userService.getUser(id)) {
+	@GetMapping(USER_ID_URL)
+	fun getUser(@PathVariable userId: UInt) {
+		when (val response = userService.getUser(userId)) {
 			is Success -> {
 				ResponseEntity.ok(UserInfoOutputModel.fromDomain(response.value))
 			}
+
 			is Failure -> {
 				Problem.UserNotFound.response(NOT_FOUND)
 			}
@@ -72,7 +70,7 @@ class UserController @Inject constructor(
 
 	}
 
-	@PutMapping("/channels/{channelId}/users/{userId}")
+	@PutMapping(CHANNEL_ID_USER_ID_URL)
 	fun joinChannel(
 		@PathVariable channelId: UInt,
 		@PathVariable userId: UInt
@@ -89,5 +87,20 @@ class UserController @Inject constructor(
 				}
 			}
 		}
+	}
+
+	companion object {
+		/**
+		 * The base URL for the user endpoints.
+		 */
+		const val USER_BASE_URL = "/users"
+		/**
+		 * The URL for the user with the given id.
+		 */
+		const val USER_ID_URL = "$USER_BASE_URL/{userId}"
+		/**
+		 * The URL for the user with the given id and the channel with the given id.
+		 */
+		const val CHANNEL_ID_USER_ID_URL = "${ChannelController.CHANNEL_ID_URL}$USER_ID_URL"
 	}
 }

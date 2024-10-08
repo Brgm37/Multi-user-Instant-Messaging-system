@@ -7,4 +7,6 @@ abstract class UserError: Error() {
 	data object UserNotFound : UserError()
 	data object UserAlreadyExists : UserError()
 	data object InvalidUserInfo : UserError()
+	data object UsernameIsEmpty : UserError()
+	data object PasswordIsInvalid : UserError()
 }

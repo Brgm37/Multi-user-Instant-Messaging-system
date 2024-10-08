@@ -12,11 +12,12 @@ interface UserServicesInterface {
 
 	/**
 	 * Creates a new user.
-	 * @param user The user info to create.
-	 * @return The created [User].
+	 * @param username The username of the user.
+	 * @param password The password of the user.
 	 */
 	fun createUser(
-		user: User
+		username: String,
+		password: String,
 	): Either<UserError, User>
 
 	/**
@@ -24,7 +25,7 @@ interface UserServicesInterface {
 	 * @param id The id of the user to delete.
 	 */
 	fun deleteUser(
-		id: UInt
+		id: UInt,
 	): Either<UserError, Unit>
 
 	/**
@@ -32,7 +33,7 @@ interface UserServicesInterface {
 	 * @param id The id of the user to get.
 	 */
 	fun getUser(
-		id: UInt
+		id: UInt,
 	): Either<UserError, User>
 
 	/**
@@ -42,6 +43,6 @@ interface UserServicesInterface {
 	 */
 	fun joinChannel(
 		userId: UInt,
-		channelId: UInt
+		channelId: UInt,
 	): Either<Error, Unit>
 }

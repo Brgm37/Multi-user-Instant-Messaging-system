@@ -7,6 +7,7 @@ import errors.UserError
 import interfaces.UserServicesInterface
 import jakarta.inject.Inject
 import jakarta.inject.Named
+import model.Password
 import utils.Either
 import model.User
 import utils.failure
@@ -17,7 +18,16 @@ import utils.success
 class UserServices @Inject constructor(
 	@Named("TransactionManagerJDBC")  private val repoManager: TransactionManager,
 ): UserServicesInterface {
-	override fun createUser(user: User): Either<UserError, User> {
+	override fun createUser(
+		username: String,
+		password: String,
+	): Either<UserError, User> {
+		if (username.isEmpty()) return failure(UserError.UsernameIsEmpty)
+		if (!Password.isValidPassword(password)) return failure(UserError.PasswordIsInvalid)
+		val user = User(
+			username = username,
+			password = Password(password),
+		)
 		return repoManager.run {
 			val createdUser = userRepo.createUser(user) ?: return@run failure(UserError.UserAlreadyExists)
 			success(createdUser)
