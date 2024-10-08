@@ -52,8 +52,8 @@ class MessageJDBC (envName: String
 	override fun findById(id: UInt): Message? {
 		return connect { connection ->
 			val selectQuery = """
-				SELECT msgId, msgChannel, msgContent, msgAuthor, msgTimestamp,
-				 msgChannelName, authorUsername
+				SELECT msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
+				 msgChannelName, msgAuthorUsername
 				FROM v_message
 				WHERE id = ?
 			""".trimIndent()
@@ -70,8 +70,8 @@ class MessageJDBC (envName: String
 	override fun findAll(): Sequence<Message> {
 		return connect { connection ->
 			val selectQuery = """
-				SELECT msgId, msgChannel, msgContent, msgAuthor, msgTimestamp,
-				 msgChannelName, authorUsername
+				SELECT msgId, msgChannelId, msgContent, msgAuthor, msgTimestamp,
+				 msgChannelName, msgAuthorUsername
 				FROM v_message
 			""".trimIndent()
 			val stm = connection.prepareStatement(selectQuery)

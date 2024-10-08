@@ -14,14 +14,12 @@ join users u on c.owner = u.id;
 create or replace view v_message as
 select
     m.id as msgId,
-    m.channel as msgChannel,
-    m.author as msgAuthor,
+    m.channel as msgChannelId,
+    m.author as msgAuthorId,
     m.content as msgContent,
     m.timestamp as msgTimestamp,
-    c.id as msgChannelId,
     c.owner as msgChannelName,
-    u.id as authorId,
-    u.name as authorUsername
+    u.name as msgAuthorUsername
 from messages m
         join users u on m.author = u.id
         join channels c on m.channel = c.id;
