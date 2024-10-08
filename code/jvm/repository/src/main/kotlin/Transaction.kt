@@ -1,4 +1,4 @@
-package org.example.transaction
+package transaction
 
 import ChannelRepositoryInterface
 import UserRepositoryInterface
