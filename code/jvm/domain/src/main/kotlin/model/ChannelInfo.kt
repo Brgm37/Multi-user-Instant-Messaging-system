@@ -11,7 +11,5 @@ data class ChannelInfo(
 	val uId: UInt,
 	val channelname: ChannelName,
 ) {
-	init {
-		require(channelname.isNotBlank()) { "channelname must not be blank." }
-	}
+
 }
