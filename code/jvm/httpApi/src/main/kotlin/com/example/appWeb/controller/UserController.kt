@@ -72,7 +72,7 @@ class UserController @Inject constructor(
 
 	}
 
-	@PutMapping("/channels/{channelId}/{userId}")
+	@PutMapping("/channels/{channelId}/users/{userId}")
 	fun joinChannel(
 		@PathVariable channelId: UInt,
 		@PathVariable userId: UInt
