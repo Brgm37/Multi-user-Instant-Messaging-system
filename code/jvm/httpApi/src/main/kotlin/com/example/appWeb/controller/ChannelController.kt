@@ -20,6 +20,11 @@ import org.springframework.web.bind.annotation.RequestBody
 import utils.Failure
 import utils.Success
 
+/**
+ * Controller for the channel endpoints.
+ *
+ * @property channelService The service for the channel endpoints.
+ */
 @Controller
 class ChannelController @Inject constructor(
 	@Named("ChannelServices") private val channelService: ChannelServicesInterface

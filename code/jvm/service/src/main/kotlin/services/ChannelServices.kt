@@ -13,7 +13,7 @@ import utils.success
 
 @Named("ChannelServices")
 class ChannelServices @Inject constructor(
-	private val repoManager: TransactionManager,
+	@Named("TransactionManagerJDBC") private val repoManager: TransactionManager,
 ): ChannelServicesInterface {
 	override fun createChannel(
 		owner: UInt,
