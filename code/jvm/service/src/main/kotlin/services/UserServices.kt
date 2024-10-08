@@ -1,5 +1,6 @@
 package services
 
+import TransactionManager
 import errors.ChannelError
 import errors.Error
 import errors.UserError
@@ -8,7 +9,6 @@ import jakarta.inject.Inject
 import jakarta.inject.Named
 import utils.Either
 import model.User
-import transactionManager.TransactionManager
 import utils.failure
 import utils.success
 
