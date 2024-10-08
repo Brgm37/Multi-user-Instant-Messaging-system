@@ -19,8 +19,17 @@ sealed class Problem(
 			.header("Content-Type", MEDIA_TYPE)
 			.body(this)
 
+	//TODO(implement ChannelProblem, UserProblem, etc.)
+	//chanel
 	data object ChannelNotFound : Problem(URI("$PROBLEM_URI_PATH/channel-not-found"))
 	data object InvalidChannelInfo : Problem(URI("$PROBLEM_URI_PATH/invalid-channel-info"))
-	data object UserNotFound : Problem(URI("$PROBLEM_URI_PATH/user-not-found"))
+
 	data object UnableToCreateChannel : Problem(URI("$PROBLEM_URI_PATH/unable-to-create-channel"))
+
+	//user
+	data object InvalidUserInfo : Problem(URI("$PROBLEM_URI_PATH/invalid-user-info"))
+	data object UserAlreadyExists : Problem(URI("$PROBLEM_URI_PATH/user-already-exists"))
+	data object UserNotFound : Problem(URI("$PROBLEM_URI_PATH/user-not-found"))
+	data object UnableToCreateUser : Problem(URI("$PROBLEM_URI_PATH/unable-to-create-user"))
+	data object UnableToJoinChannel : Problem(URI("$PROBLEM_URI_PATH/unable-to-join-channel"))
 }

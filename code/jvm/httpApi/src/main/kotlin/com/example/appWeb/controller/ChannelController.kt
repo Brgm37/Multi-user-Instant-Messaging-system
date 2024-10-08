@@ -1,7 +1,7 @@
 package com.example.appWeb.controller
 
-import com.example.appWeb.model.dto.input.ChannelInputModel
-import com.example.appWeb.model.dto.output.ChannelOutputModel
+import com.example.appWeb.model.dto.input.channel.ChannelInputModel
+import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import com.example.appWeb.model.problem.Problem
 import errors.ChannelError.InvalidChannelInfo
 import errors.ChannelError.UserNotFound
@@ -21,9 +21,9 @@ import utils.Failure
 import utils.Success
 
 /**
- * Controller for the channel endpoints.
+ * Represents the controller for the channel
  *
- * @property channelService The service for the channel endpoints.
+ * @param channelService The channel service
  */
 @Controller
 class ChannelController @Inject constructor(
