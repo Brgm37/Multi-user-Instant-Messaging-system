@@ -11,27 +11,26 @@ class MessageJDBC (envName: String
 ) : MessageRepositoryInterface, JDBC(envName) {
 
 	private fun ResultSet.toMessage(): Message {
-		val sender = UserInfo(
-			uId = getInt("senderId").toUInt(),
-			username = getString("senderUsername"),
+		val author = UserInfo(
+			uId = getInt("authorId").toUInt(),
+			username = getString("authorUsername"),
 		)
-		val receiver = ChannelName(
-			name = getString("receiverName"),
-			ownerName = getString("receiverOwnerName"),
+		val channel = ChannelInfo( uId = getInt("msgChannelId").toUInt(),
+			getString("msgChannelName").toChannelName())
 		)
 		return Message(
-			msgId = getInt("id").toUInt(),
-			msg = getString("message"),
-			user = sender,
-			channel = receiver,
-			creationTime = getTimestamp("creationTime").toLocalDateTime(),
+			id = getInt("msgId").toUInt(),
+			content = getString("msgContent"),
+			author = author,
+			channel = channel,
+			timestamp = getTimestamp("msgTimestamp").toLocalDateTime()
 		)
 	}
 
 	override fun createMessage(message: Message): Message {
 		return connect { connection ->
 			val insertQuery = """
-				INSERT INTO messages (msg, user, channel, creationTime)
+				INSERT INTO messages (content, author, channel, timestamp)
 				VALUES (?, ?, ?, ?) RETURNING id
 			""".trimIndent()
 			val stm = connection.prepareStatement(insertQuery)
@@ -39,7 +38,7 @@ class MessageJDBC (envName: String
 			stm.setString(idx++, message.msg)
 			stm.setString(idx++, message.user.username)
 			stm.setString(idx++, message.channel.name)
-			stm.setString(idx++, message.creationTime.toString())
+			stm.setString(idx, message.creationTime.toString())
 			val rs = stm.executeQuery()
 			if (rs.next()) {
 				return@connect message.copy(msgId = rs.getInt("id").toUInt())
@@ -48,13 +47,14 @@ class MessageJDBC (envName: String
 			}
 		}
 	}
-	//TODO: falar com arthur sobre channel id
+	//TODO: falar com arthur sobre channel id -- msgchannel equivalente a msgChannelID
+	//caso dele channel_owner -> owner_id
 	override fun findById(id: UInt): Message? {
 		return connect { connection ->
 			val selectQuery = """
-				SELECT id, message, senderId, senderUsername, receiverName,
-				 receiverOwnerName, creationTime
-				FROM messages
+				SELECT msgId, msgChannel, msgContent, msgAuthor, msgTimestamp,
+				 msgChannelName, authorUsername
+				FROM v_message
 				WHERE id = ?
 			""".trimIndent()
 			val stm = connection.prepareStatement(selectQuery)
@@ -70,9 +70,9 @@ class MessageJDBC (envName: String
 	override fun findAll(): Sequence<Message> {
 		return connect { connection ->
 			val selectQuery = """
-				SELECT id, message, senderId, senderUsername, receiverName,
-				 receiverOwnerName, creationTime
-				FROM messages
+				SELECT msgId, msgChannel, msgContent, msgAuthor, msgTimestamp,
+				 msgChannelName, authorUsername
+				FROM v_message
 			""".trimIndent()
 			val stm = connection.prepareStatement(selectQuery)
 			val rs = stm.executeQuery()
@@ -89,7 +89,7 @@ class MessageJDBC (envName: String
 		connect { connection ->
 			val updateQuery = """
                 UPDATE messages
-                SET msg = ?, user = ?, channel = ?, creationTime = ?
+                SET channel = ?, author = ?, content = ?, timestamp = ?
                 WHERE id = ?
             """.trimIndent()
 			val stm = connection.prepareStatement(updateQuery)
@@ -98,7 +98,8 @@ class MessageJDBC (envName: String
 			stm.setString(idx++, entity.user.username)
 			stm.setString(idx++, entity.channel.name)
 			stm.setString(idx++, entity.creationTime.toString())
-			//TODO id not null + set int
+			val id = requireNotNull(entity.id) { "Message id is null"}
+			stm.setInt(idx, id.toInt())
 			stm.executeUpdate()
 		}
 	}

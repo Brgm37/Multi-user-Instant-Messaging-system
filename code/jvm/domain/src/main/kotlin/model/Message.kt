@@ -16,7 +16,7 @@ data class Message(
 	val msgId: UInt? = null,
 	val msg: String,
 	val user: UserInfo,
-	val channel: ChannelName,
+	val channel: ChannelInfo,
 	val creationTime: LocalDateTime
 ){
 	init {

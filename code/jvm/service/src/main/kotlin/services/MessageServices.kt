@@ -30,9 +30,4 @@ class MessageServices(
 		val msg = messageRepo.findById(id) ?: return failure(Error.MessageNotFound)
 		return success(msg)
 	}
-
-//	override fun getUserMessages(userId: UInt): Either<Error, Sequence<Message>> {
-//		val user = userRepo.findById(userId) ?: return failure(Error.UserNotFound)
-//		TODO()
-//	}
 }

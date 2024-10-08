@@ -9,7 +9,7 @@ class MessageTest {
 	private val msgId: UInt = 1u
 	private val msg: String = "Hello World"
 	private val user: UserInfo = UserInfo(1u, "user1")
-	private val channel: ChannelName = ChannelName("channel1", "user2")
+	private val channel: ChannelInfo = ChannelInfo(1u, ChannelName("channel1", "user2"))
 	private val creationTime: LocalDateTime = LocalDateTime.now()
 
 	@Test

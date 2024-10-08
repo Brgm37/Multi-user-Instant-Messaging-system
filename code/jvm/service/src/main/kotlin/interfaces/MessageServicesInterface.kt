@@ -34,12 +34,6 @@ interface MessageServicesInterface {
 	fun getMessage(
 		id: UInt
 	): Either<Error, Message>
-//
-//	/**
-//	 * Gets all the messages from a user by its id.
-//	 * @param userId The id of the user.
-//	 */
-//	fun getUserMessages(
-//		userId: UInt
-//	): Either<Error, Sequence<Message>>
+
+	TODO(relocate get latest messages)
 }
