@@ -5,6 +5,8 @@ import com.zaxxer.hikari.HikariDataSource
 import jakarta.inject.Named
 import Transaction
 import TransactionManager
+import jakarta.inject.Inject
+import jdbc.transactionManager.dataSource.ConnectionSource
 import java.sql.SQLException
 import javax.sql.DataSource
 
@@ -12,16 +14,17 @@ import javax.sql.DataSource
  * TransactionManager implementation using JDBC
  */
 @Named("TransactionManagerJDBC")
-class TransactionManagerJDBC: TransactionManager {
+class TransactionManagerJDBC @Inject constructor(
+	@Named("PostgresSQLConnectionSource") private val dS: ConnectionSource
+): TransactionManager {
 	private val dataSource: DataSource
-
 	init {
 		val config = HikariConfig().apply {
-			jdbcUrl = System.getenv("DB_URL")
-			username = System.getenv("DB_USER")
-			password = System.getenv("DB_PASSWORD")
+			jdbcUrl = dS.connectionUrl
+			username = dS.username
+			password = dS.password
 			driverClassName = "org.postgresql.Driver"
-			maximumPoolSize = System.getenv("POOL_SIZE")?.toInt() ?: 10
+			maximumPoolSize = dS.poolSize
 		}
 		dataSource = HikariDataSource(config)
 	}
