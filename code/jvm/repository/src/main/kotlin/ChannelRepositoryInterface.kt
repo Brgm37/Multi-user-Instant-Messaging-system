@@ -10,4 +10,11 @@ interface ChannelRepositoryInterface : Repository<Channel> {
 	 * @return The created channel with its ID
 	 */
 	fun createChannel(channel: Channel): Channel
+
+	/**
+	 * Retrieves all channels owned by a user
+	 * @param userId The ID of the user
+	 * @return A list with all channels owned by the user
+	 */
+	fun findByUserId(userId: UInt): List<Channel>
 }
