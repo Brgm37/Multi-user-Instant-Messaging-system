@@ -1,7 +1,6 @@
 package services
 
 import errors.ChannelError
-import interfaces.ChannelServicesInterface
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -16,10 +15,10 @@ import kotlin.test.assertIs
 class ChannelServicesTest {
 
 	private lateinit var transactionManager: TransactionManager
-	private lateinit var channelServices: ChannelServicesInterface
+	private lateinit var channelServices: ChannelServices
 
 	@BeforeEach
-	fun setup() {
+	fun setUp() {
 		transactionManager = mockk()
 		channelServices = ChannelServices(transactionManager)
 	}

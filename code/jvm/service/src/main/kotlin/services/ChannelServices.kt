@@ -58,9 +58,14 @@ class ChannelServices @Inject constructor(
 				success(channel)
 			}
 
-	override fun getChannels(owner: UInt): Either<UnableToGetChannel, Sequence<Channel>> {
-		TODO("Not yet implemented")
-	}
+	override fun getChannels(owner: UInt): Either<ChannelError, List<Channel>> =
+		repoManager
+			.run {
+				val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
+				val id = requireNotNull(user.uId) { "User id is null" }
+				val channels = channelRepo.findByUserId(id)
+				success(channels)
+			}
 
 	override fun getChannels(): Either<ChannelError, List<Channel>> =
 		repoManager

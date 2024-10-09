@@ -46,7 +46,7 @@ interface ChannelServicesInterface {
 	 */
 	fun getChannels(
 		owner: UInt
-	): Either<ChannelError, Sequence<Channel>>
+	): Either<ChannelError, List<Channel>>
 
 	/**
 	 * Gets all channels.
