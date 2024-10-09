@@ -22,34 +22,6 @@ private const val CHANNELS_TABLE = "channels"
  */
 private const val CHANNELS_TABLE_ID = "id"
 
-///**
-// * The name of the column in the table [CHANNELS_TABLE].
-// *
-// * @property CHANNELS_TABLE_OWNER The name of the column in the table [CHANNELS_TABLE].
-// */
-//private const val CHANNELS_TABLE_OWNER = "owner"
-//
-///**
-// * The name of the column in the table [CHANNELS_TABLE].
-// *
-// * @property CHANNELS_TABLE_NAME The name of the column in the table [CHANNELS_TABLE].
-// */
-//private const val CHANNELS_TABLE_NAME = "name"
-//
-///**
-// * The name of the column in the table [CHANNELS_TABLE].
-// *
-// * @property CHANNELS_TABLE_ACCESS_CONTROL The name of the column in the table [CHANNELS_TABLE].
-// */
-//private const val CHANNELS_TABLE_ACCESS_CONTROL = "accessControl"
-//
-///**
-// * The name of the column in the table [CHANNELS_TABLE].
-// *
-// * @property CHANNELS_TABLE_VISIBILITY The name of the column in the table [CHANNELS_TABLE].
-// */
-//private const val CHANNELS_TABLE_VISIBILITY = "visibility"
-
 /**
  * The name of the view in the database.
  *
@@ -99,34 +71,6 @@ private const val CHANNELS_VIEW_VISIBILITY = "channel_visibility"
  */
 private const val CHANNELS_VIEW_OWNER_NAME = "owner_name"
 
-///**
-// * The name of the table in the database.
-// *
-// * @property CHANNEL_MEMBERS_TABLE The name of the table in the database.
-// */
-//private const val CHANNEL_MEMBERS_TABLE = "channel_members"
-
-///**
-// * The name of the column in the table [CHANNEL_MEMBERS_TABLE].
-// *
-// * @property CHANNEL_MEMBERS_TABLE_MEMBER The name of the column in the table [CHANNEL_MEMBERS_TABLE].
-// */
-//private const val CHANNEL_MEMBERS_TABLE_MEMBER = "member"
-//
-///**
-// * The name of the column in the table [CHANNEL_MEMBERS_TABLE].
-// *
-// * @property CHANNEL_MEMBERS_TABLE_CHANNEL The name of the column in the table [CHANNEL_MEMBERS_TABLE].
-// */
-//private const val CHANNEL_MEMBERS_TABLE_CHANNEL = "channel"
-//
-///**
-// * The name of the column in the table [CHANNEL_MEMBERS_TABLE].
-// *
-// * @property CHANNEL_MEMBERS_TABLE_ID The name of the column in the table [CHANNEL_MEMBERS_TABLE].
-// */
-//private const val CHANNEL_MEMBERS_TABLE_ID = "id"
-
 /**
  * A JDBC implementation of the [ChannelRepositoryInterface].
  * @property connection The connection to the database.
@@ -135,7 +79,9 @@ private const val CHANNELS_VIEW_OWNER_NAME = "owner_name"
 class ChannelJDBC(
 	private val connection: Connection
 ) : ChannelRepositoryInterface {
-
+	/**
+	 * Converts the [ResultSet] to a [Channel].
+	 */
 	private fun ResultSet.toChannel(): Channel {
 		val id = getInt(CHANNELS_VIEW_ID).toUInt()
 		val owner = UserInfo(
@@ -154,6 +100,9 @@ class ChannelJDBC(
 		)
 	}
 
+	/**
+	 * Converts the [ResultSet] to a list of [Channel].
+	 */
 	private fun ResultSet.toChannelList(): List<Channel> {
 		val channels = mutableListOf<Channel>()
 		while (next()) {
@@ -162,20 +111,33 @@ class ChannelJDBC(
 		return channels
 	}
 
+	/**
+	 * Sets the information of the [Channel] in the [PreparedStatement].
+	 *
+	 * @param channel The [Channel] to set the information.
+	 */
+	private fun PreparedStatement.setInfo(channel: Channel) {
+		var idx = 1
+		setInt(idx++, channel.owner.uId.toInt())
+		setString(idx++, channel.name.fullName)
+		setString(idx++, channel.accessControl.toString())
+		when (channel) {
+			is Channel.Public -> { setString(idx++, PUBLIC.name) }
+			is Channel.Private -> { setString(idx++, PRIVATE.name) }
+		}
+		val id = channel.id
+		if (id != null) {
+			setInt(idx, id.toInt())
+		}
+	}
+
 	override fun createChannel(channel: Channel): Channel {
 		val insertQuery = """
                 INSERT INTO channels (owner, name, accessControl, visibility)
                 VALUES (?, ?, ?, ?) RETURNING id
             """.trimIndent()
 		val stm = connection.prepareStatement(insertQuery)
-		var idx = 1
-		stm.setInt(idx++, channel.owner.uId.toInt())
-		stm.setString(idx++, channel.name.fullName)
-		stm.setString(idx++, channel.accessControl.toString())
-		when (channel) {
-			is Channel.Public -> { stm.setString(idx, PUBLIC.name) }
-			is Channel.Private -> { stm.setString(idx, PRIVATE.name) }
-		}
+		stm.setInfo(channel)
 		val rs = stm.executeQuery()
 		if (rs.next()) {
 			return when (channel) {
@@ -239,16 +201,7 @@ class ChannelJDBC(
                 WHERE id = ?
             """.trimIndent()
 		val stm = connection.prepareStatement(updateQuery)
-		var idx = 1
-		stm.setInt(idx++, entity.owner.uId.toInt())
-		stm.setString(idx++, entity.name.fullName)
-		stm.setString(idx++, entity.accessControl.toString())
-		when (entity) {
-			is Channel.Public -> { stm.setString(idx++, PUBLIC.name) }
-			is Channel.Private -> { stm.setString(idx++, PRIVATE.name) }
-		}
-		val id = requireNotNull(entity.id) { "Channel id is null" }
-		stm.setInt(idx, id.toInt())
+		stm.setInfo(entity)
 		stm.executeUpdate()
 	}
 
@@ -262,6 +215,7 @@ class ChannelJDBC(
 		stm.executeUpdate()
 	}
 
+	@Suppress("SqlWithoutWhere")
 	override fun clear() {
 		val deleteQuery = """
 				DELETE FROM channels
