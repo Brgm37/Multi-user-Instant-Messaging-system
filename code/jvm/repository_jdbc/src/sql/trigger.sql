@@ -32,3 +32,22 @@ $$ language plpgsql;
 create or replace trigger tr_channel_update after update on channels
     for each statement
 execute function remake_channel_view();
+
+create or replace trigger tr_channel_update after insert on channels
+    for each statement
+execute function remake_channel_view();
+
+create or replace trigger tr_channel_update after delete on channels
+    for each statement
+execute function remake_channel_view();
+
+create or replace function f_channel_delete() returns trigger as $$
+begin
+    delete from channel_members where channel = old.id;
+    return old;
+end;
+$$ language plpgsql;
+
+create or replace trigger tr_channel_delete before delete on channels
+    for each row
+execute function f_channel_delete();
