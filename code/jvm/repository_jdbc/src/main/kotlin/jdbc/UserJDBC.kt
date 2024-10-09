@@ -112,4 +112,12 @@ class UserJDBC(
 		stmUsers.executeUpdate()
 	}
 
+	override fun clear() {
+		val deleteFromUsersQuery = """
+			DELETE FROM users
+		""".trimIndent()
+
+		val stmUsers = connection.prepareStatement(deleteFromUsersQuery)
+		stmUsers.executeUpdate()
+	}
 }

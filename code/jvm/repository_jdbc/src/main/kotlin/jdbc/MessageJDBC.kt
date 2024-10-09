@@ -5,6 +5,7 @@ import model.*
 import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.SQLException
+import java.sql.Timestamp
 
 /**
  * MessageJDBC is a JDBC implementation of MessageRepositoryInterface
@@ -39,9 +40,9 @@ class MessageJDBC (
 		val stm = connection.prepareStatement(insertQuery)
 		var idx = 1
 		stm.setString(idx++, message.msg)
-		stm.setString(idx++, message.user.username)
-		stm.setString(idx++, message.channel.channelname.fullName)
-		stm.setString(idx, message.creationTime.toString())
+		stm.setInt(idx++, message.user.uId.toInt())
+		stm.setInt(idx++, message.channel.uId.toInt())
+		stm.setTimestamp(idx, Timestamp.valueOf(message.creationTime))
 		val rs = stm.executeQuery()
 		if (rs.next()) {
 			return message.copy(msgId = rs.getInt("id").toUInt())
@@ -105,6 +106,14 @@ class MessageJDBC (
 		""".trimIndent()
 		val stm = connection.prepareStatement(deleteQuery)
 		stm.setInt(1, id.toInt())
+		stm.executeUpdate()
+	}
+
+	override fun clear() {
+		val deleteQuery = """
+			DELETE FROM messages
+		""".trimIndent()
+		val stm = connection.prepareStatement(deleteQuery)
 		stm.executeUpdate()
 	}
 

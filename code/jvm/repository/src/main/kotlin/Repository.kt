@@ -1,7 +1,6 @@
 /**
  * Generic repository interface for basic CRUD operations
  */
-//TODO: Check if is reasonable to return a sequence of entities in findAll method
 interface Repository<T> {
 
     /**
@@ -28,4 +27,9 @@ interface Repository<T> {
      * @param id The entity to delete
      */
     fun deleteById(id: UInt)
+
+	/**
+	 * Deletes all entities
+	 */
+	fun clear()
 }

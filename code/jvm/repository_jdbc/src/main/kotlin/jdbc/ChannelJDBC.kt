@@ -5,6 +5,7 @@ import model.*
 import model.Visibility.PRIVATE
 import model.Visibility.PUBLIC
 import java.sql.Connection
+import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
 
@@ -153,6 +154,14 @@ class ChannelJDBC(
 		)
 	}
 
+	private fun ResultSet.toChannelList(): List<Channel> {
+		val channels = mutableListOf<Channel>()
+		while (next()) {
+			channels.add(toChannel())
+		}
+		return channels
+	}
+
 	override fun createChannel(channel: Channel): Channel {
 		val insertQuery = """
                 INSERT INTO channels (owner, name, accessControl, visibility)
@@ -160,7 +169,7 @@ class ChannelJDBC(
             """.trimIndent()
 		val stm = connection.prepareStatement(insertQuery)
 		var idx = 1
-		stm.setString(idx++, channel.owner.username)
+		stm.setInt(idx++, channel.owner.uId.toInt())
 		stm.setString(idx++, channel.name.fullName)
 		stm.setString(idx++, channel.accessControl.toString())
 		when (channel) {
@@ -176,6 +185,20 @@ class ChannelJDBC(
 		} else {
 			throw SQLException("Failed to create channel")
 		}
+	}
+
+	override fun findByUserId(userId: UInt): List<Channel> {
+		val selectQuery = """
+				SELECT 
+					channel_id, channel_name, channel_owner, channel_accessControl,
+					channel_visibility, owner_name
+				FROM v_channel
+				WHERE channel_owner = ?
+			""".trimIndent()
+		val stm = connection.prepareStatement(selectQuery)
+		stm.setInt(1, userId.toInt())
+		val rs = stm.executeQuery()
+		return rs.toChannelList()
 	}
 
 	override fun findById(id: UInt): Channel? {
@@ -206,11 +229,7 @@ class ChannelJDBC(
 			""".trimIndent()
 		val stm = connection.prepareStatement(selectQuery)
 		val rs = stm.executeQuery()
-		val channels = mutableListOf<Channel>()
-		while (rs.next()) {
-			channels.add(rs.toChannel())
-		}
-		return channels
+		return rs.toChannelList()
 	}
 
 	override fun save(entity: Channel) {
@@ -221,8 +240,8 @@ class ChannelJDBC(
             """.trimIndent()
 		val stm = connection.prepareStatement(updateQuery)
 		var idx = 1
-		stm.setString(idx++, entity.owner.username)
-		stm.setString(idx++, entity.name.name)
+		stm.setInt(idx++, entity.owner.uId.toInt())
+		stm.setString(idx++, entity.name.fullName)
 		stm.setString(idx++, entity.accessControl.toString())
 		when (entity) {
 			is Channel.Public -> { stm.setString(idx++, PUBLIC.name) }
@@ -241,5 +260,22 @@ class ChannelJDBC(
 		val stm = connection.prepareStatement(deleteQuery)
 		stm.setInt(1, id.toInt())
 		stm.executeUpdate()
+	}
+
+	override fun clear() {
+		val deleteQuery = """
+				DELETE FROM channels
+			""".trimIndent()
+
+		val deleteFromChannelMembersQuery = """
+			DELETE FROM channel_members
+		""".trimIndent()
+
+		connection
+			.prepareStatement(deleteFromChannelMembersQuery)
+			.executeUpdate()
+		connection
+			.prepareStatement(deleteQuery)
+			.executeUpdate()
 	}
 }
