@@ -17,7 +17,7 @@ data class Message(
 	val msg: String,
 	val user: UserInfo,
 	val channel: ChannelInfo,
-	val creationTime: LocalDateTime
+	val creationTime: LocalDateTime = LocalDateTime.now()
 ){
 	init {
 		require(msg.isNotBlank()) { "The message cannot be empty." }

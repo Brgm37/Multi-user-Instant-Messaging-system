@@ -30,5 +30,5 @@ data class ChannelName(
  */
 fun String.toChannelName(): ChannelName {
 	val (ownerName, name) = this.split("/")
-	return ChannelName(name.drop(1), ownerName)
+	return ChannelName(name, ownerName.drop(1))
 }
