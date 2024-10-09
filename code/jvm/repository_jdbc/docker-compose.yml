@@ -1,0 +1,12 @@
+services:
+  db-test:
+    container_name: db-test
+    build:
+      context: .
+      dockerfile: Dockerfile-db-test
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=daw_test
+    ports:
+      - "5433:5432"
