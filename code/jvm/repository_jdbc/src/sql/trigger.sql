@@ -51,3 +51,16 @@ $$ language plpgsql;
 create or replace trigger tr_channel_delete before delete on channels
     for each row
 execute function f_channel_delete();
+
+create or replace function f_message_delete() returns trigger as $$
+begin
+    delete from messages where channel = old.id;
+    return old;
+end;
+$$ language plpgsql;
+
+create or replace trigger tr_message_delete before delete on channels
+    for each row
+execute function f_message_delete();
+
+rollback
