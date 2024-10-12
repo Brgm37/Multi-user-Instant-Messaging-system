@@ -5,15 +5,15 @@ import com.example.appWeb.model.dto.output.user.UserAuthenticationOutputModel
 import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
 import com.example.appWeb.model.problem.Problem
 import errors.ChannelError
-import errors.UserError.UserNotFound
-import errors.UserError.UserAlreadyExists
 import errors.UserError.InvalidUserInfo
+import errors.UserError.UserAlreadyExists
+import errors.UserError.UserNotFound
 import interfaces.UserServicesInterface
 import jakarta.inject.Inject
 import jakarta.inject.Named
 import jakarta.validation.Valid
-import org.springframework.http.HttpStatus.BAD_REQUEST
 import model.User
+import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
@@ -30,64 +30,79 @@ import utils.Success
  * @param userService The user service
  */
 @Controller
-class UserController @Inject constructor(
-	@Named("UserServices") private val userService: UserServicesInterface
-) {
-
-	@PostMapping("/users")
-	fun createUser(
-		@Valid @RequestBody user: UserInputModel
+class UserController
+	@Inject
+	constructor(
+		@Named("UserServices") private val userService: UserServicesInterface,
 	) {
-		val response = userService.createUser(
-			User(
-				username = user.username,
-				password = user.password
-			)
-		)
-		when (response) {
-			is Success -> {
-				ResponseEntity.ok(UserAuthenticationOutputModel.fromDomain(response.value))
-			}
+		@PostMapping("/users")
+		fun createUser(
+			@Valid @RequestBody user: UserInputModel,
+		) {
+			val response =
+				userService.createUser(
+					User(
+						username = user.username,
+						password = user.password,
+					),
+				)
+			when (response) {
+				is Success -> {
+					ResponseEntity.ok(UserAuthenticationOutputModel.fromDomain(response.value))
+				}
 
-			is Failure -> {
-				when (response.value) {
-					InvalidUserInfo -> Problem.InvalidUserInfo.response(BAD_REQUEST)
-					UserAlreadyExists -> Problem.UserAlreadyExists.response(BAD_REQUEST)
-					else -> Problem.UnableToCreateUser.response(BAD_REQUEST)
+				is Failure -> {
+					when (response.value) {
+						InvalidUserInfo -> Problem.InvalidUserInfo.response(BAD_REQUEST)
+						UserAlreadyExists -> Problem.UserAlreadyExists.response(BAD_REQUEST)
+						else -> Problem.UnableToCreateUser.response(BAD_REQUEST)
+					}
 				}
 			}
 		}
-	}
 
-	@GetMapping("/users/{id}")
-	fun getUser(@PathVariable id: UInt) {
-		when (val response = userService.getUser(id)) {
-			is Success -> {
-				ResponseEntity.ok(UserInfoOutputModel.fromDomain(response.value))
-			}
-			is Failure -> {
-				Problem.UserNotFound.response(NOT_FOUND)
-			}
-		}
-
-	}
-
-	@PutMapping("/channels/{channelId}/users/{userId}")
-	fun joinChannel(
-		@PathVariable channelId: UInt,
-		@PathVariable userId: UInt
-	) {
-		when (val response = userService.joinChannel(userId, channelId)) {
-			is Success -> {
-				ResponseEntity.ok()
-			}
-			is Failure -> {
-				when (response.value) {
-					UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
-					ChannelError.ChannelNotFound -> Problem.ChannelNotFound.response(NOT_FOUND)
-					else -> Problem.UnableToJoinChannel.response(BAD_REQUEST)
+		@GetMapping("/users/{id}")
+		fun getUser(
+			@PathVariable id: UInt,
+		) {
+			when (val response = userService.getUser(id)) {
+				is Success -> {
+					ResponseEntity.ok(UserInfoOutputModel.fromDomain(response.value))
+				}
+				is Failure -> {
+					Problem.UserNotFound.response(NOT_FOUND)
 				}
 			}
 		}
+
+		@PutMapping("/channels/{channelId}/users/{userId}")
+		fun joinChannel(
+			@PathVariable channelId: UInt,
+			@PathVariable userId: UInt,
+		) {
+			when (val response = userService.joinChannel(userId, channelId)) {
+				is Success -> {
+					ResponseEntity.ok()
+				}
+				is Failure -> {
+					when (response.value) {
+						UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
+						ChannelError.ChannelNotFound -> Problem.ChannelNotFound.response(NOT_FOUND)
+						else -> Problem.UnableToJoinChannel.response(BAD_REQUEST)
+					}
+				}
+			}
+		}
+
+		companion object {
+			/**
+			 * The base URL for the user endpoints.
+			 */
+			const val USER_BASE_URL = "/users"
+
+			/**
+			 * The URL for the user with the given id.
+			 */
+			const val USER_ID_URL = "$USER_BASE_URL/{userId}"
+		}
 	}
-}

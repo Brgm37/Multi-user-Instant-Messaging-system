@@ -16,7 +16,7 @@ data class ChannelListOutputModel(
 ) {
 	companion object {
 		fun fromDomain(channel: Channel): ChannelListOutputModel {
-			val id = checkNotNull(channel.id) { "Channel id must not be null" }
+			val id = checkNotNull(channel.channelId) { "Channel id must not be null" }
 			return ChannelListOutputModel(
 				name = ChannelNameOutputModel.fromDomain(channel.name),
 				id = id,
