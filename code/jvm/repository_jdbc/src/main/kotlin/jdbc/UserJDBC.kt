@@ -3,6 +3,7 @@ package jdbc
 import UserRepositoryInterface
 import model.Password
 import model.User
+import model.UserInvitation
 import java.sql.Connection
 import java.sql.ResultSet
 import java.util.UUID
@@ -50,6 +51,21 @@ class UserJDBC(
 		stm.setInt(idx++, uId.toInt())
 		stm.setInt(idx, channelId.toInt())
 		stm.executeUpdate()
+	}
+
+	override fun findInvitation(
+		inviterUId: UInt,
+		invitationCode: String,
+	): UserInvitation? {
+		TODO("Not yet implemented")
+	}
+
+	override fun deleteInvitation(invitation: UserInvitation) {
+		TODO("Not yet implemented")
+	}
+
+	override fun createInvitation(invitation: UserInvitation) {
+		TODO("Not yet implemented")
 	}
 
 	override fun findById(id: UInt): User? {

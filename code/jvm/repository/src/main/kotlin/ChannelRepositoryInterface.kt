@@ -1,4 +1,5 @@
 import model.Channel
+import model.ChannelInvitation
 
 /**
  * Interface for the channel repository
@@ -44,4 +45,33 @@ interface ChannelRepositoryInterface : Repository<Channel> {
 		channelId: UInt,
 		userId: UInt,
 	): Boolean
+
+	/**
+	 * Retrieves a channel invitation associated with a channel
+	 * @param channelId The ID of the channel
+	 */
+	fun findInvitation(channelId: UInt): ChannelInvitation?
+
+	/**
+	 * Updates a channel invitation
+	 * @param channelId The ID of the channel
+	 * @param invitation The updated invitation
+	 */
+	fun updateInvitation(
+		channelId: UInt,
+		invitation: ChannelInvitation,
+	)
+
+	/**
+	 * Deletes a channel invitation
+	 * @param channelId The ID of the channel
+	 */
+	fun deleteInvitation(channelId: UInt)
+
+	/**
+	 * Creates a channel invitation
+	 * @param invitation The invitation to create
+	 * @return The created invitation
+	 */
+	fun createInvitation(invitation: ChannelInvitation)
 }

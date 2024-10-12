@@ -3,6 +3,7 @@ package jdbc
 import ChannelRepositoryInterface
 import model.AccessControl
 import model.Channel
+import model.ChannelInvitation
 import model.UserInfo
 import model.Visibility
 import model.Visibility.PRIVATE
@@ -111,11 +112,7 @@ class ChannelJDBC(
 				accessControl = accessControl,
 				visibility = Visibility.valueOf(visibility.uppercase()),
 			)
-		return if (channel is Channel.Private) {
-			channel.copy(invitationCode = getString(CHANNELS_VIEW_INVITATION))
-		} else {
-			channel
-		}
+		return channel
 	}
 
 	/**
@@ -217,6 +214,25 @@ class ChannelJDBC(
 		channelId: UInt,
 		userId: UInt,
 	): Boolean {
+		TODO("Not yet implemented")
+	}
+
+	override fun findInvitation(channelId: UInt): ChannelInvitation? {
+		TODO("Not yet implemented")
+	}
+
+	override fun updateInvitation(
+		channelId: UInt,
+		invitation: ChannelInvitation,
+	) {
+		TODO("Not yet implemented")
+	}
+
+	override fun deleteInvitation(channelId: UInt) {
+		TODO("Not yet implemented")
+	}
+
+	override fun createInvitation(invitation: ChannelInvitation) {
 		TODO("Not yet implemented")
 	}
 

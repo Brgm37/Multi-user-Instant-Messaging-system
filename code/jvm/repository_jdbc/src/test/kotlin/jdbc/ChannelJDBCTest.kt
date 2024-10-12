@@ -3,12 +3,12 @@ package jdbc
 import model.AccessControl.READ_WRITE
 import model.Channel
 import model.ChannelName
+import model.Password
 import model.User
 import model.UserInfo
 import model.Visibility
 import model.Visibility.PRIVATE
 import model.Visibility.PUBLIC
-import org.eclipse.jetty.util.security.Password
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.postgresql.ds.PGSimpleDataSource
