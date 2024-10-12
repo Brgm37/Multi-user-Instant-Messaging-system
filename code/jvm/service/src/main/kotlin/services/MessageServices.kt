@@ -1,7 +1,6 @@
 package services
 
 import MessageRepositoryInterface
-import UserRepositoryInterface
 import errors.Error
 import interfaces.MessageServicesInterface
 import model.Message
@@ -10,16 +9,16 @@ import utils.failure
 import utils.success
 
 class MessageServices(
-	//private val userRepo: UserRepositoryInterface,
-	private val messageRepo: MessageRepositoryInterface
+	// private val userRepo: UserRepositoryInterface,
+	private val messageRepo: MessageRepositoryInterface,
 ) : MessageServicesInterface {
-
 	override fun createMessage(msg: Message): Either<Error, Message> {
 		require(msg.msg.isNotBlank()) { "msg cannot be blank" }
 		require(msg.user.username.isNotBlank()) { "username cannot be blank" }
-		require(msg.channel.name.isNotBlank()) { "channel name cannot be blank" }
+// 		require(msg.channel.name.isNotBlank()) { "channel name cannot be blank" }
 		val createdMessage = messageRepo.createMessage(msg)
-		return success(createdMessage)	}
+		return success(createdMessage)
+	}
 
 	override fun deleteMessage(id: UInt): Either<Error, String> {
 		messageRepo.deleteById(id)

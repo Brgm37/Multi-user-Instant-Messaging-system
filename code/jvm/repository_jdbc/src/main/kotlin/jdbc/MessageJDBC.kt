@@ -1,7 +1,6 @@
 package jdbc
 
 import MessageRepositoryInterface
-import model.ChannelName
 import model.Message
 import model.UserInfo
 import java.sql.ResultSet
@@ -47,8 +46,7 @@ class MessageJDBC (envName: String
 			}
 		}
 	}
-	//TODO: falar com arthur sobre channel id -- msgchannel equivalente a msgChannelID
-	//caso dele channel_owner -> owner_id
+
 	override fun findById(id: UInt): Message? {
 		return connect { connection ->
 			val selectQuery = """
@@ -84,7 +82,6 @@ class MessageJDBC (envName: String
 		}
 	}
 
-	//TODO: user format
 	override fun save(entity: Message) {
 		connect { connection ->
 			val updateQuery = """

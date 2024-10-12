@@ -10,6 +10,4 @@ package model
 data class ChannelInfo(
 	val uId: UInt,
 	val channelname: ChannelName,
-) {
-
-}
+)

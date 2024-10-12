@@ -1,20 +1,22 @@
 package services
 
+import TransactionManager
 import errors.ChannelError
 import errors.ChannelError.*
 import interfaces.ChannelServicesInterface
 import jakarta.inject.Inject
 import jakarta.inject.Named
 import model.*
-import TransactionManager
 import utils.Either
 import utils.failure
 import utils.success
 
 @Named("ChannelServices")
-class ChannelServices @Inject constructor(
+class ChannelServices
+@Inject
+constructor(
 	private val repoManager: TransactionManager,
-): ChannelServicesInterface {
+) : ChannelServicesInterface {
 	override fun createChannel(
 		owner: UInt,
 		name: String,
@@ -33,12 +35,13 @@ class ChannelServices @Inject constructor(
 		return repoManager.run {
 			val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
 			val id = requireNotNull(user.uId) { "User id is null" }
-			val channel = Channel.createChannel(
-				owner = UserInfo(id, user.username),
-				name = ChannelName(name, user.username),
-				accessControl = AccessControl.valueOf(accessControl.uppercase()),
-				visibility = Visibility.valueOf(visibility.uppercase())
-			)
+			val channel =
+				Channel.createChannel(
+					owner = UserInfo(id, user.username),
+					name = ChannelName(name, user.username),
+					accessControl = AccessControl.valueOf(accessControl.uppercase()),
+					visibility = Visibility.valueOf(visibility.uppercase()),
+				)
 			success(channelRepo.createChannel(channel))
 		}
 	}
@@ -69,7 +72,10 @@ class ChannelServices @Inject constructor(
 				success(channels)
 			}
 
-	override fun latestMessages(id: UInt, quantity: Int): Sequence<Message> {
+	override fun latestMessages(
+		id: UInt,
+		quantity: Int,
+	): Sequence<Message> {
 		TODO("Not yet implemented")
 	}
 }

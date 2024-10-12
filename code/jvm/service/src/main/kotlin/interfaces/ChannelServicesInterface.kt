@@ -21,32 +21,26 @@ interface ChannelServicesInterface {
 		owner: UInt,
 		name: String,
 		accessControl: String,
-		visibility: String
+		visibility: String,
 	): Either<ChannelError, Channel>
 
 	/**
 	 * Deletes a channel.
 	 * @param id The id of the channel to delete.
 	 */
-	fun deleteChannel(
-		id: UInt
-	): Either<ChannelError, Unit>
+	fun deleteChannel(id: UInt): Either<ChannelError, Unit>
 
 	/**
 	 * Gets a channel by its id.
 	 * @param id The id of the channel to get.
 	 */
-	fun getChannel(
-		id: UInt
-	): Either<ChannelError, Channel>
+	fun getChannel(id: UInt): Either<ChannelError, Channel>
 
 	/**
 	 * Gets all channels that owner owns.
 	 * @param owner The owner of the channels.
 	 */
-	fun getChannels(
-		owner: UInt
-	): Either<ChannelError, Sequence<Channel>>
+	fun getChannels(owner: UInt): Either<ChannelError, Sequence<Channel>>
 
 	/**
 	 * Gets all channels.
@@ -60,6 +54,6 @@ interface ChannelServicesInterface {
 	 */
 	fun latestMessages(
 		id: UInt,
-		quantity: Int
+		quantity: Int,
 	): Sequence<Message>
 }

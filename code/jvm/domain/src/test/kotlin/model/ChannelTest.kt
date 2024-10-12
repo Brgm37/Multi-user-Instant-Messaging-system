@@ -7,14 +7,13 @@ import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
 class ChannelTest {
-
 	@Test
 	fun `successful channel instantiation test`() {
 		Channel.Public(
 			id = 1u,
 			owner = UserInfo(uId = 1u, username = "username"),
 			name = ChannelName(name = "channelName", ownerName = "ownerName"),
-			accessControl = READ_WRITE
+			accessControl = READ_WRITE,
 		)
 	}
 
@@ -25,7 +24,7 @@ class ChannelTest {
 				id = 1u,
 				owner = UserInfo(uId = 1u, username = "username"),
 				name = ChannelName(name = "", ownerName = "ownerName"),
-				accessControl = READ_WRITE
+				accessControl = READ_WRITE,
 			)
 		}
 	}
@@ -36,19 +35,20 @@ class ChannelTest {
 			id = null,
 			owner = UserInfo(uId = 1u, username = "username"),
 			name = ChannelName(name = "channelName", ownerName = "ownerName"),
-			accessControl = READ_ONLY
+			accessControl = READ_ONLY,
 		)
 	}
 
 	@Test
 	fun `createChannel test`() {
-		val channel = Channel.createChannel(
-			id = 1u,
-			owner = UserInfo(uId = 1u, username = "username"),
-			name = ChannelName(name = "channelName", ownerName = "ownerName"),
-			accessControl = READ_WRITE,
-			visibility = PUBLIC
-		)
+		val channel =
+			Channel.createChannel(
+				id = 1u,
+				owner = UserInfo(uId = 1u, username = "username"),
+				name = ChannelName(name = "channelName", ownerName = "ownerName"),
+				accessControl = READ_WRITE,
+				visibility = PUBLIC,
+			)
 		assert(channel is Channel.Public)
 	}
 }

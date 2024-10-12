@@ -21,16 +21,20 @@ import utils.Failure
 import utils.Success
 
 @Controller
-class ChannelController @Inject constructor(
-	@Named("ChannelServices") private val channelService: ChannelServicesInterface
+class ChannelController
+@Inject
+constructor(
+	@Named("ChannelServices") private val channelService: ChannelServicesInterface,
 ) {
-
 	@GetMapping(CHANNEL_ID_URL)
-	fun getChannel(@PathVariable channelId: UInt) {
+	fun getChannel(
+		@PathVariable channelId: UInt,
+	) {
 		when (val response = channelService.getChannel(channelId)) {
 			is Success -> {
 				ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
 			}
+
 			is Failure -> {
 				Problem.ChannelNotFound.response(NOT_FOUND)
 			}
@@ -39,18 +43,20 @@ class ChannelController @Inject constructor(
 
 	@PostMapping(CHANNEL_BASE_URL)
 	fun createChannel(
-		@Valid @RequestBody channel: ChannelInputModel
+		@Valid @RequestBody channel: ChannelInputModel,
 	) {
-		val response = channelService.createChannel(
-			owner = channel.owner,
-			name = channel.name,
-			accessControl = channel.accessControl,
-			visibility = channel.visibility
-		)
+		val response =
+			channelService.createChannel(
+				owner = channel.owner,
+				name = channel.name,
+				accessControl = channel.accessControl,
+				visibility = channel.visibility,
+			)
 		when (response) {
 			is Success -> {
 				ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
 			}
+
 			is Failure -> {
 				when (response.value) {
 					InvalidChannelInfo -> Problem.InvalidChannelInfo.response(BAD_REQUEST)
@@ -66,6 +72,7 @@ class ChannelController @Inject constructor(
 		 * The base URL for the channel endpoints.
 		 */
 		const val CHANNEL_BASE_URL = "/channels"
+
 		/**
 		 * The URL for the channel with the given id.
 		 */
