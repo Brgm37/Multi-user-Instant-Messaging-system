@@ -1,22 +1,22 @@
 plugins {
-    kotlin("jvm") version "2.0.20"
+	kotlin("jvm") version "2.0.20"
 }
 
 group = "org.example"
 version = "unspecified"
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
-    implementation(project(":domain"))
-    testImplementation(kotlin("test"))
+	implementation(project(":domain"))
+	testImplementation(kotlin("test"))
 }
 
 tasks.test {
-    useJUnitPlatform()
+	useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(21)
+	jvmToolchain(21)
 }

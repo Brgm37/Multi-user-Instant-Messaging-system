@@ -1,7 +1,7 @@
 package com.example.appWeb.model.dto.output.user
 
 import model.User
-import java.util.UUID
+import java.util.*
 
 /**
  * Represents the output model for a user authentication
