@@ -35,34 +35,37 @@ class TransactionManagerJDBCTest {
 	@Test
 	fun `test repo interaction`() {
 		transactionManager.run {
-			val user = userRepo
-				.createUser(
-					User(
-						username = "user",
-						password = Password("password"),
+			val user =
+				userRepo
+					.createUser(
+						User(
+							username = "user",
+							password = Password("password"),
+						),
 					)
-				)
 			assertNotNull(user)
 			val id = requireNotNull(user.uId)
-			val channel = channelRepo
-				.createChannel(
-					Channel.createChannel(
-						name = ChannelName("channel", user.username),
-						owner = UserInfo(id, user.username),
-						accessControl = AccessControl.READ_WRITE,
-						visibility = Visibility.PUBLIC
+			val channel =
+				channelRepo
+					.createChannel(
+						Channel.createChannel(
+							name = ChannelName("channel", user.username),
+							owner = UserInfo(id, user.username),
+							accessControl = AccessControl.READ_WRITE,
+							visibility = Visibility.PUBLIC,
+						),
 					)
-				)
 			assertNotNull(channel)
-			val channelId = requireNotNull(channel.id)
-			val message = messageRepo
-				.createMessage(
-					Message(
-						msg = "message",
-						user = UserInfo(id, user.username),
-						channel = ChannelInfo(channelId, channel.name)
+			val channelId = requireNotNull(channel.channelId)
+			val message =
+				messageRepo
+					.createMessage(
+						Message(
+							msg = "message",
+							user = UserInfo(id, user.username),
+							channel = ChannelInfo(channelId, channel.name),
+						),
 					)
-				)
 			assertNotNull(message.msgId)
 		}
 	}

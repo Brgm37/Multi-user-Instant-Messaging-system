@@ -56,13 +56,13 @@ class ChannelJDBCTest {
 
 	@Test
 	fun `create a channel and find it`() = runWithConnection { connection ->
-		assertNotNull(createChannel(connection).id)
+		assertNotNull(createChannel(connection).channelId)
 	}
 
 	@Test
 	fun `find a channel by id`() = runWithConnection { connection ->
 		val channel = createChannel(connection)
-		val id = requireNotNull(channel.id) { "Channel id is null" }
+		val id = requireNotNull(channel.channelId) { "Channel id is null" }
 		val foundChannel = ChannelJDBC(connection).findById(id)
 		assertNotNull(foundChannel)
 	}
@@ -91,7 +91,7 @@ class ChannelJDBCTest {
 					}
 				}
 				ChannelJDBC(connection)
-					.findByUserId(id)
+					.findByUserId(id,,)
 					.let { channels ->
 						assertTrue(channels.isNotEmpty())
 						assertEquals(numberOfChannel, channels.size)
@@ -104,7 +104,7 @@ class ChannelJDBCTest {
 		runWithConnection { connection ->
 			val channel = createChannel(connection)
 			assertIs<Channel.Public>(channel)
-			val id = requireNotNull(channel.id) { "Channel id is null" }
+			val id = requireNotNull(channel.channelId) { "Channel id is null" }
 			val updatedChannel = channel.copy(
 				name = ChannelName("new name", channel.owner.username),
 			)
@@ -118,7 +118,7 @@ class ChannelJDBCTest {
 	fun `test delete a channel`() {
 		runWithConnection { connection ->
 			val channel = createChannel(connection)
-			val id = requireNotNull(channel.id) { "Channel id is null" }
+			val id = requireNotNull(channel.channelId) { "Channel id is null" }
 			ChannelJDBC(connection).deleteById(id)
 			assertNull(ChannelJDBC(connection).findById(id))
 		}
@@ -134,11 +134,11 @@ class ChannelJDBCTest {
 			createChannel(connection, PRIVATE)
 				.let { channel ->
 					assertIs<Channel.Private>(channel)
-					assertNotNull(channel.id)
-					val id = requireNotNull(channel.id) { "Channel id is null" }
+					assertNotNull(channel.channelId)
+					val id = requireNotNull(channel.channelId) { "Channel id is null" }
 					assertNotNull(ChannelJDBC(connection).deleteById(id))
 				}
-			val foundChannels = ChannelJDBC(connection).findAll()
+			val foundChannels = ChannelJDBC(connection).findAll(,)
 			assertEquals(numberOfChannels, foundChannels.size)
 			assertEquals(channels, foundChannels)
 		}

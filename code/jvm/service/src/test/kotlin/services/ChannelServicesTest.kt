@@ -1,11 +1,11 @@
 package services
 
+import TransactionManager
 import errors.ChannelError
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import model.*
-import TransactionManager
 import org.junit.jupiter.api.BeforeEach
 import utils.*
 import kotlin.test.Test
@@ -13,7 +13,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 class ChannelServicesTest {
-
 	private lateinit var transactionManager: TransactionManager
 	private lateinit var channelServices: ChannelServices
 
@@ -30,22 +29,23 @@ class ChannelServicesTest {
 		val name = "name"
 		val accessControl = "READ_WRITE"
 		val visibility = "PUBLIC"
-		every { transactionManager.run<Either<Channel, Channel>>(any()) } returns success(
-			Channel.createChannel(
-				1u,
-				UserInfo(owner, ownerName),
-				ChannelName(name, ownerName),
-				AccessControl.valueOf(accessControl),
-				Visibility.valueOf(visibility)
+		every { transactionManager.run<Either<Channel, Channel>>(any()) } returns
+			success(
+				Channel.createChannel(
+					1u,
+					UserInfo(owner, ownerName),
+					ChannelName(name, ownerName),
+					AccessControl.valueOf(accessControl),
+					Visibility.valueOf(visibility),
+				),
 			)
-		)
 		val response = channelServices.createChannel(owner, name, accessControl, visibility)
 		verify { transactionManager.run<Either<Channel, Channel>>(any()) }
 		assertIs<Success<Channel>>(response)
 		val channel = response.value
-		assertEquals(1u, channel.id)
+		assertEquals(1u, channel.channelId)
 		assertEquals(owner, channel.owner.uId)
-		assertEquals("@${ownerName}/$name", channel.name.fullName)
+		assertEquals("@$ownerName/$name", channel.name.fullName)
 		assertEquals(AccessControl.READ_WRITE, channel.accessControl)
 	}
 
