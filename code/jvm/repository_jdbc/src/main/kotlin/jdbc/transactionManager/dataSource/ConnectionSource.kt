@@ -4,7 +4,6 @@ package jdbc.transactionManager.dataSource
  * Represents the connection source
  */
 interface ConnectionSource {
-
 	/**
 	 * Returns the connection URL
 	 */

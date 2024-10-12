@@ -4,7 +4,7 @@ import model.Message
  * Interface for the channel repository
  */
 
-interface MessageRepositoryInterface: Repository<Message> {
+interface MessageRepositoryInterface : Repository<Message> {
 	/**
 	 * Creates a new message
 	 * @param message The message to create

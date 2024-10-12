@@ -4,7 +4,6 @@ import com.example.appWeb.model.dto.input.channel.ChannelInputModel
 import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import com.example.appWeb.model.problem.Problem
-import errors.ChannelError.ChannelNotFound
 import errors.ChannelError.InvalidChannelInfo
 import errors.ChannelError.UserNotFound
 import interfaces.ChannelServicesInterface
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import utils.Failure
@@ -67,34 +65,6 @@ class ChannelController
 								.value
 								.map(ChannelListOutputModel::fromDomain),
 						)
-				}
-			}
-		}
-
-		@PutMapping("$CHANNEL_ID_URL${UserController.USER_ID_URL}")
-		fun joinChannel(
-			@PathVariable channelId: UInt,
-			@PathVariable userId: UInt,
-			@RequestParam invitationCode: String = "",
-		) {
-			val response =
-				channelService
-					.joinChannel(
-						channelId = channelId,
-						userId = userId,
-						invitationCode = invitationCode,
-					)
-			when (response) {
-				is Success -> {
-					ResponseEntity.ok().build()
-				}
-
-				is Failure -> {
-					when (response.value) {
-						ChannelNotFound -> Problem.ChannelNotFound.response(NOT_FOUND)
-						UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
-						else -> Problem.UnableToJoinChannel.response(BAD_REQUEST)
-					}
 				}
 			}
 		}

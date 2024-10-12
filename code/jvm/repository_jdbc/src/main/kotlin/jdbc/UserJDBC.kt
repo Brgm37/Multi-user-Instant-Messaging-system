@@ -11,7 +11,6 @@ import java.util.*
 class UserJDBC(
 	private val connection: Connection,
 ) : UserRepositoryInterface {
-
 	private fun ResultSet.toUser(): User =
 		User(
 			uId = getInt("id").toUInt(),

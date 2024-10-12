@@ -33,4 +33,15 @@ interface ChannelRepositoryInterface : Repository<Channel> {
 		channelId: UInt,
 		userId: UInt,
 	)
+
+	/**
+	 * Checks if a user is in a channel
+	 * @param channelId The ID of the channel
+	 * @param userId The ID of the user
+	 * @return True if the user is in the channel, false otherwise
+	 */
+	fun isUserInChannel(
+		channelId: UInt,
+		userId: UInt,
+	): Boolean
 }
