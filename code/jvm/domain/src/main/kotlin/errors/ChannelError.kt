@@ -19,4 +19,10 @@ sealed class ChannelError : Error() {
 	data object InvalidChannelInfo : ChannelError()
 
 	data object UnableToJoinChannel : ChannelError()
+
+	data object InvitationCodeHasExpired : UserError()
+
+	data object InvitationCodeMaxUsesReached : UserError()
+
+	data object InvitationCodeIsInvalid : UserError()
 }
