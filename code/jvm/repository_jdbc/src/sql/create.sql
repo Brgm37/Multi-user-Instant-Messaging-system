@@ -3,7 +3,8 @@ create table if not exists users (
     id serial primary key,
     name varchar(128) not null unique,
     password varchar(128) not null,
-    token varchar(128)
+    token varchar(128),
+    invitation varchar(128)
 );
 
 create table if not exists channels (
@@ -12,6 +13,7 @@ create table if not exists channels (
     owner integer not null,
     accessControl varchar(10) check ( accessControl in ('READ_ONLY', 'READ_WRITE') ) not null,
     visibility varchar(10) check ( visibility in ('PUBLIC', 'PRIVATE') ) not null,
+    invitation varchar(128),
     foreign key (owner) references users(id)
 );
 

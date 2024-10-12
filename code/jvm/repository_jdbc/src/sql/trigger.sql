@@ -22,7 +22,8 @@ begin
         c.accessControl as channel_accessControl,
         c.visibility as channel_visibility,
         u.id as owner_id,
-        u.name as owner_name
+        u.name as owner_name,
+        c.invitation as channel_invitation
     from channels c
     join users u on c.owner = u.id;
     return new;
@@ -63,4 +64,34 @@ create or replace trigger tr_message_delete before delete on channels
     for each row
 execute function f_message_delete();
 
-rollback
+create or replace function remake_message_view()
+returns trigger as $$
+begin
+    drop view if exists v_message;
+    create or replace view v_message as
+    select
+        m.id as msgId,
+        m.channel as msgChannelId,
+        m.author as msgAuthorId,
+        m.content as msgContent,
+        m.timestamp as msgTimestamp,
+        c.owner as msgChannelName,
+        u.name as msgAuthorUsername
+    from messages m
+    join users u on m.author = u.id
+    join channels c on m.channel = c.id;
+    return new;
+end;
+$$ language plpgsql;
+
+create or replace trigger tr_message_update after update on messages
+    for each statement
+execute function remake_message_view();
+
+create or replace trigger tr_message_update after insert on messages
+    for each statement
+execute function remake_message_view();
+
+create or replace trigger tr_message_update after delete on messages
+    for each statement
+execute function remake_message_view();
