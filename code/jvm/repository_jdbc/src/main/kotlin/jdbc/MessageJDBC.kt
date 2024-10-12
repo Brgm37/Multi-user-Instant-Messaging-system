@@ -1,7 +1,10 @@
 package jdbc
 
 import MessageRepositoryInterface
-import model.*
+import model.ChannelInfo
+import model.Message
+import model.UserInfo
+import model.toChannelName
 import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.SQLException
@@ -120,6 +123,7 @@ class MessageJDBC(
 		stm.executeUpdate()
 	}
 
+	@Suppress("SqlWithoutWhere")
 	override fun clear() {
 		val deleteQuery =
 			"""

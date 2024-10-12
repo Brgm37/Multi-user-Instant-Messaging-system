@@ -2,10 +2,12 @@ package services
 
 import TransactionManager
 import errors.ChannelError
-import io.mockk.*
 import errors.ChannelError.ChannelNotFound
 import errors.UserError
-import model.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import model.User
 import org.eclipse.jetty.util.security.Password
 import org.junit.jupiter.api.BeforeEach
 import utils.Either
@@ -15,7 +17,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class UserServicesTest {
-
 	private lateinit var tm: TransactionManager
 	private lateinit var userServices: UserServices
 
@@ -25,10 +26,6 @@ class UserServicesTest {
 	private val cIdDefault = 1u
 	private val userDefault = User(null, usernameDefault, passwordDefault)
 	private val userWithIdDefault = User(uIdDefault, usernameDefault, passwordDefault)
-	private val userInfoDefault = UserInfo(uIdDefault, usernameDefault)
-	private val channelNameDefault = ChannelName("name", "name")
-	private val accessControlDefault = AccessControl.READ_WRITE
-	private val channelDefault = Channel.Public(cIdDefault, userInfoDefault, channelNameDefault, accessControlDefault)
 
 	@BeforeEach
 	fun setup() {
@@ -41,12 +38,12 @@ class UserServicesTest {
 		val user = userDefault
 		every { tm.run<Either<UserError, User>>(any()) } returns success(userWithIdDefault)
 
-			val userCreated = userServices.createUser(user) as Either.Right
-			val userId = userCreated.value.uId
+		val userCreated = userServices.createUser(user) as Either.Right
+		val userId = userCreated.value.uId
 
-			assertEquals(uIdDefault, userId)
+		assertEquals(uIdDefault, userId)
 
-			verify { tm.run<Either<UserError, User>>(any()) }
+		verify { tm.run<Either<UserError, User>>(any()) }
 	}
 
 	@Test
@@ -71,7 +68,7 @@ class UserServicesTest {
 		val result = userServices.joinChannel(userId, channelId) as Either.Right
 		val message = result.value
 
-		assertEquals(Unit , message)
+		assertEquals(Unit, message)
 
 		verify { tm.run<Either<UserError, Unit>>(any()) }
 	}

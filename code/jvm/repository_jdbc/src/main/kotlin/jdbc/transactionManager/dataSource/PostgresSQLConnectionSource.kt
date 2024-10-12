@@ -6,7 +6,7 @@ import jakarta.inject.Named
  * Represents the connection source for PostgresSQL
  */
 @Named("PostgresSQLConnectionSource")
-class PostgresSQLConnectionSource: ConnectionSource {
+class PostgresSQLConnectionSource : ConnectionSource {
 	override val connectionUrl: String
 		get() = System.getenv("DB_URL")
 	override val username: String

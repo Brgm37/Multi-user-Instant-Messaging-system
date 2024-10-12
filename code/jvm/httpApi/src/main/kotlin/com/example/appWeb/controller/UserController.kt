@@ -1,10 +1,12 @@
 package com.example.appWeb.controller
 
+import com.example.appWeb.controller.ChannelController.Companion.CHANNEL_ID_URL
 import com.example.appWeb.model.dto.input.user.UserInputModel
 import com.example.appWeb.model.dto.output.user.UserAuthenticationOutputModel
 import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
 import com.example.appWeb.model.problem.Problem
 import errors.ChannelError
+import errors.ChannelError.ChannelNotFound
 import errors.UserError.InvalidUserInfo
 import errors.UserError.UserAlreadyExists
 import errors.UserError.UserNotFound
@@ -35,7 +37,7 @@ class UserController
 	constructor(
 		@Named("UserServices") private val userService: UserServicesInterface,
 	) {
-		@PostMapping("/users")
+		@PostMapping(USER_BASE_URL)
 		fun createUser(
 			@Valid @RequestBody user: UserInputModel,
 		) {
@@ -61,21 +63,22 @@ class UserController
 			}
 		}
 
-		@GetMapping("/users/{id}")
+		@GetMapping(USER_ID_URL)
 		fun getUser(
-			@PathVariable id: UInt,
+			@PathVariable userId: UInt,
 		) {
-			when (val response = userService.getUser(id)) {
+			when (val response = userService.getUser(userId)) {
 				is Success -> {
 					ResponseEntity.ok(UserInfoOutputModel.fromDomain(response.value))
 				}
+
 				is Failure -> {
 					Problem.UserNotFound.response(NOT_FOUND)
 				}
 			}
 		}
 
-		@PutMapping("/channels/{channelId}/users/{userId}")
+		@PutMapping("$CHANNEL_ID_URL/$USER_ID_URL")
 		fun joinChannel(
 			@PathVariable channelId: UInt,
 			@PathVariable userId: UInt,
@@ -84,6 +87,7 @@ class UserController
 				is Success -> {
 					ResponseEntity.ok()
 				}
+
 				is Failure -> {
 					when (response.value) {
 						UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)

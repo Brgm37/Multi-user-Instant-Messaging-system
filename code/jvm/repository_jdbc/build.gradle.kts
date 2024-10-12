@@ -1,5 +1,6 @@
 plugins {
 	kotlin("jvm") version "2.0.20"
+	id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
 group = "org.example"
@@ -20,57 +21,57 @@ dependencies {
 
 tasks.test {
 	useJUnitPlatform()
-	environment(
-		"DB_URL",
-		"jdbc:postgresql://localhost:5433/daw_test?user=postgres&password=password",
-	)
-	dependsOn(":repository_jdbc:dbTestsWait")
-	finalizedBy(":repository_jdbc:dbTestsDown")
-}
-
-val composeFileDir: Directory = rootProject.layout.projectDirectory.dir("repository_jdbc")
-val dockerComposePath = composeFileDir.file("docker-compose.yml").toString()
-
-task<Exec>("dbTestsUp") {
-// 	commandLine(
-// 		"ls",
-// 		"-l",
-// 		dockerComposePath,
+// 	environment(
+// 		"DB_URL",
+// 		"jdbc:postgresql://localhost:5433/daw_test?user=postgres&password=password",
 // 	)
-	commandLine(
-		"docker",
-		"compose",
-		"-f",
-		dockerComposePath,
-		"up",
-		"-d",
-		"--build",
-		"--force-recreate",
-		"db-tests",
-	)
+// 	dependsOn(":repository_jdbc:dbTestsWait")
+// 	finalizedBy(":repository_jdbc:dbTestsDown")
 }
-
-task<Exec>("dbTestsWait") {
-	commandLine(
-		"docker",
-		"exec",
-		"db-tests",
-		"/app/bin/wait-for-postgres.sh",
-		"localhost",
-	)
-	dependsOn("dbTestsUp")
-}
-
-task<Exec>("dbTestsDown") {
-	commandLine(
-		"docker",
-		"compose",
-		"-f",
-		dockerComposePath,
-		"down",
-		"db-tests",
-	)
-}
+//
+// val composeFileDir: Directory = rootProject.layout.projectDirectory.dir("repository_jdbc")
+// val dockerComposePath = composeFileDir.file("docker-compose.yml").toString()
+//
+// task<Exec>("dbTestsUp") {
+// // 	commandLine(
+// // 		"ls",
+// // 		"-l",
+// // 		dockerComposePath,
+// // 	)
+// 	commandLine(
+// 		"docker",
+// 		"compose",
+// 		"-f",
+// 		dockerComposePath,
+// 		"up",
+// 		"-d",
+// 		"--build",
+// 		"--force-recreate",
+// 		"db-tests",
+// 	)
+// }
+//
+// task<Exec>("dbTestsWait") {
+// 	commandLine(
+// 		"docker",
+// 		"exec",
+// 		"db-tests",
+// 		"/app/bin/wait-for-postgres.sh",
+// 		"localhost",
+// 	)
+// 	dependsOn("dbTestsUp")
+// }
+//
+// task<Exec>("dbTestsDown") {
+// 	commandLine(
+// 		"docker",
+// 		"compose",
+// 		"-f",
+// 		dockerComposePath,
+// 		"down",
+// 		"db-tests",
+// 	)
+// }
 
 kotlin {
 	jvmToolchain(21)

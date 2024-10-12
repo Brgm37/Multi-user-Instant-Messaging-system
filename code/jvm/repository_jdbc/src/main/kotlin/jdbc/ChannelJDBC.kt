@@ -213,6 +213,13 @@ class ChannelJDBC(
 		stm.executeUpdate()
 	}
 
+	override fun isUserInChannel(
+		channelId: UInt,
+		userId: UInt,
+	): Boolean {
+		TODO("Not yet implemented")
+	}
+
 	override fun findById(id: UInt): Channel? {
 		val selectQuery =
 			"""

@@ -37,6 +37,9 @@ class ChannelServices
 						return@run failure(UnableToJoinChannel)
 					}
 					userRepo.findById(userId) ?: return@run failure(UserNotFound)
+					if (channelRepo.isUserInChannel(channelId, userId)) {
+						return@run success(Unit)
+					}
 					channelRepo.joinChannel(channelId, userId)
 					success(Unit)
 				}

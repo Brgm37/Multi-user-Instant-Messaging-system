@@ -6,12 +6,11 @@ import org.eclipse.jetty.util.security.Password
 import org.eclipse.jetty.util.security.Password.obfuscate
 import java.sql.Connection
 import java.sql.ResultSet
-import java.util.*
+import java.util.UUID
 
 class UserJDBC(
 	private val connection: Connection,
 ) : UserRepositoryInterface {
-
 	private fun ResultSet.toUser(): User =
 		User(
 			uId = getInt("id").toUInt(),
@@ -125,6 +124,7 @@ class UserJDBC(
 		stmUsers.executeUpdate()
 	}
 
+	@Suppress("SqlWithoutWhere")
 	override fun clear() {
 		val deleteFromUsersQuery =
 			"""
