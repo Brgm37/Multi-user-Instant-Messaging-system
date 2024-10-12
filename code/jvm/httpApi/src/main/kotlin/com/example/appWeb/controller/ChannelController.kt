@@ -1,8 +1,10 @@
 package com.example.appWeb.controller
 
 import com.example.appWeb.model.dto.input.channel.ChannelInputModel
+import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import com.example.appWeb.model.problem.Problem
+import errors.ChannelError.ChannelNotFound
 import errors.ChannelError.InvalidChannelInfo
 import errors.ChannelError.UserNotFound
 import interfaces.ChannelServicesInterface
@@ -16,7 +18,9 @@ import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import utils.Failure
 import utils.Success
 
@@ -26,54 +30,110 @@ import utils.Success
  * @param channelService The channel service
  */
 @Controller
-class ChannelController @Inject constructor(
-	@Named("ChannelServices") private val channelService: ChannelServicesInterface
-) {
-
-	@GetMapping(CHANNEL_ID_URL)
-	fun getChannel(@PathVariable channelId: UInt) {
-		when (val response = channelService.getChannel(channelId)) {
-			is Success -> {
-				ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
-			}
-			is Failure -> {
-				Problem.ChannelNotFound.response(NOT_FOUND)
-			}
-		}
-	}
-
-	@PostMapping(CHANNEL_BASE_URL)
-	fun createChannel(
-		@Valid @RequestBody channel: ChannelInputModel
+class ChannelController
+	@Inject
+	constructor(
+		@Named("ChannelServices") private val channelService: ChannelServicesInterface,
 	) {
-		val response = channelService.createChannel(
-			owner = channel.owner,
-			name = channel.name,
-			accessControl = channel.accessControl,
-			visibility = channel.visibility
-		)
-		when (response) {
-			is Success -> {
-				ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
-			}
-			is Failure -> {
-				when (response.value) {
-					InvalidChannelInfo -> Problem.InvalidChannelInfo.response(BAD_REQUEST)
-					UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
-					else -> Problem.UnableToCreateChannel.response(BAD_REQUEST)
+		@GetMapping(CHANNEL_ID_URL)
+		fun getChannel(
+			@PathVariable channelId: UInt,
+		) {
+			when (val response = channelService.getChannel(channelId)) {
+				is Success -> {
+					ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
+				}
+
+				is Failure -> {
+					Problem.ChannelNotFound.response(NOT_FOUND)
 				}
 			}
 		}
-	}
 
-	companion object {
-		/**
-		 * The base URL for the channel endpoints.
-		 */
-		const val CHANNEL_BASE_URL = "/channels"
-		/**
-		 * The URL for the channel with the given id.
-		 */
-		const val CHANNEL_ID_URL = "$CHANNEL_BASE_URL/{channelId}"
+		@GetMapping(CHANNEL_BASE_URL)
+		fun getChannels(
+			@RequestParam offset: Int = 0,
+			@RequestParam limit: Int = 10,
+		) {
+			when (val response = channelService.getChannels(offset, limit)) {
+				is Failure -> {
+					Problem.ChannelNotFound.response(NOT_FOUND)
+				}
+
+				is Success -> {
+					ResponseEntity
+						.ok(
+							response
+								.value
+								.map(ChannelListOutputModel::fromDomain),
+						)
+				}
+			}
+		}
+
+		@PutMapping("$CHANNEL_ID_URL${UserController.USER_ID_URL}")
+		fun joinChannel(
+			@PathVariable channelId: UInt,
+			@PathVariable userId: UInt,
+			@RequestParam invitationCode: String = "",
+		) {
+			val response =
+				channelService
+					.joinChannel(
+						channelId = channelId,
+						userId = userId,
+						invitationCode = invitationCode,
+					)
+			when (response) {
+				is Success -> {
+					ResponseEntity.ok().build()
+				}
+
+				is Failure -> {
+					when (response.value) {
+						ChannelNotFound -> Problem.ChannelNotFound.response(NOT_FOUND)
+						UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
+						else -> Problem.UnableToJoinChannel.response(BAD_REQUEST)
+					}
+				}
+			}
+		}
+
+		@PostMapping(CHANNEL_BASE_URL)
+		fun createChannel(
+			@Valid @RequestBody channel: ChannelInputModel,
+		) {
+			val response =
+				channelService.createChannel(
+					owner = channel.owner,
+					name = channel.name,
+					accessControl = channel.accessControl,
+					visibility = channel.visibility,
+				)
+			when (response) {
+				is Success -> {
+					ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
+				}
+
+				is Failure -> {
+					when (response.value) {
+						InvalidChannelInfo -> Problem.InvalidChannelInfo.response(BAD_REQUEST)
+						UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
+						else -> Problem.UnableToCreateChannel.response(BAD_REQUEST)
+					}
+				}
+			}
+		}
+
+		companion object {
+			/**
+			 * The base URL for the channel endpoints.
+			 */
+			const val CHANNEL_BASE_URL = "/channels"
+
+			/**
+			 * The URL for the channel with the given id.
+			 */
+			const val CHANNEL_ID_URL = "$CHANNEL_BASE_URL/{channelId}"
+		}
 	}
-}
