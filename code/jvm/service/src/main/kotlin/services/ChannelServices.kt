@@ -4,7 +4,6 @@ import TransactionManager
 import errors.ChannelError
 import errors.ChannelError.ChannelNotFound
 import errors.ChannelError.InvalidChannelInfo
-import errors.ChannelError.UnableToJoinChannel
 import errors.ChannelError.UserNotFound
 import interfaces.ChannelServicesInterface
 import jakarta.inject.Inject
@@ -25,25 +24,6 @@ class ChannelServices
 	constructor(
 		@Named("TransactionManagerJDBC") private val repoManager: TransactionManager,
 	) : ChannelServicesInterface {
-		override fun joinChannel(
-			channelId: UInt,
-			userId: UInt,
-			invitationCode: String,
-		): Either<ChannelError, Unit> =
-			repoManager
-				.run {
-					val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelNotFound)
-					if (channel is Channel.Private && channel.invitationCode != invitationCode) {
-						return@run failure(UnableToJoinChannel)
-					}
-					userRepo.findById(userId) ?: return@run failure(UserNotFound)
-					if (channelRepo.isUserInChannel(channelId, userId)) {
-						return@run success(Unit)
-					}
-					channelRepo.joinChannel(channelId, userId)
-					success(Unit)
-				}
-
 		override fun createChannel(
 			owner: UInt,
 			name: String,

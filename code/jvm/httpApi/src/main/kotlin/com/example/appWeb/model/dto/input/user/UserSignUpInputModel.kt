@@ -11,7 +11,7 @@ import model.Password
  * @param invitationCode The invitation code to join the app
  * @param inviterUId The inviter user id
  */
-data class UserInputSignUpModel(
+data class UserSignUpInputModel(
 	@get:NotBlank val username: String,
 	@get:NotBlank @get:Pattern(regexp = Password.PASSWORD_PATTERN)
 	val password: String,

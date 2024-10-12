@@ -10,18 +10,6 @@ import utils.Either
  */
 interface ChannelServicesInterface {
 	/**
-	 * Joins a channel.
-	 * @param channelId The id of the channel to join.
-	 * @param userId The id of the user joining the channel.
-	 * @param invitationCode The invitation code of the channel, if the channel is private.
-	 */
-	fun joinChannel(
-		channelId: UInt,
-		userId: UInt,
-		invitationCode: String,
-	): Either<ChannelError, Unit>
-
-	/**
 	 * Creates a new channel.
 	 * @param owner The owner of the channel.
 	 * @param name The name of the channel.
