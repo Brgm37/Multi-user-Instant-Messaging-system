@@ -9,7 +9,6 @@ import utils.Either
  * Represents the services available for the user entity.
  */
 interface UserServicesInterface {
-
 	/**
 	 * Creates a new user.
 	 * @param username The username of the user.
@@ -24,17 +23,13 @@ interface UserServicesInterface {
 	 * Deletes a user.
 	 * @param id The id of the user to delete.
 	 */
-	fun deleteUser(
-		id: UInt,
-	): Either<UserError, Unit>
+	fun deleteUser(id: UInt): Either<UserError, Unit>
 
 	/**
 	 * Gets a user by its id.
 	 * @param id The id of the user to get.
 	 */
-	fun getUser(
-		id: UInt,
-	): Either<UserError, User>
+	fun getUser(id: UInt): Either<UserError, User>
 
 	/**
 	 * Associates a user to a channel.

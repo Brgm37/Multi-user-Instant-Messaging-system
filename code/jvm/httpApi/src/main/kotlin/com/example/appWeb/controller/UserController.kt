@@ -4,7 +4,7 @@ import com.example.appWeb.model.dto.input.user.UserInputModel
 import com.example.appWeb.model.dto.output.user.UserAuthenticationOutputModel
 import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
 import com.example.appWeb.model.problem.Problem
-import errors.ChannelError
+import errors.ChannelError.ChannelNotFound
 import errors.UserError.InvalidUserInfo
 import errors.UserError.UserAlreadyExists
 import errors.UserError.UserNotFound
@@ -86,7 +86,7 @@ class UserController
 				is Failure -> {
 					when (response.value) {
 						UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
-						ChannelError.ChannelNotFound -> Problem.ChannelNotFound.response(NOT_FOUND)
+						ChannelNotFound -> Problem.ChannelNotFound.response(NOT_FOUND)
 						else -> Problem.UnableToJoinChannel.response(BAD_REQUEST)
 					}
 				}

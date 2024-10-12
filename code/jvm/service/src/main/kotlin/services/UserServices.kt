@@ -34,30 +34,30 @@ class UserServices @Inject constructor(
 		}
 	}
 
-	override fun deleteUser(id: UInt): Either<UserError, Unit> {
-		return repoManager.run {
-			userRepo.findById(id) ?: return@run failure(UserError.UserNotFound)
-			userRepo.deleteById(id)
-			success(Unit)
+		override fun deleteUser(id: UInt): Either<UserError, Unit> {
+			return repoManager.run {
+				userRepo.findById(id) ?: return@run failure(UserError.UserNotFound)
+				userRepo.deleteById(id)
+				success(Unit)
+			}
 		}
-	}
 
-	override fun getUser(id: UInt): Either<UserError, User> {
-		return repoManager.run {
-			val user = userRepo.findById(id) ?: return@run failure(UserError.UserNotFound)
-			success(user)
+		override fun getUser(id: UInt): Either<UserError, User> {
+			return repoManager.run {
+				val user = userRepo.findById(id) ?: return@run failure(UserError.UserNotFound)
+				success(user)
+			}
 		}
-	}
 
-	override fun joinChannel(
-		userId: UInt,
-		channelId: UInt
-	): Either<Error, Unit> {
-		return repoManager.run {
-			val user = userRepo.findById(userId) ?: return@run failure(UserError.UserNotFound)
-			val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelError.ChannelNotFound)
-			user.uId?.let { uId -> channel.id?.let { cId -> userRepo.joinChannel(uId, cId) } }
-			success(Unit)
+		override fun joinChannel(
+			userId: UInt,
+			channelId: UInt,
+		): Either<Error, Unit> {
+			return repoManager.run {
+				val user = userRepo.findById(userId) ?: return@run failure(UserError.UserNotFound)
+				val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelError.ChannelNotFound)
+				user.uId?.let { uId -> channel.channelId?.let { cId -> userRepo.joinChannel(uId, cId) } }
+				success(Unit)
+			}
 		}
 	}
-}

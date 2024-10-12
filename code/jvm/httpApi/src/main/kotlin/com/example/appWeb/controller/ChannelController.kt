@@ -1,6 +1,7 @@
 package com.example.appWeb.controller
 
 import com.example.appWeb.model.dto.input.channel.ChannelInputModel
+import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import com.example.appWeb.model.problem.Problem
 import errors.ChannelError.InvalidChannelInfo
@@ -17,11 +18,13 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import utils.Failure
 import utils.Success
 
 /**
  * Represents the controller for the channel
+ *
  * @param channelService The channel service
  */
 @Controller
@@ -41,6 +44,27 @@ class ChannelController
 
 				is Failure -> {
 					Problem.ChannelNotFound.response(NOT_FOUND)
+				}
+			}
+		}
+
+		@GetMapping(CHANNEL_BASE_URL)
+		fun getChannels(
+			@RequestParam offset: Int = 0,
+			@RequestParam limit: Int = 10,
+		) {
+			when (val response = channelService.getChannels(offset, limit)) {
+				is Failure -> {
+					Problem.ChannelNotFound.response(NOT_FOUND)
+				}
+
+				is Success -> {
+					ResponseEntity
+						.ok(
+							response
+								.value
+								.map(ChannelListOutputModel::fromDomain),
+						)
 				}
 			}
 		}
@@ -81,5 +105,5 @@ class ChannelController
 			 * The URL for the channel with the given id.
 			 */
 			const val CHANNEL_ID_URL = "$CHANNEL_BASE_URL/{channelId}"
+		}
 	}
-}

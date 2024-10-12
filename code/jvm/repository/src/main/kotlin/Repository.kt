@@ -11,9 +11,14 @@ interface Repository<T> {
 
 	/**
 	 * Retrieves all entities
+	 * @param offset The offset to start retrieving entities
+	 * @param limit The maximum number of entities to retrieve
 	 * @return A list with all entities
 	 */
-	fun findAll(): Sequence<T>
+	fun findAll(
+		offset: Int,
+		limit: Int,
+	): List<T>
 
 	/**
 	 * Saves a new or existing entity
@@ -26,4 +31,9 @@ interface Repository<T> {
 	 * @param id The entity to delete
 	 */
 	fun deleteById(id: UInt)
+
+	/**
+	 * Deletes all entities
+	 */
+	fun clear()
 }

@@ -3,47 +3,51 @@ package model
 /**
  * A channel is a container for user messages.
  *
- * @property id The unique identifier of the channel.
+ * @property channelId The unique identifier of the channel.
  * @property owner The user that created the channel.
  * @property name The name of the channel.
  * @property accessControl The access control settings of the channel.
  */
 sealed class Channel {
-    abstract val id: UInt?
-    abstract val owner: UserInfo
-    abstract val name: ChannelName
-    abstract val accessControl: AccessControl
+	abstract val channelId: UInt?
+	abstract val owner: UserInfo
+	abstract val name: ChannelName
+	abstract val accessControl: AccessControl
+	abstract val messages: List<Message>
 
-    /**
-     * A public channel is visible to all users.
-     *
-     * @property id The unique identifier of the channel.
-     * @property owner The user that created the channel.
-     * @property name The name of the channel.
-     * @property accessControl The access control settings of the channel.
-     */
-    data class Public(
-        override val id: UInt? = null,
-        override val owner: UserInfo,
-        override val name: ChannelName,
-        override val accessControl: AccessControl,
-    ) : Channel()
+	/**
+	 * A public channel is visible to all users.
+	 *
+	 * @property channelId The unique identifier of the channel.
+	 * @property owner The user that created the channel.
+	 * @property name The name of the channel.
+	 * @property accessControl The access control settings of the channel.
+	 */
+	data class Public(
+		override val channelId: UInt? = null,
+		override val owner: UserInfo,
+		override val name: ChannelName,
+		override val accessControl: AccessControl,
+		override val messages: List<Message> = emptyList(),
+	) : Channel()
 
-    /**
-     * A private channel is only visible to the owner
-     * and the users invited to the channel by the owner.
-     *
-     * @property id The unique identifier of the channel.
-     * @property owner The user that created the channel.
-     * @property name The name of the channel.
-     * @property accessControl The access control settings of the channel.
-     */
-    data class Private(
-        override val id: UInt? = null,
-        override val owner: UserInfo,
-        override val name: ChannelName,
-        override val accessControl: AccessControl,
-    ) : Channel()
+	/**
+	 * A private channel is only visible to the owner
+	 * and the users invited to the channel by the owner.
+	 *
+	 * @property channelId The unique identifier of the channel.
+	 * @property owner The user that created the channel.
+	 * @property name The name of the channel.
+	 * @property accessControl The access control settings of the channel.
+	 */
+	data class Private(
+		override val channelId: UInt? = null,
+		override val owner: UserInfo,
+		override val name: ChannelName,
+		override val accessControl: AccessControl,
+		override val messages: List<Message> = emptyList(),
+		val invitationCode: String = "",
+	) : Channel()
 
 	companion object {
 		/**
@@ -61,12 +65,11 @@ sealed class Channel {
 			owner: UserInfo,
 			name: ChannelName,
 			accessControl: AccessControl,
-			visibility: Visibility
-		): Channel {
-			return when (visibility) {
+			visibility: Visibility,
+		): Channel =
+			when (visibility) {
 				Visibility.PUBLIC -> Public(id, owner, name, accessControl)
 				Visibility.PRIVATE -> Private(id, owner, name, accessControl)
 			}
-		}
 	}
 }

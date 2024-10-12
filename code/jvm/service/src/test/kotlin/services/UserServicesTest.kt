@@ -2,10 +2,17 @@ package services
 
 import TransactionManager
 import errors.ChannelError
-import io.mockk.*
 import errors.ChannelError.ChannelNotFound
 import errors.UserError
-import model.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import model.AccessControl
+import model.Channel
+import model.ChannelName
+import model.Password
+import model.User
+import model.UserInfo
 import org.junit.jupiter.api.BeforeEach
 import utils.Either
 import utils.failure
@@ -14,7 +21,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class UserServicesTest {
-
 	private lateinit var tm: TransactionManager
 	private lateinit var userServices: UserServices
 
@@ -25,10 +31,6 @@ class UserServicesTest {
 	private val cIdDefault = 1u
 	private val userDefault = User(null, usernameDefault, passwordDefault)
 	private val userWithIdDefault = User(uIdDefault, usernameDefault, passwordDefault)
-	private val userInfoDefault = UserInfo(uIdDefault, usernameDefault)
-	private val channelNameDefault = ChannelName("name", "name")
-	private val accessControlDefault = AccessControl.READ_WRITE
-	private val channelDefault = Channel.Public(cIdDefault, userInfoDefault, channelNameDefault, accessControlDefault)
 
 	@BeforeEach
 	fun setup() {
@@ -67,7 +69,7 @@ class UserServicesTest {
 		val result = userServices.joinChannel(uIdDefault, cIdDefault) as Either.Right
 		val message = result.value
 
-		assertEquals(Unit , message)
+		assertEquals(Unit, message)
 
 		verify { tm.run<Either<UserError, Unit>>(any()) }
 	}
