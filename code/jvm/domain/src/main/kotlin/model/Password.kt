@@ -14,7 +14,6 @@ package model
 data class Password(
 	val value: String,
 ) {
-
 	override fun toString(): String = value
 
 	init {
