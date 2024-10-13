@@ -1,10 +1,10 @@
 package jdbc
 
 import MessageRepositoryInterface
-import model.ChannelInfo
-import model.Message
-import model.UserInfo
-import model.toChannelName
+import model.channels.ChannelInfo
+import model.channels.toChannelName
+import model.messages.Message
+import model.users.UserInfo
 import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.SQLException

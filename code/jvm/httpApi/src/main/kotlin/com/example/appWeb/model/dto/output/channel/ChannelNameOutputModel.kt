@@ -1,6 +1,6 @@
 package com.example.appWeb.model.dto.output.channel
 
-import model.ChannelName
+import model.channels.ChannelName
 
 data class ChannelNameOutputModel(
 	val name: String,

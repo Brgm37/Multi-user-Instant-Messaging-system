@@ -1,8 +1,8 @@
 package com.example.appWeb.model.dto.output.channel
 
-import model.Channel
-import model.Visibility.PRIVATE
-import model.Visibility.PUBLIC
+import model.channels.Channel
+import model.channels.Visibility.PRIVATE
+import model.channels.Visibility.PUBLIC
 
 data class ChannelOutputModel(
 	val id: UInt,

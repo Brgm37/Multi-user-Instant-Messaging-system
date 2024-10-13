@@ -1,5 +1,6 @@
 package model
 
+import model.channels.ChannelName
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

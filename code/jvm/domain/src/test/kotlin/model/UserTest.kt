@@ -1,5 +1,7 @@
 package model
 
+import model.users.Password
+import model.users.User
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 

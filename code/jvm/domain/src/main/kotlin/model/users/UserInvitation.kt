@@ -1,4 +1,4 @@
-package model
+package model.users
 
 import java.time.LocalDateTime
 import java.util.UUID

@@ -1,5 +1,6 @@
 package model
 
+import model.users.UserInfo
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 

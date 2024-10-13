@@ -1,7 +1,7 @@
 interface Transaction {
-	val channelRepo: ChannelRepositoryInterface
-	val userRepo: UserRepositoryInterface
-	val messageRepo: MessageRepositoryInterface
+    val channelRepo: ChannelRepositoryInterface
+    val userRepo: UserRepositoryInterface
+    val messageRepo: MessageRepositoryInterface
 
-	fun rollback()
+    fun rollback()
 }

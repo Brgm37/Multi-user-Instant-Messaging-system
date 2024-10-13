@@ -1,4 +1,4 @@
-package model
+package model.channels
 
 /**
  * Represents a Channel.

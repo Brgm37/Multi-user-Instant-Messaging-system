@@ -1,4 +1,4 @@
-package model
+package model.channels
 
 /**
  * The access control settings of a channel.

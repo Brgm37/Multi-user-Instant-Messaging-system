@@ -1,8 +1,7 @@
 package interfaces
 
 import errors.ChannelError
-import model.Channel
-import model.Message
+import model.channels.Channel
 import utils.Either
 
 /**
@@ -53,15 +52,4 @@ interface ChannelServicesInterface {
 		offset: Int,
 		limit: Int,
 	): Either<ChannelError, List<Channel>>
-
-	/**
-	 * Gets the latest messages of a channel.
-	 * @param id The id of the channel.
-	 * @param limit The quantity of messages to get.
-	 */
-	fun latestMessages(
-		id: UInt,
-		offset: Int,
-		limit: Int,
-	): Either<ChannelError, List<Message>>
 }

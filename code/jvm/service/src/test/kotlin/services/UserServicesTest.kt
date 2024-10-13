@@ -7,8 +7,8 @@ import errors.UserError
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import model.Password
-import model.User
+import model.users.Password
+import model.users.User
 import org.junit.jupiter.api.BeforeEach
 import utils.Either
 import utils.failure

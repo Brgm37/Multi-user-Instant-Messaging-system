@@ -3,8 +3,8 @@ package com.example.appWeb.model.dto.input.channel
 import jakarta.validation.constraints.AssertTrue
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Positive
-import model.AccessControl
-import model.Visibility
+import model.channels.AccessControl
+import model.channels.Visibility
 
 /**
  * Data class representing the input model for creating a channel.

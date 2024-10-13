@@ -1,6 +1,6 @@
 package com.example.appWeb.model.dto.output.channel
 
-import model.UserInfo
+import model.users.UserInfo
 
 data class OwnerOutputModel(
 	val id: UInt,

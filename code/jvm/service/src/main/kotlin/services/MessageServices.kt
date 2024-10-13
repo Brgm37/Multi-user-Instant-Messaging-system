@@ -3,7 +3,7 @@ package services
 import MessageRepositoryInterface
 import errors.Error
 import interfaces.MessageServicesInterface
-import model.Message
+import model.messages.Message
 import utils.Either
 import utils.failure
 import utils.success

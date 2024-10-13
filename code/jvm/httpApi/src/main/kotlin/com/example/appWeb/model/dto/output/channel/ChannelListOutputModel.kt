@@ -1,6 +1,6 @@
 package com.example.appWeb.model.dto.output.channel
 
-import model.Channel
+import model.channels.Channel
 
 /**
  * Represents the channel list output model

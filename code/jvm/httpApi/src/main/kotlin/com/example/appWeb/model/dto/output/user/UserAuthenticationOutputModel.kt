@@ -1,6 +1,6 @@
 package com.example.appWeb.model.dto.output.user
 
-import model.User
+import model.users.User
 import java.util.UUID
 
 /**

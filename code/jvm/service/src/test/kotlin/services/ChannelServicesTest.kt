@@ -5,11 +5,11 @@ import errors.ChannelError
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import model.AccessControl
-import model.Channel
-import model.ChannelName
-import model.UserInfo
-import model.Visibility
+import model.channels.AccessControl
+import model.channels.Channel
+import model.channels.ChannelName
+import model.channels.Visibility
+import model.users.UserInfo
 import org.junit.jupiter.api.BeforeEach
 import utils.Either
 import utils.Failure
@@ -47,7 +47,7 @@ class ChannelServicesTest {
 					Visibility.valueOf(visibility),
 				),
 			)
-		val response = channelServices.createChannel(owner, name, accessControl, visibility)
+		val response = channelServices.createChannel(owner, name, visibility)
 		verify { transactionManager.run<Either<Channel, Channel>>(any()) }
 		assertIs<Success<Channel>>(response)
 		val channel = response.value
@@ -72,7 +72,7 @@ class ChannelServicesTest {
 		val accessControl = "READ_WRITE"
 		val visibility = "PUBLIC"
 		every { transactionManager.run<Either<ChannelError, Channel>>(any()) } returns failure(ChannelError.InvalidChannelInfo)
-		val response = channelServices.createChannel(owner, name, accessControl, visibility)
+		val response = channelServices.createChannel(owner, name, visibility)
 		verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any()) }
 		assertIs<Failure<ChannelError>>(response)
 	}
@@ -84,7 +84,7 @@ class ChannelServicesTest {
 		val accessControl = ""
 		val visibility = "PUBLIC"
 		every { transactionManager.run<Either<ChannelError, Channel>>(any()) } returns failure(ChannelError.InvalidChannelInfo)
-		val response = channelServices.createChannel(owner, name, accessControl, visibility)
+		val response = channelServices.createChannel(owner, name, visibility)
 		verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any()) }
 		assertIs<Failure<ChannelError>>(response)
 	}
@@ -96,7 +96,7 @@ class ChannelServicesTest {
 		val accessControl = "READ_WRITE"
 		val visibility = ""
 		every { transactionManager.run<Either<ChannelError, Channel>>(any()) } returns failure(ChannelError.InvalidChannelInfo)
-		val response = channelServices.createChannel(owner, name, accessControl, visibility)
+		val response = channelServices.createChannel(owner, name, visibility)
 		verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any()) }
 		assertIs<Failure<ChannelError>>(response)
 	}

@@ -1,4 +1,4 @@
-import model.Message
+import model.messages.Message
 
 /**
  * Interface for the channel repository

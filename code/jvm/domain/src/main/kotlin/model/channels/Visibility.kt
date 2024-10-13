@@ -1,4 +1,4 @@
-package model
+package model.channels
 
 /**
  * The visibility of a channel.

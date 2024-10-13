@@ -1,7 +1,8 @@
 package interfaces
 
+import errors.ChannelError
 import errors.Error
-import model.Message
+import model.messages.Message
 import utils.Either
 
 /**
@@ -9,7 +10,7 @@ import utils.Either
  */
 interface MessageServicesInterface {
 	/**
-	 * Creates a new mesage.
+	 * Creates a new message.
 	 * @param msg The message info to create.
 	 * @return The created [Message].
 	 */
@@ -27,5 +28,14 @@ interface MessageServicesInterface {
 	 */
 	fun getMessage(id: UInt): Either<Error, Message>
 
-	// TODO(relocate get latest messages)
+	/**
+	 * Gets the latest messages of a channel.
+	 * @param id The id of the channel.
+	 * @param limit The quantity of messages to get.
+	 */
+	fun latestMessages(
+		id: UInt,
+		offset: Int,
+		limit: Int,
+	): Either<ChannelError, List<Message>>
 }

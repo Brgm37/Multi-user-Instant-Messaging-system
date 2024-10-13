@@ -1,5 +1,7 @@
-package model
+package model.messages
 
+import model.channels.ChannelInfo
+import model.users.UserInfo
 import java.time.LocalDateTime
 
 /**

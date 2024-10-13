@@ -1,5 +1,9 @@
 package model
 
+import model.channels.ChannelInfo
+import model.channels.ChannelName
+import model.messages.Message
+import model.users.UserInfo
 import java.time.LocalDateTime
 import kotlin.test.Test
 import kotlin.test.assertFailsWith

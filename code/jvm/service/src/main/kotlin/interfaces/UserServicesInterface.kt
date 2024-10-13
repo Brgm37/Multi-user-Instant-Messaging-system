@@ -2,7 +2,7 @@ package interfaces
 
 import errors.Error
 import errors.UserError
-import model.User
+import model.users.User
 import utils.Either
 
 /**

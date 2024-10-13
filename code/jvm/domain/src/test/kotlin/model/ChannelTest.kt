@@ -1,8 +1,11 @@
 package model
 
-import model.AccessControl.READ_ONLY
-import model.AccessControl.READ_WRITE
-import model.Visibility.PUBLIC
+import model.channels.AccessControl.READ_ONLY
+import model.channels.AccessControl.READ_WRITE
+import model.channels.Channel
+import model.channels.ChannelName
+import model.channels.Visibility.PUBLIC
+import model.users.UserInfo
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
