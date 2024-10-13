@@ -14,12 +14,24 @@ import jakarta.inject.Named
 import model.channels.AccessControl
 import model.channels.Channel
 import model.channels.Channel.Companion.createChannel
+import model.channels.Channel.Private
+import model.channels.Channel.Public
 import model.channels.ChannelName
 import model.channels.Visibility
 import model.users.UserInfo
 import utils.Either
 import utils.failure
 import utils.success
+
+/**
+ * The offset for the channels.
+ */
+private const val OFFSET = 0u
+
+/**
+ * The limit for the channels.
+ */
+private const val LIMIT = 100u
 
 @Named("ChannelServices")
 class ChannelServices
@@ -72,9 +84,12 @@ class ChannelServices
         override fun getChannel(id: UInt): Either<ChannelError, Channel> =
             repoManager
                 .run {
-                    // TODO: add messages to channel
                     val channel = channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
-                    success(channel)
+                    val messages = messageRepo.findMessagesByChannelId(id, LIMIT, OFFSET)
+                    return@run when (channel) {
+                        is Public -> success(channel.copy(messages = messages))
+                        is Private -> success(channel.copy(messages = messages))
+                    }
                 }
 
         override fun getChannels(
