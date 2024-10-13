@@ -15,6 +15,9 @@ import kotlin.test.Test
 import kotlin.test.assertNotNull
 
 class TransactionManagerJDBCTest {
+	private val validPassword = "Password123"
+	private val passwordDefault = Password(validPassword)
+
 	private class TestConnectionSource : ConnectionSource {
 		override val connectionUrl: String
 			get() = "jdbc:postgresql://localhost:5433/daw_test"
@@ -47,7 +50,7 @@ class TransactionManagerJDBCTest {
 					.createUser(
 						User(
 							username = "user",
-							password = Password("password"),
+							password = passwordDefault,
 						),
 					)
 			assertNotNull(user)

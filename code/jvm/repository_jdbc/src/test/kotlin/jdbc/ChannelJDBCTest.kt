@@ -21,6 +21,9 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ChannelJDBCTest {
+	private val validPassword = "Password123"
+	private val passwordDefault = Password(validPassword)
+
 	companion object {
 		private fun runWithConnection(block: (Connection) -> Unit) =
 			PGSimpleDataSource()
@@ -46,7 +49,7 @@ class ChannelJDBCTest {
 			.createUser(
 				User(
 					username = "user${System.currentTimeMillis() + Random.nextInt()}",
-					password = Password("password"),
+					password = passwordDefault,
 				),
 			).let { user ->
 				assertNotNull(user)
@@ -86,7 +89,7 @@ class ChannelJDBCTest {
 				.createUser(
 					User(
 						username = "user",
-						password = Password("password"),
+						password = passwordDefault,
 					),
 				).let { user ->
 					assertNotNull(user)
