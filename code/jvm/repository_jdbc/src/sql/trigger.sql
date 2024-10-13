@@ -26,7 +26,7 @@ begin
            c.visibility    as channel_visibility,
            u.id            as owner_id,
            u.name          as owner_name,
-          c.accessControl as channel_accessControl
+           c.accessControl as channel_accessControl
     from channels c
              join users u on c.owner = u.id;
     return new;

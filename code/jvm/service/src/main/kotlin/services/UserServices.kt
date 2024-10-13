@@ -82,7 +82,7 @@ class UserServices
                     return@run success(Unit)
                 }
                 if (channel is Channel.Public) {
-                    userRepo.joinChannel(channelId, userId, channel.accessControl)
+                    channelRepo.joinChannel(channelId, userId, channel.accessControl)
                     return@run success(Unit)
                 }
                 val invitation =
@@ -96,7 +96,7 @@ class UserServices
                     return@run failure(InvitationCodeMaxUsesReached)
                 }
                 channelRepo.updateInvitation(invitation.decrementUses())
-                userRepo.joinChannel(channelId, userId, invitation.accessControl)
+                channelRepo.joinChannel(channelId, userId, invitation.accessControl)
                 success(Unit)
             }
         }

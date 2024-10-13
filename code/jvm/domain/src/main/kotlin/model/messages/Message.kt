@@ -15,13 +15,13 @@ import java.time.LocalDateTime
  */
 
 data class Message(
-	val msgId: UInt? = null,
-	val msg: String,
-	val user: UserInfo,
-	val channel: ChannelInfo,
-	val creationTime: LocalDateTime = LocalDateTime.now(),
+    val msgId: UInt? = null,
+    val msg: String,
+    val user: UserInfo,
+    val channel: ChannelInfo,
+    val creationTime: LocalDateTime = LocalDateTime.now(),
 ) {
-	init {
-		require(msg.isNotBlank()) { "The message cannot be empty." }
-	}
+    init {
+        require(msg.isNotBlank()) { "The message cannot be empty." }
+    }
 }

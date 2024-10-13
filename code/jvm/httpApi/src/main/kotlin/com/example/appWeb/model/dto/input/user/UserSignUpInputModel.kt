@@ -12,9 +12,9 @@ import model.users.Password
  * @param inviterUId The inviter user id
  */
 data class UserSignUpInputModel(
-	@get:NotBlank val username: String,
-	@get:NotBlank @get:Pattern(regexp = Password.PASSWORD_PATTERN)
-	val password: String,
-	@get:NotBlank val invitationCode: String,
-	val inviterUId: UInt,
+    @get:NotBlank val username: String,
+    @get:NotBlank @get:Pattern(regexp = Password.PASSWORD_PATTERN)
+    val password: String,
+    @get:NotBlank val invitationCode: String,
+    val inviterUId: UInt,
 )

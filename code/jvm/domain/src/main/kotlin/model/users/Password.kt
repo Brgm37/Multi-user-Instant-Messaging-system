@@ -12,18 +12,18 @@ package model.users
  * @throws IllegalArgumentException if the password is invalid.
  */
 data class Password(
-	val value: String,
+    val value: String,
 ) {
-	override fun toString(): String = value
+    override fun toString(): String = value
 
-	init {
-		require(isValidPassword(value)) { "Invalid password." }
-	}
+    init {
+        require(isValidPassword(value)) { "Invalid password." }
+    }
 
-	companion object {
-		const val PASSWORD_MIN_LENGTH = 8
-		const val PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{$PASSWORD_MIN_LENGTH,}$"
+    companion object {
+        const val PASSWORD_MIN_LENGTH = 8
+        const val PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{$PASSWORD_MIN_LENGTH,}$"
 
-		fun isValidPassword(password: String): Boolean = Regex(PASSWORD_PATTERN).matches(password)
-	}
+        fun isValidPassword(password: String): Boolean = Regex(PASSWORD_PATTERN).matches(password)
+    }
 }

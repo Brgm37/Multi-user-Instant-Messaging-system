@@ -1,6 +1,6 @@
 plugins {
-	id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
-	kotlin("jvm") version "1.9.25" apply false
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+    kotlin("jvm") version "1.9.25" apply false
 }
 
 rootProject.name = "2024-daw-leic52d-im-i52d-2425-g04"

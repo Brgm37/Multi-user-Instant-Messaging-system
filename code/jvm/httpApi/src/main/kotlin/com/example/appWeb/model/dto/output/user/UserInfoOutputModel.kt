@@ -7,12 +7,12 @@ import model.users.User
  * @param username The username of the user
  */
 data class UserInfoOutputModel(
-	val username: String,
+    val username: String,
 ) {
-	companion object {
-		fun fromDomain(user: User): UserInfoOutputModel =
-			UserInfoOutputModel(
-				username = user.username,
-			)
-	}
+    companion object {
+        fun fromDomain(user: User): UserInfoOutputModel =
+            UserInfoOutputModel(
+                username = user.username,
+            )
+    }
 }

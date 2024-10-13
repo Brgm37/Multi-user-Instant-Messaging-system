@@ -10,18 +10,18 @@ import model.channels.Channel
  * @property ownerOutputModel The owner output model
  */
 data class ChannelListOutputModel(
-	val name: ChannelNameOutputModel,
-	val id: UInt,
-	val ownerOutputModel: OwnerOutputModel,
+    val name: ChannelNameOutputModel,
+    val id: UInt,
+    val ownerOutputModel: OwnerOutputModel,
 ) {
-	companion object {
-		fun fromDomain(channel: Channel): ChannelListOutputModel {
-			val id = checkNotNull(channel.channelId) { "Channel id must not be null" }
-			return ChannelListOutputModel(
-				name = ChannelNameOutputModel.fromDomain(channel.name),
-				id = id,
-				ownerOutputModel = OwnerOutputModel.fromDomain(channel.owner),
-			)
-		}
-	}
+    companion object {
+        fun fromDomain(channel: Channel): ChannelListOutputModel {
+            val id = checkNotNull(channel.channelId) { "Channel id must not be null" }
+            return ChannelListOutputModel(
+                name = ChannelNameOutputModel.fromDomain(channel.name),
+                id = id,
+                ownerOutputModel = OwnerOutputModel.fromDomain(channel.owner),
+            )
+        }
+    }
 }

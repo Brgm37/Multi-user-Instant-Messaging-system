@@ -9,5 +9,5 @@ import org.springframework.context.annotation.ComponentScan
 class HttpApiApplication
 
 fun main(args: Array<String>) {
-	runApplication<HttpApiApplication>(*args)
+    runApplication<HttpApiApplication>(*args)
 }
