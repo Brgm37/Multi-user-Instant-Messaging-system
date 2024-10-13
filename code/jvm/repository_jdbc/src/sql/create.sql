@@ -23,6 +23,7 @@ create table if not exists channels
     name varchar(128) not null unique,
     owner integer not null,
     visibility varchar(10) check ( visibility in ('PUBLIC', 'PRIVATE') ) not null,
+    accessControl varchar(10) check ( accessControl in ('READ_ONLY', 'READ_WRITE') ) not null,
     foreign key (owner) references users (id)
 );
 
