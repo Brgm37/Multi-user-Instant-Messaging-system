@@ -1,4 +1,3 @@
-import model.channels.AccessControl
 import model.users.User
 import model.users.UserInvitation
 
@@ -9,18 +8,6 @@ interface UserRepositoryInterface : Repository<User> {
      * @return The created user
      */
     fun createUser(user: User): User?
-
-    /**
-     * Associates a user with a channel
-     * @param uId The ID of the user
-     * @param channelId The ID of the channel
-     * @param accessControl The access control settings of the user in the channel
-     */
-    fun joinChannel(
-        uId: UInt,
-        channelId: UInt,
-        accessControl: AccessControl,
-    )
 
     /**
      * Retrieves an invitation associated to the user

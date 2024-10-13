@@ -1,7 +1,6 @@
 package jdbc
 
 import UserRepositoryInterface
-import model.channels.AccessControl
 import model.users.Password
 import model.users.User
 import model.users.UserInvitation
@@ -36,24 +35,6 @@ class UserJDBC(
         } else {
             null
         }
-    }
-
-    override fun joinChannel(
-        uId: UInt,
-        channelId: UInt,
-        accessControl: AccessControl,
-    ) {
-        TODO("Update the query to include the access control")
-//        val insertQuery =
-//            """
-//            INSERT INTO channel_members (member, channel)
-//            VALUES (?, ?)
-//            """.trimIndent()
-//        val stm = connection.prepareStatement(insertQuery)
-//        var idx = 1
-//        stm.setInt(idx++, uId.toInt())
-//        stm.setInt(idx, channelId.toInt())
-//        stm.executeUpdate()
     }
 
     override fun findInvitation(
