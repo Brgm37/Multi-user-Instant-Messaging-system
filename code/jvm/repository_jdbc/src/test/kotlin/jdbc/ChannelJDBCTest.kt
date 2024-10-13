@@ -24,16 +24,16 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ChannelJDBCTest {
-	private val validPassword = "Password123"
-	private val passwordDefault = Password(validPassword)
+    private val validPassword = "Password123"
+    private val passwordDefault = Password(validPassword)
 
-	companion object {
-		private fun runWithConnection(block: (Connection) -> Unit) =
-			PGSimpleDataSource()
-				.apply { setURL("jdbc:postgresql://localhost:5433/daw_test?user=postgres&password=password") }
-				.connection
-				.let(block)
-	}
+    companion object {
+        private fun runWithConnection(block: (Connection) -> Unit) =
+            PGSimpleDataSource()
+                .apply { setURL("jdbc:postgresql://localhost:5433/daw_test?user=postgres&password=password") }
+                .connection
+                .let(block)
+    }
 
     @BeforeEach
     fun clean() {
