@@ -77,7 +77,6 @@ class ChannelController
 				channelService.createChannel(
 					owner = channel.owner,
 					name = channel.name,
-					accessControl = channel.accessControl,
 					visibility = channel.visibility,
 				)
 			when (response) {
