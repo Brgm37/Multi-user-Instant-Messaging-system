@@ -1,7 +1,6 @@
 package model
 
-import org.eclipse.jetty.util.security.Password
-import java.util.*
+import java.util.UUID
 
 /**
  * Represents a User.
@@ -13,12 +12,12 @@ import java.util.*
  * @throws IllegalArgumentException if the username is empty.
  */
 data class User(
-    val uId: UInt? = null,
-    val username: String,
-    val password: Password,
-    val token: UUID = UUID.randomUUID(),
+	val uId: UInt? = null,
+	val username: String,
+	val password: Password,
+	val token: UUID = UUID.randomUUID(),
 ) {
-    init {
-        require(username.isNotBlank()) { "Username must not be blank." }
-    }
+	init {
+		require(username.isNotBlank()) { "Username must not be blank." }
+	}
 }

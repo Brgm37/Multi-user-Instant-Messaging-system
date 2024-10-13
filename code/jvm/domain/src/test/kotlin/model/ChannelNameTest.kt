@@ -5,7 +5,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class ChannelNameTest {
-
 	@Test
 	fun `successful channel name instantiation test`() {
 		ChannelName(name = "channelName", ownerName = "ownerName")

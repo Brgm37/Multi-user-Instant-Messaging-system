@@ -1,34 +1,34 @@
 package jdbc
 
 import UserRepositoryInterface
+import model.Password
 import model.User
-import org.eclipse.jetty.util.security.Password
-import org.eclipse.jetty.util.security.Password.obfuscate
+import model.UserInvitation
 import java.sql.Connection
 import java.sql.ResultSet
-import java.util.*
+import java.util.UUID
 
 class UserJDBC(
-	private val connection: Connection
-): UserRepositoryInterface{
-
-	private fun ResultSet.toUser(): User {
-		return User(
+	private val connection: Connection,
+) : UserRepositoryInterface {
+	private fun ResultSet.toUser(): User =
+		User(
 			uId = getInt("id").toUInt(),
 			username = getString("username"),
-			password = Password(obfuscate(getString("password"))),
+			password = Password(getString(("password"))),
 			token = UUID.fromString(getString("token")),
 		)
-	}
+
 	override fun createUser(user: User): User? {
-		val insertQuery = """
-				INSERT INTO users (name, password)
-				VALUES (?, ?) RETURNING id
+		val insertQuery =
+			"""
+			INSERT INTO users (name, password)
+			VALUES (?, ?) RETURNING id
 			""".trimIndent()
 		val stm = connection.prepareStatement(insertQuery)
 		var idx = 1
 		stm.setString(idx++, user.username)
-		stm.setString(idx, obfuscate(user.password.toString()))
+		stm.setString(idx, (user.password.value))
 		val rs = stm.executeQuery()
 		return if (rs.next()) {
 			user.copy(uId = rs.getInt("id").toUInt())
@@ -37,10 +37,14 @@ class UserJDBC(
 		}
 	}
 
-	override fun joinChannel(uId: UInt, channelId: UInt) {
-		val insertQuery = """
-				INSERT INTO channel_members (member, channel)
-				VALUES (?, ?)
+	override fun joinChannel(
+		uId: UInt,
+		channelId: UInt,
+	) {
+		val insertQuery =
+			"""
+			INSERT INTO channel_members (member, channel)
+			VALUES (?, ?)
 			""".trimIndent()
 		val stm = connection.prepareStatement(insertQuery)
 		var idx = 1
@@ -49,11 +53,27 @@ class UserJDBC(
 		stm.executeUpdate()
 	}
 
+	override fun findInvitation(
+		inviterUId: UInt,
+		invitationCode: String,
+	): UserInvitation? {
+		TODO("Not yet implemented")
+	}
+
+	override fun deleteInvitation(invitation: UserInvitation) {
+		TODO("Not yet implemented")
+	}
+
+	override fun createInvitation(invitation: UserInvitation) {
+		TODO("Not yet implemented")
+	}
+
 	override fun findById(id: UInt): User? {
-		val selectQuery = """
-				SELECT id, name, password, token
-				FROM users
-				WHERE id = ?
+		val selectQuery =
+			"""
+			SELECT id, name, password, token
+			FROM users
+			WHERE id = ?
 			""".trimIndent()
 		val stm = connection.prepareStatement(selectQuery)
 		stm.setInt(1, id.toInt())
@@ -65,43 +85,50 @@ class UserJDBC(
 		}
 	}
 
-	override fun findAll(): Sequence<User> {
-		val selectQuery = """
-				SELECT id, name, password, token
-				FROM users
+	override fun findAll(
+		offset: Int,
+		limit: Int,
+	): List<User> {
+		val selectQuery =
+			"""
+			SELECT id, name, password, token
+			FROM users
 			""".trimIndent()
 		val stm = connection.prepareStatement(selectQuery)
 		val rs = stm.executeQuery()
-		return sequence {
-			while (rs.next()) {
-				yield(rs.toUser())
-			}
+		val users = mutableListOf<User>()
+		while (rs.next()) {
+			users.add(rs.toUser())
 		}
+		return users
 	}
 
 	override fun save(entity: User) {
-		val updateQuery = """
-				UPDATE users
-				SET name = ?, password = ?
-				WHERE id = ?
+		val updateQuery =
+			"""
+			UPDATE users
+			SET name = ?, password = ?
+			WHERE id = ?
 			""".trimIndent()
 		val stm = connection.prepareStatement(updateQuery)
 		var idx = 1
 		stm.setString(idx++, entity.username)
-		stm.setString(idx++, obfuscate(entity.password.toString()))
+		stm.setString(idx++, entity.password.value)
 		entity.uId?.let { stm.setInt(idx, it.toInt()) }
 		stm.executeUpdate()
 	}
 
 	override fun deleteById(id: UInt) {
-		val deleteFromUserChannelsQuery = """
-            DELETE FROM channel_members
-            WHERE member = ?
-        """.trimIndent()
-		val deleteFromUsersQuery = """
-            DELETE FROM users
-            WHERE id = ?
-        """.trimIndent()
+		val deleteFromUserChannelsQuery =
+			"""
+			DELETE FROM channel_members
+			WHERE member = ?
+			""".trimIndent()
+		val deleteFromUsersQuery =
+			"""
+			DELETE FROM users
+			WHERE id = ?
+			""".trimIndent()
 
 		val stmUserChannels = connection.prepareStatement(deleteFromUserChannelsQuery)
 		stmUserChannels.setInt(1, id.toInt())
@@ -112,4 +139,14 @@ class UserJDBC(
 		stmUsers.executeUpdate()
 	}
 
+	@Suppress("SqlWithoutWhere")
+	override fun clear() {
+		val deleteFromUsersQuery =
+			"""
+			DELETE FROM users
+			""".trimIndent()
+
+		val stmUsers = connection.prepareStatement(deleteFromUsersQuery)
+		stmUsers.executeUpdate()
+	}
 }

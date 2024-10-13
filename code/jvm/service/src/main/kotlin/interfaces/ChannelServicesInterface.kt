@@ -40,20 +40,28 @@ interface ChannelServicesInterface {
 	 * Gets all channels that owner owns.
 	 * @param owner The owner of the channels.
 	 */
-	fun getChannels(owner: UInt): Either<ChannelError, Sequence<Channel>>
+	fun getChannels(
+		owner: UInt,
+		offset: Int,
+		limit: Int,
+	): Either<ChannelError, List<Channel>>
 
 	/**
 	 * Gets all channels.
 	 */
-	fun getChannels(): Either<ChannelError, Sequence<Channel>>
+	fun getChannels(
+		offset: Int,
+		limit: Int,
+	): Either<ChannelError, List<Channel>>
 
 	/**
 	 * Gets the latest messages of a channel.
 	 * @param id The id of the channel.
-	 * @param quantity The quantity of messages to get.
+	 * @param limit The quantity of messages to get.
 	 */
 	fun latestMessages(
 		id: UInt,
-		quantity: Int,
-	): Sequence<Message>
+		offset: Int,
+		limit: Int,
+	): Either<ChannelError, List<Message>>
 }

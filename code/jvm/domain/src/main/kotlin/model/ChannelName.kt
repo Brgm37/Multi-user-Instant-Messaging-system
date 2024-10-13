@@ -11,15 +11,16 @@ package model
  * @throws IllegalArgumentException If the channel name or the owner name is blank.
  */
 data class ChannelName(
-    val name: String,
-    val ownerName: String,
+	val name: String,
+	val ownerName: String,
 ) {
-    init {
-        require(name.isNotBlank()) { "The channel name cannot be blank." }
-        require(ownerName.isNotBlank()) { "The owner name cannot be blank." }
-    }
-    val fullName: String
-        get() = "@$ownerName/$name"
+	init {
+		require(name.isNotBlank()) { "The channel name cannot be blank." }
+		require(ownerName.isNotBlank()) { "The owner name cannot be blank." }
+	}
+
+	val fullName: String
+		get() = "@$ownerName/$name"
 }
 
 /**
@@ -30,5 +31,5 @@ data class ChannelName(
  */
 fun String.toChannelName(): ChannelName {
 	val (ownerName, name) = this.split("/")
-	return ChannelName(name.drop(1), ownerName)
+	return ChannelName(name, ownerName.drop(1))
 }

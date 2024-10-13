@@ -1,4 +1,4 @@
-package com.example.appWeb.model.dto.input
+package com.example.appWeb.model.dto.input.channel
 
 import jakarta.validation.constraints.AssertTrue
 import jakarta.validation.constraints.NotBlank

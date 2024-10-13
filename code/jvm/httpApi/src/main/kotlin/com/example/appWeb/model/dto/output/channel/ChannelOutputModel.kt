@@ -1,4 +1,4 @@
-package com.example.appWeb.model.dto.output
+package com.example.appWeb.model.dto.output.channel
 
 import model.Channel
 import model.Visibility.PRIVATE
@@ -14,7 +14,7 @@ data class ChannelOutputModel(
 	companion object {
 		fun fromDomain(channel: Channel): ChannelOutputModel =
 			ChannelOutputModel(
-				id = channel.id ?: throw IllegalArgumentException("Channel id is null"),
+				id = channel.channelId ?: throw IllegalArgumentException("Channel id is null"),
 				owner = OwnerOutputModel.fromDomain(channel.owner),
 				name = ChannelNameOutputModel.fromDomain(channel.name),
 				accessControl = channel.accessControl.name,
