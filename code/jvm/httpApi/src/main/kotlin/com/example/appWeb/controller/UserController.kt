@@ -1,20 +1,20 @@
 package com.example.appWeb.controller
 
-import com.example.appWeb.controller.ChannelController.Companion.CHANNEL_ID_URL
-import com.example.appWeb.model.dto.input.user.UserInputModel
+import com.example.appWeb.model.dto.input.user.UserSignUpInputModel
 import com.example.appWeb.model.dto.output.user.UserAuthenticationOutputModel
 import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
 import com.example.appWeb.model.problem.Problem
-import errors.ChannelError
 import errors.ChannelError.ChannelNotFound
 import errors.UserError.InvalidUserInfo
+import errors.UserError.InvitationCodeHasExpired
+import errors.UserError.InvitationCodeIsInvalid
+import errors.UserError.InviterNotFound
 import errors.UserError.UserAlreadyExists
 import errors.UserError.UserNotFound
 import interfaces.UserServicesInterface
 import jakarta.inject.Inject
 import jakarta.inject.Named
 import jakarta.validation.Valid
-import model.User
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import utils.Failure
 import utils.Success
 
@@ -39,14 +40,14 @@ class UserController
 	) {
 		@PostMapping(USER_BASE_URL)
 		fun createUser(
-			@Valid @RequestBody user: UserInputModel,
+			@Valid @RequestBody user: UserSignUpInputModel,
 		) {
 			val response =
 				userService.createUser(
-					User(
-						username = user.username,
-						password = user.password,
-					),
+					username = user.username,
+					password = user.password,
+					invitationCode = user.invitationCode,
+					inviterUId = user.inviterUId,
 				)
 			when (response) {
 				is Success -> {
@@ -57,6 +58,9 @@ class UserController
 					when (response.value) {
 						InvalidUserInfo -> Problem.InvalidUserInfo.response(BAD_REQUEST)
 						UserAlreadyExists -> Problem.UserAlreadyExists.response(BAD_REQUEST)
+						InviterNotFound -> Problem.InviterNotFound.response(BAD_REQUEST)
+						InvitationCodeIsInvalid -> Problem.InvitationCodeIsInvalid.response(BAD_REQUEST)
+						InvitationCodeHasExpired -> Problem.InvitationCodeHasExpired.response(BAD_REQUEST)
 						else -> Problem.UnableToCreateUser.response(BAD_REQUEST)
 					}
 				}
@@ -78,12 +82,13 @@ class UserController
 			}
 		}
 
-		@PutMapping("$CHANNEL_ID_URL/$USER_ID_URL")
+		@PutMapping(CHANNEL_ID_USER_ID_URL)
 		fun joinChannel(
 			@PathVariable channelId: UInt,
 			@PathVariable userId: UInt,
+			@RequestParam invitationCode: String = "",
 		) {
-			when (val response = userService.joinChannel(userId, channelId)) {
+			when (val response = userService.joinChannel(userId, channelId, invitationCode)) {
 				is Success -> {
 					ResponseEntity.ok()
 				}
@@ -91,7 +96,7 @@ class UserController
 				is Failure -> {
 					when (response.value) {
 						UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
-						ChannelError.ChannelNotFound -> Problem.ChannelNotFound.response(NOT_FOUND)
+						ChannelNotFound -> Problem.ChannelNotFound.response(NOT_FOUND)
 						else -> Problem.UnableToJoinChannel.response(BAD_REQUEST)
 					}
 				}
@@ -108,5 +113,10 @@ class UserController
 			 * The URL for the user with the given id.
 			 */
 			const val USER_ID_URL = "$USER_BASE_URL/{userId}"
+
+			/**
+			 * The URL for the user with the given id, the channel with the given id and invitation code.
+			 */
+			const val CHANNEL_ID_USER_ID_URL = "${ChannelController.CHANNEL_ID_URL}$USER_ID_URL"
 		}
 	}

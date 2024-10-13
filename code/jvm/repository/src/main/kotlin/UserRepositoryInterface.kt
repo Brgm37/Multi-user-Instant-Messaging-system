@@ -1,4 +1,5 @@
 import model.User
+import model.UserInvitation
 
 interface UserRepositoryInterface : Repository<User> {
 	/**
@@ -17,4 +18,26 @@ interface UserRepositoryInterface : Repository<User> {
 		uId: UInt,
 		channelId: UInt,
 	)
+
+	/**
+	 * Retrieves an invitation associated to the user
+	 * @param inviterUId The ID of the inviter
+	 * @param invitationCode The invitation code
+	 */
+	fun findInvitation(
+		inviterUId: UInt,
+		invitationCode: String,
+	): UserInvitation?
+
+	/**
+	 * Deletes an invitation associated to the user
+	 * @param invitation The invitation to delete
+	 */
+	fun deleteInvitation(invitation: UserInvitation)
+
+	/**
+	 * Creates an invitation for the user
+	 * @param invitation The invitation to create
+	 */
+	fun createInvitation(invitation: UserInvitation)
 }

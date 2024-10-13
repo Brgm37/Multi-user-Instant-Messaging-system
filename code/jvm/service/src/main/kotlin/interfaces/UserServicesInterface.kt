@@ -11,10 +11,17 @@ import utils.Either
 interface UserServicesInterface {
 	/**
 	 * Creates a new user.
-	 * @param user The user info to create.
-	 * @return The created [User].
+	 * @param username The username of the user.
+	 * @param password The password of the user.
+	 * @param invitationCode The invitation code to join the app.
+	 * @param inviterUId The inviter user id.
 	 */
-	fun createUser(user: User): Either<UserError, User>
+	fun createUser(
+		username: String,
+		password: String,
+		invitationCode: String,
+		inviterUId: UInt,
+	): Either<UserError, User>
 
 	/**
 	 * Deletes a user.
@@ -32,9 +39,11 @@ interface UserServicesInterface {
 	 * Associates a user to a channel.
 	 * @param userId The id of the user to join the channel.
 	 * @param channelId The id of the channel to join.
+	 * @param invitationCode The invitation code to join the channel.
 	 */
 	fun joinChannel(
 		userId: UInt,
 		channelId: UInt,
+		invitationCode: String,
 	): Either<Error, Unit>
 }

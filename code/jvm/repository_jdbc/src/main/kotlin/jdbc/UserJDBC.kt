@@ -1,9 +1,9 @@
 package jdbc
 
 import UserRepositoryInterface
+import model.Password
 import model.User
-import org.eclipse.jetty.util.security.Password
-import org.eclipse.jetty.util.security.Password.obfuscate
+import model.UserInvitation
 import java.sql.Connection
 import java.sql.ResultSet
 import java.util.UUID
@@ -15,7 +15,7 @@ class UserJDBC(
 		User(
 			uId = getInt("id").toUInt(),
 			username = getString("username"),
-			password = Password(obfuscate(getString("password"))),
+			password = Password(getString(("password"))),
 			token = UUID.fromString(getString("token")),
 		)
 
@@ -28,7 +28,7 @@ class UserJDBC(
 		val stm = connection.prepareStatement(insertQuery)
 		var idx = 1
 		stm.setString(idx++, user.username)
-		stm.setString(idx, obfuscate(user.password.toString()))
+		stm.setString(idx, (user.password.value))
 		val rs = stm.executeQuery()
 		return if (rs.next()) {
 			user.copy(uId = rs.getInt("id").toUInt())
@@ -51,6 +51,21 @@ class UserJDBC(
 		stm.setInt(idx++, uId.toInt())
 		stm.setInt(idx, channelId.toInt())
 		stm.executeUpdate()
+	}
+
+	override fun findInvitation(
+		inviterUId: UInt,
+		invitationCode: String,
+	): UserInvitation? {
+		TODO("Not yet implemented")
+	}
+
+	override fun deleteInvitation(invitation: UserInvitation) {
+		TODO("Not yet implemented")
+	}
+
+	override fun createInvitation(invitation: UserInvitation) {
+		TODO("Not yet implemented")
 	}
 
 	override fun findById(id: UInt): User? {
@@ -98,7 +113,7 @@ class UserJDBC(
 		val stm = connection.prepareStatement(updateQuery)
 		var idx = 1
 		stm.setString(idx++, entity.username)
-		stm.setString(idx++, obfuscate(entity.password.toString()))
+		stm.setString(idx++, entity.password.value)
 		entity.uId?.let { stm.setInt(idx, it.toInt()) }
 		stm.executeUpdate()
 	}

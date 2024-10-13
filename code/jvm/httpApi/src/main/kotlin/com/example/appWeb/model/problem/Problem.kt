@@ -20,14 +20,14 @@ sealed class Problem(
 			.body(this)
 
 	// TODO(implement ChannelProblem, UserProblem, etc.)
-	// chanel
+	// CHANNEL
 	data object ChannelNotFound : Problem(URI("$PROBLEM_URI_PATH/channel-not-found"))
 
 	data object InvalidChannelInfo : Problem(URI("$PROBLEM_URI_PATH/invalid-channel-info"))
 
 	data object UnableToCreateChannel : Problem(URI("$PROBLEM_URI_PATH/unable-to-create-channel"))
 
-	// user
+	// USER
 	data object InvalidUserInfo : Problem(URI("$PROBLEM_URI_PATH/invalid-user-info"))
 
 	data object UserAlreadyExists : Problem(URI("$PROBLEM_URI_PATH/user-already-exists"))
@@ -37,4 +37,12 @@ sealed class Problem(
 	data object UnableToCreateUser : Problem(URI("$PROBLEM_URI_PATH/unable-to-create-user"))
 
 	data object UnableToJoinChannel : Problem(URI("$PROBLEM_URI_PATH/unable-to-join-channel"))
+
+	data object InvalidInviter : Problem(URI("$PROBLEM_URI_PATH/invalid-inviter"))
+
+	data object InviterNotFound : Problem(URI("$PROBLEM_URI_PATH/inviter-not-found"))
+
+	data object InvitationCodeHasExpired : Problem(URI("$PROBLEM_URI_PATH/invitation-code-has-expired"))
+
+	data object InvitationCodeIsInvalid : Problem(URI("$PROBLEM_URI_PATH/invitation-code-has-expired"))
 }

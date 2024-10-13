@@ -7,8 +7,8 @@ import errors.UserError
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import model.Password
 import model.User
-import org.eclipse.jetty.util.security.Password
 import org.junit.jupiter.api.BeforeEach
 import utils.Either
 import utils.failure
@@ -20,10 +20,12 @@ class UserServicesTest {
 	private lateinit var tm: TransactionManager
 	private lateinit var userServices: UserServices
 
-	private val passwordDefault = Password("password")
+	private val validPassword = "Password123"
+	private val passwordDefault = Password(validPassword)
 	private val usernameDefault = "name"
 	private val uIdDefault = 1u
 	private val cIdDefault = 1u
+	private val invitationCodeDefault = "code"
 	private val userDefault = User(null, usernameDefault, passwordDefault)
 	private val userWithIdDefault = User(uIdDefault, usernameDefault, passwordDefault)
 
@@ -35,10 +37,10 @@ class UserServicesTest {
 
 	@Test
 	fun `create a new user should return the user created with uID attribute`() {
-		val user = userDefault
 		every { tm.run<Either<UserError, User>>(any()) } returns success(userWithIdDefault)
 
-		val userCreated = userServices.createUser(user) as Either.Right
+		val userCreated =
+			userServices.createUser(usernameDefault, validPassword, invitationCodeDefault, uIdDefault) as Either.Right
 		val userId = userCreated.value.uId
 
 		assertEquals(uIdDefault, userId)
@@ -48,10 +50,10 @@ class UserServicesTest {
 
 	@Test
 	fun `trying to create a user that already exists should return an error`() {
-		val user = userDefault
 		every { tm.run<Either<UserError, User>>(any()) } returns failure(UserError.UserAlreadyExists)
 
-		val userCreated = userServices.createUser(user) as Either.Left
+		val userCreated =
+			userServices.createUser(usernameDefault, validPassword, invitationCodeDefault, uIdDefault) as Either.Left
 		val error = userCreated.value
 
 		assertEquals(UserError.UserAlreadyExists, error)
@@ -61,11 +63,9 @@ class UserServicesTest {
 
 	@Test
 	fun `successfully joining a channel should return a success message`() {
-		val userId = uIdDefault
-		val channelId = cIdDefault
 		every { tm.run<Either<UserError, Unit>>(any()) } returns success(Unit)
 
-		val result = userServices.joinChannel(userId, channelId) as Either.Right
+		val result = userServices.joinChannel(uIdDefault, cIdDefault, invitationCodeDefault) as Either.Right
 		val message = result.value
 
 		assertEquals(Unit, message)
@@ -75,11 +75,9 @@ class UserServicesTest {
 
 	@Test
 	fun `trying to join a channel with a user that does not exist should return an error`() {
-		val userId = uIdDefault
-		val channelId = cIdDefault
 		every { tm.run<Either<UserError, Unit>>(any()) } returns failure(UserError.UserNotFound)
 
-		val result = userServices.joinChannel(userId, channelId) as Either.Left
+		val result = userServices.joinChannel(uIdDefault, cIdDefault, invitationCodeDefault) as Either.Left
 		val error = result.value
 
 		assertEquals(UserError.UserNotFound, error)
@@ -89,11 +87,9 @@ class UserServicesTest {
 
 	@Test
 	fun `trying to join a channel that does not exist should return an error`() {
-		val userId = uIdDefault
-		val channelId = cIdDefault
 		every { tm.run<Either<ChannelError, Unit>>(any()) } returns failure(ChannelNotFound)
 
-		val result = userServices.joinChannel(userId, channelId) as Either.Left
+		val result = userServices.joinChannel(uIdDefault, cIdDefault, invitationCodeDefault) as Either.Left
 		val error = result.value
 
 		assertEquals(ChannelNotFound, error)

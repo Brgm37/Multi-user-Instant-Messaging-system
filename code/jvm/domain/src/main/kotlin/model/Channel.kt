@@ -46,7 +46,6 @@ sealed class Channel {
 		override val name: ChannelName,
 		override val accessControl: AccessControl,
 		override val messages: List<Message> = emptyList(),
-		val invitationCode: String = "",
 	) : Channel()
 
 	companion object {

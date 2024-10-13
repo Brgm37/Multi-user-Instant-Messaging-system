@@ -6,10 +6,10 @@ import model.Channel
 import model.ChannelInfo
 import model.ChannelName
 import model.Message
+import model.Password
 import model.User
 import model.UserInfo
 import model.Visibility
-import org.eclipse.jetty.util.security.Password
 import org.junit.jupiter.api.BeforeEach
 import kotlin.test.Test
 import kotlin.test.assertNotNull
