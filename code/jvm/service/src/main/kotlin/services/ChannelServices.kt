@@ -3,17 +3,19 @@ package services
 import TransactionManager
 import errors.ChannelError
 import errors.ChannelError.ChannelNotFound
+import errors.ChannelError.InvalidChannelAccessControl
 import errors.ChannelError.InvalidChannelInfo
 import errors.ChannelError.InvalidChannelVisibility
+import errors.ChannelError.UnableToCreateChannel
 import errors.ChannelError.UserNotFound
 import interfaces.ChannelServicesInterface
 import jakarta.inject.Inject
 import jakarta.inject.Named
 import model.channels.AccessControl
 import model.channels.Channel
+import model.channels.Channel.Companion.createChannel
 import model.channels.ChannelName
 import model.channels.Visibility
-import model.messages.Message
 import model.users.UserInfo
 import utils.Either
 import utils.failure
@@ -35,7 +37,7 @@ class ChannelServices
                 return failure(InvalidChannelInfo)
             }
             if (accessControl.uppercase() !in AccessControl.entries.map(AccessControl::name)) {
-                return failure(InvalidChannelInfo)
+                return failure(InvalidChannelAccessControl)
             }
             if (visibility.uppercase() !in Visibility.entries.map(Visibility::name)) {
                 return failure(InvalidChannelVisibility)
@@ -44,14 +46,18 @@ class ChannelServices
                 val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
                 val id = checkNotNull(user.uId) { "User id is null" }
                 val channel =
-                    Channel
-                        .createChannel(
-                            owner = UserInfo(id, user.username),
-                            name = ChannelName(name, user.username),
-                            accessControl = AccessControl.valueOf(accessControl.uppercase()),
-                            visibility = Visibility.valueOf(visibility.uppercase()),
-                        )
-                success(channelRepo.createChannel(channel))
+                    createChannel(
+                        owner = UserInfo(id, user.username),
+                        name = ChannelName(name, user.username),
+                        accessControl = AccessControl.valueOf(accessControl.uppercase()),
+                        visibility = Visibility.valueOf(visibility.uppercase()),
+                    )
+                val createdChannel = channelRepo.createChannel(channel)
+                if (createdChannel == null) {
+                    failure(UnableToCreateChannel)
+                } else {
+                    success(createdChannel)
+                }
             }
         }
 
@@ -79,7 +85,7 @@ class ChannelServices
             repoManager
                 .run {
                     val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
-                    val id = requireNotNull(user.uId) { "User id is null" }
+                    val id = checkNotNull(user.uId) { "User id is null" }
                     val channels = channelRepo.findByUserId(id, offset, limit)
                     success(channels)
                 }
@@ -93,12 +99,4 @@ class ChannelServices
                     val channels = channelRepo.findAll(offset, limit)
                     success(channels)
                 }
-
-        override fun latestMessages(
-            id: UInt,
-            offset: Int,
-            limit: Int,
-        ): Either<ChannelError, List<Message>> {
-            TODO("Not yet implemented")
-        }
     }
