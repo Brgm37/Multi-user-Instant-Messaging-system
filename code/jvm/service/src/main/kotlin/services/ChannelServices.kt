@@ -94,24 +94,24 @@ class ChannelServices
 
         override fun getChannels(
             owner: UInt,
-            offset: Int,
-            limit: Int,
+            offset: UInt,
+            limit: UInt,
         ): Either<ChannelError, List<Channel>> =
             repoManager
                 .run {
                     val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
                     val id = checkNotNull(user.uId) { "User id is null" }
-                    val channels = channelRepo.findByUserId(id, offset, limit)
+                    val channels = channelRepo.findByUserId(id, offset.toInt(), limit.toInt())
                     success(channels)
                 }
 
         override fun getChannels(
-            offset: Int,
-            limit: Int,
+            offset: UInt,
+            limit: UInt,
         ): Either<ChannelError, List<Channel>> =
             repoManager
                 .run {
-                    val channels = channelRepo.findAll(offset, limit)
+                    val channels = channelRepo.findAll(offset.toInt(), limit.toInt())
                     success(channels)
                 }
     }

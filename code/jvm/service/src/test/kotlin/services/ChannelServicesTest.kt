@@ -6,6 +6,7 @@ import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
 import model.channels.AccessControl.READ_WRITE
 import model.channels.Channel
+import model.channels.Visibility.PRIVATE
 import model.channels.Visibility.PUBLIC
 import model.users.Password
 import model.users.User
@@ -14,7 +15,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import utils.Failure
 import utils.Success
 import java.util.stream.Stream
-import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
@@ -122,42 +122,87 @@ class ChannelServicesTest {
         assertIs<Success<Unit>>(result, "Channel deletion failed")
     }
 
-    @Test
-    fun `fail to create a channel due to blank name`() {
-//        val owner = 1u
-//        val name = ""
-//        val accessControl = "READ_WRITE"
-//        val visibility = "PUBLIC"
-//        every { transactionManager.run<Either<ChannelError, Channel>>(any()) } returns
-//            failure(ChannelError.InvalidChannelInfo)
-//        val response = channelServices.createChannel(owner, name, visibility, accessControl)
-//        verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any()) }
-//        assertIs<Failure<ChannelError>>(response)
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `fail to delete a channel due to invalid id`(manager: TransactionManager) {
+        val channelServices = ChannelServices(manager)
+        val result = channelServices.deleteChannel(0u)
+        assertIs<Failure<ChannelError>>(result, "Channel deletion should have failed")
+        assertEquals(ChannelError.ChannelNotFound, result.value, "Channel error is different")
     }
 
-    @Test
-    fun `fail to create a channel due to blank access control`() {
-//        val owner = 1u
-//        val name = "name"
-//        val accessControl = ""
-//        val visibility = "PUBLIC"
-//        every { transactionManager.run<Either<ChannelError, Channel>>(any()) } returns
-//            failure(ChannelError.InvalidChannelInfo)
-//        val response = channelServices.createChannel(owner, name, accessControl, visibility)
-//        verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any()) }
-//        assertIs<Failure<ChannelError>>(response)
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `get channel`(manager: TransactionManager) {
+        val owner = makeUser(manager)
+        val channelServices = ChannelServices(manager)
+        val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
+        val newChannel = channelServices.createChannel(ownerId, "name", READ_WRITE.name, PUBLIC.name)
+        assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+        assertNotNull(newChannel.value.channelId, "Channel id is null")
+        val newChannelId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
+        val result = channelServices.getChannel(newChannelId)
+        assertIs<Success<Channel>>(result, "Channel retrieval failed")
+        assertEquals(newChannel.value, result.value, "Channel is different")
     }
 
-    @Test
-    fun `fail to create a channel due to blank visibility`() {
-//        val owner = 1u
-//        val name = "name"
-//        val accessControl = "READ_WRITE"
-//        val visibility = ""
-//        every { transactionManager.run<Either<ChannelError, Channel>>(any()) } returns
-//            failure(ChannelError.InvalidChannelInfo)
-//        val response = channelServices.createChannel(owner, name, visibility, accessControl)
-//        verify(inverse = true) { transactionManager.run<Either<Channel, Channel>>(any()) }
-//        assertIs<Failure<ChannelError>>(response)
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `fail to get a channel due to invalid id`(manager: TransactionManager) {
+        val channelServices = ChannelServices(manager)
+        val result = channelServices.getChannel(0u)
+        assertIs<Failure<ChannelError>>(result, "Channel retrieval should have failed")
+        assertEquals(ChannelError.ChannelNotFound, result.value, "Channel error is different")
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `get channels`(manager: TransactionManager) {
+        val owner = makeUser(manager)
+        val channelServices = ChannelServices(manager)
+        val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
+        val nr = 5
+        repeat(nr) {
+            val newChannel = channelServices.createChannel(ownerId, "name$it", READ_WRITE.name, PUBLIC.name)
+            assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+            assertNotNull(newChannel.value.channelId, "Channel id is null")
+        }
+        val result = channelServices.getChannels(0u, nr.toUInt())
+        assertIs<Success<List<Channel>>>(result, "Channels retrieval failed")
+        assertEquals(nr, result.value.size, "Number of channels is different")
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `get channels from userid`(manager: TransactionManager) {
+        val owner = makeUser(manager)
+        val channelServices = ChannelServices(manager)
+        val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
+        val nr = 5
+        repeat(nr) {
+            val newChannel = channelServices.createChannel(ownerId, "name$it", READ_WRITE.name, PRIVATE.name)
+            assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+            assertNotNull(newChannel.value.channelId, "Channel id is null")
+        }
+        val result = channelServices.getChannels(ownerId, 0u, nr.toUInt())
+        assertIs<Success<List<Channel>>>(result, "Channels retrieval failed")
+        assertEquals(nr, result.value.size, "Number of channels is different")
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `fail to get channels due to invalid owner id`(manager: TransactionManager) {
+        val owner = makeUser(manager)
+        val channelServices = ChannelServices(manager)
+        val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
+        val nr = 5
+        repeat(nr) {
+            val newChannel = channelServices.createChannel(ownerId, "name$it", READ_WRITE.name, PRIVATE.name)
+            assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+            assertNotNull(newChannel.value.channelId, "Channel id is null")
+        }
+        val result = channelServices.getChannels(0u, 0u, nr.toUInt())
+        assertIs<Failure<ChannelError>>(result, "Channels retrieval should have failed")
+        assertEquals(ChannelError.UserNotFound, result.value, "Channel error is different")
     }
 }

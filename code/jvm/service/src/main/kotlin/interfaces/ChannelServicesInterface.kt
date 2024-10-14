@@ -41,15 +41,15 @@ interface ChannelServicesInterface {
      */
     fun getChannels(
         owner: UInt,
-        offset: Int,
-        limit: Int,
+        offset: UInt,
+        limit: UInt,
     ): Either<ChannelError, List<Channel>>
 
     /**
      * Gets all channels.
      */
     fun getChannels(
-        offset: Int,
-        limit: Int,
+        offset: UInt,
+        limit: UInt,
     ): Either<ChannelError, List<Channel>>
 }

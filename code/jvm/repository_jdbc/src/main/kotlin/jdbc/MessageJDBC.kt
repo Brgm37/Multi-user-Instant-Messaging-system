@@ -61,9 +61,7 @@ class MessageJDBC(
         channelId: UInt,
         limit: UInt,
         offset: UInt,
-    ): List<Message> {
-        TODO("Not yet implemented")
-    }
+    ): List<Message> = emptyList()
 
     override fun findById(id: UInt): Message? {
         val selectQuery =
