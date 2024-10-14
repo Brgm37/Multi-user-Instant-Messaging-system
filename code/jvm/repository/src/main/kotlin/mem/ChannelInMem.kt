@@ -63,6 +63,13 @@ class ChannelInMem : ChannelRepositoryInterface {
         invitations.add(invitation)
     }
 
+    override fun findUserAccessControl(
+        channelId: UInt,
+        userId: UInt,
+    ): AccessControl? {
+        TODO("Not yet implemented")
+    }
+
     override fun findById(id: UInt): Channel? = channels.find { it.channelId == id }
 
     override fun findAll(

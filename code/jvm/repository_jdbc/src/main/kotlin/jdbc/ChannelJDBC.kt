@@ -341,6 +341,13 @@ class ChannelJDBC(
         stm.executeUpdate()
     }
 
+    override fun findUserAccessControl(
+        channelId: UInt,
+        userId: UInt,
+    ): AccessControl? {
+        TODO("Not yet implemented")
+    }
+
     override fun findById(id: UInt): Channel? {
         val selectQuery =
             """
