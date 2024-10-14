@@ -2,7 +2,7 @@ package model.messages
 
 import model.channels.ChannelInfo
 import model.users.UserInfo
-import java.time.LocalDateTime
+import java.sql.Timestamp
 
 /**
  * Represents a Message.
@@ -19,7 +19,7 @@ data class Message(
     val msg: String,
     val user: UserInfo,
     val channel: ChannelInfo,
-    val creationTime: LocalDateTime = LocalDateTime.now(),
+    val creationTime: Timestamp,
 ) {
     init {
         require(msg.isNotBlank()) { "The message cannot be empty." }

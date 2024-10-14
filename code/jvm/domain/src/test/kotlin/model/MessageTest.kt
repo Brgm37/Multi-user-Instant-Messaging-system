@@ -4,6 +4,7 @@ import model.channels.ChannelInfo
 import model.channels.ChannelName
 import model.messages.Message
 import model.users.UserInfo
+import java.sql.Timestamp
 import java.time.LocalDateTime
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
@@ -13,7 +14,7 @@ class MessageTest {
     private val msg: String = "Hello World"
     private val user: UserInfo = UserInfo(1u, "user1")
     private val channel: ChannelInfo = ChannelInfo(1u, ChannelName("channel1", "user2"))
-    private val creationTime: LocalDateTime = LocalDateTime.now()
+    private val creationTime: Timestamp = Timestamp.valueOf(LocalDateTime.now())
 
     @Test
     fun `successful message instantiation test`() {

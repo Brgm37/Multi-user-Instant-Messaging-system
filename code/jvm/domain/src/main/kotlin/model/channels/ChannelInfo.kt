@@ -3,11 +3,15 @@ package model.channels
 /**
  * Represents a Channel.
  *
- * @param uId the channel’s identifier (unique).
+ * @param channelId the channel’s identifier (unique).
  * @param channelName the username of the user.
  * @throws IllegalArgumentException if the username is empty.
  */
 data class ChannelInfo(
-    val uId: UInt,
+    val channelId: UInt,
     val channelName: ChannelName,
-)
+) {
+    init {
+        require(channelName.fullName.isNotBlank()) { "The channel name cannot be blank." }
+    }
+}
