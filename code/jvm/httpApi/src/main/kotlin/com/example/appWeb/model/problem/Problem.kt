@@ -8,36 +8,38 @@ private const val MEDIA_TYPE = "application/problem+json"
 private const val PROBLEM_URI_PATH = "https://github.com/isel-leic-daw/2024-daw-leic52d-im-i52d-2425-g04/tree/main/docs"
 
 sealed class Problem(
-    typeUri: URI,
+	typeUri: URI,
 ) {
-    val type = typeUri.toString()
-    val title = type.split("/").last()
+	val type = typeUri.toString()
+	val title = type.split("/").last()
 
-    fun response(status: HttpStatus): ResponseEntity<Any> =
-        ResponseEntity
-            .status(status)
-            .header("Content-Type", MEDIA_TYPE)
-            .body(this)
+	fun response(status: HttpStatus): ResponseEntity<Any> =
+		ResponseEntity
+			.status(status)
+			.header("Content-Type", MEDIA_TYPE)
+			.body(this)
 
-    // TODO(implement ChannelProblem, UserProblem, etc.)
-    // USER
-    data object InvalidUserInfo : Problem(URI("$PROBLEM_URI_PATH/invalid-user-info"))
+	// TODO(implement ChannelProblem, UserProblem, etc.)
+	// USER
+	data object InvalidUserInfo : Problem(URI("$PROBLEM_URI_PATH/invalid-user-info"))
 
-    data object UserAlreadyExists : Problem(URI("$PROBLEM_URI_PATH/user-already-exists"))
+	data object UserAlreadyExists : Problem(URI("$PROBLEM_URI_PATH/user-already-exists"))
 
-    data object UserNotFound : Problem(URI("$PROBLEM_URI_PATH/user-not-found"))
+	data object UserNotFound : Problem(URI("$PROBLEM_URI_PATH/user-not-found"))
 
-    data object UnableToCreateUser : Problem(URI("$PROBLEM_URI_PATH/unable-to-create-user"))
+	data object UnableToCreateUser : Problem(URI("$PROBLEM_URI_PATH/unable-to-create-user"))
 
-    data object UnableToJoinChannel : Problem(URI("$PROBLEM_URI_PATH/unable-to-join-channel"))
+	data object UnableToJoinChannel : Problem(URI("$PROBLEM_URI_PATH/unable-to-join-channel"))
 
-    data object InvalidInviter : Problem(URI("$PROBLEM_URI_PATH/invalid-inviter"))
+	data object InvalidInviter : Problem(URI("$PROBLEM_URI_PATH/invalid-inviter"))
 
-    data object InviterNotFound : Problem(URI("$PROBLEM_URI_PATH/inviter-not-found"))
+	data object InviterNotFound : Problem(URI("$PROBLEM_URI_PATH/inviter-not-found"))
 
-    data object InvitationCodeHasExpired : Problem(URI("$PROBLEM_URI_PATH/invitation-code-has-expired"))
+	data object InvitationCodeHasExpired : Problem(URI("$PROBLEM_URI_PATH/invitation-code-has-expired"))
 
-    data object InvitationCodeIsInvalid : Problem(URI("$PROBLEM_URI_PATH/invitation-code-has-expired"))
+	data object InvitationCodeIsInvalid : Problem(URI("$PROBLEM_URI_PATH/invitation-code-is-invalid"))
 
-    data object Unauthorized : Problem(URI("$PROBLEM_URI_PATH/unauthorized"))
+	data object InvitationCodeMaxUsesReached : Problem(URI("$PROBLEM_URI_PATH/invitation-code-max-uses-reached"))
+
+	data object Unauthorized : Problem(URI("$PROBLEM_URI_PATH/unauthorized"))
 }
