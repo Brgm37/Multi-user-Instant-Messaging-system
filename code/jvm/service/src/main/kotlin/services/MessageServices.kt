@@ -3,7 +3,7 @@ package services
 import TransactionManager
 import errors.MessageError
 import errors.MessageError.ChannelNotFound
-import errors.MessageError.EmptyMessageContent
+import errors.MessageError.InvalidMessageInfo
 import errors.MessageError.MessageNotFound
 import errors.MessageError.UserHasNoWriteAccess
 import errors.MessageError.UserNotFound
@@ -32,7 +32,7 @@ constructor(
         channel: UInt,
         creationTime: Timestamp,
     ): Either<MessageError, Message> {
-        if (msg.isEmpty()) return failure(EmptyMessageContent)
+        if (msg.isEmpty()) return failure(InvalidMessageInfo)
         return repoManager.run {
             if (!channelRepo.isUserInChannel(user, channel)) {
                 return@run failure(UserNotInChannel)

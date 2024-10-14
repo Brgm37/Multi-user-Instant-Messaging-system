@@ -1,10 +1,8 @@
 package errors
 
-import utils.failure
-
 sealed class MessageError : Error() {
 
-    data object EmptyMessageContent : MessageError()
+    data object InvalidMessageInfo : MessageError()
 
     data object UserNotInChannel : MessageError()
 
