@@ -10,12 +10,14 @@ interface MessageRepositoryInterface : Repository<Message> {
      * @param message The message to create
      * @return The created message with its ID
      */
-    fun createMessage(message: Message): Message
+    fun createMessage(message: Message): Message?
 
     /**
-     * Finds a message by its channel id
-     * @param channelId The id of the channel
-     * @return The message with the given id.
+     * Finds limit amount of messages by channel ID
+     * @param channelId The ID of the channel
+     * @param limit The maximum number of messages to retrieve
+     * @param offset The offset to start retrieving messages
+     * @return A list with all messages in the channel
      */
     fun findMessagesByChannelId(
         channelId: UInt,
