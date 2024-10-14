@@ -8,7 +8,6 @@ import model.users.UserInfo
 import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.SQLException
-import java.sql.Timestamp
 
 /**
  * MessageJDBC is a JDBC implementation of MessageRepositoryInterface
@@ -25,7 +24,7 @@ class MessageJDBC(
             )
         val channel =
             ChannelInfo(
-                uId = getInt("msgChannelId").toUInt(),
+                channelId = getInt("msgChannelId").toUInt(),
                 channelName = getString("msgChannelName").toChannelName(),
             )
         return Message(
@@ -33,8 +32,16 @@ class MessageJDBC(
             msg = getString("msgContent"),
             user = author,
             channel = channel,
-            creationTime = getTimestamp("msgTimestamp").toLocalDateTime(),
+            creationTime = getTimestamp("msgTimestamp"),
         )
+    }
+
+    private fun ResultSet.toMessageList(): List<Message> {
+        val messages = mutableListOf<Message>()
+        while (next()) {
+            messages.add(toMessage())
+        }
+        return messages
     }
 
     override fun createMessage(message: Message): Message {
@@ -47,8 +54,8 @@ class MessageJDBC(
         var idx = 1
         stm.setString(idx++, message.msg)
         stm.setInt(idx++, message.user.uId.toInt())
-        stm.setInt(idx++, message.channel.uId.toInt())
-        stm.setTimestamp(idx, Timestamp.valueOf(message.creationTime))
+        stm.setInt(idx++, message.channel.channelId.toInt())
+        stm.setTimestamp(idx, message.creationTime)
         val rs = stm.executeQuery()
         if (rs.next()) {
             return message.copy(msgId = rs.getInt("id").toUInt())
@@ -62,14 +69,31 @@ class MessageJDBC(
         limit: UInt,
         offset: UInt,
     ): List<Message> {
-        TODO("Not yet implemented")
+        val selectQuery =
+            """
+            SELECT 
+                msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
+                msgChannelName, msgAuthorUsername
+            FROM v_message
+            WHERE msgChannelId = ?
+            ORDER BY msgTimestamp DESC
+            LIMIT ? OFFSET ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, channelId.toInt())
+        stm.setInt(idx++, limit.toInt())
+        stm.setInt(idx, offset.toInt())
+        val rs = stm.executeQuery()
+        return rs.toMessageList()
     }
 
     override fun findById(id: UInt): Message? {
         val selectQuery =
             """
-            SELECT msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
-             msgChannelName, msgAuthorUsername
+            SELECT 
+                msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
+                msgChannelName, msgAuthorUsername
             FROM v_message
             WHERE msgid = ?
             """.trimIndent()
@@ -89,8 +113,9 @@ class MessageJDBC(
     ): List<Message> {
         val selectQuery =
             """
-            SELECT msgId, msgChannelId, msgContent, msgauthorid, msgTimestamp,
-             msgChannelName, msgAuthorUsername
+            SELECT 
+                msgId, msgChannelId, msgContent, msgauthorid, msgTimestamp,
+                msgChannelName, msgAuthorUsername
             FROM v_message
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
