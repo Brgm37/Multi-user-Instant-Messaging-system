@@ -14,7 +14,7 @@ class UserJDBC(
     private fun ResultSet.toUser(): User =
         User(
             uId = getInt("id").toUInt(),
-            username = getString("username"),
+            username = getString("name"),
             password = Password(getString(("password"))),
             token = UUID.fromString(getString("token")),
         )
@@ -22,13 +22,14 @@ class UserJDBC(
     override fun createUser(user: User): User? {
         val insertQuery =
             """
-            INSERT INTO users (name, password)
-            VALUES (?, ?) RETURNING id
+            INSERT INTO users (name, password, token)
+            VALUES (?, ?, ?) RETURNING id
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         var idx = 1
         stm.setString(idx++, user.username)
-        stm.setString(idx, (user.password.value))
+        stm.setString(idx++, (user.password.value))
+        stm.setString(idx, user.token.toString())
         val rs = stm.executeQuery()
         return if (rs.next()) {
             user.copy(uId = rs.getInt("id").toUInt())

@@ -30,7 +30,7 @@ class ChannelJDBCTest {
     companion object {
         private fun runWithConnection(block: (Connection) -> Unit) =
             PGSimpleDataSource()
-                .apply { setURL(System.getenv(Environment.getDbUrl())) }
+                .apply { setURL(Environment.getDbUrl()) }
                 .connection
                 .let(block)
     }
