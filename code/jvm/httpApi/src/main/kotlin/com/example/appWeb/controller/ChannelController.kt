@@ -53,8 +53,8 @@ class ChannelController
 
         @GetMapping(CHANNEL_BASE_URL)
         fun getChannels(
-            @RequestParam offset: Int = 0,
-            @RequestParam limit: Int = 10,
+            @RequestParam offset: UInt = 0u,
+            @RequestParam limit: UInt = 10u,
         ) {
             when (val response = channelService.getChannels(offset, limit)) {
                 is Failure -> {
