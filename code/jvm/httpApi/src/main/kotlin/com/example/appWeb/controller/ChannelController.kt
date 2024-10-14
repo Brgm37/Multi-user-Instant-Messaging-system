@@ -11,7 +11,6 @@ import errors.ChannelError.InvalidChannelVisibility
 import errors.ChannelError.UserNotFound
 import interfaces.ChannelServicesInterface
 import jakarta.inject.Inject
-import jakarta.inject.Named
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -34,12 +33,12 @@ import utils.Success
 class ChannelController
     @Inject
     constructor(
-        @Named("ChannelServices") private val channelService: ChannelServicesInterface,
+        private val channelService: ChannelServicesInterface,
     ) {
         @GetMapping(CHANNEL_ID_URL)
         fun getChannel(
             @PathVariable channelId: UInt,
-        ) {
+        ): ResponseEntity<*> =
             when (val response = channelService.getChannel(channelId)) {
                 is Success -> {
                     ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
@@ -49,13 +48,12 @@ class ChannelController
                     ChannelProblem.ChannelNotFound.response(NOT_FOUND)
                 }
             }
-        }
 
         @GetMapping(CHANNEL_BASE_URL)
         fun getChannels(
             @RequestParam offset: UInt = 0u,
             @RequestParam limit: UInt = 10u,
-        ) {
+        ): ResponseEntity<*> =
             when (val response = channelService.getChannels(offset, limit)) {
                 is Failure -> {
                     ChannelProblem.ChannelNotFound.response(NOT_FOUND)
@@ -70,12 +68,11 @@ class ChannelController
                         )
                 }
             }
-        }
 
         @PostMapping(CHANNEL_BASE_URL)
         fun createChannel(
             @Valid @RequestBody channel: CreateChannelInputModel,
-        ) {
+        ): ResponseEntity<*> {
             val response =
                 channelService.createChannel(
                     owner = channel.owner,
@@ -83,7 +80,7 @@ class ChannelController
                     visibility = channel.visibility,
                     accessControl = channel.accessControl,
                 )
-            when (response) {
+            return when (response) {
                 is Success -> {
                     ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
                 }

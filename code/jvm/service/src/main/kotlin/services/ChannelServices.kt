@@ -37,7 +37,7 @@ private const val LIMIT = 100u
 class ChannelServices
     @Inject
     constructor(
-        @Named("TransactionManagerJDBC") private val repoManager: TransactionManager,
+        private val repoManager: TransactionManager,
     ) : ChannelServicesInterface {
         override fun createChannel(
             owner: UInt,

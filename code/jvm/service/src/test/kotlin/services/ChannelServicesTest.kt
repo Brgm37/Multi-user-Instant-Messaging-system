@@ -34,19 +34,19 @@ class ChannelServicesTest {
                 userRepo.clear()
                 messageRepo.clear()
             }
-    }
 
-    private fun makeUser(manager: TransactionManager) =
-        manager
-            .run {
-                userRepo
-                    .createUser(
-                        User(
-                            username = "owner",
-                            password = Password("Password123"),
-                        ),
-                    )
-            }
+        private fun makeUser(manager: TransactionManager) =
+            manager
+                .run {
+                    userRepo
+                        .createUser(
+                            User(
+                                username = "owner",
+                                password = Password("Password123"),
+                            ),
+                        )
+                }
+    }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")

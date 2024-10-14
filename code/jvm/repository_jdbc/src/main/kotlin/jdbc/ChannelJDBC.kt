@@ -345,7 +345,21 @@ class ChannelJDBC(
         channelId: UInt,
         userId: UInt,
     ): AccessControl? {
-        TODO("Not yet implemented")
+        val selectQuery =
+            """
+            SELECT accessControl from channel_members
+            WHERE channel = ? AND member = ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, channelId.toInt())
+        stm.setInt(idx, userId.toInt())
+        val rs = stm.executeQuery()
+        return if (rs.next()) {
+            AccessControl.valueOf(rs.getString(1).uppercase())
+        } else {
+            null
+        }
     }
 
     override fun findById(id: UInt): Channel? {

@@ -1,4 +1,4 @@
-package org.example
+package org.example.appWeb
 
 import com.example.appWeb.filter.ValidateCookie
 import interfaces.UserServicesInterface

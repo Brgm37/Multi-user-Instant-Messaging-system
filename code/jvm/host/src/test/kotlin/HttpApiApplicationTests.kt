@@ -1,4 +1,4 @@
-import org.example.HttpApiApplication
+import org.example.appWeb.HttpApiApplication
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 

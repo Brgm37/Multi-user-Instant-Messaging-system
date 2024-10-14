@@ -17,7 +17,7 @@ import javax.sql.DataSource
 class TransactionManagerJDBC
     @Inject
     constructor(
-        @Named("PostgresSQLConnectionSource") private val dS: ConnectionSource,
+        private val dS: ConnectionSource,
     ) : TransactionManager {
         private val dataSource: DataSource
 
