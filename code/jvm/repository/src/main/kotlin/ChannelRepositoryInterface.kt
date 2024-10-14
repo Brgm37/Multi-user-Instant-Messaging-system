@@ -73,4 +73,15 @@ interface ChannelRepositoryInterface : Repository<Channel> {
      * @return The created invitation
      */
     fun createInvitation(invitation: ChannelInvitation)
+
+    /**
+     * Retrieves the access control settings for a user in a channel
+     * @param channelId The ID of the channel
+     * @param userId The ID of the user
+     * @return The access control settings for the user in the channel
+     */
+    fun findUserAccessControl(
+        channelId: UInt,
+        userId: UInt,
+    ): AccessControl?
 }

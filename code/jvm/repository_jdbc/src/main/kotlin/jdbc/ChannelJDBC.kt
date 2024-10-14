@@ -13,7 +13,7 @@ import model.users.UserInfo
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import java.util.UUID
+import java.util.*
 
 /**
  * The name of the table in the database.
@@ -339,6 +339,24 @@ class ChannelJDBC(
         stm.setString(idx++, invitation.accessControl.toString())
         stm.setInt(idx, invitation.maxUses.toInt())
         stm.executeUpdate()
+    }
+
+    override fun findUserAccessControl(channelId: UInt, userId: UInt): AccessControl? {
+        val selectQuery =
+            """
+            SELECT accessControl from channel_members
+            WHERE channel = ? AND member = ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, channelId.toInt())
+        stm.setInt(idx, userId.toInt())
+        val rs = stm.executeQuery()
+        return if (rs.next()) {
+            AccessControl.valueOf(rs.getString(1).uppercase())
+        } else {
+            null
+        }
     }
 
     override fun findById(id: UInt): Channel? {
