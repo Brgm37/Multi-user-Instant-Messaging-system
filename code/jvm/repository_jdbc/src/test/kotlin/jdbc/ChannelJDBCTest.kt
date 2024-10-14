@@ -30,7 +30,7 @@ class ChannelJDBCTest {
     companion object {
         private fun runWithConnection(block: (Connection) -> Unit) =
             PGSimpleDataSource()
-                .apply { setURL("jdbc:postgresql://localhost:5433/daw_test?user=postgres&password=password") }
+                .apply { setURL(System.getenv("DB_URL")) }
                 .connection
                 .let(block)
     }
