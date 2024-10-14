@@ -20,7 +20,6 @@ sealed class Problem(
             .body(this)
 
     // TODO(implement ChannelProblem, UserProblem, etc.)
-    // CHANNEL
     // USER
     data object InvalidUserInfo : Problem(URI("$PROBLEM_URI_PATH/invalid-user-info"))
 
@@ -39,4 +38,6 @@ sealed class Problem(
     data object InvitationCodeHasExpired : Problem(URI("$PROBLEM_URI_PATH/invitation-code-has-expired"))
 
     data object InvitationCodeIsInvalid : Problem(URI("$PROBLEM_URI_PATH/invitation-code-has-expired"))
+
+    data object Unauthorized : Problem(URI("$PROBLEM_URI_PATH/unauthorized"))
 }

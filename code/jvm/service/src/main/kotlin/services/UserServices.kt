@@ -100,4 +100,10 @@ class UserServices
                 success(Unit)
             }
         }
+
+        override fun isValidToken(token: String): Either<UserError, Boolean> =
+            repoManager.run {
+                val session = userRepo.validateToken(token)
+                success(session)
+            }
     }

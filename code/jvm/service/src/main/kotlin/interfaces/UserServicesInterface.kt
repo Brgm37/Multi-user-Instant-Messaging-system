@@ -46,4 +46,10 @@ interface UserServicesInterface {
         channelId: UInt,
         invitationCode: String,
     ): Either<Error, Unit>
+
+    /**
+     * Validates a token.
+     * @param token The token to validate.
+     */
+    fun isValidToken(token: String): Either<UserError, Boolean>
 }

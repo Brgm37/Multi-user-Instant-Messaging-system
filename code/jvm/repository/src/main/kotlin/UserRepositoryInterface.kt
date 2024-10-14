@@ -30,4 +30,11 @@ interface UserRepositoryInterface : Repository<User> {
      * @param invitation The invitation to create
      */
     fun createInvitation(invitation: UserInvitation)
+
+    /**
+     * Validates a token
+     *
+     * @param token The token to validate
+     */
+    fun validateToken(token: String): Boolean
 }

@@ -5,7 +5,7 @@ create table if not exists users
     id       serial primary key,
     name     varchar(128) not null unique,
     password varchar(128) not null,
-    token    varchar(128)
+    token    varchar(128) unique
 );
 
 create table if not exists users_invitations

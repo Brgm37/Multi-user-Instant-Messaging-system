@@ -52,6 +52,19 @@ class UserJDBC(
         TODO("Not yet implemented")
     }
 
+    override fun validateToken(token: String): Boolean {
+        val selectQuery =
+            """
+            SELECT id
+            FROM users
+            WHERE token = ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        stm.setString(1, token)
+        val rs = stm.executeQuery()
+        return rs.next()
+    }
+
     override fun findById(id: UInt): User? {
         val selectQuery =
             """
