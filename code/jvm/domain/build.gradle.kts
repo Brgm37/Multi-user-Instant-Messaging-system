@@ -1,22 +1,22 @@
 plugins {
-	kotlin("jvm") version "2.0.20"
-	id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
+    kotlin("jvm") version "1.9.25"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
 group = "org.example"
 version = "unspecified"
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	testImplementation(kotlin("test"))
+    testImplementation(kotlin("test"))
 }
 
 tasks.test {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 kotlin {
-	jvmToolchain(21)
+    jvmToolchain(21)
 }

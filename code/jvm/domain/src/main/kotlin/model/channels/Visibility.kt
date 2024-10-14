@@ -1,4 +1,4 @@
-package model
+package model.channels
 
 /**
  * The visibility of a channel.
@@ -7,6 +7,6 @@ package model
  * @property PRIVATE The channel is only visible to the owner and the users in the channel.
  */
 enum class Visibility {
-	PUBLIC,
-	PRIVATE,
+    PUBLIC,
+    PRIVATE,
 }

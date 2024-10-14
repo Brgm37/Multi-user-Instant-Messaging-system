@@ -1,4 +1,4 @@
-package model
+package model.users
 
 import java.time.LocalDateTime
 import java.util.UUID
@@ -10,12 +10,12 @@ import java.util.UUID
  * @param invitationCode The invitation code to join the app.
  */
 data class UserInvitation(
-	val userId: UInt,
-	val expirationDate: LocalDateTime,
-	val invitationCode: UUID = UUID.randomUUID(),
+    val userId: UInt,
+    val expirationDate: LocalDateTime,
+    val invitationCode: UUID = UUID.randomUUID(),
 ) {
-	/**
-	 * Checks if the invitation is expired.
-	 */
-	val isExpired: Boolean get() = expirationDate.isBefore(LocalDateTime.now())
+    /**
+     * Checks if the invitation is expired.
+     */
+    val isExpired: Boolean get() = expirationDate.isBefore(LocalDateTime.now())
 }

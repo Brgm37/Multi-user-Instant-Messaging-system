@@ -1,10 +1,11 @@
 package services
 
 import MessageRepositoryInterface
+import errors.ChannelError
 import UserRepositoryInterface
 import errors.Error
 import interfaces.MessageServicesInterface
-import model.Message
+import model.messages.Message
 import utils.Either
 import utils.failure
 import utils.success
@@ -29,8 +30,16 @@ class MessageServices(
 		return success("Message deleted successfully")
 	}
 
-	override fun getMessage(id: UInt): Either<Error, Message> {
-		val msg = messageRepo.findById(id) ?: return failure(Error.MessageNotFound)
-		return success(msg)
-	}
+    override fun getMessage(id: UInt): Either<Error, Message> {
+        val msg = messageRepo.findById(id) ?: return failure(Error.MessageNotFound)
+        return success(msg)
+    }
+
+    override fun latestMessages(
+        id: UInt,
+        offset: Int,
+        limit: Int,
+    ): Either<ChannelError, List<Message>> {
+        TODO("Not yet implemented")
+    }
 }

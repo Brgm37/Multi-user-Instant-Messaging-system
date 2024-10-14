@@ -1,3 +1,3 @@
 interface TransactionManager {
-	fun <R> run(block: Transaction.() -> R): R
+    fun <R> run(block: Transaction.() -> R): R
 }

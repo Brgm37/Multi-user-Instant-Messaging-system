@@ -1,4 +1,4 @@
-package model
+package model.channels
 
 /**
  * Represents a Channel.
@@ -8,6 +8,6 @@ package model
  * @throws IllegalArgumentException if the username is empty.
  */
 data class ChannelInfo(
-	val uId: UInt,
-	val channelName: ChannelName,
+    val uId: UInt,
+    val channelName: ChannelName,
 )
