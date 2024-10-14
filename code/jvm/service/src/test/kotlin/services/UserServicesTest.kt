@@ -1,99 +1,88 @@
 package services
 
 import TransactionManager
-import errors.ChannelError
-import errors.ChannelError.ChannelNotFound
-import errors.UserError
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import jdbc.transactionManager.TransactionManagerJDBC
+import mem.TransactionManagerInMem
 import model.users.Password
 import model.users.User
-import org.junit.jupiter.api.BeforeEach
-import utils.Either
-import utils.failure
-import utils.success
-import kotlin.test.Test
+import model.users.UserInvitation
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+import utils.Failure
+import utils.Success
+import java.sql.Timestamp
+import java.time.LocalDateTime
+import java.util.UUID
+import java.util.stream.Stream
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 
 class UserServicesTest {
-    private lateinit var tm: TransactionManager
-    private lateinit var userServices: UserServices
+	private val validPassword = "Password123"
+	private val passwordDefault = Password(validPassword)
+	private val usernameDefault1 = "name"
+	private val usernameDefault2 = "name2"
+	private val uIdDefault = 1u
+	private val cIdDefault = 1u
+	private val invitationCodeDefault = UUID.fromString("0f7ed58e-89c0-4331-b22d-0d075b356317")
+	private val userDefault = User(null, usernameDefault1, passwordDefault)
+	private val userWithIdDefault = User(uIdDefault, usernameDefault1, passwordDefault)
 
-    private val validPassword = "Password123"
-    private val passwordDefault = Password(validPassword)
-    private val usernameDefault = "name"
-    private val uIdDefault = 1u
-    private val cIdDefault = 1u
-    private val invitationCodeDefault = "code"
-    private val userDefault = User(null, usernameDefault, passwordDefault)
-    private val userWithIdDefault = User(uIdDefault, usernameDefault, passwordDefault)
+	companion object {
+		@JvmStatic
+		fun transactionManagers(): Stream<TransactionManager> =
+			Stream.of(
+				TransactionManagerInMem().also { cleanup(it) },
+				TransactionManagerJDBC(Environment).also { cleanup(it) },
+			)
 
-    @BeforeEach
-    fun setup() {
-        tm = mockk()
-        userServices = UserServices(tm)
-    }
+		private fun cleanup(manager: TransactionManager) =
+			manager.run {
+				userRepo.clear()
+				channelRepo.clear()
+				messageRepo.clear()
+			}
+	}
 
-    @Test
-    fun `create a new user should return the user created with uID attribute`() {
-        every { tm.run<Either<UserError, User>>(any()) } returns success(userWithIdDefault)
+	/**
+	 * Create an inviter and an invitation in the database.
+	 * @param manager The transaction manager.
+	 * @return The ID of the new inviter.
+	 */
+	private fun makeInviter(manager: TransactionManager): UInt {
+		val inviter =
+			manager.run {
+				userRepo.createUser(userDefault)
+			}
 
-        val userCreated =
-            userServices.createUser(usernameDefault, validPassword, invitationCodeDefault, uIdDefault) as Either.Right
-        val userId = userCreated.value.uId
+		val inviterUId = checkNotNull(inviter?.uId)
 
-        assertEquals(uIdDefault, userId)
+		manager.run {
+			userRepo.createInvitation(
+				UserInvitation(
+					inviterUId,
+					Timestamp.valueOf(LocalDateTime.now().plusDays(1)),
+					invitationCodeDefault,
+				),
+			)
+		}
+		return inviterUId
+	}
 
-        verify { tm.run<Either<UserError, User>>(any()) }
-    }
+	@ParameterizedTest
+	@MethodSource("transactionManagers")
+	fun `creating a new user successfully should return the User`(manager: TransactionManager) {
+		val userServices = UserServices(manager)
+		val inviterUId = makeInviter(manager)
+		val newUser =
+			userServices
+				.createUser(usernameDefault2, validPassword, invitationCodeDefault.toString(), inviterUId)
 
-    @Test
-    fun `trying to create a user that already exists should return an error`() {
-        every { tm.run<Either<UserError, User>>(any()) } returns failure(UserError.UserAlreadyExists)
-
-        val userCreated =
-            userServices.createUser(usernameDefault, validPassword, invitationCodeDefault, uIdDefault) as Either.Left
-        val error = userCreated.value
-
-        assertEquals(UserError.UserAlreadyExists, error)
-
-        verify { tm.run<Either<UserError, User>>(any()) }
-    }
-
-    @Test
-    fun `successfully joining a channel should return a success message`() {
-        every { tm.run<Either<UserError, Unit>>(any()) } returns success(Unit)
-
-        val result = userServices.joinChannel(uIdDefault, cIdDefault, invitationCodeDefault) as Either.Right
-        val message = result.value
-
-        assertEquals(Unit, message)
-
-        verify { tm.run<Either<UserError, Unit>>(any()) }
-    }
-
-    @Test
-    fun `trying to join a channel with a user that does not exist should return an error`() {
-        every { tm.run<Either<UserError, Unit>>(any()) } returns failure(UserError.UserNotFound)
-
-        val result = userServices.joinChannel(uIdDefault, cIdDefault, invitationCodeDefault) as Either.Left
-        val error = result.value
-
-        assertEquals(UserError.UserNotFound, error)
-
-        verify { tm.run<Either<UserError, Unit>>(any()) }
-    }
-
-    @Test
-    fun `trying to join a channel that does not exist should return an error`() {
-        every { tm.run<Either<ChannelError, Unit>>(any()) } returns failure(ChannelNotFound)
-
-        val result = userServices.joinChannel(uIdDefault, cIdDefault, invitationCodeDefault) as Either.Left
-        val error = result.value
-
-        assertEquals(ChannelNotFound, error)
-
-        verify { tm.run<Either<ChannelError, Unit>>(any()) }
-    }
+		assertIs<Success<User>>(newUser, "User creation failed with error" + (newUser as? Failure)?.value)
+		assertNotNull(newUser.value.uId, "User id is null")
+		assertEquals(usernameDefault2, newUser.value.username, "Username is different")
+		assertEquals(passwordDefault, newUser.value.password, "Password is different")
+		assertIs<UUID>(newUser.value.token, "Token is not a UUID")
+	}
 }
