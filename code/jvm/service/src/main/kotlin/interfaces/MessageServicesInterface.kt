@@ -25,14 +25,18 @@ interface MessageServicesInterface {
 
     /**
      * Deletes a user.
-     * @param id The id of the message to delete.
+     * @param msgId The id of the message to delete.
+     * @param uId The id of the user trying to delete the message.
      */
-    fun deleteMessage(id: UInt): Either<MessageError, Unit>
+    fun deleteMessage(
+        msgId: UInt,
+        uId: UInt,
+    ): Either<MessageError, Unit>
 
     /**
      * Gets a message by its id.
      * @param msgId The id of the message to get.
-     * @param uId The id of the user that created the message.
+     * @param uId The id of the user trying to access the message.
      */
     fun getMessage(
         msgId: UInt,

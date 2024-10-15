@@ -30,90 +30,66 @@ class MessageServicesTest {
                 messageRepo.clear()
             }
 
-        private fun makeOwnerUser(manager: TransactionManager) =
+        private fun makeUser(manager: TransactionManager, username: String ) =
             manager
                 .run {
                     userRepo
                         .createUser(
                             User(
-                                username = "owner",
+                                username = username,
                                 password = Password("Password123"),
                             ),
                         )
                 }
 
-        private fun makeReaderUser(manager: TransactionManager) =
+        private fun userJoinChannel(
+            manager: TransactionManager,
+            channel: Channel,
+            accessControl: AccessControl,
+        ) =
             manager
                 .run {
-                    userRepo
-                        .createUser(
-                            User(
-                                username = "reader",
-                                password = Password("Password1234"),
+                    val user = makeUser(manager,"User")
+                    val userId = checkNotNull(user?.uId) { "User id is null" }
+                    val channelId = checkNotNull(channel.channelId) { "Channel id is null" }
+                    channelRepo.joinChannel(channelId, userId, accessControl)
+                }
+
+        private fun makeChannel(
+            manager: TransactionManager,
+            accessControl: AccessControl,
+            visibility: Visibility,
+        ) =
+            manager
+                .run {
+                    val owner = makeUser(manager, "Owner")
+                    val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
+                    checkNotNull(owner)
+                    channelRepo
+                        .createChannel(
+                            Channel.createChannel(
+                                owner = UserInfo(ownerId, owner.username),
+                                name = ChannelName("RWPriv", owner.username),
+                                accessControl = accessControl,
+                                visibility = visibility,
                             ),
                         )
-                }
-
-        private fun makeRWPubChannel(manager: TransactionManager) =
-            manager
-                .run {
-                    val owner = makeOwnerUser(manager)
-                    val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
-                    checkNotNull(owner)
-                    Channel.createChannel(
-                        owner = UserInfo(ownerId,owner.username),
-                        name = ChannelName("name",owner.username),
-                        accessControl = AccessControl.READ_WRITE,
-                        visibility =  Visibility.PUBLIC
-                    )
-                }
-
-        private fun makeROPubChannel(manager: TransactionManager) =
-            manager
-                .run {
-                    val owner = makeOwnerUser(manager)
-                    val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
-                    checkNotNull(owner)
-                    Channel.createChannel(
-                        owner = UserInfo(ownerId,owner.username),
-                        name = ChannelName("name",owner.username),
-                        accessControl = AccessControl.READ_ONLY,
-                        visibility =  Visibility.PUBLIC
-                    )
-                }
-
-        private fun makeRWPrivChannel(manager: TransactionManager) =
-            manager
-                .run {
-                    val owner = makeOwnerUser(manager)
-                    val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
-                    checkNotNull(owner)
-                    Channel.createChannel(
-                        owner = UserInfo(ownerId,owner.username),
-                        name = ChannelName("name",owner.username),
-                        accessControl = AccessControl.READ_WRITE,
-                        visibility =  Visibility.PRIVATE
-                    )
-                }
-        private fun makeROPrivChannel(manager: TransactionManager) =
-            manager
-                .run {
-                    val owner = makeOwnerUser(manager)
-                    val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
-                    checkNotNull(owner)
-                    Channel.createChannel(
-                        owner = UserInfo(ownerId,owner.username),
-                        name = ChannelName("name",owner.username),
-                        accessControl = AccessControl.READ_ONLY,
-                        visibility =  Visibility.PRIVATE
-                    )
                 }
     }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
-    fun `create a new message while being the channel owner`(manager: TransactionManager) {
-        val owner = makeOwnerUser(manager)
+    fun `create a new message on a private channel`(manager: TransactionManager) {
+        val owner = makeUser(manager, "Owner")
+        val user = makeUser(manager, "User")
+        val privChannel = makeChannel(manager, AccessControl.READ_WRITE, Visibility.PRIVATE)
+        checkNotNull(channelRO)
+        checkNotNull(channelRW)
+        val channelRWId = checkNotNull(channelRW.channelId) { "Channel id is null" }
+        val channelROId = checkNotNull(channelRO.channelId) { "Channel id is null" }
+        val messageServices = MessageServices(manager)
+        userJoinChannel(manager, channelRW, AccessControl.READ_WRITE)
+        userJoinChannel(manager, channelRO, AccessControl.READ_ONLY)
 
     }
 
