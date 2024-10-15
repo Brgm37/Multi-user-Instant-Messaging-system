@@ -37,7 +37,7 @@ class MessageJDBC(
         )
     }
 
-    override fun createMessage(message: Message): Message {
+    override fun createMessage(message: Message): Message? {
         val insertQuery =
             """
             INSERT INTO messages (content, author, channel, timestamp)
@@ -61,9 +61,7 @@ class MessageJDBC(
         channelId: UInt,
         limit: UInt,
         offset: UInt,
-    ): List<Message> {
-        TODO("Not yet implemented")
-    }
+    ): List<Message> = emptyList()
 
     override fun findById(id: UInt): Message? {
         val selectQuery =

@@ -6,44 +6,25 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
-group = "com.example"
-version = "0.0.1-SNAPSHOT"
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
+group = "org.example"
+version = "unspecified"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    api(project(":service"))
-    testImplementation(project(":repository_jdbc"))
+    implementation(project(":httpApi"))
+    implementation(project(":repository_jdbc"))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    testImplementation("org.springframework.boot:spring-boot-starter-webflux")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(kotlin("test"))
 }
 
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.addAll("-Xjsr305=strict")
-    }
-}
-
-tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
-    enabled = false
-}
-
-tasks.withType<Test> {
+tasks.test {
     useJUnitPlatform()
     environment(
         "DB_URL",
@@ -61,6 +42,12 @@ tasks.withType<Test> {
         "DB_POOL_SIZE",
         "10",
     )
-    dependsOn(":repository_jdbc:dbTestWait")
-    finalizedBy(":repository_jdbc:dbTestDown")
+}
+
+tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
+    mainClass.set("HttpApiApplicationKt")
+}
+
+kotlin {
+    jvmToolchain(21)
 }

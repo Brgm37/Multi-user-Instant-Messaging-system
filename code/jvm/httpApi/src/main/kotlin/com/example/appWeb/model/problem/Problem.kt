@@ -23,6 +23,8 @@ sealed class Problem(
     // USER
     data object InvalidUserInfo : Problem(URI("$PROBLEM_URI_PATH/invalid-user-info"))
 
+    data object UserAlreadyExists : Problem(URI("$PROBLEM_URI_PATH/user-already-exists"))
+
     data object UsernameAlreadyExists : Problem(URI("$PROBLEM_URI_PATH/username-already-exists"))
 
     data object UserNotFound : Problem(URI("$PROBLEM_URI_PATH/user-not-found"))

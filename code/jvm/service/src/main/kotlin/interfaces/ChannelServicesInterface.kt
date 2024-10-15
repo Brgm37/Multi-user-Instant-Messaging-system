@@ -3,6 +3,7 @@ package interfaces
 import errors.ChannelError
 import model.channels.Channel
 import utils.Either
+import java.util.UUID
 
 /**
  * Represents the services available for the channel entity.
@@ -41,15 +42,23 @@ interface ChannelServicesInterface {
      */
     fun getChannels(
         owner: UInt,
-        offset: Int,
-        limit: Int,
+        offset: UInt,
+        limit: UInt,
     ): Either<ChannelError, List<Channel>>
 
     /**
      * Gets all channels.
      */
     fun getChannels(
-        offset: Int,
-        limit: Int,
+        offset: UInt,
+        limit: UInt,
     ): Either<ChannelError, List<Channel>>
+
+    fun createChannelInvitation(
+        channelId: UInt,
+        maxUses: UInt,
+        expirationDate: String?,
+        accessControl: String,
+        owner: UInt,
+    ): Either<ChannelError, UUID>
 }
