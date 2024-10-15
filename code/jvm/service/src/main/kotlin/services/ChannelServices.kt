@@ -68,12 +68,9 @@ class ChannelServices
                         accessControl = AccessControl.valueOf(accessControl.uppercase()),
                         visibility = Visibility.valueOf(visibility.uppercase()),
                     )
-                val createdChannel = channelRepo.createChannel(channel)
-                if (createdChannel == null) {
-                    failure(UnableToCreateChannel)
-                } else {
-                    success(createdChannel)
-                }
+                channelRepo.createChannel(channel)?.let {
+                    success(it)
+                } ?: failure(UnableToCreateChannel)
             }
         }
 
