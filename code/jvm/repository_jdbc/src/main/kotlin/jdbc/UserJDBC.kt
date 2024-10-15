@@ -19,6 +19,13 @@ class UserJDBC(
             token = UUID.fromString(getString("token")),
         )
 
+    private fun ResultSet.toUserInvitation(): UserInvitation =
+        UserInvitation(
+            userId = getInt("user_id").toUInt(),
+            invitationCode = UUID.fromString(getString("invitation")),
+            expirationDate = getTimestamp("expirationDate"),
+        )
+
     override fun createUser(user: User): User? {
         val insertQuery =
             """
@@ -42,15 +49,46 @@ class UserJDBC(
         inviterUId: UInt,
         invitationCode: String,
     ): UserInvitation? {
-        TODO("Not yet implemented")
+        val selectQuery =
+            """
+            SELECT user_id, invitation, expirationDate
+            FROM users_invitations
+            WHERE user_id = ? AND invitation = ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        stm.setInt(1, inviterUId.toInt())
+        stm.setString(2, invitationCode)
+        val rs = stm.executeQuery()
+        return if (rs.next()) {
+            rs.toUserInvitation()
+        } else {
+            null
+        }
     }
 
     override fun deleteInvitation(invitation: UserInvitation) {
-        TODO("Not yet implemented")
+        val deleteQuery =
+            """
+            DELETE FROM users_invitations
+            WHERE user_id = ? AND invitation = ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(deleteQuery)
+        stm.setInt(1, invitation.userId.toInt())
+        stm.setString(2, invitation.invitationCode.toString())
+        stm.executeUpdate()
     }
 
     override fun createInvitation(invitation: UserInvitation) {
-        TODO("Not yet implemented")
+        val insertQuery =
+            """
+            INSERT INTO users_invitations (user_id, invitation, expirationDate)
+            VALUES (?, ?, ?)
+            """.trimIndent()
+        val stm = connection.prepareStatement(insertQuery)
+        stm.setInt(1, invitation.userId.toInt())
+        stm.setString(2, invitation.invitationCode.toString())
+        stm.setTimestamp(3, invitation.expirationDate)
+        stm.executeUpdate()
     }
 
     override fun validateToken(token: String): Boolean {
@@ -143,8 +181,14 @@ class UserJDBC(
             """
             DELETE FROM users
             """.trimIndent()
+        val deleteFromUsersInvitationsQuery =
+            """
+            DELETE FROM users_invitations
+            """.trimIndent()
+        val stmDeleteInvitations = connection.prepareStatement(deleteFromUsersInvitationsQuery)
+        stmDeleteInvitations.executeUpdate()
 
-        val stmUsers = connection.prepareStatement(deleteFromUsersQuery)
-        stmUsers.executeUpdate()
+        val stmDelete = connection.prepareStatement(deleteFromUsersQuery)
+        stmDelete.executeUpdate()
     }
 }

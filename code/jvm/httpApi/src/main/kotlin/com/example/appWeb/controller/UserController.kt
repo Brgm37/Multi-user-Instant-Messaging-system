@@ -6,6 +6,7 @@ import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.Problem
 import errors.ChannelError.ChannelNotFound
+import errors.ChannelError.InvitationCodeMaxUsesReached
 import errors.UserError.InvalidUserInfo
 import errors.UserError.InvitationCodeHasExpired
 import errors.UserError.InvitationCodeIsInvalid
@@ -15,17 +16,19 @@ import errors.UserError.UserNotFound
 import interfaces.UserServicesInterface
 import jakarta.inject.Inject
 import jakarta.inject.Named
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import utils.Failure
 import utils.Success
 
@@ -33,7 +36,7 @@ import utils.Success
  * Represents the controller for the user
  * @param userService The user service
  */
-@Controller
+@RestController
 class UserController
     @Inject
     constructor(
@@ -42,6 +45,7 @@ class UserController
         @PostMapping(USER_BASE_URL)
         fun createUser(
             @Valid @RequestBody user: UserSignUpInputModel,
+            res: HttpServletResponse,
         ) {
             val response =
                 userService.createUser(
@@ -52,6 +56,8 @@ class UserController
                 )
             when (response) {
                 is Success -> {
+                    setCookie(response.value.token.toString(), res)
+                    // TODO : check if this is the correct way to set cookie
                     ResponseEntity.ok(UserAuthenticationOutputModel.fromDomain(response.value))
                 }
 
@@ -98,10 +104,24 @@ class UserController
                     when (response.value) {
                         UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
                         ChannelNotFound -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+                        InvitationCodeIsInvalid -> Problem.InvitationCodeIsInvalid.response(BAD_REQUEST)
+                        InvitationCodeHasExpired -> Problem.InvitationCodeHasExpired.response(BAD_REQUEST)
+                        InvitationCodeMaxUsesReached -> Problem.InvitationCodeMaxUsesReached.response(BAD_REQUEST)
                         else -> Problem.UnableToJoinChannel.response(BAD_REQUEST)
                     }
                 }
             }
+        }
+
+        private fun setCookie(
+            token: String,
+            response: HttpServletResponse,
+        ) {
+            val cookie = Cookie("session", token)
+            cookie.isHttpOnly = true
+            cookie.secure = true
+            cookie.maxAge = 60 * 60 * 24
+            response.addCookie(cookie)
         }
 
         companion object {

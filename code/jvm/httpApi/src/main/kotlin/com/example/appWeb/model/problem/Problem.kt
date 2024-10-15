@@ -37,7 +37,9 @@ sealed class Problem(
 
     data object InvitationCodeHasExpired : Problem(URI("$PROBLEM_URI_PATH/invitation-code-has-expired"))
 
-    data object InvitationCodeIsInvalid : Problem(URI("$PROBLEM_URI_PATH/invitation-code-has-expired"))
+    data object InvitationCodeIsInvalid : Problem(URI("$PROBLEM_URI_PATH/invitation-code-is-invalid"))
+
+    data object InvitationCodeMaxUsesReached : Problem(URI("$PROBLEM_URI_PATH/invitation-code-max-uses-reached"))
 
     data object Unauthorized : Problem(URI("$PROBLEM_URI_PATH/unauthorized"))
 }

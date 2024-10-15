@@ -1,5 +1,6 @@
 package model.users
 
+import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -11,11 +12,11 @@ import java.util.UUID
  */
 data class UserInvitation(
     val userId: UInt,
-    val expirationDate: LocalDateTime,
+    val expirationDate: Timestamp,
     val invitationCode: UUID = UUID.randomUUID(),
 ) {
     /**
      * Checks if the invitation is expired.
      */
-    val isExpired: Boolean get() = expirationDate.isBefore(LocalDateTime.now())
+    val isExpired: Boolean get() = expirationDate < Timestamp.valueOf(LocalDateTime.now())
 }

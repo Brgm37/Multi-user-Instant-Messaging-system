@@ -21,7 +21,7 @@ data class Password(
     }
 
     companion object {
-        const val PASSWORD_MIN_LENGTH = 8
+        private const val PASSWORD_MIN_LENGTH = 8
         const val PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{$PASSWORD_MIN_LENGTH,}$"
 
         fun isValidPassword(password: String): Boolean = Regex(PASSWORD_PATTERN).matches(password)
