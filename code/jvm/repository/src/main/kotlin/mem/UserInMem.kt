@@ -6,6 +6,7 @@ import model.users.UserInvitation
 
 class UserInMem : UserRepositoryInterface {
     private val users = mutableListOf<User>()
+    private val invitations = mutableListOf<UserInvitation>()
     private var nextId = 1u
 
     override fun createUser(user: User): User =
@@ -16,20 +17,18 @@ class UserInMem : UserRepositoryInterface {
     override fun findInvitation(
         inviterUId: UInt,
         invitationCode: String,
-    ): UserInvitation? {
-        TODO("Not yet implemented")
-    }
+    ): UserInvitation? = invitations.find { it.userId == inviterUId && it.invitationCode.toString() == invitationCode }
 
     override fun deleteInvitation(invitation: UserInvitation) {
-        TODO("Not yet implemented")
+        invitations.removeIf { it.invitationCode == invitation.invitationCode }
     }
 
     override fun createInvitation(invitation: UserInvitation) {
-        TODO("Not yet implemented")
+        invitations.add(invitation)
     }
 
     override fun validateToken(token: String): Boolean {
-        TODO("Not yet implemented")
+        users.find { it.token.toString() == token }?.let { return true } ?: return false
     }
 
     override fun findById(id: UInt): User? = users.find { it.uId == id }
@@ -37,20 +36,19 @@ class UserInMem : UserRepositoryInterface {
     override fun findAll(
         offset: Int,
         limit: Int,
-    ): List<User> {
-        TODO("Not yet implemented")
-    }
+    ): List<User> = users.drop(offset).take(limit)
 
     override fun save(entity: User) {
-        TODO("Not yet implemented")
+        users.removeIf { it.uId == entity.uId }
+        users.add(entity)
     }
 
     override fun deleteById(id: UInt) {
-        TODO("Not yet implemented")
+        users.removeIf { it.uId == id }
     }
 
     override fun clear() {
-        // TODO: Implement this method
-        return
+        users.clear()
+        invitations.clear()
     }
 }

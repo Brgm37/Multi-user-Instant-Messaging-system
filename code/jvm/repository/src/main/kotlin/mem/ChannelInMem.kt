@@ -75,7 +75,11 @@ class ChannelInMem : ChannelRepositoryInterface {
     override fun findAll(
         offset: Int,
         limit: Int,
-    ): List<Channel> = channels.filterIsInstance<Channel.Public>()
+    ): List<Channel> =
+        channels
+            .filterIsInstance<Channel.Public>()
+            .drop(offset)
+            .take(limit)
 
     override fun save(entity: Channel) {
         channels.removeIf { it.channelId == entity.channelId }

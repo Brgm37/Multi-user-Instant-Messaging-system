@@ -26,6 +26,22 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    environment(
+        "DB_URL",
+        "jdbc:postgresql://localhost:5433/daw_test",
+    )
+    environment(
+        "DB_USER",
+        "postgres",
+    )
+    environment(
+        "DB_PASSWORD",
+        "password",
+    )
+    environment(
+        "DB_POOL_SIZE",
+        "10",
+    )
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
