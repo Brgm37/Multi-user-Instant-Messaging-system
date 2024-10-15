@@ -40,7 +40,7 @@ tasks.test {
     )
     environment(
         "DB_POOL_SIZE",
-        "10",
+        "1000",
     )
 }
 
