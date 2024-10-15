@@ -4,9 +4,15 @@ import UserRepositoryInterface
 import model.users.Password
 import model.users.User
 import model.users.UserInvitation
+import model.users.UserToken
 import java.sql.Connection
 import java.sql.ResultSet
 import java.util.UUID
+
+/**
+ * Represent the maximum number of authentication tokens that a user can have.
+ */
+private const val MAX_TOKENS = 5
 
 class UserJDBC(
     private val connection: Connection,
@@ -122,7 +128,7 @@ class UserJDBC(
     override fun findByUsername(username: String): User? {
         val selectQuery =
             """
-            SELECT id, name, password, token
+            SELECT id, name, password
             FROM users
             WHERE name = ?
             """.trimIndent()
@@ -134,6 +140,47 @@ class UserJDBC(
         } else {
             null
         }
+    }
+
+    override fun createToken(token: UserToken): Boolean {
+        val selectQuery =
+            """
+            SELECT COUNT(*)
+            FROM users_tokens
+            WHERE user_id = ?
+            """.trimIndent()
+        val stmCount = connection.prepareStatement(selectQuery)
+        stmCount.setInt(1, token.userId.toInt())
+        val rsCount = stmCount.executeQuery()
+        rsCount.next()
+        if (rsCount.getInt(1) >= MAX_TOKENS) {
+            val deleteOldestQuery =
+                """
+                DELETE FROM users_tokens
+                WHERE token IN (
+                    SELECT token
+                    FROM users_tokens
+                    WHERE user_id = ?
+                    ORDER BY creation
+                    LIMIT 1
+                )
+                """.trimIndent()
+            val stmDelete = connection.prepareStatement(deleteOldestQuery)
+            stmDelete.setInt(1, token.userId.toInt())
+        }
+
+        val insertQuery =
+            """
+            INSERT INTO users_tokens (user_id, token, creation, expiration)
+            VALUES (?, ?, ?, ?)
+            """.trimIndent()
+        val stm = connection.prepareStatement(insertQuery)
+        var idx = 1
+        stm.setInt(idx++, token.userId.toInt())
+        stm.setString(idx++, token.token.toString())
+        stm.setTimestamp(idx, token.creationDate)
+        stm.setTimestamp(idx, token.expirationDate)
+        return stm.executeUpdate() > 0
     }
 
     override fun findAll(

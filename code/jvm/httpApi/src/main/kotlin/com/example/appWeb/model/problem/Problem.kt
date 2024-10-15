@@ -44,4 +44,10 @@ sealed class Problem(
     data object InvitationCodeMaxUsesReached : Problem(URI("$PROBLEM_URI_PATH/invitation-code-max-uses-reached"))
 
     data object Unauthorized : Problem(URI("$PROBLEM_URI_PATH/unauthorized"))
+
+    data object UnableToLogin : Problem(URI("$PROBLEM_URI_PATH/unable-to-login"))
+
+    data object PasswordIsInvalid : Problem(URI("$PROBLEM_URI_PATH/password-is-invalid"))
+
+    data object UnableToCreateToken : Problem(URI("$PROBLEM_URI_PATH/unable-to-create-token"))
 }
