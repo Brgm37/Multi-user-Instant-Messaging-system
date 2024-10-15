@@ -6,5 +6,6 @@ drop table if exists channel_members;
 drop table if exists channels_invitations;
 drop table if exists channels;
 drop table if exists users_invitations;
+drop table if exists users_tokens;
 drop table if exists users;
 commit;

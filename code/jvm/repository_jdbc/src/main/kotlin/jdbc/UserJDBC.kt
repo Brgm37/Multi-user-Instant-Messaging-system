@@ -16,27 +16,25 @@ class UserJDBC(
             uId = getInt("id").toUInt(),
             username = getString("name"),
             password = Password(getString(("password"))),
-            token = UUID.fromString(getString("token")),
         )
 
     private fun ResultSet.toUserInvitation(): UserInvitation =
         UserInvitation(
             userId = getInt("user_id").toUInt(),
             invitationCode = UUID.fromString(getString("invitation")),
-            expirationDate = getTimestamp("expirationDate"),
+            expirationDate = getTimestamp("expiration_date"),
         )
 
     override fun createUser(user: User): User? {
         val insertQuery =
             """
-            INSERT INTO users (name, password, token)
-            VALUES (?, ?, ?) RETURNING id
+            INSERT INTO users (name, password)
+            VALUES (?, ?) RETURNING id
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         var idx = 1
         stm.setString(idx++, user.username)
-        stm.setString(idx++, (user.password.value))
-        stm.setString(idx, user.token.toString())
+        stm.setString(idx, (user.password.value))
         val rs = stm.executeQuery()
         return if (rs.next()) {
             user.copy(uId = rs.getInt("id").toUInt())
@@ -51,7 +49,7 @@ class UserJDBC(
     ): UserInvitation? {
         val selectQuery =
             """
-            SELECT user_id, invitation, expirationDate
+            SELECT user_id, invitation, expiration_date
             FROM users_invitations
             WHERE user_id = ? AND invitation = ?
             """.trimIndent()
@@ -81,7 +79,7 @@ class UserJDBC(
     override fun createInvitation(invitation: UserInvitation) {
         val insertQuery =
             """
-            INSERT INTO users_invitations (user_id, invitation, expirationDate)
+            INSERT INTO users_invitations (user_id, invitation, expiration_date)
             VALUES (?, ?, ?)
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
@@ -94,8 +92,8 @@ class UserJDBC(
     override fun validateToken(token: String): Boolean {
         val selectQuery =
             """
-            SELECT id
-            FROM users
+            SELECT user_id
+            FROM users_tokens
             WHERE token = ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
@@ -107,7 +105,7 @@ class UserJDBC(
     override fun findById(id: UInt): User? {
         val selectQuery =
             """
-            SELECT id, name, password, token
+            SELECT id, name, password
             FROM users
             WHERE id = ?
             """.trimIndent()
@@ -127,7 +125,7 @@ class UserJDBC(
     ): List<User> {
         val selectQuery =
             """
-            SELECT id, name, password, token
+            SELECT id, name, password
             FROM users
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)

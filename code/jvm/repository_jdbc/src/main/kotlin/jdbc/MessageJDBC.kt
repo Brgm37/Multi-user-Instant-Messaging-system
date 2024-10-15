@@ -44,7 +44,7 @@ class MessageJDBC(
         return messages
     }
 
-    override fun createMessage(message: Message): Message {
+    override fun createMessage(message: Message): Message? {
         val insertQuery =
             """
             INSERT INTO messages (content, author, channel, timestamp)
@@ -60,7 +60,7 @@ class MessageJDBC(
         if (rs.next()) {
             return message.copy(msgId = rs.getInt("id").toUInt())
         } else {
-            throw SQLException("Failed to create message")
+            return null
         }
     }
 

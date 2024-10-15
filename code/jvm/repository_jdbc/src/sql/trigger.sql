@@ -2,8 +2,8 @@ create or replace function f_channel_insert()
     returns trigger as
 $$
 begin
-    insert into channel_members (channel, member, accessControl)
-    values (new.id, new.owner, new.accessControl);
+    insert into channel_members (channel, member, access_control)
+    values (new.id, new.owner, new.access_control);
     return new;
 end;
 $$ language plpgsql;
@@ -26,7 +26,7 @@ begin
            c.visibility    as channel_visibility,
            u.id            as owner_id,
            u.name          as owner_name,
-           c.accessControl as channel_accessControl
+           c.access_control as channel_accessControl
     from channels c
              join users u on c.owner = u.id;
     return new;

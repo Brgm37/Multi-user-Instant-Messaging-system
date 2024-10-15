@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     api(project(":service"))
-    implementation(project(":repository_jdbc"))
+    testImplementation(project(":repository_jdbc"))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")

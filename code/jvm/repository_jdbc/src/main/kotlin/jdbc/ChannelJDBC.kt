@@ -96,7 +96,7 @@ private const val CHANNELS_INVITATIONS_CHANNEL_ID = "channel_id"
  *
  * @property CHANNELS_INVITATIONS_EXPIRATION_DATE The name of the column in the table [CHANNELS_INVITATIONS_TABLE].
  */
-private const val CHANNELS_INVITATIONS_EXPIRATION_DATE = "expirationDate"
+private const val CHANNELS_INVITATIONS_EXPIRATION_DATE = "expiration_date"
 
 /**
  * The name of the column in the table [CHANNELS_INVITATIONS_TABLE].
@@ -110,14 +110,14 @@ private const val CHANNELS_INVITATIONS_INVITATION = "invitation"
  *
  * @property CHANNELS_INVITATIONS_ACCESS_CONTROL The name of the column in the table [CHANNELS_INVITATIONS_TABLE].
  */
-private const val CHANNELS_INVITATIONS_ACCESS_CONTROL = "accessControl"
+private const val CHANNELS_INVITATIONS_ACCESS_CONTROL = "access_control"
 
 /**
  * The name of the column in the table [CHANNELS_INVITATIONS_TABLE].
  *
  * @property CHANNELS_INVITATIONS_MAX_USES The name of the column in the table [CHANNELS_INVITATIONS_TABLE].
  */
-private const val CHANNELS_INVITATIONS_MAX_USES = "maxUses"
+private const val CHANNELS_INVITATIONS_MAX_USES = "max_uses"
 
 /**
  * A JDBC implementation of the [ChannelRepositoryInterface].
@@ -208,7 +208,7 @@ class ChannelJDBC(
     override fun createChannel(channel: Channel): Channel? {
         val insertQuery =
             """
-            INSERT INTO channels (owner, name, accessControl, visibility)
+            INSERT INTO channels (owner, name, access_control, visibility)
             VALUES (?, ?, ?, ?) RETURNING id
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
@@ -255,7 +255,7 @@ class ChannelJDBC(
     ) {
         val insertQuery =
             """
-            INSERT INTO channel_members (channel, member, accessControl)
+            INSERT INTO channel_members (channel, member, access_control)
             VALUES (?, ?, ?)
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
@@ -286,7 +286,7 @@ class ChannelJDBC(
     override fun findInvitation(channelId: UInt): ChannelInvitation? {
         val selectQuery =
             """
-            SELECT channel_id, expirationdate, invitation, accessControl, maxuses
+            SELECT channel_id, expiration_date, invitation, access_control, max_uses
             FROM channels_invitations
             WHERE channel_id = ?
             """.trimIndent()
@@ -304,7 +304,7 @@ class ChannelJDBC(
         val updateQuery =
             """
             UPDATE channels_invitations
-            SET maxuses = ?
+            SET max_uses = ?
             WHERE channel_id = ?
             """.trimIndent()
         val stm = connection.prepareStatement(updateQuery)
@@ -328,7 +328,7 @@ class ChannelJDBC(
     override fun createInvitation(invitation: ChannelInvitation) {
         val insertQuery =
             """
-            INSERT INTO channels_invitations (channel_id, expirationDate, invitation, accessControl, maxUses)
+            INSERT INTO channels_invitations (channel_id, expiration_date, invitation, access_control, max_uses)
             VALUES (?, ?, ?, ?, ?)
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
@@ -347,7 +347,7 @@ class ChannelJDBC(
     ): AccessControl? {
         val selectQuery =
             """
-            SELECT accessControl from channel_members
+            SELECT access_control from channel_members
             WHERE channel = ? AND member = ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
@@ -407,7 +407,7 @@ class ChannelJDBC(
         val updateQuery =
             """
             UPDATE channels
-            SET owner = ?, name = ?, accessControl = ?, visibility = ?
+            SET owner = ?, name = ?, access_control = ?, visibility = ?
             WHERE id = ?
             """.trimIndent()
         val stm = connection.prepareStatement(updateQuery)

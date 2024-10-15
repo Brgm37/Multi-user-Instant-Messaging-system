@@ -3,6 +3,7 @@ package com.example.appWeb
 import TransactionManager
 import com.example.appWeb.controller.ChannelController
 import com.example.appWeb.model.dto.input.channel.CreateChannelInputModel
+import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputModel
 import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import jdbc.transactionManager.TransactionManagerJDBC
@@ -17,6 +18,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.http.HttpStatus
 import services.ChannelServices
 import utils.Success
+import java.util.UUID
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -139,5 +141,31 @@ class ChannelControllerTest {
                 assertEquals(accessControl, outputModel.accessControl, "Access control is different")
                 assertEquals(visibility, outputModel.visibility, "Visibility is different")
             }
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManager")
+    fun `create channel invitation`(manager: TransactionManager) {
+        val owner = makeUser(manager)
+        val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
+        val channelServices = ChannelServices(manager)
+        val channelController = ChannelController(channelServices)
+        val channelName = "name"
+        val accessControl = READ_WRITE.name
+        val visibility = PUBLIC.name
+        val newChannel = channelServices.createChannel(ownerId, channelName, accessControl, visibility)
+        assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+        val cId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
+        val invitation =
+            channelController.createChannelInvitation(
+                cId,
+                CreateChannelInvitationInputModel(
+                    owner = ownerId,
+                    maxUses = 1u,
+                    expirationDate = null,
+                    accessControl = accessControl,
+                ),
+            )
+        assertIs<UUID>(invitation.body, "Body is not a ChannelOutputModel")
     }
 }

@@ -4,7 +4,7 @@ import MessageRepositoryInterface
 import model.messages.Message
 
 class MessageInMem : MessageRepositoryInterface {
-    override fun createMessage(message: Message): Message {
+    override fun createMessage(message: Message): Message? {
         TODO("Not yet implemented")
     }
 
