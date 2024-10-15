@@ -1,6 +1,6 @@
 create index if not exists idx_users_name on users (name);
 
-create index if not exists idx_users_token on users (token);
+create index if not exists idx_users_tokens_token on users_tokens (token);
 
 create index if not exists idx_channels_name on channels (name);
 
