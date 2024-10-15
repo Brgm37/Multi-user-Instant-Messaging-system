@@ -1,7 +1,6 @@
 package errors
 
 sealed class MessageError : Error() {
-
     data object InvalidMessageInfo : MessageError()
 
     data object UserNotInChannel : MessageError()
