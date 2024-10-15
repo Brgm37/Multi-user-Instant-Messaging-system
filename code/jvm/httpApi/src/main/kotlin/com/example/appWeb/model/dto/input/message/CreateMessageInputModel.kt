@@ -11,5 +11,5 @@ data class CreateMessageInputModel (
     @get:NotBlank val msg: String,
     @get:Positive val user: UInt,
     @get:Positive val channel: UInt,
-    val creationTime: UInt,
+    val creationTime: T,
 )

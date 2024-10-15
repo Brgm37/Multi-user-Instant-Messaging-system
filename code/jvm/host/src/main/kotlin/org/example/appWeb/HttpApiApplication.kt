@@ -1,4 +1,4 @@
-package com.example.appWeb
+package org.example.appWeb
 
 import com.example.appWeb.filter.ValidateCookie
 import interfaces.UserServicesInterface
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 
 @SpringBootApplication
-@ComponentScan(basePackages = ["services", "jdbc.transactionManager"])
+@ComponentScan(basePackages = ["services", "jdbc.transactionManager", "com.example.appWeb"])
 class HttpApiApplication
     @Inject
     constructor(

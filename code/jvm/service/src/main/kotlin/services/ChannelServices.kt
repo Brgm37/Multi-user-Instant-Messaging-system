@@ -37,7 +37,7 @@ private const val LIMIT = 100u
 class ChannelServices
     @Inject
     constructor(
-        @Named("TransactionManagerJDBC") private val repoManager: TransactionManager,
+        private val repoManager: TransactionManager,
     ) : ChannelServicesInterface {
         override fun createChannel(
             owner: UInt,
@@ -94,24 +94,24 @@ class ChannelServices
 
         override fun getChannels(
             owner: UInt,
-            offset: Int,
-            limit: Int,
+            offset: UInt,
+            limit: UInt,
         ): Either<ChannelError, List<Channel>> =
             repoManager
                 .run {
                     val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
                     val id = checkNotNull(user.uId) { "User id is null" }
-                    val channels = channelRepo.findByUserId(id, offset, limit)
+                    val channels = channelRepo.findByUserId(id, offset.toInt(), limit.toInt())
                     success(channels)
                 }
 
         override fun getChannels(
-            offset: Int,
-            limit: Int,
+            offset: UInt,
+            limit: UInt,
         ): Either<ChannelError, List<Channel>> =
             repoManager
                 .run {
-                    val channels = channelRepo.findAll(offset, limit)
+                    val channels = channelRepo.findAll(offset.toInt(), limit.toInt())
                     success(channels)
                 }
     }

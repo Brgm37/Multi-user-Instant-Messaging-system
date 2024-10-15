@@ -13,7 +13,7 @@ import model.users.UserInfo
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import java.util.*
+import java.util.UUID
 
 /**
  * The name of the table in the database.
@@ -341,7 +341,10 @@ class ChannelJDBC(
         stm.executeUpdate()
     }
 
-    override fun findUserAccessControl(channelId: UInt, userId: UInt): AccessControl? {
+    override fun findUserAccessControl(
+        channelId: UInt,
+        userId: UInt,
+    ): AccessControl? {
         val selectQuery =
             """
             SELECT accessControl from channel_members

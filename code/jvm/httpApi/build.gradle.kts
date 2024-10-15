@@ -27,6 +27,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
@@ -37,6 +39,28 @@ kotlin {
     }
 }
 
+tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
+    enabled = false
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
+    environment(
+        "DB_URL",
+        "jdbc:postgresql://localhost:5433/daw_test",
+    )
+    environment(
+        "DB_USER",
+        "postgres",
+    )
+    environment(
+        "DB_PASSWORD",
+        "password",
+    )
+    environment(
+        "DB_POOL_SIZE",
+        "10",
+    )
+    dependsOn(":repository_jdbc:dbTestWait")
+    finalizedBy(":repository_jdbc:dbTestDown")
 }

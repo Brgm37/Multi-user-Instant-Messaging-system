@@ -11,6 +11,7 @@ repositories {
 }
 
 dependencies {
+//    implementation("jakarta.inject:jakarta.inject-api:2.0.1")
     implementation(project(":domain"))
     testImplementation(kotlin("test"))
 }
