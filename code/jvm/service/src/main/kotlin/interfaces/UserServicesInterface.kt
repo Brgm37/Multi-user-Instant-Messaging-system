@@ -51,5 +51,5 @@ interface UserServicesInterface {
      * Validates a token.
      * @param token The token to validate.
      */
-    fun isValidToken(token: String): Either<UserError, Boolean>
+    fun getUserByToken(token: String): Either<UserError, User>
 }

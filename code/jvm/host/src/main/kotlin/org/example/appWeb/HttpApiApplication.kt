@@ -1,30 +1,32 @@
 package org.example.appWeb
 
-import com.example.appWeb.filter.ValidateCookie
-import interfaces.UserServicesInterface
-import jakarta.inject.Inject
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.boot.web.servlet.FilterRegistrationBean
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Configuration
+import org.springframework.web.method.support.HandlerMethodArgumentResolver
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import pipeline.AuthenticatedUserArgumentResolver
+import pipeline.AuthenticationInterceptor
+
+@Configuration
+@ComponentScan(basePackages = ["services", "jdbc.transactionManager", "com.example.appWeb", "pipeline"])
+class PipelineConfigurer(
+    val interceptor: AuthenticationInterceptor,
+    val resolver: AuthenticatedUserArgumentResolver,
+) : WebMvcConfigurer {
+    override fun addInterceptors(registry: InterceptorRegistry) {
+        registry.addInterceptor(interceptor)
+    }
+
+    override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
+        resolvers.add(resolver)
+    }
+}
 
 @SpringBootApplication
-@ComponentScan(basePackages = ["services", "jdbc.transactionManager", "com.example.appWeb"])
 class HttpApiApplication
-    @Inject
-    constructor(
-        private val services: UserServicesInterface,
-    ) {
-        @Bean
-        fun addFilter(): FilterRegistrationBean<ValidateCookie> {
-            val registrationBean = FilterRegistrationBean<ValidateCookie>()
-            registrationBean.filter = ValidateCookie(services)
-            registrationBean.addUrlPatterns("/verified/*")
-            // TODO: add verified routes
-            return registrationBean
-        }
-    }
 
 fun main(args: Array<String>) {
     runApplication<HttpApiApplication>(*args)

@@ -13,14 +13,14 @@ import org.hibernate.validator.constraints.Range
  */
 data class CreateChannelInvitationInputModel(
     @get:Range(min = 1) val maxUses: UInt = 1u,
-    @get:Range(min = 1) val owner: UInt,
     val expirationDate: String? = null,
-    val accessControl: String = AccessControl.READ_ONLY.name,
+    val accessControl: String? = null,
 ) {
     @AssertTrue(message = "Invalid access control")
     fun isValidAccessControl(): Boolean =
         AccessControl
             .entries
             .map(AccessControl::name)
-            .contains(accessControl.uppercase())
+            .contains(accessControl?.uppercase()) ||
+            accessControl == null
 }

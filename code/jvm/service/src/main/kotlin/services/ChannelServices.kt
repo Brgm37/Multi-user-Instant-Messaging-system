@@ -120,7 +120,7 @@ class ChannelServices
             channelId: UInt,
             maxUses: UInt,
             expirationDate: String?,
-            accessControl: String,
+            accessControl: String?,
             owner: UInt,
         ): Either<ChannelError, UUID> {
             val timestamp =
@@ -139,12 +139,21 @@ class ChannelServices
                         return@run failure(InvalidChannelInfo)
                     }
                     val invitation =
-                        ChannelInvitation(
-                            channelId = channelId,
-                            expirationDate = timestamp.toLocalDateTime().toLocalDate(),
-                            maxUses = maxUses,
-                            accessControl = AccessControl.valueOf(accessControl.uppercase()),
-                        )
+                        if (accessControl == null) {
+                            ChannelInvitation(
+                                channelId = channelId,
+                                expirationDate = timestamp.toLocalDateTime().toLocalDate(),
+                                maxUses = maxUses,
+                                accessControl = channel.accessControl,
+                            )
+                        } else {
+                            ChannelInvitation(
+                                channelId = channelId,
+                                expirationDate = timestamp.toLocalDateTime().toLocalDate(),
+                                maxUses = maxUses,
+                                accessControl = AccessControl.valueOf(accessControl.uppercase()),
+                            )
+                        }
                     channelRepo.createInvitation(invitation)
                     success(invitation.invitationCode)
                 }
