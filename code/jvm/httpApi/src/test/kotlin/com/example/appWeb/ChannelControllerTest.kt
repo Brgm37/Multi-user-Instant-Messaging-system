@@ -4,6 +4,7 @@ import TransactionManager
 import com.example.appWeb.controller.ChannelController
 import com.example.appWeb.model.dto.input.channel.CreateChannelInputModel
 import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputModel
+import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import jdbc.transactionManager.TransactionManagerJDBC
@@ -23,6 +24,7 @@ import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
+// TODO: Improve the authentication mechanism to test
 class ChannelControllerTest {
     companion object {
         @JvmStatic
@@ -63,9 +65,14 @@ class ChannelControllerTest {
         val newChannel = channelServices.createChannel(ownerId, "name", READ_WRITE.name, PUBLIC.name)
         assertIs<Success<Channel>>(newChannel, "Channel creation failed")
         val cId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
+        val u = manager.run { userRepo.findById(ownerId) }
+        checkNotNull(u) { "User not found" }
+        val authenticated = AuthenticatedUserInputModel(ownerId, u.token.toString())
         channelController
-            .getChannel(cId)
-            .let { resp ->
+            .getChannel(
+                cId,
+                authenticated,
+            ).let { resp ->
                 assertEquals(HttpStatus.OK, resp.statusCode, "Status code is different")
                 assertIs<ChannelOutputModel>(resp.body, "Body is not a ChannelOutputModel")
                 val outputModel = resp.body as ChannelOutputModel
@@ -80,11 +87,16 @@ class ChannelControllerTest {
     @ParameterizedTest
     @MethodSource("transactionManager")
     fun `fail to get a channel`(manager: TransactionManager) {
+        val owner = makeUser(manager)
+        val uId = checkNotNull(owner?.uId) { "Owner id is null" }
+        val u = manager.run { userRepo.findById(uId) }
+        checkNotNull(u) { "User not found" }
+        val authenticated = AuthenticatedUserInputModel(uId, u.token.toString())
         val channelServices = ChannelServices(manager)
         val channelController = ChannelController(channelServices)
         val cId = 1u
         channelController
-            .getChannel(cId)
+            .getChannel(cId, authenticated)
             .let { resp ->
                 assertEquals(HttpStatus.NOT_FOUND, resp.statusCode, "Status code is different")
             }
@@ -102,8 +114,11 @@ class ChannelControllerTest {
         repeat(nr) {
             channelServices.createChannel(ownerId, "name$it", READ_WRITE.name, PUBLIC.name)
         }
+        val u = manager.run { userRepo.findById(ownerId) }
+        checkNotNull(u) { "User not found" }
+        val authenticated = AuthenticatedUserInputModel(ownerId, u.token.toString())
         channelController
-            .getChannels()
+            .getChannels(authenticated)
             .let { resp ->
                 assertEquals(HttpStatus.OK, resp.statusCode, "Status code is different")
                 assertIs<List<ChannelListOutputModel>>(resp.body, "Body is not a List<ChannelOutputModel>")
@@ -124,14 +139,17 @@ class ChannelControllerTest {
         val channelName = "name"
         val accessControl = READ_WRITE.name
         val visibility = PUBLIC.name
+        val u = manager.run { userRepo.findById(ownerId) }
+        checkNotNull(u) { "User not found" }
+        val authenticated = AuthenticatedUserInputModel(ownerId, u.token.toString())
         channelController
             .createChannel(
                 CreateChannelInputModel(
-                    owner = ownerId,
                     name = channelName,
                     accessControl = accessControl,
                     visibility = visibility,
                 ),
+                authenticated,
             ).let { resp ->
                 assertEquals(HttpStatus.OK, resp.statusCode, "Status code is different")
                 assertIs<ChannelOutputModel>(resp.body, "Body is not a ChannelOutputModel")
@@ -156,15 +174,17 @@ class ChannelControllerTest {
         val newChannel = channelServices.createChannel(ownerId, channelName, accessControl, visibility)
         assertIs<Success<Channel>>(newChannel, "Channel creation failed")
         val cId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
+        val u = manager.run { userRepo.findById(ownerId) }
+        val authenticated = AuthenticatedUserInputModel(ownerId, u?.token.toString())
         val invitation =
             channelController.createChannelInvitation(
                 cId,
                 CreateChannelInvitationInputModel(
-                    owner = ownerId,
                     maxUses = 1u,
                     expirationDate = null,
                     accessControl = accessControl,
                 ),
+                authenticated,
             )
         assertIs<UUID>(invitation.body, "Body is not a ChannelOutputModel")
     }

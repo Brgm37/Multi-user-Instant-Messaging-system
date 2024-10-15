@@ -37,4 +37,11 @@ interface UserRepositoryInterface : Repository<User> {
      * @param token The token to validate
      */
     fun validateToken(token: String): Boolean
+
+    /**
+     * Finds a user by its token
+     * @param token The ID of the user
+     * @return The user with the given ID
+     */
+    fun findByToken(token: String): User?
 }

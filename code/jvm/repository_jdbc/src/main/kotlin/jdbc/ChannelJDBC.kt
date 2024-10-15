@@ -389,7 +389,7 @@ class ChannelJDBC(
             """
             SELECT 
             	channel_id, channel_name, channel_owner, channel_accessControl,
-            	channel_visibility, owner_id, owner_name
+            	channel_visibility, owner_name
             FROM v_channel
             WHERE channel_visibility = '${PUBLIC.name}'
             LIMIT ?
