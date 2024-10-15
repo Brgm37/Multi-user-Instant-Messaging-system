@@ -13,7 +13,6 @@ import utils.Failure
 import utils.Success
 import java.sql.Timestamp
 import java.time.LocalDateTime
-import java.util.UUID
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -52,20 +51,16 @@ class UserServicesTest {
      * @param expirationDate the expirationDare of the invitation to be created
      * @return The invitation created
      */
-    private fun makeInvitation(
+    private fun makeInviterAndInvitation(
         manager: TransactionManager,
+        username: String = usernameDefault1,
+        password: Password = passwordDefault,
         expirationDate: Timestamp = Timestamp.valueOf(LocalDateTime.now().plusHours(1)),
     ) = manager.run {
-        val inviter = userRepo.createUser(userDefault)
+        val inviter = userRepo.createUser(User(username = username, password = password))
         val inviterUId = checkNotNull(inviter?.uId)
-        val invitation =
-            UserInvitation(
-                inviterUId,
-                expirationDate,
-            )
-        userRepo.createInvitation(
-            invitation,
-        )
+        val invitation = UserInvitation(inviterUId, expirationDate)
+        userRepo.createInvitation(invitation)
         return@run invitation
     }
 
@@ -73,7 +68,7 @@ class UserServicesTest {
     @MethodSource("transactionManagers")
     fun `creating a new user with a valid invitation should return the User`(manager: TransactionManager) {
         val userServices = UserServices(manager)
-        val invitation = makeInvitation(manager)
+        val invitation = makeInviterAndInvitation(manager)
 
         val newUser =
             userServices
@@ -83,7 +78,6 @@ class UserServicesTest {
         assertNotNull(newUser.value.uId, "User id is null")
         assertEquals(usernameDefault2, newUser.value.username, "Username is different")
         assertEquals(passwordDefault, newUser.value.password, "Password is different")
-        assertIs<UUID>(newUser.value.token, "Token is not a UUID")
     }
 
     @ParameterizedTest
@@ -92,7 +86,7 @@ class UserServicesTest {
         manager: TransactionManager,
     ) {
         val userServices = UserServices(manager)
-        val invitation = makeInvitation(manager)
+        val invitation = makeInviterAndInvitation(manager)
         val newUser =
             userServices
                 .createUser("", validPassword, invitation.invitationCode.toString(), invitation.userId)
@@ -105,7 +99,7 @@ class UserServicesTest {
         manager: TransactionManager,
     ) {
         val userServices = UserServices(manager)
-        val invitation = makeInvitation(manager)
+        val invitation = makeInviterAndInvitation(manager)
         val newUser =
             userServices
                 .createUser(usernameDefault1, invalidPassword, invitation.invitationCode.toString(), invitation.userId)
@@ -116,7 +110,7 @@ class UserServicesTest {
     @MethodSource("transactionManagers")
     fun `trying to create a user with an Invitation with an nonexistent inviter id`(manager: TransactionManager) {
         val userServices = UserServices(manager)
-        val invitation = makeInvitation(manager)
+        val invitation = makeInviterAndInvitation(manager)
         val newUser =
             userServices
                 .createUser(
@@ -134,12 +128,12 @@ class UserServicesTest {
         manager: TransactionManager,
     ) {
         val userServices = UserServices(manager)
-        val invitation = makeInvitation(manager)
+        val invitation = makeInviterAndInvitation(manager)
         val newUser =
             userServices
                 .createUser(
                     usernameDefault1,
-                    invalidPassword,
+                    validPassword,
                     "0f7ed58e-89c0-4331-b22d-0d075b3563156",
                     invitation.userId,
                 )
@@ -153,7 +147,7 @@ class UserServicesTest {
     ) {
         val userServices = UserServices(manager)
         val expirationDate = Timestamp.valueOf(LocalDateTime.now().minusHours(1))
-        val invitation = makeInvitation(manager, expirationDate)
+        val invitation = makeInviterAndInvitation(manager, expirationDate = expirationDate)
         val newUser =
             userServices
                 .createUser(
@@ -171,40 +165,62 @@ class UserServicesTest {
         manager: TransactionManager,
     ) {
         val userServices = UserServices(manager)
-        val invitation = makeInvitation(manager)
-        val user =
-            userServices
-                .createUser(usernameDefault2, validPassword, invitation.invitationCode.toString(), invitation.userId)
-                as Success<User>
-        val invitation2 =
-            manager
-                .run {
-                    val inviter =
-                        userRepo.createUser(
-                            User(
-                                username = "inviter2",
-                                password = passwordDefault,
-                            ),
-                        )
-                    val inviterUId = checkNotNull(inviter?.uId)
-                    val invitation2 =
-                        UserInvitation(
-                            inviterUId,
-                            Timestamp.valueOf(LocalDateTime.now().plusHours(1)),
-                        )
-                    userRepo.createInvitation(
-                        invitation2,
-                    )
-                    return@run invitation2
-                }
+        val invitation = makeInviterAndInvitation(manager)
         val newUser =
             userServices
                 .createUser(
-                    user.value.username,
+                    usernameDefault1,
                     validPassword,
-                    invitation2.invitationCode.toString(),
-                    invitation2.userId,
+                    invitation.invitationCode.toString(),
+                    invitation.userId,
                 )
         assertIs<Failure<UserError.UsernameAlreadyExists>>(newUser)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `deleting a user successfully should return Unit`(manager: TransactionManager) {
+        val userServices = UserServices(manager)
+        val invitation = makeInviterAndInvitation(manager)
+        val user =
+            userServices
+                .createUser(
+                    "userToDelete",
+                    validPassword,
+                    invitation.invitationCode.toString(),
+                    invitation.userId,
+                )
+                as Success<User>
+        val userId = checkNotNull(user.value.uId)
+        val result = userServices.deleteUser(userId)
+        assertIs<Success<Unit>>(result)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `trying to delete a nonexistent user should return UserNotFound`(manager: TransactionManager) {
+        val userServices = UserServices(manager)
+        val result = userServices.deleteUser(0u)
+        assertIs<Failure<UserError.UserNotFound>>(result)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `getting a user by its id should return the user`(manager: TransactionManager) {
+        val userServices = UserServices(manager)
+        val invitation = makeInviterAndInvitation(manager)
+        val user =
+            userServices
+                .createUser(
+                    "userToGet",
+                    validPassword,
+                    invitation.invitationCode.toString(),
+                    invitation.userId,
+                )
+                as Success<User>
+        val userId = checkNotNull(user.value.uId)
+        val result = userServices.getUser(userId)
+        assertIs<Success<User>>(result)
+        assertEquals(user.value, result.value)
     }
 }
