@@ -101,9 +101,5 @@ class UserServices
             }
         }
 
-        override fun isValidToken(token: String): Either<UserError, Boolean> =
-            repoManager.run {
-                val session = userRepo.validateToken(token)
-                success(session)
-            }
+        override fun getUserByToken(token: String): Either<UserError, User> = TODO("Not yet implemented")
     }
