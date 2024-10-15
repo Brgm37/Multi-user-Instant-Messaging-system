@@ -7,12 +7,19 @@ import model.channels.AccessControl
 import model.channels.Channel
 import model.channels.ChannelName
 import model.channels.Visibility
+import model.messages.Message
 import model.users.Password
 import model.users.User
 import model.users.UserInfo
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import utils.Success
+import java.sql.Timestamp
 import java.util.stream.Stream
+import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertNotNull
+import kotlin.time.TimeSource
 
 class MessageServicesTest {
     companion object {
@@ -44,12 +51,13 @@ class MessageServicesTest {
 
         private fun userJoinChannel(
             manager: TransactionManager,
+            user: User,
             channel: Channel,
             accessControl: AccessControl,
         ) =
             manager
                 .run {
-                    val user = makeUser(manager,"User")
+                    val user = checkNotNull(user)
                     val userId = checkNotNull(user?.uId) { "User id is null" }
                     val channelId = checkNotNull(channel.channelId) { "Channel id is null" }
                     channelRepo.joinChannel(channelId, userId, accessControl)
@@ -57,12 +65,13 @@ class MessageServicesTest {
 
         private fun makeChannel(
             manager: TransactionManager,
+            user: User,
             accessControl: AccessControl,
             visibility: Visibility,
         ) =
             manager
                 .run {
-                    val owner = makeUser(manager, "Owner")
+                    val owner = user
                     val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
                     checkNotNull(owner)
                     channelRepo
@@ -79,37 +88,59 @@ class MessageServicesTest {
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
-    fun `create a new message on a private channel`(manager: TransactionManager) {
-        val owner = makeUser(manager, "Owner")
-        val user = makeUser(manager, "User")
-        val privChannel = makeChannel(manager, AccessControl.READ_WRITE, Visibility.PRIVATE)
-        checkNotNull(channelRO)
-        checkNotNull(channelRW)
-        val channelRWId = checkNotNull(channelRW.channelId) { "Channel id is null" }
-        val channelROId = checkNotNull(channelRO.channelId) { "Channel id is null" }
+    fun `create a new message on a Read_Write channel`(manager: TransactionManager) {
+        val user = makeUser(manager,"User")
+        val privChannel = makeChannel(
+            manager,
+            checkNotNull(makeUser(manager,"Owner")) ,
+            AccessControl.READ_WRITE,
+            Visibility.PRIVATE,
+        )
+        checkNotNull(privChannel) { "Channel is null" }
+        checkNotNull(user) { "User is null" }
         val messageServices = MessageServices(manager)
-        userJoinChannel(manager, channelRW, AccessControl.READ_WRITE)
-        userJoinChannel(manager, channelRO, AccessControl.READ_ONLY)
-
+        userJoinChannel(manager, user, privChannel, AccessControl.READ_WRITE)
+        val newMessage = messageServices.createMessage(
+            "Hello, World!",
+            checkNotNull(user.uId) { "User id is null" },
+            checkNotNull(privChannel.channelId) { "Channel id is null" },
+            "2024-09-01 12:00:00",
+        )
+        assertIs<Success<Message>>(newMessage, "Message creation failed with error")
+        assertNotNull(newMessage.value.msgId, "Message id is null")
+        assertEquals(user.uId, newMessage.value.user.uId, "User id is different")
+        assertEquals(privChannel.channelId,
+            newMessage.value.channel.channelId,
+            "Channel id is different",
+        )
+        assertEquals("Hello, World!", newMessage.value.msg, "Message is different")
+        assertEquals( Timestamp.valueOf("2024-09-01 12:00:00"),
+            newMessage.value.creationTime,
+            "Creation time is different",
+        )
     }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `delete a message`(manager: TransactionManager) {
+        TODO()
     }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to send a message to non-existent channel`(manager: TransactionManager) {
+        TODO()
     }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to send a message to non-existent user`(manager: TransactionManager) {
+        TODO()
     }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to send an empty message`(manager: TransactionManager) {
+        TODO()
     }
 }

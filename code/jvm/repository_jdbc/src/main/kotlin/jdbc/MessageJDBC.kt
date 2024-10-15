@@ -7,7 +7,6 @@ import model.messages.Message
 import model.users.UserInfo
 import java.sql.Connection
 import java.sql.ResultSet
-import java.sql.SQLException
 
 /**
  * MessageJDBC is a JDBC implementation of MessageRepositoryInterface
