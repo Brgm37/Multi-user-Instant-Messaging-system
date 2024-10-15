@@ -34,7 +34,10 @@ interface MessageServicesInterface {
      * @param msgId The id of the message to get.
      * @param uId The id of the user that created the message.
      */
-    fun getMessage(msgId: UInt, uId: UInt): Either<MessageError, Message>
+    fun getMessage(
+        msgId: UInt,
+        uId: UInt,
+    ): Either<MessageError, Message>
 
     /**
      * Gets limit amount of messages of a channel.
