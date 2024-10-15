@@ -1,5 +1,9 @@
 plugins {
     kotlin("jvm") version "1.9.25"
+    kotlin("plugin.spring") version "1.9.25"
+    id("org.springframework.boot") version "3.3.3"
+    id("io.spring.dependency-management") version "1.1.6"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
 group = "org.example"
@@ -12,9 +16,8 @@ repositories {
 dependencies {
     implementation(project(":service"))
     implementation(project(":httpApi"))
-    implementation("org.springframework:spring-webmvc:6.1.13")
     implementation("jakarta.servlet:jakarta.servlet-api:6.1.0")
-    implementation("org.slf4j:slf4j-api:2.0.16")
+    implementation("org.springframework:spring-webmvc:6.1.13")
     testImplementation(kotlin("test"))
 }
 

@@ -1,13 +1,13 @@
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.3.4"
+    id("org.springframework.boot") version "3.3.3"
     id("io.spring.dependency-management") version "1.1.6"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
 group = "com.example"
-version = "0.0.1-SNAPSHOT"
+version = "unspecified"
 
 java {
     toolchain {
@@ -21,11 +21,12 @@ repositories {
 
 dependencies {
     api(project(":service"))
-    testImplementation(project(":repository_jdbc"))
+    implementation("org.springframework:spring-webmvc:6.1.13")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    testImplementation(project(":repository_jdbc"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")

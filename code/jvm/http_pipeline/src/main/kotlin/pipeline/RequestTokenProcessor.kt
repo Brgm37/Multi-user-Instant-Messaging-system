@@ -1,4 +1,4 @@
-package org.example.org.example.pipeline
+package pipeline
 
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import interfaces.UserServicesInterface
