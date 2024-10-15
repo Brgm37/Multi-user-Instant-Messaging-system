@@ -76,7 +76,7 @@ class TransactionManagerJDBCTest {
                             channel = ChannelInfo(channelId, channel.name),
                         ),
                     )
-            assertNotNull(message.msgId)
+            assertNotNull(message?.msgId)
         }
     }
 }
