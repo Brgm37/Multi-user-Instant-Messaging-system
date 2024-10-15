@@ -16,6 +16,14 @@ data class Password(
 ) {
     override fun toString(): String = value
 
+    /**
+     * Checks if the password matches the given password.
+     *
+     * @param password the password to check.
+     * @return true if the password matches the given password, false otherwise.
+     */
+    fun matches(password: String): Boolean = value == password
+
     init {
         require(isValidPassword(value)) { "Invalid password." }
     }
@@ -24,6 +32,12 @@ data class Password(
         private const val PASSWORD_MIN_LENGTH = 8
         const val PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{$PASSWORD_MIN_LENGTH,}$"
 
+        /**
+         * Checks if the given password follows the PASSWORD_PATTERN.
+         *
+         * @param password the password to check.
+         * @return true if the password is valid, false otherwise.
+         */
         fun isValidPassword(password: String): Boolean = Regex(PASSWORD_PATTERN).matches(password)
     }
 }

@@ -4,6 +4,7 @@ import errors.Error
 import errors.UserError
 import model.users.User
 import model.users.UserInvitation
+import model.users.UserToken
 import utils.Either
 
 /**
@@ -63,4 +64,14 @@ interface UserServicesInterface {
         inviterUId: UInt,
         invitationCode: String,
     ): Either<UserError, UserInvitation>
+
+    /**
+     * Logs in a user.
+     * @param username The username of the user.
+     * @param password The password of the user.
+     */
+    fun login(
+        username: String,
+        password: String,
+    ): Either<UserError, UserToken>
 }

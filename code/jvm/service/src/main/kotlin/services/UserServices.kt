@@ -16,9 +16,12 @@ import model.channels.decrementUses
 import model.users.Password
 import model.users.User
 import model.users.UserInvitation
+import model.users.UserToken
 import utils.Either
 import utils.failure
 import utils.success
+import java.sql.Timestamp
+import java.time.LocalDateTime
 
 @Named("UserServices")
 class UserServices
@@ -119,6 +122,23 @@ class UserServices
                     userRepo
                         .findInvitation(inviterUId, invitationCode) ?: return@run failure(UserError.InvitationNotFound)
                 success(invitation)
+            }
+        }
+
+        override fun login(
+            username: String,
+            password: String,
+        ): Either<UserError, UserToken> {
+            return repoManager.run {
+                val user = userRepo.findByUsername(username) ?: return@run failure(UserError.UserNotFound)
+                if (!user.password.matches(password)) return@run failure(UserError.PasswordIsInvalid)
+                val userId = checkNotNull(user.uId)
+                val token =
+                    UserToken(
+                        userId = userId,
+                        expirationDate = Timestamp.valueOf(LocalDateTime.now().plusWeeks(1)),
+                    )
+                if (userRepo.createToken(token)) success(token) else failure(UserError.UnableToCreateToken)
             }
         }
     }
