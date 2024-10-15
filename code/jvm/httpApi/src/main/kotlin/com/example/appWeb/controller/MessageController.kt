@@ -45,7 +45,7 @@ class MessageController
                         msg = message.msg,
                         user = message.user,
                         channel = message.channel,
-                        creationTime = Timestamp.valueOf(LocalDateTime.now()),
+                        creationTime = Timestamp.valueOf(LocalDateTime.now()).toString(),
                     )
             when (response) {
                 is Success -> {

@@ -20,7 +20,7 @@ interface MessageServicesInterface {
         msg: String,
         user: UInt,
         channel: UInt,
-        creationTime: Timestamp,
+        creationTime: String,
     ): Either<MessageError, Message>
 
     /**

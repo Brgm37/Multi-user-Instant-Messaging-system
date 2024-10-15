@@ -30,27 +30,28 @@ class MessageServices
             msg: String,
             user: UInt,
             channel: UInt,
-            creationTime: Timestamp,
+            creationTime: String,
         ): Either<MessageError, Message> {
             if (msg.isEmpty()) return failure(InvalidMessageInfo)
             return repoManager.run {
                 if (!channelRepo.isUserInChannel(user, channel)) {
                     return@run failure(UserNotInChannel)
                 }
-                val channelAccess = channelRepo.findUserAccessControl(user, channel)
-                if (channelAccess != AccessControl.READ_WRITE) {
-                    return@run failure(UserHasNoWriteAccess)
-                }
-                val msgUser = userRepo.findById(user) ?: return@run failure(UserNotFound)
-                val uId = checkNotNull(msgUser.uId) { "User id is null" }
                 val msgChannel = channelRepo.findById(channel) ?: return@run failure(ChannelNotFound)
                 val channelId = checkNotNull(msgChannel.channelId) { "Channel id is null" }
+                val msgUser = userRepo.findById(user) ?: return@run failure(UserNotFound)
+                val uId = checkNotNull(msgUser.uId) { "User id is null" }
+                val channelAccess = channelRepo.findUserAccessControl(user, channel)
+                if (channelAccess != AccessControl.READ_WRITE && msgChannel.owner.uId != uId) {
+                    return@run failure(UserHasNoWriteAccess)
+                }
+                val timeOfCreation = Timestamp.valueOf(creationTime) ?: return@run failure(InvalidMessageInfo)
                 val message =
                     Message(
                         msg = msg,
                         user = UserInfo(uId, msgUser.username),
                         channel = ChannelInfo(channelId, msgChannel.name),
-                        creationTime = creationTime,
+                        creationTime = timeOfCreation,
                     )
                 val createdMessage = messageRepo.createMessage(message)
                 if (createdMessage == null) {
