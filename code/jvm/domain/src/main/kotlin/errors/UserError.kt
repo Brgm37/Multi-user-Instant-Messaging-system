@@ -6,7 +6,7 @@ package errors
 abstract class UserError : Error() {
     data object UserNotFound : UserError()
 
-    data object UserAlreadyExists : UserError()
+    data object UnableToCreateUser : UserError()
 
     data object InvalidUserInfo : UserError()
 
@@ -21,4 +21,8 @@ abstract class UserError : Error() {
     data object InvitationCodeIsInvalid : UserError()
 
     data object InvitationCodeHasExpired : UserError()
+
+    data object InvitationNotFound : UserError()
+
+    data object UsernameAlreadyExists : UserError()
 }

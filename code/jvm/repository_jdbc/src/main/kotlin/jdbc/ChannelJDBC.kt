@@ -125,112 +125,112 @@ private const val CHANNELS_INVITATIONS_MAX_USES = "maxUses"
  * @constructor Creates a [ChannelJDBC] with the given connection.
  */
 class ChannelJDBC(
-	private val connection: Connection,
+    private val connection: Connection,
 ) : ChannelRepositoryInterface {
-	/**
-	 * Converts the [ResultSet] to a [Channel].
-	 */
-	private fun ResultSet.toChannel(): Channel {
-		val id = getInt(CHANNELS_VIEW_ID).toUInt()
-		val owner =
-			UserInfo(
-				uId = getInt(CHANNELS_VIEW_OWNER).toUInt(),
-				username = getString(CHANNELS_VIEW_OWNER_NAME),
-			)
-		val name = getString(CHANNELS_VIEW_NAME).toChannelName()
-		val accessControl = AccessControl.valueOf(getString(CHANNELS_VIEW_ACCESS_CONTROL).uppercase())
-		val visibility = getString(CHANNELS_VIEW_VISIBILITY)
-		return createChannel(
-			id = id,
-			owner = owner,
-			name = name,
-			accessControl = accessControl,
-			visibility = Visibility.valueOf(visibility.uppercase()),
-		)
-	}
+    /**
+     * Converts the [ResultSet] to a [Channel].
+     */
+    private fun ResultSet.toChannel(): Channel {
+        val id = getInt(CHANNELS_VIEW_ID).toUInt()
+        val owner =
+            UserInfo(
+                uId = getInt(CHANNELS_VIEW_OWNER).toUInt(),
+                username = getString(CHANNELS_VIEW_OWNER_NAME),
+            )
+        val name = getString(CHANNELS_VIEW_NAME).toChannelName()
+        val accessControl = AccessControl.valueOf(getString(CHANNELS_VIEW_ACCESS_CONTROL).uppercase())
+        val visibility = getString(CHANNELS_VIEW_VISIBILITY)
+        return createChannel(
+            id = id,
+            owner = owner,
+            name = name,
+            accessControl = accessControl,
+            visibility = Visibility.valueOf(visibility.uppercase()),
+        )
+    }
 
-	/**
-	 * Converts the [ResultSet] to a [ChannelInvitation].
-	 */
-	private fun ResultSet.toChannelInvitation(): ChannelInvitation {
-		val id = getInt(CHANNELS_INVITATIONS_CHANNEL_ID).toUInt()
-		val expirationDate = getDate(CHANNELS_INVITATIONS_EXPIRATION_DATE).toLocalDate()
-		val invitation = getString(CHANNELS_INVITATIONS_INVITATION)
-		val accessControl = AccessControl.valueOf(getString(CHANNELS_INVITATIONS_ACCESS_CONTROL).uppercase())
-		val maxUses = getInt(CHANNELS_INVITATIONS_MAX_USES)
-		return ChannelInvitation(
-			channelId = id,
-			expirationDate = expirationDate,
-			invitationCode = UUID.fromString(invitation),
-			accessControl = accessControl,
-			maxUses = maxUses.toUInt(),
-		)
-	}
+    /**
+     * Converts the [ResultSet] to a [ChannelInvitation].
+     */
+    private fun ResultSet.toChannelInvitation(): ChannelInvitation {
+        val id = getInt(CHANNELS_INVITATIONS_CHANNEL_ID).toUInt()
+        val expirationDate = getDate(CHANNELS_INVITATIONS_EXPIRATION_DATE).toLocalDate()
+        val invitation = getString(CHANNELS_INVITATIONS_INVITATION)
+        val accessControl = AccessControl.valueOf(getString(CHANNELS_INVITATIONS_ACCESS_CONTROL).uppercase())
+        val maxUses = getInt(CHANNELS_INVITATIONS_MAX_USES)
+        return ChannelInvitation(
+            channelId = id,
+            expirationDate = expirationDate,
+            invitationCode = UUID.fromString(invitation),
+            accessControl = accessControl,
+            maxUses = maxUses.toUInt(),
+        )
+    }
 
-	/**
-	 * Converts the [ResultSet] to a list of [Channel].
-	 */
-	private fun ResultSet.toChannelList(): List<Channel> {
-		val channels = mutableListOf<Channel>()
-		while (next()) {
-			channels.add(toChannel())
-		}
-		return channels
-	}
+    /**
+     * Converts the [ResultSet] to a list of [Channel].
+     */
+    private fun ResultSet.toChannelList(): List<Channel> {
+        val channels = mutableListOf<Channel>()
+        while (next()) {
+            channels.add(toChannel())
+        }
+        return channels
+    }
 
-	/**
-	 * Sets the information of the [Channel] in the [PreparedStatement].
-	 *
-	 * @param channel The [Channel] to set the information.
-	 *
-	 * - The [PreparedStatement] must have the following parameters: owner, name, accessControl, visibility.
-	 */
-	private fun PreparedStatement.setInfo(channel: Channel) {
-		var idx = 1
-		setInt(idx++, channel.owner.uId.toInt())
-		setString(idx++, channel.name.fullName)
-		setString(idx++, channel.accessControl.toString())
-		when (channel) {
-			is Channel.Public -> {
-				setString(idx++, PUBLIC.name)
-			}
+    /**
+     * Sets the information of the [Channel] in the [PreparedStatement].
+     *
+     * @param channel The [Channel] to set the information.
+     *
+     * - The [PreparedStatement] must have the following parameters: owner, name, accessControl, visibility.
+     */
+    private fun PreparedStatement.setInfo(channel: Channel) {
+        var idx = 1
+        setInt(idx++, channel.owner.uId.toInt())
+        setString(idx++, channel.name.fullName)
+        setString(idx++, channel.accessControl.toString())
+        when (channel) {
+            is Channel.Public -> {
+                setString(idx++, PUBLIC.name)
+            }
 
-			is Channel.Private -> {
-				setString(idx++, PRIVATE.name)
-			}
-		}
-		val id = channel.channelId
-		if (id != null) {
-			setInt(idx, id.toInt())
-		}
-	}
+            is Channel.Private -> {
+                setString(idx++, PRIVATE.name)
+            }
+        }
+        val id = channel.channelId
+        if (id != null) {
+            setInt(idx, id.toInt())
+        }
+    }
 
-	override fun createChannel(channel: Channel): Channel? {
-		val insertQuery =
-			"""
+    override fun createChannel(channel: Channel): Channel? {
+        val insertQuery =
+            """
 			INSERT INTO channels (owner, name, accessControl, visibility)
 			VALUES (?, ?, ?, ?) RETURNING id
 			""".trimIndent()
-		val stm = connection.prepareStatement(insertQuery)
-		stm.setInfo(channel)
-		val rs = stm.executeQuery()
-		return if (rs.next()) {
-			when (channel) {
-				is Channel.Public -> channel.copy(channelId = rs.getInt(CHANNELS_TABLE_ID).toUInt())
-				is Channel.Private -> channel.copy(channelId = rs.getInt(CHANNELS_TABLE_ID).toUInt())
-			}
-		} else {
-			null
-		}
-	}
+        val stm = connection.prepareStatement(insertQuery)
+        stm.setInfo(channel)
+        val rs = stm.executeQuery()
+        return if (rs.next()) {
+            when (channel) {
+                is Channel.Public -> channel.copy(channelId = rs.getInt(CHANNELS_TABLE_ID).toUInt())
+                is Channel.Private -> channel.copy(channelId = rs.getInt(CHANNELS_TABLE_ID).toUInt())
+            }
+        } else {
+            null
+        }
+    }
 
-	override fun findByUserId(
-		userId: UInt,
-		offset: Int,
-		limit: Int,
-	): List<Channel> {
-		val selectQuery =
-			"""
+    override fun findByUserId(
+        userId: UInt,
+        offset: Int,
+        limit: Int,
+    ): List<Channel> {
+        val selectQuery =
+            """
 			SELECT 
 				channel_id, channel_name, channel_owner, channel_accessControl,
 				channel_visibility, owner_name
@@ -239,133 +239,133 @@ class ChannelJDBC(
 			LIMIT ?
 			OFFSET ?
 			""".trimIndent()
-		val stm = connection.prepareStatement(selectQuery)
-		var idx = 1
-		stm.setInt(idx++, userId.toInt())
-		stm.setInt(idx++, limit)
-		stm.setInt(idx, offset)
-		val rs = stm.executeQuery()
-		return rs.toChannelList()
-	}
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, userId.toInt())
+        stm.setInt(idx++, limit)
+        stm.setInt(idx, offset)
+        val rs = stm.executeQuery()
+        return rs.toChannelList()
+    }
 
-	override fun joinChannel(
-		channelId: UInt,
-		userId: UInt,
-		accessControl: AccessControl,
-	) {
-		val insertQuery =
-			"""
+    override fun joinChannel(
+        channelId: UInt,
+        userId: UInt,
+        accessControl: AccessControl,
+    ) {
+        val insertQuery =
+            """
 			INSERT INTO channel_members (channel, member, accessControl)
 			VALUES (?, ?, ?)
 			""".trimIndent()
-		val stm = connection.prepareStatement(insertQuery)
-		var idx = 1
-		stm.setInt(idx++, channelId.toInt())
-		stm.setInt(idx++, userId.toInt())
-		stm.setString(idx, accessControl.toString())
-		stm.executeUpdate()
-	}
+        val stm = connection.prepareStatement(insertQuery)
+        var idx = 1
+        stm.setInt(idx++, channelId.toInt())
+        stm.setInt(idx++, userId.toInt())
+        stm.setString(idx, accessControl.toString())
+        stm.executeUpdate()
+    }
 
-	override fun isUserInChannel(
-		channelId: UInt,
-		userId: UInt,
-	): Boolean {
-		val selectQuery =
-			"""
+    override fun isUserInChannel(
+        channelId: UInt,
+        userId: UInt,
+    ): Boolean {
+        val selectQuery =
+            """
 			SELECT member from channel_members
 			WHERE channel = ? AND member = ?
 			""".trimIndent()
-		val stm = connection.prepareStatement(selectQuery)
-		var idx = 1
-		stm.setInt(idx++, channelId.toInt())
-		stm.setInt(idx, userId.toInt())
-		val rs = stm.executeQuery()
-		return rs.next()
-	}
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, channelId.toInt())
+        stm.setInt(idx, userId.toInt())
+        val rs = stm.executeQuery()
+        return rs.next()
+    }
 
-	override fun findInvitation(channelId: UInt): ChannelInvitation? {
-		val selectQuery =
-			"""
+    override fun findInvitation(channelId: UInt): ChannelInvitation? {
+        val selectQuery =
+            """
 			SELECT channel_id, expirationdate, invitation, accessControl, maxuses
 			FROM channels_invitations
 			WHERE channel_id = ?
 			""".trimIndent()
-		val stm = connection.prepareStatement(selectQuery)
-		stm.setInt(1, channelId.toInt())
-		val rs = stm.executeQuery()
-		return if (rs.next()) {
-			rs.toChannelInvitation()
-		} else {
-			null
-		}
-	}
+        val stm = connection.prepareStatement(selectQuery)
+        stm.setInt(1, channelId.toInt())
+        val rs = stm.executeQuery()
+        return if (rs.next()) {
+            rs.toChannelInvitation()
+        } else {
+            null
+        }
+    }
 
-	override fun updateInvitation(invitation: ChannelInvitation) {
-		val updateQuery =
-			"""
+    override fun updateInvitation(invitation: ChannelInvitation) {
+        val updateQuery =
+            """
 			UPDATE channels_invitations
 			SET maxuses = ?
 			WHERE channel_id = ?
 			""".trimIndent()
-		val stm = connection.prepareStatement(updateQuery)
-		var idx = 1
-		stm.setInt(idx++, invitation.maxUses.toInt())
-		stm.setInt(idx, invitation.channelId.toInt())
-		stm.executeUpdate()
-	}
+        val stm = connection.prepareStatement(updateQuery)
+        var idx = 1
+        stm.setInt(idx++, invitation.maxUses.toInt())
+        stm.setInt(idx, invitation.channelId.toInt())
+        stm.executeUpdate()
+    }
 
-	override fun deleteInvitation(channelId: UInt) {
-		val deleteQuery =
-			"""
+    override fun deleteInvitation(channelId: UInt) {
+        val deleteQuery =
+            """
 			DELETE FROM channels_invitations
 			WHERE channel_id = ?
 			""".trimIndent()
-		val stm = connection.prepareStatement(deleteQuery)
-		stm.setInt(1, channelId.toInt())
-		stm.executeUpdate()
-	}
+        val stm = connection.prepareStatement(deleteQuery)
+        stm.setInt(1, channelId.toInt())
+        stm.executeUpdate()
+    }
 
-	override fun createInvitation(invitation: ChannelInvitation) {
-		val insertQuery =
-			"""
+    override fun createInvitation(invitation: ChannelInvitation) {
+        val insertQuery =
+            """
 			INSERT INTO channels_invitations (channel_id, expirationDate, invitation, accessControl, maxUses)
 			VALUES (?, ?, ?, ?, ?)
 			""".trimIndent()
-		val stm = connection.prepareStatement(insertQuery)
-		var idx = 1
-		stm.setInt(idx++, invitation.channelId.toInt())
-		stm.setObject(idx++, invitation.expirationDate)
-		stm.setString(idx++, invitation.invitationCode.toString())
-		stm.setString(idx++, invitation.accessControl.toString())
-		stm.setInt(idx, invitation.maxUses.toInt())
-		stm.executeUpdate()
-	}
+        val stm = connection.prepareStatement(insertQuery)
+        var idx = 1
+        stm.setInt(idx++, invitation.channelId.toInt())
+        stm.setObject(idx++, invitation.expirationDate)
+        stm.setString(idx++, invitation.invitationCode.toString())
+        stm.setString(idx++, invitation.accessControl.toString())
+        stm.setInt(idx, invitation.maxUses.toInt())
+        stm.executeUpdate()
+    }
 
-	override fun findById(id: UInt): Channel? {
-		val selectQuery =
-			"""
+    override fun findById(id: UInt): Channel? {
+        val selectQuery =
+            """
 			SELECT 
 				channel_id, channel_name, channel_owner, channel_accessControl,
 				channel_visibility, owner_name
 			FROM v_channel
 			WHERE channel_id = ?
 			""".trimIndent()
-		val stm = connection.prepareStatement(selectQuery)
-		stm.setInt(1, id.toInt())
-		val rs = stm.executeQuery()
-		return if (rs.next()) {
-			rs.toChannel()
-		} else {
-			null
-		}
-	}
+        val stm = connection.prepareStatement(selectQuery)
+        stm.setInt(1, id.toInt())
+        val rs = stm.executeQuery()
+        return if (rs.next()) {
+            rs.toChannel()
+        } else {
+            null
+        }
+    }
 
-	override fun findAll(
-		offset: Int,
-		limit: Int,
-	): List<Channel> {
-		val selectQuery =
-			"""
+    override fun findAll(
+        offset: Int,
+        limit: Int,
+    ): List<Channel> {
+        val selectQuery =
+            """
 			SELECT 
 				channel_id, channel_name, channel_owner, channel_accessControl,
 				channel_visibility, owner_id, owner_name
@@ -374,59 +374,59 @@ class ChannelJDBC(
 			LIMIT ?
 			OFFSET ?
 			""".trimIndent()
-		val stm = connection.prepareStatement(selectQuery)
-		var idx = 1
-		stm.setInt(idx++, limit)
-		stm.setInt(idx, offset)
-		val rs = stm.executeQuery()
-		return rs.toChannelList()
-	}
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, limit)
+        stm.setInt(idx, offset)
+        val rs = stm.executeQuery()
+        return rs.toChannelList()
+    }
 
-	override fun save(entity: Channel) {
-		val updateQuery =
-			"""
+    override fun save(entity: Channel) {
+        val updateQuery =
+            """
 			UPDATE channels
 			SET owner = ?, name = ?, accessControl = ?, visibility = ?
 			WHERE id = ?
 			""".trimIndent()
-		val stm = connection.prepareStatement(updateQuery)
-		stm.setInfo(entity)
-		stm.executeUpdate()
-	}
+        val stm = connection.prepareStatement(updateQuery)
+        stm.setInfo(entity)
+        stm.executeUpdate()
+    }
 
-	override fun deleteById(id: UInt) {
-		val deleteQuery =
-			"""
+    override fun deleteById(id: UInt) {
+        val deleteQuery =
+            """
 			DELETE FROM channels
 			WHERE id = ?
 			""".trimIndent()
-		val stm = connection.prepareStatement(deleteQuery)
-		stm.setInt(1, id.toInt())
-		stm.executeUpdate()
-	}
+        val stm = connection.prepareStatement(deleteQuery)
+        stm.setInt(1, id.toInt())
+        stm.executeUpdate()
+    }
 
-	@Suppress("SqlWithoutWhere")
-	override fun clear() {
-		val deleteQuery =
-			"""
+    @Suppress("SqlWithoutWhere")
+    override fun clear() {
+        val deleteQuery =
+            """
 			DELETE FROM channels
 			""".trimIndent()
-		val deleteFromChannelMembersQuery =
-			"""
+        val deleteFromChannelMembersQuery =
+            """
 			DELETE FROM channel_members
 			""".trimIndent()
-		val deleteFromInvitationsQuery =
-			"""
+        val deleteFromInvitationsQuery =
+            """
 			DELETE FROM channels_invitations
 			""".trimIndent()
-		connection
-			.prepareStatement(deleteFromChannelMembersQuery)
-			.executeUpdate()
-		connection
-			.prepareStatement(deleteFromInvitationsQuery)
-			.executeUpdate()
-		connection
-			.prepareStatement(deleteQuery)
-			.executeUpdate()
-	}
+        connection
+            .prepareStatement(deleteFromChannelMembersQuery)
+            .executeUpdate()
+        connection
+            .prepareStatement(deleteFromInvitationsQuery)
+            .executeUpdate()
+        connection
+            .prepareStatement(deleteQuery)
+            .executeUpdate()
+    }
 }
