@@ -54,20 +54,20 @@ class UserServicesTest {
      */
     private fun makeInvitation(
         manager: TransactionManager,
-        expirationDate: Timestamp = Timestamp.valueOf(LocalDateTime.now().plusHours(1))
-    ) =
-        manager.run {
-            val inviter = userRepo.createUser(userDefault)
-            val inviterUId = checkNotNull(inviter?.uId)
-            val invitation = UserInvitation(
+        expirationDate: Timestamp = Timestamp.valueOf(LocalDateTime.now().plusHours(1)),
+    ) = manager.run {
+        val inviter = userRepo.createUser(userDefault)
+        val inviterUId = checkNotNull(inviter?.uId)
+        val invitation =
+            UserInvitation(
                 inviterUId,
                 expirationDate,
             )
-            userRepo.createInvitation(
-                invitation,
-            )
-            return@run invitation
-        }
+        userRepo.createInvitation(
+            invitation,
+        )
+        return@run invitation
+    }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
@@ -89,7 +89,7 @@ class UserServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `trying to create a user with an empty username should return UsernameIsEmptyError`(
-        manager: TransactionManager
+        manager: TransactionManager,
     ) {
         val userServices = UserServices(manager)
         val invitation = makeInvitation(manager)
@@ -102,7 +102,7 @@ class UserServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `trying to create a user with an invalid password should return PasswordIsInvalid`(
-        manager: TransactionManager
+        manager: TransactionManager,
     ) {
         val userServices = UserServices(manager)
         val invitation = makeInvitation(manager)
@@ -114,9 +114,7 @@ class UserServicesTest {
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
-    fun `trying to create a user with an Invitation with an nonexistent inviter id`(
-        manager: TransactionManager
-    ) {
+    fun `trying to create a user with an Invitation with an nonexistent inviter id`(manager: TransactionManager) {
         val userServices = UserServices(manager)
         val invitation = makeInvitation(manager)
         val newUser =
@@ -133,7 +131,7 @@ class UserServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `trying to create a user with and invitation with invalid code should return InvitationCodeIsInvalid`(
-        manager: TransactionManager
+        manager: TransactionManager,
     ) {
         val userServices = UserServices(manager)
         val invitation = makeInvitation(manager)
@@ -151,7 +149,7 @@ class UserServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `trying to create a user with an expired invitation should return InvitationCodeHasExpired`(
-        manager: TransactionManager
+        manager: TransactionManager,
     ) {
         val userServices = UserServices(manager)
         val expirationDate = Timestamp.valueOf(LocalDateTime.now().minusHours(1))
@@ -169,31 +167,36 @@ class UserServicesTest {
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
-    fun `trying to create a user with a username that already exists should return UsernameAlreadyExists`(manager: TransactionManager) {
+    fun `trying to create a user with a username that already exists should return UsernameAlreadyExists`(
+        manager: TransactionManager,
+    ) {
         val userServices = UserServices(manager)
         val invitation = makeInvitation(manager)
         val user =
             userServices
                 .createUser(usernameDefault2, validPassword, invitation.invitationCode.toString(), invitation.userId)
                 as Success<User>
-        val invitation2 = manager
-            .run {
-                val inviter = userRepo.createUser(
-                    User(
-                        username = "inviter2",
-                        password = passwordDefault,
-                    ),
-                )
-                val inviterUId = checkNotNull(inviter?.uId)
-                val invitation2 = UserInvitation(
-                    inviterUId,
-                    Timestamp.valueOf(LocalDateTime.now().plusHours(1)),
-                )
-                userRepo.createInvitation(
-                    invitation2,
-                )
-                return@run invitation2
-            }
+        val invitation2 =
+            manager
+                .run {
+                    val inviter =
+                        userRepo.createUser(
+                            User(
+                                username = "inviter2",
+                                password = passwordDefault,
+                            ),
+                        )
+                    val inviterUId = checkNotNull(inviter?.uId)
+                    val invitation2 =
+                        UserInvitation(
+                            inviterUId,
+                            Timestamp.valueOf(LocalDateTime.now().plusHours(1)),
+                        )
+                    userRepo.createInvitation(
+                        invitation2,
+                    )
+                    return@run invitation2
+                }
         val newUser =
             userServices
                 .createUser(

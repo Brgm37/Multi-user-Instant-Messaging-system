@@ -29,9 +29,9 @@ class UserJDBC(
     override fun createUser(user: User): User? {
         val insertQuery =
             """
-			INSERT INTO users (name, password, token)
-			VALUES (?, ?, ?) RETURNING id
-			""".trimIndent()
+            INSERT INTO users (name, password, token)
+            VALUES (?, ?, ?) RETURNING id
+            """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         var idx = 1
         stm.setString(idx++, user.username)
@@ -51,10 +51,10 @@ class UserJDBC(
     ): UserInvitation? {
         val selectQuery =
             """
-                SELECT user_id, invitation, expirationDate
-			    FROM users_invitations
-			    WHERE user_id = ? AND invitation = ?
-			""".trimIndent()
+            SELECT user_id, invitation, expirationDate
+            FROM users_invitations
+            WHERE user_id = ? AND invitation = ?
+            """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         stm.setInt(1, inviterUId.toInt())
         stm.setString(2, invitationCode)
@@ -69,9 +69,9 @@ class UserJDBC(
     override fun deleteInvitation(invitation: UserInvitation) {
         val deleteQuery =
             """
-			DELETE FROM users_invitations
-			WHERE user_id = ? AND invitation = ?
-			""".trimIndent()
+            DELETE FROM users_invitations
+            WHERE user_id = ? AND invitation = ?
+            """.trimIndent()
         val stm = connection.prepareStatement(deleteQuery)
         stm.setInt(1, invitation.userId.toInt())
         stm.setString(2, invitation.invitationCode.toString())
@@ -81,9 +81,9 @@ class UserJDBC(
     override fun createInvitation(invitation: UserInvitation) {
         val insertQuery =
             """
-			INSERT INTO users_invitations (user_id, invitation, expirationDate)
-			VALUES (?, ?, ?)
-			""".trimIndent()
+            INSERT INTO users_invitations (user_id, invitation, expirationDate)
+            VALUES (?, ?, ?)
+            """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         stm.setInt(1, invitation.userId.toInt())
         stm.setString(2, invitation.invitationCode.toString())
@@ -94,10 +94,10 @@ class UserJDBC(
     override fun validateToken(token: String): Boolean {
         val selectQuery =
             """
-			SELECT id
-			FROM users
-			WHERE token = ?
-			""".trimIndent()
+            SELECT id
+            FROM users
+            WHERE token = ?
+            """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         stm.setString(1, token)
         val rs = stm.executeQuery()
@@ -107,10 +107,10 @@ class UserJDBC(
     override fun findByUsername(username: String): User? {
         val selectQuery =
             """
-			SELECT id, name, password, token
-			FROM users
-			WHERE name = ?
-			""".trimIndent()
+            SELECT id, name, password, token
+            FROM users
+            WHERE name = ?
+            """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         stm.setString(1, username)
         val rs = stm.executeQuery()
@@ -124,10 +124,10 @@ class UserJDBC(
     override fun findById(id: UInt): User? {
         val selectQuery =
             """
-			SELECT id, name, password, token
-			FROM users
-			WHERE id = ?
-			""".trimIndent()
+            SELECT id, name, password, token
+            FROM users
+            WHERE id = ?
+            """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         stm.setInt(1, id.toInt())
         val rs = stm.executeQuery()
@@ -144,9 +144,9 @@ class UserJDBC(
     ): List<User> {
         val selectQuery =
             """
-			SELECT id, name, password, token
-			FROM users
-			""".trimIndent()
+            SELECT id, name, password, token
+            FROM users
+            """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         val rs = stm.executeQuery()
         val users = mutableListOf<User>()
@@ -159,10 +159,10 @@ class UserJDBC(
     override fun save(entity: User) {
         val updateQuery =
             """
-			UPDATE users
-			SET name = ?, password = ?
-			WHERE id = ?
-			""".trimIndent()
+            UPDATE users
+            SET name = ?, password = ?
+            WHERE id = ?
+            """.trimIndent()
         val stm = connection.prepareStatement(updateQuery)
         var idx = 1
         stm.setString(idx++, entity.username)
@@ -174,14 +174,14 @@ class UserJDBC(
     override fun deleteById(id: UInt) {
         val deleteFromUserChannelsQuery =
             """
-			DELETE FROM channel_members
-			WHERE member = ?
-			""".trimIndent()
+            DELETE FROM channel_members
+            WHERE member = ?
+            """.trimIndent()
         val deleteFromUsersQuery =
             """
-			DELETE FROM users
-			WHERE id = ?
-			""".trimIndent()
+            DELETE FROM users
+            WHERE id = ?
+            """.trimIndent()
 
         val stmUserChannels = connection.prepareStatement(deleteFromUserChannelsQuery)
         stmUserChannels.setInt(1, id.toInt())
@@ -196,12 +196,12 @@ class UserJDBC(
     override fun clear() {
         val deleteFromUsersQuery =
             """
-			DELETE FROM users
-			""".trimIndent()
+            DELETE FROM users
+            """.trimIndent()
         val deleteFromUsersInvitationsQuery =
             """
-			DELETE FROM users_invitations
-			""".trimIndent()
+            DELETE FROM users_invitations
+            """.trimIndent()
         val stmDeleteInvitations = connection.prepareStatement(deleteFromUsersInvitationsQuery)
         stmDeleteInvitations.executeUpdate()
         val stmDelete = connection.prepareStatement(deleteFromUsersQuery)

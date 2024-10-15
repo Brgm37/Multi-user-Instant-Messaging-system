@@ -208,9 +208,9 @@ class ChannelJDBC(
     override fun createChannel(channel: Channel): Channel? {
         val insertQuery =
             """
-			INSERT INTO channels (owner, name, accessControl, visibility)
-			VALUES (?, ?, ?, ?) RETURNING id
-			""".trimIndent()
+            INSERT INTO channels (owner, name, accessControl, visibility)
+            VALUES (?, ?, ?, ?) RETURNING id
+            """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         stm.setInfo(channel)
         val rs = stm.executeQuery()
@@ -231,14 +231,14 @@ class ChannelJDBC(
     ): List<Channel> {
         val selectQuery =
             """
-			SELECT 
-				channel_id, channel_name, channel_owner, channel_accessControl,
-				channel_visibility, owner_name
-			FROM v_channel
-			WHERE channel_owner = ?
-			LIMIT ?
-			OFFSET ?
-			""".trimIndent()
+            SELECT 
+                 channel_id, channel_name, channel_owner, channel_accessControl,
+                 channel_visibility, owner_name
+             FROM v_channel
+             WHERE channel_owner = ?
+             LIMIT ?
+             OFFSET ?
+            """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
         stm.setInt(idx++, userId.toInt())
@@ -255,9 +255,9 @@ class ChannelJDBC(
     ) {
         val insertQuery =
             """
-			INSERT INTO channel_members (channel, member, accessControl)
-			VALUES (?, ?, ?)
-			""".trimIndent()
+            INSERT INTO channel_members (channel, member, accessControl)
+            VALUES (?, ?, ?)
+            """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         var idx = 1
         stm.setInt(idx++, channelId.toInt())
@@ -272,9 +272,9 @@ class ChannelJDBC(
     ): Boolean {
         val selectQuery =
             """
-			SELECT member from channel_members
-			WHERE channel = ? AND member = ?
-			""".trimIndent()
+            SELECT member from channel_members
+            WHERE channel = ? AND member = ?
+            """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
         stm.setInt(idx++, channelId.toInt())
@@ -286,10 +286,10 @@ class ChannelJDBC(
     override fun findInvitation(channelId: UInt): ChannelInvitation? {
         val selectQuery =
             """
-			SELECT channel_id, expirationdate, invitation, accessControl, maxuses
-			FROM channels_invitations
-			WHERE channel_id = ?
-			""".trimIndent()
+            SELECT channel_id, expirationdate, invitation, accessControl, maxuses
+            FROM channels_invitations
+            WHERE channel_id = ?
+            """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         stm.setInt(1, channelId.toInt())
         val rs = stm.executeQuery()
@@ -303,10 +303,10 @@ class ChannelJDBC(
     override fun updateInvitation(invitation: ChannelInvitation) {
         val updateQuery =
             """
-			UPDATE channels_invitations
-			SET maxuses = ?
-			WHERE channel_id = ?
-			""".trimIndent()
+            UPDATE channels_invitations
+            SET maxuses = ?
+            WHERE channel_id = ?
+            """.trimIndent()
         val stm = connection.prepareStatement(updateQuery)
         var idx = 1
         stm.setInt(idx++, invitation.maxUses.toInt())
@@ -317,9 +317,9 @@ class ChannelJDBC(
     override fun deleteInvitation(channelId: UInt) {
         val deleteQuery =
             """
-			DELETE FROM channels_invitations
-			WHERE channel_id = ?
-			""".trimIndent()
+            DELETE FROM channels_invitations
+            WHERE channel_id = ?
+            """.trimIndent()
         val stm = connection.prepareStatement(deleteQuery)
         stm.setInt(1, channelId.toInt())
         stm.executeUpdate()
@@ -328,9 +328,9 @@ class ChannelJDBC(
     override fun createInvitation(invitation: ChannelInvitation) {
         val insertQuery =
             """
-			INSERT INTO channels_invitations (channel_id, expirationDate, invitation, accessControl, maxUses)
-			VALUES (?, ?, ?, ?, ?)
-			""".trimIndent()
+            INSERT INTO channels_invitations (channel_id, expirationDate, invitation, accessControl, maxUses)
+            VALUES (?, ?, ?, ?, ?)
+            """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         var idx = 1
         stm.setInt(idx++, invitation.channelId.toInt())
@@ -344,12 +344,12 @@ class ChannelJDBC(
     override fun findById(id: UInt): Channel? {
         val selectQuery =
             """
-			SELECT 
-				channel_id, channel_name, channel_owner, channel_accessControl,
-				channel_visibility, owner_name
-			FROM v_channel
-			WHERE channel_id = ?
-			""".trimIndent()
+            SELECT 
+            	channel_id, channel_name, channel_owner, channel_accessControl,
+            	channel_visibility, owner_name
+            FROM v_channel
+            WHERE channel_id = ?
+            """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         stm.setInt(1, id.toInt())
         val rs = stm.executeQuery()
@@ -366,14 +366,14 @@ class ChannelJDBC(
     ): List<Channel> {
         val selectQuery =
             """
-			SELECT 
-				channel_id, channel_name, channel_owner, channel_accessControl,
-				channel_visibility, owner_id, owner_name
-			FROM v_channel
-			WHERE channel_visibility = '${PUBLIC.name}'
-			LIMIT ?
-			OFFSET ?
-			""".trimIndent()
+            SELECT 
+            	channel_id, channel_name, channel_owner, channel_accessControl,
+            	channel_visibility, owner_id, owner_name
+            FROM v_channel
+            WHERE channel_visibility = '${PUBLIC.name}'
+            LIMIT ?
+            OFFSET ?
+            """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
         stm.setInt(idx++, limit)
@@ -385,10 +385,10 @@ class ChannelJDBC(
     override fun save(entity: Channel) {
         val updateQuery =
             """
-			UPDATE channels
-			SET owner = ?, name = ?, accessControl = ?, visibility = ?
-			WHERE id = ?
-			""".trimIndent()
+            UPDATE channels
+            SET owner = ?, name = ?, accessControl = ?, visibility = ?
+            WHERE id = ?
+            """.trimIndent()
         val stm = connection.prepareStatement(updateQuery)
         stm.setInfo(entity)
         stm.executeUpdate()
@@ -397,9 +397,9 @@ class ChannelJDBC(
     override fun deleteById(id: UInt) {
         val deleteQuery =
             """
-			DELETE FROM channels
-			WHERE id = ?
-			""".trimIndent()
+            DELETE FROM channels
+            WHERE id = ?
+            """.trimIndent()
         val stm = connection.prepareStatement(deleteQuery)
         stm.setInt(1, id.toInt())
         stm.executeUpdate()
@@ -409,16 +409,16 @@ class ChannelJDBC(
     override fun clear() {
         val deleteQuery =
             """
-			DELETE FROM channels
-			""".trimIndent()
+            DELETE FROM channels
+            """.trimIndent()
         val deleteFromChannelMembersQuery =
             """
-			DELETE FROM channel_members
-			""".trimIndent()
+            DELETE FROM channel_members
+            """.trimIndent()
         val deleteFromInvitationsQuery =
             """
-			DELETE FROM channels_invitations
-			""".trimIndent()
+            DELETE FROM channels_invitations
+            """.trimIndent()
         connection
             .prepareStatement(deleteFromChannelMembersQuery)
             .executeUpdate()
