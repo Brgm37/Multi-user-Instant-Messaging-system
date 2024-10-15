@@ -58,7 +58,7 @@ interface ChannelServicesInterface {
         channelId: UInt,
         maxUses: UInt,
         expirationDate: String?,
-        accessControl: String,
+        accessControl: String?,
         owner: UInt,
     ): Either<ChannelError, UUID>
 }

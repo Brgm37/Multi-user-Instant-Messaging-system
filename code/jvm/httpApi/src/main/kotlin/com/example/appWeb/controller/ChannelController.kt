@@ -2,6 +2,7 @@ package com.example.appWeb.controller
 
 import com.example.appWeb.model.dto.input.channel.CreateChannelInputModel
 import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputModel
+import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
@@ -40,6 +41,7 @@ class ChannelController
         @GetMapping(CHANNEL_ID_URL)
         fun getChannel(
             @PathVariable channelId: UInt,
+            authenticated: AuthenticatedUserInputModel,
         ): ResponseEntity<*> =
             when (val response = channelService.getChannel(channelId)) {
                 is Success -> {
@@ -53,6 +55,7 @@ class ChannelController
 
         @GetMapping(CHANNEL_BASE_URL)
         fun getChannels(
+            authenticated: AuthenticatedUserInputModel,
             @RequestParam offset: UInt = 0u,
             @RequestParam limit: UInt = 10u,
         ): ResponseEntity<*> =
@@ -74,6 +77,7 @@ class ChannelController
         @PostMapping(CHANNEL_BASE_URL)
         fun createChannel(
             @Valid @RequestBody channel: CreateChannelInputModel,
+            authenticated: AuthenticatedUserInputModel,
         ): ResponseEntity<*> {
             val response =
                 channelService.createChannel(
@@ -103,11 +107,12 @@ class ChannelController
         fun createChannelInvitation(
             @PathVariable channelId: UInt,
             @RequestBody invitation: CreateChannelInvitationInputModel,
+            authenticated: AuthenticatedUserInputModel,
         ): ResponseEntity<*> {
             val response =
                 channelService.createChannelInvitation(
                     channelId = channelId,
-                    owner = invitation.owner,
+                    owner = authenticated.uId,
                     maxUses = invitation.maxUses,
                     expirationDate = invitation.expirationDate,
                     accessControl = invitation.accessControl,
