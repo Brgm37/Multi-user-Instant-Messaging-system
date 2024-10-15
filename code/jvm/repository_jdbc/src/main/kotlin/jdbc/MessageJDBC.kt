@@ -37,7 +37,7 @@ class MessageJDBC(
         )
     }
 
-    override fun createMessage(message: Message): Message {
+    override fun createMessage(message: Message): Message? {
         val insertQuery =
             """
             INSERT INTO messages (content, author, channel, timestamp)

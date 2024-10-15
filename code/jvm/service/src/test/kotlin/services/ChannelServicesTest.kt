@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import utils.Failure
 import utils.Success
+import java.util.UUID
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -204,5 +205,26 @@ class ChannelServicesTest {
         val result = channelServices.getChannels(0u, 0u, nr.toUInt())
         assertIs<Failure<ChannelError>>(result, "Channels retrieval should have failed")
         assertEquals(ChannelError.UserNotFound, result.value, "Channel error is different")
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `create a channel invitation`(manager: TransactionManager) {
+        val owner = makeUser(manager)
+        val channelServices = ChannelServices(manager)
+        val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
+        val newChannel = channelServices.createChannel(ownerId, "name", READ_WRITE.name, PUBLIC.name)
+        assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+        assertNotNull(newChannel.value.channelId, "Channel id is null")
+        val newChannelId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
+        val result =
+            channelServices.createChannelInvitation(
+                newChannelId,
+                ownerId,
+                null,
+                READ_WRITE.name,
+                ownerId,
+            )
+        assertIs<Success<UUID>>(result, "Channel invitation creation failed")
     }
 }

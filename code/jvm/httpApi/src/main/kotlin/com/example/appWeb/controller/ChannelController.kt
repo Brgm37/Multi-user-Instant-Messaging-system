@@ -1,10 +1,12 @@
 package com.example.appWeb.controller
 
 import com.example.appWeb.model.dto.input.channel.CreateChannelInputModel
+import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputModel
 import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.Problem
+import errors.ChannelError
 import errors.ChannelError.InvalidChannelAccessControl
 import errors.ChannelError.InvalidChannelInfo
 import errors.ChannelError.InvalidChannelVisibility
@@ -97,6 +99,34 @@ class ChannelController
             }
         }
 
+        @PostMapping(CHANNEL_INVITATION_BASE_URL)
+        fun createChannelInvitation(
+            @PathVariable channelId: UInt,
+            @RequestBody invitation: CreateChannelInvitationInputModel,
+        ): ResponseEntity<*> {
+            val response =
+                channelService.createChannelInvitation(
+                    channelId = channelId,
+                    owner = invitation.owner,
+                    maxUses = invitation.maxUses,
+                    expirationDate = invitation.expirationDate,
+                    accessControl = invitation.accessControl,
+                )
+            return when (response) {
+                is Success -> {
+                    ResponseEntity.ok(response.value)
+                }
+
+                is Failure -> {
+                    when (response.value) {
+                        UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
+                        ChannelError.ChannelNotFound -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+                        else -> ChannelProblem.InvalidChannelInfo.response(BAD_REQUEST)
+                    }
+                }
+            }
+        }
+
         companion object {
             /**
              * The base URL for the channel endpoints.
@@ -107,5 +137,10 @@ class ChannelController
              * The URL for the channel with the given id.
              */
             const val CHANNEL_ID_URL = "$CHANNEL_BASE_URL/{channelId}"
+
+            /**
+             * The URL for the channel invitations.
+             */
+            const val CHANNEL_INVITATION_BASE_URL = "$CHANNEL_ID_URL/invitations"
         }
     }

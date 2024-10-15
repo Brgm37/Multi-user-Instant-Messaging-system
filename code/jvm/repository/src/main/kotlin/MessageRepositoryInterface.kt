@@ -10,7 +10,7 @@ interface MessageRepositoryInterface : Repository<Message> {
      * @param message The message to create
      * @return The created message with its ID
      */
-    fun createMessage(message: Message): Message
+    fun createMessage(message: Message): Message?
 
     /**
      * Finds a message by its channel id

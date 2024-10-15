@@ -21,7 +21,7 @@ class MessageServices(
                 .isNotBlank(),
         ) { "channel name cannot be blank" }
         val createdMessage = messageRepo.createMessage(msg)
-        return success(createdMessage)
+        return createdMessage?.let { success(it) } ?: failure(Error.UnableToCreateMessage)
     }
 
     override fun deleteMessage(id: UInt): Either<Error, String> {

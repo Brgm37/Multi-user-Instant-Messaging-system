@@ -6,6 +6,8 @@ package errors
 open class Error {
     data object MessageNotFound : Error()
 
+    data object UnableToCreateMessage : Error()
+
     data object UserNotFound : Error()
 
     data object UserAlreadyExists : Error()
