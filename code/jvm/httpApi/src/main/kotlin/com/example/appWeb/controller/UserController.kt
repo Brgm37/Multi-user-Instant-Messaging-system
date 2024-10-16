@@ -1,21 +1,16 @@
 package com.example.appWeb.controller
 
+import com.example.appWeb.model.dto.input.user.UserLogInInputModel
 import com.example.appWeb.model.dto.input.user.UserSignUpInputModel
-import com.example.appWeb.model.dto.output.user.UserAuthenticationOutputModel
+import com.example.appWeb.model.dto.output.user.UserAuthenticatedOutputModel
 import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
+import com.example.appWeb.model.dto.output.user.UserSignUpOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.Problem
 import errors.ChannelError.ChannelNotFound
 import errors.ChannelError.InvitationCodeMaxUsesReached
-import errors.UserError.InvalidUserInfo
-import errors.UserError.InvitationCodeHasExpired
-import errors.UserError.InvitationCodeIsInvalid
-import errors.UserError.InviterNotFound
-import errors.UserError.UserAlreadyExists
-import errors.UserError.UserNotFound
+import errors.UserError
 import interfaces.UserServicesInterface
-import jakarta.inject.Named
-import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -37,10 +32,10 @@ import utils.Success
  */
 @RestController
 class UserController(
-    @Named("UserServices") private val userService: UserServicesInterface,
+    private val userService: UserServicesInterface,
 ) {
-    @PostMapping(USER_BASE_URL)
-    fun createUser(
+    @PostMapping(SIGNUP_URL)
+    fun signUp(
         @Valid @RequestBody user: UserSignUpInputModel,
         res: HttpServletResponse,
     ) {
@@ -53,18 +48,16 @@ class UserController(
             )
         when (response) {
             is Success -> {
-                setCookie(response.value.token.toString(), res)
-                // TODO : check if this is the correct way to set cookie
-                ResponseEntity.ok(UserAuthenticationOutputModel.fromDomain(response.value))
+                ResponseEntity.ok(UserSignUpOutputModel.fromDomain(response.value))
             }
 
             is Failure -> {
                 when (response.value) {
-                    InvalidUserInfo -> Problem.InvalidUserInfo.response(BAD_REQUEST)
-                    UserAlreadyExists -> Problem.UserAlreadyExists.response(BAD_REQUEST)
-                    InviterNotFound -> Problem.InviterNotFound.response(BAD_REQUEST)
-                    InvitationCodeIsInvalid -> Problem.InvitationCodeIsInvalid.response(BAD_REQUEST)
-                    InvitationCodeHasExpired -> Problem.InvitationCodeHasExpired.response(BAD_REQUEST)
+                    UserError.InvalidUserInfo -> Problem.InvalidUserInfo.response(BAD_REQUEST)
+                    UserError.UsernameAlreadyExists -> Problem.UsernameAlreadyExists.response(BAD_REQUEST)
+                    UserError.InviterNotFound -> Problem.InviterNotFound.response(BAD_REQUEST)
+                    UserError.InvitationCodeIsInvalid -> Problem.InvitationCodeIsInvalid.response(BAD_REQUEST)
+                    UserError.InvitationCodeHasExpired -> Problem.InvitationCodeHasExpired.response(BAD_REQUEST)
                     else -> Problem.UnableToCreateUser.response(BAD_REQUEST)
                 }
             }
@@ -86,6 +79,26 @@ class UserController(
         }
     }
 
+    @PostMapping(LOGIN_URL)
+    fun login(
+        @Valid @RequestBody user: UserLogInInputModel,
+    ) {
+        when (val response = userService.login(user.username, user.password)) {
+            is Success -> {
+                ResponseEntity.ok(UserAuthenticatedOutputModel.fromDomain(response.value))
+            }
+
+            is Failure -> {
+                when (response.value) {
+                    UserError.UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
+                    UserError.PasswordIsInvalid -> Problem.PasswordIsInvalid.response(BAD_REQUEST)
+                    UserError.UnableToCreateToken -> Problem.UnableToCreateToken.response(BAD_REQUEST)
+                    else -> Problem.UnableToLogin.response(BAD_REQUEST)
+                }
+            }
+        }
+    }
+
     @PutMapping(CHANNEL_ID_USER_ID_URL)
     fun joinChannel(
         @PathVariable channelId: UInt,
@@ -99,26 +112,15 @@ class UserController(
 
             is Failure -> {
                 when (response.value) {
-                    UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
+                    UserError.UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
                     ChannelNotFound -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
-                    InvitationCodeIsInvalid -> Problem.InvitationCodeIsInvalid.response(BAD_REQUEST)
-                    InvitationCodeHasExpired -> Problem.InvitationCodeHasExpired.response(BAD_REQUEST)
+                    UserError.InvitationCodeIsInvalid -> Problem.InvitationCodeIsInvalid.response(BAD_REQUEST)
+                    UserError.InvitationCodeHasExpired -> Problem.InvitationCodeHasExpired.response(BAD_REQUEST)
                     InvitationCodeMaxUsesReached -> Problem.InvitationCodeMaxUsesReached.response(BAD_REQUEST)
                     else -> Problem.UnableToJoinChannel.response(BAD_REQUEST)
                 }
             }
         }
-    }
-
-    private fun setCookie(
-        token: String,
-        response: HttpServletResponse,
-    ) {
-        val cookie = Cookie("session", token)
-        cookie.isHttpOnly = true
-        cookie.secure = true
-        cookie.maxAge = 60 * 60 * 24
-        response.addCookie(cookie)
     }
 
     companion object {
@@ -136,5 +138,15 @@ class UserController(
          * The URL for the user with the given id, the channel with the given id and invitation code.
          */
         const val CHANNEL_ID_USER_ID_URL = "${ChannelController.CHANNEL_ID_URL}$USER_ID_URL"
+
+        /**
+         * The URL for the login.
+         */
+        const val LOGIN_URL = "/login"
+
+        /**
+         * The URL for the signup.
+         */
+        const val SIGNUP_URL = "/signup"
     }
 }

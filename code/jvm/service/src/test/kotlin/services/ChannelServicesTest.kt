@@ -1,6 +1,8 @@
 package services
 
 import TransactionManager
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import errors.ChannelError
 import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
@@ -22,11 +24,20 @@ import kotlin.test.assertNotNull
 
 class ChannelServicesTest {
     companion object {
+        private val hikari =
+            HikariConfig()
+                .apply {
+                    jdbcUrl = Environment.connectionUrl
+                    username = Environment.username
+                    password = Environment.password
+                    maximumPoolSize = Environment.poolSize
+                }.let { HikariDataSource(it) }
+
         @JvmStatic
         fun transactionManagers(): Stream<TransactionManager> =
             Stream.of(
                 TransactionManagerInMem().also { cleanup(it) },
-                TransactionManagerJDBC(Environment).also { cleanup(it) },
+                TransactionManagerJDBC(hikari).also { cleanup(it) },
             )
 
         private fun cleanup(manager: TransactionManager) =
@@ -36,17 +47,19 @@ class ChannelServicesTest {
                 messageRepo.clear()
             }
 
-        private fun makeUser(manager: TransactionManager) =
-            manager
-                .run {
-                    userRepo
-                        .createUser(
-                            User(
-                                username = "owner",
-                                password = Password("Password123"),
-                            ),
-                        )
-                }
+        fun makeUser(
+            manager: TransactionManager,
+            username: String = "owner",
+        ) = manager
+            .run {
+                userRepo
+                    .createUser(
+                        User(
+                            username = username,
+                            password = Password("Password123"),
+                        ),
+                    )
+            }
     }
 
     @ParameterizedTest

@@ -3,6 +3,8 @@ package interfaces
 import errors.Error
 import errors.UserError
 import model.users.User
+import model.users.UserInvitation
+import model.users.UserToken
 import utils.Either
 
 /**
@@ -52,4 +54,30 @@ interface UserServicesInterface {
      * @param token The token to validate.
      */
     fun getUserByToken(token: String): Either<UserError, User>
+
+    /**
+     * Validates a token.
+     * @param token The token to validate.
+     */
+    fun isValidToken(token: String): Either<UserError, Boolean>
+
+    /**
+     * Gets an invitation by inviterId and invitationCode
+     * @param inviterUId inviter userId
+     * @param invitationCode invitation code associated to the invitation
+     */
+    fun getInvitation(
+        inviterUId: UInt,
+        invitationCode: String,
+    ): Either<UserError, UserInvitation>
+
+    /**
+     * Logs in a user.
+     * @param username The username of the user.
+     * @param password The password of the user.
+     */
+    fun login(
+        username: String,
+        password: String,
+    ): Either<UserError, UserToken>
 }

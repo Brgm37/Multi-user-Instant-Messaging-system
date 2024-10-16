@@ -1,5 +1,7 @@
 package jdbc.transactionManager
 
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import jdbc.transactionManager.dataSource.ConnectionSource
 import model.channels.AccessControl
 import model.channels.Channel
@@ -18,7 +20,7 @@ class TransactionManagerJDBCTest {
     private val validPassword = "Password123"
     private val passwordDefault = Password(validPassword)
 
-    private class TestConnectionSource : ConnectionSource {
+    private object TestConnectionSource : ConnectionSource {
         override val connectionUrl: String
             get() = "jdbc:postgresql://localhost:5433/daw_test"
         override val username: String
@@ -29,7 +31,16 @@ class TransactionManagerJDBCTest {
             get() = 10
     }
 
-    private val transactionManager = TransactionManagerJDBC(TestConnectionSource())
+    private val hikari =
+        HikariConfig()
+            .apply {
+                jdbcUrl = TestConnectionSource.connectionUrl
+                username = TestConnectionSource.username
+                password = TestConnectionSource.password
+                maximumPoolSize = TestConnectionSource.poolSize
+            }.let { HikariDataSource(it) }
+
+    private val transactionManager = TransactionManagerJDBC(hikari)
 
     @BeforeEach
     fun clear() {

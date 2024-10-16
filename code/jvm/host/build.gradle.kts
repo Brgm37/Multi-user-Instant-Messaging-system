@@ -16,7 +16,7 @@ repositories {
 dependencies {
     implementation(project(":httpApi"))
     implementation(project(":http_pipeline"))
-    implementation(project(":repository_jdbc"))
+    api(project(":repository_jdbc"))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -42,7 +42,7 @@ tasks.test {
     )
     environment(
         "DB_POOL_SIZE",
-        "10",
+        "1000",
     )
     dependsOn(":repository_jdbc:dbTestWait")
     finalizedBy(":repository_jdbc:dbTestDown")

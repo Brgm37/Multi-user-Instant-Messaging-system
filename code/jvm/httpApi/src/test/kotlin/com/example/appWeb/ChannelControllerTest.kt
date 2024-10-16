@@ -7,6 +7,8 @@ import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputMo
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
 import model.channels.AccessControl.READ_WRITE
@@ -14,6 +16,7 @@ import model.channels.Channel
 import model.channels.Visibility.PUBLIC
 import model.users.Password
 import model.users.User
+import model.users.UserToken
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.http.HttpStatus
@@ -24,14 +27,22 @@ import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
-// TODO: Improve the authentication mechanism to test
 class ChannelControllerTest {
     companion object {
+        private val hikari =
+            HikariConfig()
+                .apply {
+                    jdbcUrl = Environment.connectionUrl
+                    username = Environment.username
+                    password = Environment.password
+                    maximumPoolSize = Environment.poolSize
+                }.let { HikariDataSource(it) }
+
         @JvmStatic
         fun transactionManager(): Stream<TransactionManager> =
             Stream.of(
                 TransactionManagerInMem().also { cleanup(it) },
-                TransactionManagerJDBC(Environment).also { cleanup(it) },
+                TransactionManagerJDBC(hikari).also { cleanup(it) },
             )
 
         private fun cleanup(manager: TransactionManager) {
@@ -53,6 +64,17 @@ class ChannelControllerTest {
                             ),
                         )
                 }
+
+        private fun makeToken(
+            manager: TransactionManager,
+            uId: UInt,
+        ) = manager
+            .run {
+                val token = UserToken(userId = uId, token = UUID.randomUUID())
+                userRepo
+                    .createToken(token)
+                token
+            }
     }
 
     @ParameterizedTest
@@ -67,7 +89,7 @@ class ChannelControllerTest {
         val cId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
         val u = manager.run { userRepo.findById(ownerId) }
         checkNotNull(u) { "User not found" }
-        val authenticated = AuthenticatedUserInputModel(ownerId, u.token.toString())
+        val authenticated = AuthenticatedUserInputModel(ownerId, makeToken(manager, ownerId).token.toString())
         channelController
             .getChannel(
                 cId,
@@ -91,7 +113,7 @@ class ChannelControllerTest {
         val uId = checkNotNull(owner?.uId) { "Owner id is null" }
         val u = manager.run { userRepo.findById(uId) }
         checkNotNull(u) { "User not found" }
-        val authenticated = AuthenticatedUserInputModel(uId, u.token.toString())
+        val authenticated = AuthenticatedUserInputModel(uId, makeToken(manager, uId).token.toString())
         val channelServices = ChannelServices(manager)
         val channelController = ChannelController(channelServices)
         val cId = 1u
@@ -116,7 +138,7 @@ class ChannelControllerTest {
         }
         val u = manager.run { userRepo.findById(ownerId) }
         checkNotNull(u) { "User not found" }
-        val authenticated = AuthenticatedUserInputModel(ownerId, u.token.toString())
+        val authenticated = AuthenticatedUserInputModel(ownerId, makeToken(manager, ownerId).token.toString())
         channelController
             .getChannels(authenticated)
             .let { resp ->
@@ -141,7 +163,7 @@ class ChannelControllerTest {
         val visibility = PUBLIC.name
         val u = manager.run { userRepo.findById(ownerId) }
         checkNotNull(u) { "User not found" }
-        val authenticated = AuthenticatedUserInputModel(ownerId, u.token.toString())
+        val authenticated = AuthenticatedUserInputModel(ownerId, makeToken(manager, ownerId).token.toString())
         channelController
             .createChannel(
                 CreateChannelInputModel(
@@ -174,8 +196,7 @@ class ChannelControllerTest {
         val newChannel = channelServices.createChannel(ownerId, channelName, accessControl, visibility)
         assertIs<Success<Channel>>(newChannel, "Channel creation failed")
         val cId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
-        val u = manager.run { userRepo.findById(ownerId) }
-        val authenticated = AuthenticatedUserInputModel(ownerId, u?.token.toString())
+        val authenticated = AuthenticatedUserInputModel(ownerId, makeToken(manager, ownerId).token.toString())
         val invitation =
             channelController.createChannelInvitation(
                 cId,

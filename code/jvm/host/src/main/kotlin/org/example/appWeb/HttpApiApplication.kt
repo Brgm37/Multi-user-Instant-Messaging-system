@@ -1,9 +1,10 @@
 package org.example.appWeb
 
 import TransactionManager
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import jdbc.transactionManager.TransactionManagerJDBC
 import jdbc.transactionManager.dataSource.ConnectionSource
-import jdbc.transactionManager.dataSource.PostgresSQLConnectionSource
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import pipeline.AuthenticatedUserArgumentResolver
 import pipeline.AuthenticationInterceptor
+import javax.sql.DataSource
 
 @Configuration
 @ComponentScan(basePackages = ["services", "jdbc.transactionManager", "com.example.appWeb", "pipeline"])
@@ -35,11 +37,18 @@ class PipelineConfigurer(
 class HttpApiApplication {
     @Bean
     @Profile("jdbc")
-    fun sc(): ConnectionSource = PostgresSQLConnectionSource()
+    fun sc(config: ConnectionSource): DataSource =
+        HikariConfig()
+            .apply {
+                jdbcUrl = config.connectionUrl
+                username = config.username
+                password = config.password
+                maximumPoolSize = config.poolSize
+            }.let { HikariDataSource(it) }
 
     @Bean
     @Profile("jdbc")
-    fun jdbc(): TransactionManager = TransactionManagerJDBC(sc())
+    fun jdbc(dataSource: DataSource): TransactionManager = TransactionManagerJDBC(dataSource)
 }
 
 fun main(args: Array<String>) {
