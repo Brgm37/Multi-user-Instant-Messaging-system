@@ -178,7 +178,7 @@ class UserJDBC(
         var idx = 1
         stm.setInt(idx++, token.userId.toInt())
         stm.setString(idx++, token.token.toString())
-        stm.setTimestamp(idx, token.creationDate)
+        stm.setTimestamp(idx++, token.creationDate)
         stm.setTimestamp(idx, token.expirationDate)
         return stm.executeUpdate() > 0
     }

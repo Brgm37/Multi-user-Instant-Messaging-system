@@ -7,7 +7,7 @@ data class UserToken(
     val token: UUID = UUID.randomUUID(),
     val userId: UInt,
     val creationDate: Timestamp = Timestamp(System.currentTimeMillis()),
-    val expirationDate: Timestamp,
+    val expirationDate: Timestamp = Timestamp.valueOf(creationDate.toLocalDateTime().plusWeeks(1)),
 ) {
     init {
         require(creationDate < expirationDate) { "The creation date must be before the expiration date" }
