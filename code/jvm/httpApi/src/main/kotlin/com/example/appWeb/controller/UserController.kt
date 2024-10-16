@@ -1,5 +1,6 @@
 package com.example.appWeb.controller
 
+import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.input.user.UserLogInInputModel
 import com.example.appWeb.model.dto.input.user.UserSignUpInputModel
 import com.example.appWeb.model.dto.output.user.UserAuthenticatedOutputModel
@@ -38,7 +39,7 @@ class UserController(
     fun signUp(
         @Valid @RequestBody user: UserSignUpInputModel,
         res: HttpServletResponse,
-    ) {
+    ): ResponseEntity<*> {
         val response =
             userService.createUser(
                 username = user.username,
@@ -46,7 +47,7 @@ class UserController(
                 invitationCode = user.invitationCode,
                 inviterUId = user.inviterUId,
             )
-        when (response) {
+        return when (response) {
             is Success -> {
                 ResponseEntity.ok(UserSignUpOutputModel.fromDomain(response.value))
             }
@@ -67,7 +68,8 @@ class UserController(
     @GetMapping(USER_ID_URL)
     fun getUser(
         @PathVariable userId: UInt,
-    ) {
+        authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> =
         when (val response = userService.getUser(userId)) {
             is Success -> {
                 ResponseEntity.ok(UserInfoOutputModel.fromDomain(response.value))
@@ -77,12 +79,12 @@ class UserController(
                 Problem.UserNotFound.response(NOT_FOUND)
             }
         }
-    }
 
     @PostMapping(LOGIN_URL)
     fun login(
         @Valid @RequestBody user: UserLogInInputModel,
-    ) {
+        authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> =
         when (val response = userService.login(user.username, user.password)) {
             is Success -> {
                 ResponseEntity.ok(UserAuthenticatedOutputModel.fromDomain(response.value))
@@ -97,17 +99,17 @@ class UserController(
                 }
             }
         }
-    }
 
     @PutMapping(CHANNEL_ID_USER_ID_URL)
     fun joinChannel(
         @PathVariable channelId: UInt,
         @PathVariable userId: UInt,
         @RequestParam invitationCode: String = "",
-    ) {
+        authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> =
         when (val response = userService.joinChannel(userId, channelId, invitationCode)) {
             is Success -> {
-                ResponseEntity.ok()
+                ResponseEntity.ok(response.value)
             }
 
             is Failure -> {
@@ -121,7 +123,6 @@ class UserController(
                 }
             }
         }
-    }
 
     companion object {
         /**
