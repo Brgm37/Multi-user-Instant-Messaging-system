@@ -3,6 +3,7 @@ package pipeline
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED
 import org.springframework.core.MethodParameter
 import org.springframework.stereotype.Component
 import org.springframework.web.method.HandlerMethod
@@ -33,7 +34,7 @@ class AuthenticationInterceptor(
                 processor
                     .processAuthorizationHeader(request.getHeader(NAME_AUTHORIZATION_HEADER))
             return if (user == null) {
-                response.status = 401
+                response.status = SC_UNAUTHORIZED
                 response.addHeader(NAME_WWW_AUTHENTICATE_HEADER, RequestTokenProcessor.SCHEME)
                 false
             } else {

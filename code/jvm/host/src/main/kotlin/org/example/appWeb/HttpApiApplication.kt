@@ -17,6 +17,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import pipeline.AuthenticatedUserArgumentResolver
 import pipeline.AuthenticationInterceptor
+import utils.encryption.AESEncrypt
+import utils.encryption.Encrypt
 import javax.sql.DataSource
 
 @Configuration
@@ -39,6 +41,10 @@ class HttpApiApplication {
     @Bean
     @Profile("hikari")
     fun cs(): ConnectionSource = HikariConnectionSource()
+
+    @Bean
+    @Profile("aes")
+    fun aesEncryption(): Encrypt = AESEncrypt
 
     @Bean
     @Profile("hikari")

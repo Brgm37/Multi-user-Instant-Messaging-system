@@ -33,12 +33,6 @@ class UserServicesTest {
     private val passwordDefault = Password(validPassword)
     private val usernameDefault1 = "name"
     private val usernameDefault2 = "name2"
-//    private val uIdDefault = 1u
-//    private val cIdDefault = 1u
-//    private val userDefault = User(null, usernameDefault1, passwordDefault)
-//    private val userWithIdDefault = User(uIdDefault, usernameDefault1, passwordDefault)
-//    private val userInfoDefault = UserInfo(uIdDefault, usernameDefault1)
-//    private val channelName = ChannelName("channel", "nameDefault")
 
     companion object {
         private val hikari =

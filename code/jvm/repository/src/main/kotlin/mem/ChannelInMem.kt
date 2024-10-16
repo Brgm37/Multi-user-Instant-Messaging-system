@@ -66,9 +66,7 @@ class ChannelInMem : ChannelRepositoryInterface {
     override fun findUserAccessControl(
         channelId: UInt,
         userId: UInt,
-    ): AccessControl? {
-        TODO("Not yet implemented")
-    }
+    ): AccessControl? = usersInChannels[channelId]?.find { it.first == userId }?.second
 
     override fun findById(id: UInt): Channel? = channels.find { it.channelId == id }
 
