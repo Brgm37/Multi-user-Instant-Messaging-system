@@ -199,8 +199,8 @@ class ChannelControllerTest {
         val authenticated = AuthenticatedUserInputModel(ownerId, makeToken(manager, ownerId).token.toString())
         val invitation =
             channelController.createChannelInvitation(
-                cId,
                 CreateChannelInvitationInputModel(
+                    channelId = cId,
                     maxUses = 1u,
                     expirationDate = null,
                     accessControl = accessControl,

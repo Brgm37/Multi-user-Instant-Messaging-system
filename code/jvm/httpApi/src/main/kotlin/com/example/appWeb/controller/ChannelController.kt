@@ -102,13 +102,12 @@ class ChannelController(
 
     @PostMapping(CHANNEL_INVITATION_BASE_URL)
     fun createChannelInvitation(
-        @PathVariable channelId: UInt,
-        @RequestBody invitation: CreateChannelInvitationInputModel,
+        @Valid @RequestBody invitation: CreateChannelInvitationInputModel,
         authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> {
         val response =
             channelService.createChannelInvitation(
-                channelId = channelId,
+                channelId = invitation.channelId,
                 owner = authenticated.uId,
                 maxUses = invitation.maxUses,
                 expirationDate = invitation.expirationDate,
@@ -143,6 +142,6 @@ class ChannelController(
         /**
          * The URL for the channel invitations.
          */
-        const val CHANNEL_INVITATION_BASE_URL = "$CHANNEL_ID_URL/invitations"
+        const val CHANNEL_INVITATION_BASE_URL = "$CHANNEL_BASE_URL/invitations"
     }
 }

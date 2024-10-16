@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import jdbc.transactionManager.TransactionManagerJDBC
 import jdbc.transactionManager.dataSource.ConnectionSource
+import jdbc.transactionManager.dataSource.HikariConnectionSource
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
@@ -36,8 +37,12 @@ class PipelineConfigurer(
 @SpringBootApplication
 class HttpApiApplication {
     @Bean
-    @Profile("jdbc")
-    fun sc(config: ConnectionSource): DataSource =
+    @Profile("hikari")
+    fun cs(): ConnectionSource = HikariConnectionSource()
+
+    @Bean
+    @Profile("hikari")
+    fun hikariDc(config: ConnectionSource): DataSource =
         HikariConfig()
             .apply {
                 jdbcUrl = config.connectionUrl

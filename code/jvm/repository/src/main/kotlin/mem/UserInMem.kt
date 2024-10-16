@@ -43,7 +43,12 @@ class UserInMem : UserRepositoryInterface {
     }
 
     override fun findByToken(token: String): User? {
-        val tokenObj = UUID.fromString(token)
+        val tokenObj =
+            try {
+                UUID.fromString(token)
+            } catch (e: Exception) {
+                return null
+            }
         return tokens
             .find { it.token == tokenObj }
             ?.let { findById(it.userId) }
