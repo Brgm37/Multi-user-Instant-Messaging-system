@@ -48,8 +48,8 @@ class ChannelControllerTest {
         private fun cleanup(manager: TransactionManager) {
             manager.run {
                 channelRepo.clear()
-                userRepo.clear()
                 messageRepo.clear()
+                userRepo.clear()
             }
         }
 

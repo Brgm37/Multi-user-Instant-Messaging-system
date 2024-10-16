@@ -39,8 +39,8 @@ class ChannelJDBCTest {
     fun clean() {
         runWithConnection { connection ->
             ChannelJDBC(connection).clear()
-            UserJDBC(connection).clear()
             MessageJDBC(connection).clear()
+            UserJDBC(connection).clear()
         }
     }
 
