@@ -31,6 +31,8 @@ class UserInMem : UserRepositoryInterface {
         users.find { it.token.toString() == token }?.let { return true } ?: return false
     }
 
+    override fun findByToken(token: String): User? = users.find { it.token.toString() == token }
+
     override fun findById(id: UInt): User? = users.find { it.uId == id }
 
     override fun findAll(

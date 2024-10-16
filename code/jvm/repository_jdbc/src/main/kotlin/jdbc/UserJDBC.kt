@@ -102,6 +102,23 @@ class UserJDBC(
         return rs.next()
     }
 
+    override fun findByToken(token: String): User? {
+        val selectQuery =
+            """
+            SELECT user_id
+            FROM users_tokens
+            WHERE token = ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        stm.setString(1, token)
+        val rs = stm.executeQuery()
+        return if (rs.next()) {
+            findById(rs.getInt("user_id").toUInt())
+        } else {
+            null
+        }
+    }
+
     override fun findById(id: UInt): User? {
         val selectQuery =
             """

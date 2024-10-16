@@ -21,8 +21,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(kotlin("test"))
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux")
 }
 
 tasks.test {
@@ -43,6 +44,8 @@ tasks.test {
         "DB_POOL_SIZE",
         "10",
     )
+    dependsOn(":repository_jdbc:dbTestWait")
+    finalizedBy(":repository_jdbc:dbTestDown")
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
