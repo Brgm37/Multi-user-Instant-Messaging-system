@@ -14,7 +14,7 @@ class PostgresSQLConnectionSource : ConnectionSource {
     override val password: String
         get() = tryCatchGetEnv("DB_PASSWORD")
     override val poolSize: Int
-        get() = tryCatchGetEnv("DB_POOL_SIZE").toIntOrNull() ?: 10
+        get() = tryCatchGetEnv("DB_POOL_SIZE").toIntOrNull() ?: 100
 
     /**
      * Get the environment variable or throw an exception

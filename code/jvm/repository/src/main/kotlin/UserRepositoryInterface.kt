@@ -1,5 +1,6 @@
 import model.users.User
 import model.users.UserInvitation
+import model.users.UserToken
 
 interface UserRepositoryInterface : Repository<User> {
     /**
@@ -32,11 +33,23 @@ interface UserRepositoryInterface : Repository<User> {
     fun createInvitation(invitation: UserInvitation)
 
     /**
-     * Validates a token
+     * Validates if a token exists and is not expired
      *
      * @param token The token to validate
      */
     fun validateToken(token: String): Boolean
+
+    /**
+     * Retrieves a User by its username
+     * @param username the username of the user
+     */
+    fun findByUsername(username: String): User?
+
+    /**
+     * Creates a new authentication token for the user
+     * @param token The token to create
+     */
+    fun createToken(token: UserToken): Boolean
 
     /**
      * Finds a user by its token

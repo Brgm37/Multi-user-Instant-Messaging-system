@@ -14,9 +14,13 @@ import model.channels.Channel
 import model.channels.decrementUses
 import model.users.Password
 import model.users.User
+import model.users.UserInvitation
+import model.users.UserToken
 import utils.Either
 import utils.failure
 import utils.success
+import java.sql.Timestamp
+import java.time.LocalDateTime
 
 @Named("UserServices")
 class UserServices(
@@ -45,7 +49,8 @@ class UserServices(
                 userRepo.deleteInvitation(invitation)
                 return@run failure(UserError.InvitationCodeHasExpired)
             }
-            val createdUser = userRepo.createUser(user) ?: return@run failure(UserError.UserAlreadyExists)
+            if (userRepo.findByUsername(username) != null) return@run failure(UserError.UsernameAlreadyExists)
+            val createdUser = userRepo.createUser(user) ?: return@run failure(UserError.UnableToCreateUser)
             userRepo.deleteInvitation(invitation)
             success(createdUser)
         }
@@ -103,4 +108,40 @@ class UserServices(
             val user = userRepo.findByToken(token) ?: return@run failure(UserError.UserNotFound)
             success(user)
         }
+
+    override fun isValidToken(token: String): Either<UserError, Boolean> =
+        repoManager.run {
+            val session = userRepo.validateToken(token)
+            success(session)
+        }
+
+    override fun getInvitation(
+        inviterUId: UInt,
+        invitationCode: String,
+    ): Either<UserError, UserInvitation> {
+        return repoManager.run {
+            userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
+            val invitation =
+                userRepo
+                    .findInvitation(inviterUId, invitationCode) ?: return@run failure(UserError.InvitationNotFound)
+            success(invitation)
+        }
+    }
+
+    override fun login(
+        username: String,
+        password: String,
+    ): Either<UserError, UserToken> {
+        return repoManager.run {
+            val user = userRepo.findByUsername(username) ?: return@run failure(UserError.UserNotFound)
+            if (!user.password.matches(password)) return@run failure(UserError.PasswordIsInvalid)
+            val userId = checkNotNull(user.uId)
+            val token =
+                UserToken(
+                    userId = userId,
+                    expirationDate = Timestamp.valueOf(LocalDateTime.now().plusWeeks(1)),
+                )
+            if (userRepo.createToken(token)) success(token) else failure(UserError.UnableToCreateToken)
+        }
+    }
 }

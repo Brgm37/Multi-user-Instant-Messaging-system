@@ -60,7 +60,7 @@ tasks.withType<Test> {
     )
     environment(
         "DB_POOL_SIZE",
-        "10",
+        "1000",
     )
     dependsOn(":repository_jdbc:dbTestWait")
     finalizedBy(":repository_jdbc:dbTestDown")

@@ -2,9 +2,6 @@ package jdbc.transactionManager
 
 import Transaction
 import TransactionManager
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
-import jdbc.transactionManager.dataSource.ConnectionSource
 import java.sql.SQLException
 import javax.sql.DataSource
 
@@ -12,23 +9,8 @@ import javax.sql.DataSource
  * TransactionManager implementation using JDBC
  */
 class TransactionManagerJDBC(
-    private val dS: ConnectionSource,
+    private val dataSource: DataSource,
 ) : TransactionManager {
-    private val dataSource: DataSource
-
-    init {
-        val config =
-            HikariConfig()
-                .apply {
-                    jdbcUrl = dS.connectionUrl
-                    username = dS.username
-                    password = dS.password
-                    driverClassName = "org.postgresql.Driver"
-                    maximumPoolSize = dS.poolSize
-                }
-        dataSource = HikariDataSource(config)
-    }
-
     override fun <R> run(block: Transaction.() -> R): R {
         dataSource.connection.use { connection ->
             connection.autoCommit = false

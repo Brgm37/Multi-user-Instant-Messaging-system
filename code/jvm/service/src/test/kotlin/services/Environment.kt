@@ -10,5 +10,5 @@ object Environment : ConnectionSource {
     override val password: String
         get() = "password"
     override val poolSize: Int
-        get() = 10
+        get() = 100
 }
