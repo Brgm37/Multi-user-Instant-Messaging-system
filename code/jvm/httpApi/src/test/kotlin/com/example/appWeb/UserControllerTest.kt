@@ -5,8 +5,6 @@ import com.example.appWeb.controller.UserController
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
 import com.example.appWeb.model.problem.UserProblem
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
 import model.users.Password
@@ -16,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.http.HttpStatus
 import services.UserServices
+import utils.encryption.DummyEncrypt
 import java.util.UUID
 import java.util.stream.Stream
 import kotlin.test.assertEquals
@@ -23,20 +22,11 @@ import kotlin.test.assertIs
 
 class UserControllerTest {
     companion object {
-        private val hikari =
-            HikariConfig()
-                .apply {
-                    jdbcUrl = Environment.connectionUrl
-                    username = Environment.username
-                    password = Environment.password
-                    maximumPoolSize = Environment.poolSize
-                }.let { HikariDataSource(it) }
-
         @JvmStatic
         fun transactionManager(): Stream<TransactionManager> =
             Stream.of(
                 TransactionManagerInMem().also { cleanup(it) },
-                TransactionManagerJDBC(hikari).also { cleanup(it) },
+                TransactionManagerJDBC(TestSetup.dataSource, DummyEncrypt).also { cleanup(it) },
             )
 
         private fun cleanup(manager: TransactionManager) {

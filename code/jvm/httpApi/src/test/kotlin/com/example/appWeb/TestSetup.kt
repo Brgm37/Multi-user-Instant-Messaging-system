@@ -1,4 +1,4 @@
-package jdbc
+package com.example.appWeb
 
 import org.postgresql.ds.PGSimpleDataSource
 

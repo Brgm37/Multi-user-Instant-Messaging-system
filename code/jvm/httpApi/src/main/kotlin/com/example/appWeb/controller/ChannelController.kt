@@ -120,7 +120,6 @@ class ChannelController(
 
             is Failure -> {
                 when (response.value) {
-                    UserNotFound -> UserProblem.UserNotFound.response(NOT_FOUND)
                     ChannelError.ChannelNotFound -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
                     else -> ChannelProblem.InvalidChannelInfo.response(BAD_REQUEST)
                 }

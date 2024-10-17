@@ -41,28 +41,16 @@ kotlin {
     }
 }
 
-tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
-    enabled = false
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
+tasks.test {
     environment(
         "DB_URL",
-        "jdbc:postgresql://localhost:5433/daw_test",
+        "jdbc:postgresql://localhost:5433/daw_test?user=postgres&password=password",
     )
-    environment(
-        "DB_USER",
-        "postgres",
-    )
-    environment(
-        "DB_PASSWORD",
-        "password",
-    )
-    environment(
-        "DB_POOL_SIZE",
-        "1000",
-    )
+    useJUnitPlatform()
     dependsOn(":repository_jdbc:dbTestWait")
     finalizedBy(":repository_jdbc:dbTestDown")
+}
+
+tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
+    enabled = false
 }
