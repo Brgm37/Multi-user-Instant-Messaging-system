@@ -24,7 +24,7 @@ class ChannelInMem : ChannelRepositoryInterface {
         val cId = checkNotNull(newChannel.channelId)
         usersInChannels.getOrPut(cId) {
             mutableListOf(
-                Pair(newChannel.owner.uId, AccessControl.READ_WRITE)
+                Pair(newChannel.owner.uId, AccessControl.READ_WRITE),
             )
         }
         return newChannel
