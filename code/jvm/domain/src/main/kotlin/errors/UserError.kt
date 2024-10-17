@@ -31,4 +31,6 @@ abstract class UserError : Error() {
     data object TokenNotFound : UserError()
 
     data object UnableToCreateInvitation : UserError()
+
+    data object InvitationCodeMaxUsesReached : UserError()
 }
