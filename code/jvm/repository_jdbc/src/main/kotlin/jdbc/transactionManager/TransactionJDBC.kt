@@ -7,13 +7,17 @@ import UserRepositoryInterface
 import jdbc.ChannelJDBC
 import jdbc.MessageJDBC
 import jdbc.UserJDBC
+import utils.encryption.DummyEncrypt
+import utils.encryption.Encrypt
+import java.sql.Connection
 
 class TransactionJDBC(
-    private val connection: java.sql.Connection,
+    private val connection: Connection,
+    encrypt: Encrypt = DummyEncrypt,
 ) : Transaction {
     override val channelRepo: ChannelRepositoryInterface = ChannelJDBC(connection)
-    override val userRepo: UserRepositoryInterface = UserJDBC(connection)
-    override val messageRepo: MessageRepositoryInterface = MessageJDBC(connection)
+    override val userRepo: UserRepositoryInterface = UserJDBC(connection, encrypt)
+    override val messageRepo: MessageRepositoryInterface = MessageJDBC(connection, encrypt)
 
     override fun rollback() {
         connection.rollback()

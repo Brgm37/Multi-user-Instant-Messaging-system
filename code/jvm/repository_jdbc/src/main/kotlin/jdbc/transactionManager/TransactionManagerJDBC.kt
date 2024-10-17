@@ -2,6 +2,8 @@ package jdbc.transactionManager
 
 import Transaction
 import TransactionManager
+import utils.encryption.DummyEncrypt
+import utils.encryption.Encrypt
 import java.sql.SQLException
 import javax.sql.DataSource
 
@@ -10,11 +12,12 @@ import javax.sql.DataSource
  */
 class TransactionManagerJDBC(
     private val dataSource: DataSource,
+    private val encrypt: Encrypt = DummyEncrypt,
 ) : TransactionManager {
     override fun <R> run(block: Transaction.() -> R): R {
         dataSource.connection.use { connection ->
             connection.autoCommit = false
-            val transaction = TransactionJDBC(connection)
+            val transaction = TransactionJDBC(connection, encrypt)
             return try {
                 val result = transaction.block()
                 connection.commit()

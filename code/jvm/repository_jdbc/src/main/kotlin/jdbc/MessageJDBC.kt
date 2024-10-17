@@ -5,9 +5,10 @@ import model.channels.ChannelInfo
 import model.channels.toChannelName
 import model.messages.Message
 import model.users.UserInfo
+import utils.encryption.DummyEncrypt
+import utils.encryption.Encrypt
 import java.sql.Connection
 import java.sql.ResultSet
-import java.sql.SQLException
 import java.sql.Timestamp
 
 /**
@@ -16,6 +17,7 @@ import java.sql.Timestamp
  */
 class MessageJDBC(
     private val connection: Connection,
+    private val encrypt: Encrypt = DummyEncrypt,
 ) : MessageRepositoryInterface {
     private fun ResultSet.toMessage(): Message {
         val author =
@@ -45,15 +47,15 @@ class MessageJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         var idx = 1
-        stm.setString(idx++, message.msg)
+        stm.setString(idx++, encrypt.encrypt(message.msg))
         stm.setInt(idx++, message.user.uId.toInt())
         stm.setInt(idx++, message.channel.uId.toInt())
         stm.setTimestamp(idx, Timestamp.valueOf(message.creationTime))
         val rs = stm.executeQuery()
-        if (rs.next()) {
-            return message.copy(msgId = rs.getInt("id").toUInt())
+        return if (rs.next()) {
+            message.copy(msgId = rs.getInt("id").toUInt())
         } else {
-            throw SQLException("Failed to create message")
+            null
         }
     }
 

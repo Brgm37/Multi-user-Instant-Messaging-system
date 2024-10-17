@@ -5,6 +5,8 @@ import model.users.Password
 import model.users.User
 import model.users.UserInvitation
 import model.users.UserToken
+import utils.encryption.DummyEncrypt
+import utils.encryption.Encrypt
 import java.sql.Connection
 import java.sql.ResultSet
 import java.util.UUID
@@ -15,6 +17,7 @@ import java.util.UUID
 
 class UserJDBC(
     private val connection: Connection,
+    private val encrypt: Encrypt = DummyEncrypt,
 ) : UserRepositoryInterface {
     companion object {
         const val MAX_TOKENS = 5

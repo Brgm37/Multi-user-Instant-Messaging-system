@@ -1,11 +1,7 @@
-// import utils.encryption.Encrypt
-
 /**
  * Generic repository interface for basic CRUD operations
  */
 interface Repository<T> {
-//    val encrypt: Encrypt
-
     /**
      * Retrieves an entity by its ID
      * @param id The ID of the entity to retrieve

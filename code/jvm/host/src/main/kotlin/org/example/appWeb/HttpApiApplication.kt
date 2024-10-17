@@ -59,7 +59,10 @@ class HttpApiApplication {
 
     @Bean
     @Profile("jdbc")
-    fun jdbc(dataSource: DataSource): TransactionManager = TransactionManagerJDBC(dataSource)
+    fun jdbc(
+        dataSource: DataSource,
+        encrypt: Encrypt,
+    ): TransactionManager = TransactionManagerJDBC(dataSource, encrypt)
 }
 
 fun main(args: Array<String>) {
