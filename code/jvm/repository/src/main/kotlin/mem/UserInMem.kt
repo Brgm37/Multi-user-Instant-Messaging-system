@@ -20,14 +20,16 @@ class UserInMem : UserRepositoryInterface {
     override fun findInvitation(
         inviterUId: UInt,
         invitationCode: String,
-    ): UserInvitation? = invitations.find { it.userId == inviterUId && it.invitationCode.toString() == invitationCode }
+    ): UserInvitation? =
+        invitations.find { it.inviterId == inviterUId && it.invitationCode.toString() == invitationCode }
 
     override fun deleteInvitation(invitation: UserInvitation) {
         invitations.removeIf { it.invitationCode == invitation.invitationCode }
     }
 
-    override fun createInvitation(invitation: UserInvitation) {
+    override fun createInvitation(invitation: UserInvitation): Boolean {
         invitations.add(invitation)
+        return true
     }
 
     override fun validateToken(token: String): Boolean {
@@ -42,8 +44,17 @@ class UserInMem : UserRepositoryInterface {
         return true
     }
 
+    override fun deleteToken(token: String): Boolean {
+        return tokens.removeIf { it.token == UUID.fromString(token) }
+    }
+
     override fun findByToken(token: String): User? {
-        val tokenObj = UUID.fromString(token)
+        val tokenObj =
+            try {
+                UUID.fromString(token)
+            } catch (e: Exception) {
+                return null
+            }
         return tokens
             .find { it.token == tokenObj }
             ?.let { findById(it.userId) }

@@ -21,7 +21,7 @@ class ChannelInMem : ChannelRepositoryInterface {
                 is Channel.Private -> channel.copy(channelId = nextId++)
             }
         channels.add(newChannel)
-        val cId = checkNotNull(newChannel.channelId)
+        val cId = checkNotNull(newChannel.channelId) { "Channel ID is null" }
         usersInChannels.getOrPut(cId) {
             mutableListOf(
                 Pair(newChannel.owner.uId, AccessControl.READ_WRITE),
@@ -72,9 +72,7 @@ class ChannelInMem : ChannelRepositoryInterface {
     override fun findUserAccessControl(
         channelId: UInt,
         userId: UInt,
-    ): AccessControl? {
-        return usersInChannels[channelId]?.find { it.first == userId }?.second
-    }
+    ): AccessControl? = usersInChannels[channelId]?.find { it.first == userId }?.second
 
     override fun findById(id: UInt): Channel? = channels.find { it.channelId == id }
 

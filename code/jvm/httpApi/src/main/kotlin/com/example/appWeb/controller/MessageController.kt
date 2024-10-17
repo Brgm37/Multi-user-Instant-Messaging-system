@@ -8,13 +8,11 @@ import com.example.appWeb.model.dto.input.message.CreateMessageInputModel
 import com.example.appWeb.model.dto.output.message.MessageOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.MessageProblem
-import com.example.appWeb.model.problem.Problem
+import com.example.appWeb.model.problem.UserProblem
 import errors.MessageError.ChannelNotFound
 import errors.MessageError.InvalidMessageInfo
 import errors.MessageError.UserNotFound
 import interfaces.MessageServicesInterface
-import jakarta.inject.Inject
-import jakarta.inject.Named
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -27,13 +25,13 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import utils.Failure
 import utils.Success
+import java.sql.Timestamp
+import java.time.LocalDateTime
 
 @Controller
-class MessageController
-    @Inject
-    constructor(
-        @Named("MessageServices") private val messageService: MessageServicesInterface,
-    ) {
+class MessageController(
+    private val messageService: MessageServicesInterface,
+) {
         @PostMapping(MESSAGE_CREATE_URL)
         fun createMessage(
             @Valid @RequestBody message: CreateMessageInputModel,
@@ -50,16 +48,16 @@ class MessageController
                     ResponseEntity.ok(MessageOutputModel.fromDomain(response.value))
                 }
 
-                is Failure -> {
-                    when (response.value) {
-                        InvalidMessageInfo -> MessageProblem.InvalidMessageInfo.response(BAD_REQUEST)
-                        ChannelNotFound -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
-                        UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
-                        else -> MessageProblem.UnableToCreateMessage.response(BAD_REQUEST)
-                    }
+            is Failure -> {
+                when (response.value) {
+                    InvalidMessageInfo -> MessageProblem.InvalidMessageInfo.response(BAD_REQUEST)
+                    ChannelNotFound -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+                    UserNotFound -> UserProblem.UserNotFound.response(NOT_FOUND)
+                    else -> MessageProblem.UnableToCreateMessage.response(BAD_REQUEST)
                 }
             }
         }
+    }
 
         @GetMapping(MESSAGE_ID_URL)
         fun getSingleMessage(

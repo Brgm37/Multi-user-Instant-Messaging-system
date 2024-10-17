@@ -5,6 +5,8 @@ import model.users.Password
 import model.users.User
 import model.users.UserInvitation
 import model.users.UserToken
+import utils.encryption.DummyEncrypt
+import utils.encryption.Encrypt
 import java.sql.Connection
 import java.sql.ResultSet
 import java.util.UUID
@@ -12,11 +14,15 @@ import java.util.UUID
 /**
  * Represent the maximum number of authentication tokens that a user can have.
  */
-private const val MAX_TOKENS = 5
 
 class UserJDBC(
     private val connection: Connection,
+    private val encrypt: Encrypt = DummyEncrypt,
 ) : UserRepositoryInterface {
+    companion object {
+        const val MAX_TOKENS = 5
+    }
+
     private fun ResultSet.toUser(): User =
         User(
             uId = getInt("id").toUInt(),
@@ -26,8 +32,8 @@ class UserJDBC(
 
     private fun ResultSet.toUserInvitation(): UserInvitation =
         UserInvitation(
-            userId = getInt("user_id").toUInt(),
-            invitationCode = UUID.fromString(getString("invitation")),
+            inviterId = getInt("user_id").toUInt(),
+            invitationCode = UUID.fromString(encrypt.decrypt(getString("invitation"))),
             expirationDate = getTimestamp("expiration_date"),
         )
 
@@ -40,7 +46,7 @@ class UserJDBC(
         val stm = connection.prepareStatement(insertQuery)
         var idx = 1
         stm.setString(idx++, user.username)
-        stm.setString(idx, (user.password.value))
+        stm.setString(idx, encrypt.encrypt(user.password.value))
         val rs = stm.executeQuery()
         return if (rs.next()) {
             user.copy(uId = rs.getInt("id").toUInt())
@@ -77,22 +83,22 @@ class UserJDBC(
             WHERE user_id = ? AND invitation = ?
             """.trimIndent()
         val stm = connection.prepareStatement(deleteQuery)
-        stm.setInt(1, invitation.userId.toInt())
+        stm.setInt(1, invitation.inviterId.toInt())
         stm.setString(2, invitation.invitationCode.toString())
         stm.executeUpdate()
     }
 
-    override fun createInvitation(invitation: UserInvitation) {
+    override fun createInvitation(invitation: UserInvitation): Boolean {
         val insertQuery =
             """
             INSERT INTO users_invitations (user_id, invitation, expiration_date)
             VALUES (?, ?, ?)
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
-        stm.setInt(1, invitation.userId.toInt())
-        stm.setString(2, invitation.invitationCode.toString())
+        stm.setInt(1, invitation.inviterId.toInt())
+        stm.setString(2, encrypt.encrypt(invitation.invitationCode.toString()))
         stm.setTimestamp(3, invitation.expirationDate)
-        stm.executeUpdate()
+        return stm.executeUpdate() > 0
     }
 
     override fun validateToken(token: String): Boolean {
@@ -160,32 +166,10 @@ class UserJDBC(
     }
 
     override fun createToken(token: UserToken): Boolean {
-        val selectQuery =
-            """
-            SELECT COUNT(*)
-            FROM users_tokens
-            WHERE user_id = ?
-            """.trimIndent()
-        val stmCount = connection.prepareStatement(selectQuery)
-        stmCount.setInt(1, token.userId.toInt())
-        val rsCount = stmCount.executeQuery()
-        rsCount.next()
-        if (rsCount.getInt(1) >= MAX_TOKENS) {
-            val deleteOldestQuery =
-                """
-                DELETE FROM users_tokens
-                WHERE token IN (
-                    SELECT token
-                    FROM users_tokens
-                    WHERE user_id = ?
-                    ORDER BY creation
-                    LIMIT 1
-                )
-                """.trimIndent()
-            val stmDelete = connection.prepareStatement(deleteOldestQuery)
-            stmDelete.setInt(1, token.userId.toInt())
+        val tokenCount = countUserTokens(token.userId)
+        if (tokenCount >= MAX_TOKENS) {
+            deleteOldestToken(token.userId)
         }
-
         val insertQuery =
             """
             INSERT INTO users_tokens (user_id, token, creation, expiration)
@@ -200,6 +184,44 @@ class UserJDBC(
         return stm.executeUpdate() > 0
     }
 
+    override fun deleteToken(token: String): Boolean {
+        val deleteQuery =
+            """
+            DELETE FROM users_tokens
+            WHERE token = ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(deleteQuery)
+        stm.setString(1, token)
+        return stm.executeUpdate() > 0
+    }
+
+    private fun countUserTokens(userId: UInt): Int {
+        val query = "SELECT COUNT(*) FROM users_tokens WHERE user_id = ?"
+        val stm = connection.prepareStatement(query)
+        stm.setInt(1, userId.toInt())
+        val rs = stm.executeQuery()
+        rs.next()
+        return rs.getInt(1)
+    }
+
+    private fun deleteOldestToken(userId: UInt) {
+        val deleteOldestQuery =
+            """
+            DELETE FROM users_tokens
+            WHERE token IN (
+                SELECT token
+                FROM users_tokens
+                WHERE user_id = ?
+                ORDER BY creation 
+                    FETCH 
+                    FIRST 1 ROWS ONLY
+            )
+            """.trimIndent()
+        val stmDelete = connection.prepareStatement(deleteOldestQuery)
+        stmDelete.setInt(1, userId.toInt())
+        stmDelete.executeUpdate()
+    }
+
     override fun findAll(
         offset: Int,
         limit: Int,
@@ -208,8 +230,12 @@ class UserJDBC(
             """
             SELECT id, name, password
             FROM users
+            OFFSET ?
+            LIMIT ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
+        stm.setInt(1, offset)
+        stm.setInt(2, limit)
         val rs = stm.executeQuery()
         val users = mutableListOf<User>()
         while (rs.next()) {
@@ -234,47 +260,30 @@ class UserJDBC(
     }
 
     override fun deleteById(id: UInt) {
-        val deleteFromUserChannelsQuery =
-            """
-            DELETE FROM channel_members
-            WHERE member = ?
-            """.trimIndent()
-        val deleteFromUsersQuery =
-            """
-            DELETE FROM users
-            WHERE id = ?
-            """.trimIndent()
+        executeDeleteQuery("DELETE FROM users_invitations WHERE user_id = ?", id)
+        executeDeleteQuery("DELETE FROM users_tokens WHERE user_id = ?", id)
+        executeDeleteQuery("DELETE FROM messages WHERE author = ?", id)
+        executeDeleteQuery("DELETE FROM channel_members WHERE member = ?", id)
+        executeDeleteQuery("DELETE FROM users WHERE id = ?", id)
+    }
 
-        val stmUserChannels = connection.prepareStatement(deleteFromUserChannelsQuery)
-        stmUserChannels.setInt(1, id.toInt())
-        stmUserChannels.executeUpdate()
-
-        val stmUsers = connection.prepareStatement(deleteFromUsersQuery)
-        stmUsers.setInt(1, id.toInt())
-        stmUsers.executeUpdate()
+    private fun executeDeleteQuery(
+        query: String,
+        id: UInt,
+    ) {
+        val stm = connection.prepareStatement(query)
+        stm.setInt(1, id.toInt())
+        stm.executeUpdate()
     }
 
     @Suppress("SqlWithoutWhere")
     override fun clear() {
-        val deleteFromUsersQuery =
-            """
-            DELETE FROM users
-            """.trimIndent()
-        val deleteFromUsersInvitationsQuery =
-            """
-            DELETE FROM users_invitations
-            """.trimIndent()
-        val deleteFromUsersTokensQuery =
-            """
-            DELETE FROM users_tokens
-            """.trimIndent()
-        val stmDeleteTokens = connection.prepareStatement(deleteFromUsersTokensQuery)
-        stmDeleteTokens.executeUpdate()
+        val tables = listOf("users_tokens", "users_invitations", "users")
 
-        val stmDeleteInvitations = connection.prepareStatement(deleteFromUsersInvitationsQuery)
-        stmDeleteInvitations.executeUpdate()
-
-        val stmDelete = connection.prepareStatement(deleteFromUsersQuery)
-        stmDelete.executeUpdate()
+        for (table in tables) {
+            val deleteQuery = "DELETE FROM $table"
+            val stmDelete = connection.prepareStatement(deleteQuery)
+            stmDelete.executeUpdate()
+        }
     }
 }

@@ -11,14 +11,13 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
     api(project(":domain"))
     implementation(project(":repository"))
-    api("com.zaxxer:HikariCP:5.1.0")
     implementation("jakarta.inject:jakarta.inject-api:2.0.1")
+    testImplementation(kotlin("test"))
     testImplementation("org.slf4j:slf4j-simple:1.7.32")
     testImplementation("ch.qos.logback:logback-classic:1.5.8")
-    implementation(group = "org.postgresql", name = "postgresql", version = "42.+")
+    testImplementation(group = "org.postgresql", name = "postgresql", version = "42.+")
 }
 
 tasks.test {
@@ -31,7 +30,8 @@ tasks.test {
     finalizedBy(":repository_jdbc:dbTestDown")
 }
 
-val composeFileDir: Directory = rootProject.layout.projectDirectory.dir("repository_jdbc/connection")
+val composeFileDir: Directory = rootProject.layout.projectDirectory.dir("repository_jdbc")
+
 val dockerComposePath = composeFileDir.file("docker-compose.yml").toString()
 
 task<Exec>("dbTestUp") {

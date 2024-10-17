@@ -5,6 +5,8 @@ import model.channels.ChannelInfo
 import model.channels.toChannelName
 import model.messages.Message
 import model.users.UserInfo
+import utils.encryption.DummyEncrypt
+import utils.encryption.Encrypt
 import java.sql.Connection
 import java.sql.ResultSet
 
@@ -14,6 +16,7 @@ import java.sql.ResultSet
  */
 class MessageJDBC(
     private val connection: Connection,
+    private val encrypt: Encrypt = DummyEncrypt,
 ) : MessageRepositoryInterface {
     private fun ResultSet.toMessage(): Message {
         val author =
@@ -28,7 +31,7 @@ class MessageJDBC(
             )
         return Message(
             msgId = getInt("msgId").toUInt(),
-            msg = getString("msgContent"),
+            msg = encrypt.decrypt(getString("msgContent")),
             user = author,
             channel = channel,
             creationTime = getTimestamp("msgTimestamp"),
@@ -51,15 +54,15 @@ class MessageJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         var idx = 1
-        stm.setString(idx++, message.msg)
+        stm.setString(idx++, encrypt.encrypt(message.msg))
         stm.setInt(idx++, message.user.uId.toInt())
         stm.setInt(idx++, message.channel.channelId.toInt())
         stm.setTimestamp(idx, message.creationTime)
         val rs = stm.executeQuery()
-        if (rs.next()) {
-            return message.copy(msgId = rs.getInt("id").toUInt())
+        return if (rs.next()) {
+            message.copy(msgId = rs.getInt("id").toUInt())
         } else {
-            return null
+            null
         }
     }
 
@@ -135,11 +138,11 @@ class MessageJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(updateQuery)
         var idx = 1
-        stm.setString(idx++, entity.msg)
-        stm.setString(idx++, entity.user.username)
-        stm.setString(idx++, entity.channel.channelName.fullName)
+        stm.setInt(idx++, entity.channel.channelId.toInt())
+        stm.setInt(idx++, entity.user.uId.toInt())
+        stm.setString(idx++, encrypt.encrypt(entity.msg))
         stm.setString(idx++, entity.creationTime.toString())
-        val id = requireNotNull(entity.msgId) { "Message id is null" }
+        val id = checkNotNull(entity.msgId) { "Message id is null" }
         stm.setInt(idx, id.toInt())
         stm.executeUpdate()
     }

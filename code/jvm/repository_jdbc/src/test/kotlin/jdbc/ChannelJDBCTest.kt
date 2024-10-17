@@ -13,9 +13,9 @@ import model.users.User
 import model.users.UserInfo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.postgresql.ds.PGSimpleDataSource
 import java.sql.Connection
-import java.time.LocalDate
+import java.sql.Timestamp
+import java.time.LocalDateTime
 import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -24,15 +24,46 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ChannelJDBCTest {
-    private val validPassword = "Password123"
-    private val passwordDefault = Password(validPassword)
-
     companion object {
+        private const val VALID_PASSWORD = "Password123"
+        private val passwordDefault = Password(VALID_PASSWORD)
+
         private fun runWithConnection(block: (Connection) -> Unit) =
-            PGSimpleDataSource()
-                .apply { setURL(Environment.getDbUrl()) }
+            TestSetup
+                .dataSource
                 .connection
                 .let(block)
+
+        private val expirationDate: Timestamp
+            get() = Timestamp.valueOf(LocalDateTime.now().plusWeeks(1))
+
+        private fun testSetup(block: ChannelJDBC.(User, Channel) -> Unit) =
+            runWithConnection { connection ->
+                UserJDBC(connection)
+                    .createUser(
+                        User(
+                            username = "user",
+                            password = passwordDefault,
+                        ),
+                    ).let { user ->
+                        assertNotNull(user)
+                        val uId = checkNotNull(user.uId) { "User id is null" }
+                        val jdbc = ChannelJDBC(connection)
+                        jdbc
+                            .createChannel(
+                                Channel
+                                    .createChannel(
+                                        owner = UserInfo(uId, user.username),
+                                        name = ChannelName("channel", user.username),
+                                        accessControl = READ_WRITE,
+                                        visibility = PRIVATE,
+                                    ),
+                            ).let { channel ->
+                                assertNotNull(channel)
+                                jdbc.block(user, channel)
+                            }
+                    }
+            }
     }
 
     @BeforeEach
@@ -73,175 +104,165 @@ class ChannelJDBCTest {
     @Test
     fun `create a channel and find it`() =
         runWithConnection { connection ->
-            assertNotNull(createChannel(connection)?.channelId)
+            val channel = createChannel(connection)
+            assertNotNull(channel, "Channel is null")
         }
 
     @Test
     fun `find a channel by id`() =
-        runWithConnection { connection ->
-            val channel = createChannel(connection)
-            val id = requireNotNull(channel?.channelId) { "Channel id is null" }
-            val foundChannel = ChannelJDBC(connection).findById(id)
-            assertNotNull(foundChannel)
+        testSetup { _, channel ->
+            val id = checkNotNull(channel.channelId) { "Channel id is null" }
+            val foundChannel = findById(id)
+            assertEquals(channel, foundChannel)
         }
 
     @Test
-    fun `find a channel by name`() =
-        runWithConnection { connection ->
-            UserJDBC(connection)
-                .createUser(
-                    User(
-                        username = "user",
-                        password = passwordDefault,
+    fun `find public channels`() =
+        testSetup { user, _ ->
+            val uId = checkNotNull(user.uId) { "User id is null" }
+            val n = 10
+            repeat(n) {
+                createChannel(
+                    Channel.createChannel(
+                        owner = UserInfo(uId, user.username),
+                        name = ChannelName("channel$it", user.username),
+                        accessControl = READ_WRITE,
+                        visibility = PUBLIC,
                     ),
-                ).let { user ->
-                    assertNotNull(user)
-                    val id = requireNotNull(user.uId) { "User id is null" }
-                    val numberOfChannel = 5
-                    repeat(numberOfChannel) {
-                        Channel
-                            .createChannel(
-                                owner = UserInfo(id, user.username),
-                                name = ChannelName("channel$it", user.username),
-                                accessControl = READ_WRITE,
-                                visibility = PUBLIC,
-                            ).let { channel ->
-                                ChannelJDBC(connection).createChannel(channel)
-                            }
-                    }
-                    ChannelJDBC(connection)
-                        .findByUserId(id, 0, 10)
-                        .let { channels ->
-                            assertTrue(channels.isNotEmpty())
-                            assertEquals(numberOfChannel, channels.size)
-                        }
-                }
+                )
+            }
+            val channels = findAll(0, n)
+            assertEquals(n, channels.size)
         }
 
     @Test
-    fun `test update a channel`() {
-        runWithConnection { connection ->
-            val channel = createChannel(connection)
-            assertIs<Channel.Public>(channel)
-            val id = requireNotNull(channel.channelId) { "Channel id is null" }
-            val updatedChannel =
-                channel.copy(
-                    name = ChannelName("new name", channel.owner.username),
-                )
-            ChannelJDBC(connection).save(updatedChannel)
-            val foundChannel = ChannelJDBC(connection).findById(id)
+    fun `test update a channel`() =
+        testSetup { user, channel ->
+            val id = checkNotNull(channel.channelId) { "Channel id is null" }
+            assertIs<Channel.Private>(channel, "Channel is not private")
+            val updatedChannel = channel.copy(name = ChannelName("newName", user.username))
+            save(updatedChannel)
+            val foundChannel = findById(id)
             assertEquals(updatedChannel, foundChannel)
         }
-    }
 
     @Test
-    fun `test create a channel invitation`() {
-        runWithConnection { connection ->
-            val channel = createChannel(connection)
-            assertNotNull(channel)
-            val channelId = requireNotNull(channel.channelId) { "Channel id is null" }
+    fun `test create a channel invitation`() =
+        testSetup { _, channel ->
+            val id = checkNotNull(channel.channelId) { "Channel id is null" }
             val invitation =
                 ChannelInvitation(
-                    channelId = channelId,
-                    expirationDate = LocalDate.of(2027, 1, 1),
+                    channelId = id,
+                    expirationDate = expirationDate,
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
-            val channelRepo = ChannelJDBC(connection)
-            channelRepo.createInvitation(invitation)
+            createInvitation(invitation)
         }
-    }
 
     @Test
-    fun `test find a channel invitation`() {
-        runWithConnection { connection ->
-            val channel = createChannel(connection)
-            assertNotNull(channel)
-            val channelId = requireNotNull(channel.channelId) { "Channel id is null" }
+    fun `test find a channel invitation`() =
+        testSetup { _, channel ->
+            val id = checkNotNull(channel.channelId) { "Channel id is null" }
             val invitation =
                 ChannelInvitation(
-                    channelId = channelId,
-                    expirationDate = LocalDate.of(2027, 1, 1),
+                    channelId = id,
+                    expirationDate = expirationDate,
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
-            val channelRepo = ChannelJDBC(connection)
-            channelRepo.createInvitation(invitation)
-            val foundInvitation = channelRepo.findInvitation(channelId)
+            createInvitation(invitation)
+            val foundInvitation = findInvitation(id)
             assertEquals(invitation, foundInvitation)
         }
-    }
 
     @Test
-    fun `test update channel invitation`() {
-        runWithConnection { connection ->
-            val channel = createChannel(connection)
-            assertNotNull(channel)
-            val channelId = requireNotNull(channel.channelId) { "Channel id is null" }
+    fun `test update channel invitation`() =
+        testSetup { _, channel ->
+            val id = checkNotNull(channel.channelId) { "Channel id is null" }
             val invitation =
                 ChannelInvitation(
-                    channelId = channelId,
-                    expirationDate = LocalDate.of(2027, 1, 1),
+                    channelId = id,
+                    expirationDate = expirationDate,
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
-            val channelRepo = ChannelJDBC(connection)
-            channelRepo.createInvitation(invitation)
+            createInvitation(invitation)
             val updatedInvitation = invitation.decrementUses()
-            channelRepo.updateInvitation(updatedInvitation)
-            val foundInvitation = channelRepo.findInvitation(channelId)
+            updateInvitation(updatedInvitation)
+            val foundInvitation = findInvitation(id)
             assertEquals(updatedInvitation, foundInvitation)
         }
-    }
 
     @Test
-    fun `test delete channel invitation`() {
-        runWithConnection { connection ->
-            val channel = createChannel(connection)
-            assertNotNull(channel)
-            val channelId = requireNotNull(channel.channelId) { "Channel id is null" }
+    fun `test delete channel invitation`() =
+        testSetup { _, channel ->
+            val id = checkNotNull(channel.channelId) { "Channel id is null" }
             val invitation =
                 ChannelInvitation(
-                    channelId = channelId,
-                    expirationDate = LocalDate.of(2027, 1, 1),
+                    channelId = id,
+                    expirationDate = expirationDate,
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
-            val channelRepo = ChannelJDBC(connection)
-            channelRepo.createInvitation(invitation)
-            channelRepo.deleteInvitation(channelId)
-            assertNull(channelRepo.findInvitation(channelId))
+            createInvitation(invitation)
+            assertNotNull(findInvitation(id))
+            deleteInvitation(id)
+            assertNull(findInvitation(id))
         }
-    }
 
     @Test
-    fun `test delete a channel`() {
-        runWithConnection { connection ->
-            val channel = createChannel(connection)
-            val id = requireNotNull(channel?.channelId) { "Channel id is null" }
-            ChannelJDBC(connection).deleteById(id)
-            assertNull(ChannelJDBC(connection).findById(id))
+    fun `test delete a channel`() =
+        testSetup { _, channel ->
+            val id = checkNotNull(channel.channelId) { "Channel id is null" }
+            assertNotNull(findById(id))
+            assertNotNull(deleteById(id))
+            assertNull(findById(id))
         }
-    }
 
     @Test
-    fun `test find all channels`() {
-        runWithConnection { connection ->
-            val numberOfChannels = 5
-            val channels =
-                (0 until numberOfChannels).map {
-                    createChannel(connection)
-                }
-            createChannel(connection, PRIVATE)
-                .let { channel ->
-                    assertIs<Channel.Private>(channel)
-                    assertNotNull(channel.channelId)
-                    val id = requireNotNull(channel.channelId) { "Channel id is null" }
-                    assertNotNull(ChannelJDBC(connection).deleteById(id))
-                }
-            val foundChannels = ChannelJDBC(connection).findAll(0, 10)
-            assertEquals(numberOfChannels, foundChannels.size)
-            assertEquals(channels, foundChannels)
+    fun `test join Channel`() =
+        testSetup { _, channel ->
+            val newUser =
+                UserJDBC(
+                    TestSetup
+                        .dataSource
+                        .connection,
+                ).createUser(
+                    User(
+                        username = "newUser",
+                        password = passwordDefault,
+                    ),
+                )
+            assertNotNull(newUser, "User is null")
+            val uId = checkNotNull(newUser.uId) { "User id is null" }
+            val cId = checkNotNull(channel.channelId) { "Channel id is null" }
+            joinChannel(cId, uId, READ_WRITE)
+            assertTrue(isUserInChannel(cId, uId))
         }
-    }
+
+    @Test
+    fun `test is user in channel`() =
+        testSetup { user, channel ->
+            val uId = checkNotNull(user.uId) { "User id is null" }
+            val cId = checkNotNull(channel.channelId) { "Channel id is null" }
+            assertTrue(isUserInChannel(cId, uId))
+        }
+
+    @Test
+    fun `find user access control in channel`() =
+        testSetup { user, channel ->
+            val uId = checkNotNull(user.uId) { "User id is null" }
+            val cId = checkNotNull(channel.channelId) { "Channel id is null" }
+            assertEquals(READ_WRITE, findUserAccessControl(cId, uId))
+        }
+
+    @Test
+    fun `find by userId`() =
+        testSetup { user, _ ->
+            val uId = checkNotNull(user.uId) { "User id is null" }
+            val foundChannels = findByUserId(uId, 0, 10)
+            val expectedSize = 1
+            assertEquals(expectedSize, foundChannels.size)
+        }
 }

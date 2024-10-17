@@ -1,12 +1,9 @@
 package jdbc.transactionManager.dataSource
 
-import jakarta.inject.Named
-
 /**
  * Represents the connection source for PostgresSQL
  */
-@Named("PostgresSQLConnectionSource")
-class PostgresSQLConnectionSource : ConnectionSource {
+class HikariConnectionSource : ConnectionSource {
     override val connectionUrl: String
         get() = tryCatchGetEnv("DB_URL")
     override val username: String

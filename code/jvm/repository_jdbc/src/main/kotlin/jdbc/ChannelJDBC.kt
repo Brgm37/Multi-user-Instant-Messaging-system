@@ -10,6 +10,8 @@ import model.channels.Visibility.PRIVATE
 import model.channels.Visibility.PUBLIC
 import model.channels.toChannelName
 import model.users.UserInfo
+import utils.encryption.DummyEncrypt
+import utils.encryption.Encrypt
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -126,6 +128,7 @@ private const val CHANNELS_INVITATIONS_MAX_USES = "max_uses"
  */
 class ChannelJDBC(
     private val connection: Connection,
+    private val encrypt: Encrypt = DummyEncrypt,
 ) : ChannelRepositoryInterface {
     /**
      * Converts the [ResultSet] to a [Channel].
@@ -154,8 +157,8 @@ class ChannelJDBC(
      */
     private fun ResultSet.toChannelInvitation(): ChannelInvitation {
         val id = getInt(CHANNELS_INVITATIONS_CHANNEL_ID).toUInt()
-        val expirationDate = getDate(CHANNELS_INVITATIONS_EXPIRATION_DATE).toLocalDate()
-        val invitation = getString(CHANNELS_INVITATIONS_INVITATION)
+        val expirationDate = getTimestamp(CHANNELS_INVITATIONS_EXPIRATION_DATE)
+        val invitation = encrypt.decrypt(getString(CHANNELS_INVITATIONS_INVITATION))
         val accessControl = AccessControl.valueOf(getString(CHANNELS_INVITATIONS_ACCESS_CONTROL).uppercase())
         val maxUses = getInt(CHANNELS_INVITATIONS_MAX_USES)
         return ChannelInvitation(
@@ -334,8 +337,8 @@ class ChannelJDBC(
         val stm = connection.prepareStatement(insertQuery)
         var idx = 1
         stm.setInt(idx++, invitation.channelId.toInt())
-        stm.setObject(idx++, invitation.expirationDate)
-        stm.setString(idx++, invitation.invitationCode.toString())
+        stm.setTimestamp(idx++, invitation.expirationDate)
+        stm.setString(idx++, encrypt.encrypt(invitation.invitationCode.toString()))
         stm.setString(idx++, invitation.accessControl.toString())
         stm.setInt(idx, invitation.maxUses.toInt())
         stm.executeUpdate()

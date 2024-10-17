@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import jdbc.transactionManager.TransactionManagerJDBC
 import jdbc.transactionManager.dataSource.ConnectionSource
+import jdbc.transactionManager.dataSource.HikariConnectionSource
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
@@ -16,6 +17,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import pipeline.AuthenticatedUserArgumentResolver
 import pipeline.AuthenticationInterceptor
+import utils.encryption.AESEncrypt
+import utils.encryption.Encrypt
 import javax.sql.DataSource
 
 @Configuration
@@ -36,8 +39,16 @@ class PipelineConfigurer(
 @SpringBootApplication
 class HttpApiApplication {
     @Bean
-    @Profile("jdbc")
-    fun sc(config: ConnectionSource): DataSource =
+    @Profile("hikari")
+    fun cs(): ConnectionSource = HikariConnectionSource()
+
+    @Bean
+    @Profile("aes")
+    fun aesEncryption(): Encrypt = AESEncrypt
+
+    @Bean
+    @Profile("hikari")
+    fun hikariDc(config: ConnectionSource): DataSource =
         HikariConfig()
             .apply {
                 jdbcUrl = config.connectionUrl
@@ -48,7 +59,10 @@ class HttpApiApplication {
 
     @Bean
     @Profile("jdbc")
-    fun jdbc(dataSource: DataSource): TransactionManager = TransactionManagerJDBC(dataSource)
+    fun jdbc(
+        dataSource: DataSource,
+        encrypt: Encrypt,
+    ): TransactionManager = TransactionManagerJDBC(dataSource, encrypt)
 }
 
 fun main(args: Array<String>) {

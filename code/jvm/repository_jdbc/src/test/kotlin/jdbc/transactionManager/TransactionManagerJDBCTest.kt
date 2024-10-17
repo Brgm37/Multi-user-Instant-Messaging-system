@@ -1,8 +1,6 @@
 package jdbc.transactionManager
 
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
-import jdbc.transactionManager.dataSource.ConnectionSource
+import jdbc.TestSetup
 import model.channels.AccessControl
 import model.channels.Channel
 import model.channels.ChannelInfo
@@ -13,6 +11,7 @@ import model.users.Password
 import model.users.User
 import model.users.UserInfo
 import org.junit.jupiter.api.BeforeEach
+import utils.encryption.DummyEncrypt
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
@@ -20,27 +19,7 @@ class TransactionManagerJDBCTest {
     private val validPassword = "Password123"
     private val passwordDefault = Password(validPassword)
 
-    private object TestConnectionSource : ConnectionSource {
-        override val connectionUrl: String
-            get() = "jdbc:postgresql://localhost:5433/daw_test"
-        override val username: String
-            get() = "postgres"
-        override val password: String
-            get() = "password"
-        override val poolSize: Int
-            get() = 10
-    }
-
-    private val hikari =
-        HikariConfig()
-            .apply {
-                jdbcUrl = TestConnectionSource.connectionUrl
-                username = TestConnectionSource.username
-                password = TestConnectionSource.password
-                maximumPoolSize = TestConnectionSource.poolSize
-            }.let { HikariDataSource(it) }
-
-    private val transactionManager = TransactionManagerJDBC(hikari)
+    private val transactionManager = TransactionManagerJDBC(TestSetup.dataSource, DummyEncrypt)
 
     @BeforeEach
     fun clear() {

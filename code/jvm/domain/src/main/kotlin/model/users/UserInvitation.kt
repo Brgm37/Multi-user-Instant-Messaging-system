@@ -6,12 +6,12 @@ import java.util.UUID
 
 /**
  * Represents a user invitation to access the app.
- * @param userId The ID of the inviter.
+ * @param inviterId The ID of the inviter.
  * @param expirationDate The expiration date of the invitation.
  * @param invitationCode The invitation code to join the app.
  */
 data class UserInvitation(
-    val userId: UInt,
+    val inviterId: UInt,
     val expirationDate: Timestamp,
     val invitationCode: UUID = UUID.randomUUID(),
 ) {

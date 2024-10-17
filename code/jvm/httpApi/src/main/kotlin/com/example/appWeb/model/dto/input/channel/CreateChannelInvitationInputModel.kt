@@ -12,6 +12,7 @@ import org.hibernate.validator.constraints.Range
  * @property accessControl The access control of the invitation.
  */
 data class CreateChannelInvitationInputModel(
+    @get:Range(min = 1) val channelId: UInt,
     @get:Range(min = 1) val maxUses: UInt = 1u,
     val expirationDate: String? = null,
     val accessControl: String? = null,

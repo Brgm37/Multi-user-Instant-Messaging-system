@@ -4,8 +4,8 @@ import java.sql.Timestamp
 import java.util.UUID
 
 data class UserToken(
-    val token: UUID = UUID.randomUUID(),
     val userId: UInt,
+    val token: UUID = UUID.randomUUID(),
     val creationDate: Timestamp = Timestamp(System.currentTimeMillis()),
     val expirationDate: Timestamp = Timestamp.valueOf(creationDate.toLocalDateTime().plusWeeks(1)),
 ) {

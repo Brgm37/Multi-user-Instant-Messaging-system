@@ -1,5 +1,6 @@
 package model.channels
 
+import java.sql.Timestamp
 import java.time.LocalDate
 import java.util.UUID
 
@@ -13,7 +14,7 @@ import java.util.UUID
  */
 data class ChannelInvitation(
     val channelId: UInt,
-    val expirationDate: LocalDate,
+    val expirationDate: Timestamp,
     val maxUses: UInt,
     val accessControl: AccessControl,
     val invitationCode: UUID = UUID.randomUUID(),
@@ -21,7 +22,7 @@ data class ChannelInvitation(
     /**
      * Checks if the invitation is expired.
      */
-    val isExpired: Boolean get() = expirationDate.isBefore(LocalDate.now())
+    val isExpired: Boolean get() = expirationDate.toLocalDateTime().toLocalDate() < LocalDate.now()
 }
 
 /**

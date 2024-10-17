@@ -3,7 +3,7 @@ package errors
 /**
  * Represents the errors that can occur when handling users.
  */
-abstract class UserError : Error() {
+sealed class UserError : Error() {
     data object UserNotFound : UserError()
 
     data object UnableToCreateUser : UserError()
@@ -27,4 +27,10 @@ abstract class UserError : Error() {
     data object UsernameAlreadyExists : UserError()
 
     data object UnableToCreateToken : UserError()
+
+    data object TokenNotFound : UserError()
+
+    data object UnableToCreateInvitation : UserError()
+
+    data object InvitationCodeMaxUsesReached : UserError()
 }
