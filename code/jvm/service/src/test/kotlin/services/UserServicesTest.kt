@@ -461,8 +461,8 @@ class UserServicesTest {
         val user2 = checkNotNull(ChannelServicesTest.makeUser(manager, "user2"))
         val user2Id = checkNotNull(user2.uId)
         val result2 = channel.channelId?.let { userServices.joinChannel(user2Id, it, invitationCode.toString()) }
-        assertIs<Failure<ChannelError.InvitationCodeMaxUsesReached>>(result2)
-        assertEquals(ChannelError.InvitationCodeMaxUsesReached, result2.value)
+        assertIs<Failure<UserError.InvitationCodeMaxUsesReached>>(result2)
+        assertEquals(UserError.InvitationCodeMaxUsesReached, result2.value)
     }
 
     @ParameterizedTest

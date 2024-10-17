@@ -9,7 +9,6 @@ import com.example.appWeb.model.dto.output.user.UserSignUpOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.UserProblem
 import errors.ChannelError.ChannelNotFound
-import errors.ChannelError.InvitationCodeMaxUsesReached
 import errors.UserError
 import interfaces.UserServicesInterface
 import jakarta.servlet.http.HttpServletResponse
@@ -150,7 +149,10 @@ class UserController(
                     ChannelNotFound -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
                     UserError.InvitationCodeIsInvalid -> UserProblem.InvitationCodeIsInvalid.response(BAD_REQUEST)
                     UserError.InvitationCodeHasExpired -> UserProblem.InvitationCodeHasExpired.response(BAD_REQUEST)
-                    InvitationCodeMaxUsesReached -> UserProblem.InvitationCodeMaxUsesReached.response(BAD_REQUEST)
+                    UserError.InvitationCodeMaxUsesReached ->
+                        UserProblem.InvitationCodeMaxUsesReached.response(
+                            BAD_REQUEST,
+                        )
                     else -> UserProblem.UnableToJoinChannel.response(BAD_REQUEST)
                 }
             }
