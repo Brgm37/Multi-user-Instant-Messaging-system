@@ -31,7 +31,8 @@ tasks.test {
     finalizedBy(":repository_jdbc:dbTestDown")
 }
 
-val composeFileDir: Directory = rootProject.layout.projectDirectory.dir("repository_jdbc/connection")
+val composeFileDir: Directory = rootProject.layout.projectDirectory.dir("repository_jdbc")
+
 val dockerComposePath = composeFileDir.file("docker-compose.yml").toString()
 
 task<Exec>("dbTestUp") {

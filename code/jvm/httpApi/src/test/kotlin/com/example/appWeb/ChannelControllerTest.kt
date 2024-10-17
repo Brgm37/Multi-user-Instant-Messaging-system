@@ -7,6 +7,7 @@ import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputMo
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
+import com.example.appWeb.model.problem.ChannelProblem
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import jdbc.transactionManager.TransactionManagerJDBC
@@ -208,5 +209,19 @@ class ChannelControllerTest {
                 authenticated,
             )
         assertIs<UUID>(invitation.body, "Body is not a ChannelOutputModel")
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManager")
+    fun `fail to get a channel due ChannelNotFound`(manager: TransactionManager) {
+        val owner = makeUser(manager)
+        val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
+        val channelServices = ChannelServices(manager)
+        val token = makeToken(manager, ownerId)
+        val channelController = ChannelController(channelServices)
+        val authenticated = AuthenticatedUserInputModel(ownerId, token.token.toString())
+        val response = channelController.getChannel(1u, authenticated)
+        assertEquals(HttpStatus.NOT_FOUND, response.statusCode, "Status code is different")
+        assertIs<ChannelProblem.ChannelNotFound>(response.body, "Body is not a ChannelProblem.ChannelNotFound")
     }
 }
