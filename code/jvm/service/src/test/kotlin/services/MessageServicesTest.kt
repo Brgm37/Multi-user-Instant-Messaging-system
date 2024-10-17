@@ -8,7 +8,6 @@ import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
 import model.channels.AccessControl
 import model.channels.AccessControl.READ_WRITE
-// import model.channels.AccessControl.READ_ONLY
 import model.channels.Channel
 import model.channels.ChannelName
 import model.channels.Visibility
@@ -55,72 +54,72 @@ class MessageServicesTest {
 
         private fun makeUser(
             manager: TransactionManager,
-            username: String = "Owner"
-        ) =
-            manager
-                .run {
-                    userRepo
-                        .createUser(
-                            User(
-                                username = username,
-                                password = Password("Password123"),
-                            ),
-                        )
-                }
+            username: String = "Owner",
+        ) = manager
+            .run {
+                userRepo
+                    .createUser(
+                        User(
+                            username = username,
+                            password = Password("Password123"),
+                        ),
+                    )
+            }
 
         private fun userJoinChannel(
             manager: TransactionManager,
             user: User,
             channel: Channel,
-            accessControl: AccessControl
-        ) =
-            manager
-                .run {
-                    val userId = checkNotNull(user.uId) { "User id is null" }
-                    val channelId = checkNotNull(channel.channelId) { "Channel id is null" }
-                    channelRepo.joinChannel(channelId, userId, accessControl)
-                }
+            accessControl: AccessControl,
+        ) = manager
+            .run {
+                val userId = checkNotNull(user.uId) { "User id is null" }
+                val channelId = checkNotNull(channel.channelId) { "Channel id is null" }
+                channelRepo.joinChannel(channelId, userId, accessControl)
+            }
 
         private fun makeChannel(
             manager: TransactionManager,
             user: User,
             accessControl: AccessControl = READ_WRITE,
-            visibility: Visibility = PRIVATE
-        ) =
-            manager
-                .run {
-                    val ownerId = checkNotNull(user.uId) { "Owner id is null" }
-                    channelRepo
-                        .createChannel(
-                            Channel.createChannel(
-                                owner = UserInfo(ownerId, user.username),
-                                name = ChannelName("RWPriv", user.username),
-                                accessControl = accessControl,
-                                visibility = visibility,
-                            ),
-                        )
-                }
+            visibility: Visibility = PRIVATE,
+        ) = manager
+            .run {
+                val ownerId = checkNotNull(user.uId) { "Owner id is null" }
+                channelRepo
+                    .createChannel(
+                        Channel.createChannel(
+                            owner = UserInfo(ownerId, user.username),
+                            name = ChannelName("RWPriv", user.username),
+                            accessControl = accessControl,
+                            visibility = visibility,
+                        ),
+                    )
+            }
     }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `create a new message`(manager: TransactionManager) {
-        val user = makeUser(manager,"Writer")
-        val channel = makeChannel(
-            manager,
-            checkNotNull(makeUser(manager)) { "Owner is null" },
-            visibility = PUBLIC,
-        )
+        val user = makeUser(manager, "Writer")
+        val channel =
+            makeChannel(
+                manager,
+                checkNotNull(makeUser(manager)) { "Owner is null" },
+                visibility = PUBLIC,
+            )
         checkNotNull(channel) { "Channel is null" }
         checkNotNull(user) { "User is null" }
         val messageServices = MessageServices(manager)
         userJoinChannel(manager, user, channel, READ_WRITE)
-        val newMessage = messageServices.createMessage(
-            "Hello, World!",
-            checkNotNull(user.uId) { "User id is null" },
-            checkNotNull(channel.channelId) { "Channel id is null" },
-            "2024-09-01 12:00:00",
-        )
+        val newMessage =
+            messageServices
+                .createMessage(
+                    "Hello, World!",
+                    checkNotNull(user.uId) { "User id is null" },
+                    checkNotNull(channel.channelId) { "Channel id is null" },
+                    "2024-09-01 12:00:00",
+                )
         assertIs<Success<Message>>(newMessage, "Message creation failed with error")
         assertNotNull(newMessage.value.msgId, "Message id is null")
         assertEquals(user.uId, newMessage.value.user.uId, "User id is different")
@@ -130,8 +129,8 @@ class MessageServicesTest {
             "Channel id is different",
         )
         assertEquals("Hello, World!", newMessage.value.msg, "Message is different")
-        assertEquals( Timestamp.valueOf(
-            "2024-09-01 12:00:00"),
+        assertEquals(
+            Timestamp.valueOf("2024-09-01 12:00:00"),
             newMessage.value.creationTime,
             "Creation time is different",
         )
@@ -140,22 +139,24 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to create a new message due to blank message`(manager: TransactionManager) {
-        val user = makeUser(manager,"Writer")
-        val channel = makeChannel(
-            manager,
-            checkNotNull(makeUser(manager)) { "Owner is null" },
-        )
+        val user = makeUser(manager, "Writer")
+        val channel =
+            makeChannel(
+                manager,
+                checkNotNull(makeUser(manager)) { "Owner is null" },
+            )
         checkNotNull(channel) { "Channel is null" }
         checkNotNull(user) { "User is null" }
         val messageServices = MessageServices(manager)
         userJoinChannel(manager, user, channel, READ_WRITE)
-        val newMessage = messageServices
-            .createMessage(
-                "",
-                checkNotNull(user.uId) { "User id is null" },
-                checkNotNull(channel.channelId) { "Channel id is null" },
-                "2024-09-01 12:00:00",
-            )
+        val newMessage =
+            messageServices
+                .createMessage(
+                    "",
+                    checkNotNull(user.uId) { "User id is null" },
+                    checkNotNull(channel.channelId) { "Channel id is null" },
+                    "2024-09-01 12:00:00",
+                )
         assertIs<Failure<MessageError.InvalidMessageInfo>>(newMessage, "Message creation should have failed")
         assertEquals(MessageError.InvalidMessageInfo, newMessage.value, "Message error is different")
     }
@@ -163,24 +164,26 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to create message due to user not belonging to the channel`(manager: TransactionManager) {
-        val user = makeUser(manager,"Writer")
-        val channel = makeChannel(
-            manager,
-            checkNotNull(makeUser(manager)) { "Owner is null" },
-            visibility = PUBLIC,
-        )
+        val user = makeUser(manager, "Writer")
+        val channel =
+            makeChannel(
+                manager,
+                checkNotNull(makeUser(manager)) { "Owner is null" },
+                visibility = PUBLIC,
+            )
         checkNotNull(channel) { "Channel is null" }
         checkNotNull(user) { "User is null" }
         val messageServices = MessageServices(manager)
-        val newMessage = messageServices.createMessage(
-            "Hello, World!",
-            checkNotNull(user.uId) { "User id is null" },
-            checkNotNull(channel.channelId) { "Channel id is null" },
-            "2024-09-01 12:00:00",
-        )
+        val newMessage =
+            messageServices
+                .createMessage(
+                    "Hello, World!",
+                    checkNotNull(user.uId) { "User id is null" },
+                    checkNotNull(channel.channelId) { "Channel id is null" },
+                    "2024-09-01 12:00:00",
+                )
         assertIs<Failure<MessageError.UserNotInChannel>>(newMessage, "Message creation should have failed")
         assertEquals(MessageError.UserNotInChannel, newMessage.value, "Message error is different")
-
     }
 
 //    @ParameterizedTest
@@ -366,22 +369,25 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to get message due to invalid id`(manager: TransactionManager) {
-        val user = checkNotNull(makeUser(manager,"Writer"))
+        val user = checkNotNull(makeUser(manager, "Writer"))
         val uId = checkNotNull(user.uId) { "User id is null" }
-        val channel = makeChannel(
-            manager,
-            checkNotNull(makeUser(manager)) { "Owner is null" },
-        )
+        val channel =
+            makeChannel(
+                manager,
+                checkNotNull(makeUser(manager)) { "Owner is null" },
+            )
         checkNotNull(channel) { "Channel is null" }
         val channelId = checkNotNull(channel.channelId) { "Channel is null" }
         userJoinChannel(manager, user, channel, READ_WRITE)
         val messageServices = MessageServices(manager)
-        val newMessage = messageServices.createMessage(
-            "Hello, World!",
-            uId,
-            channelId,
-            "2024-09-01 12:00:00",
-        )
+        val newMessage =
+            messageServices
+                .createMessage(
+                    "Hello, World!",
+                    uId,
+                    channelId,
+                    "2024-09-01 12:00:00",
+                )
         assertIs<Success<Message>>(newMessage, "Message creation failed")
         assertNotNull(newMessage.value.msgId, "Message id is null")
         val getMessage = messageServices.getMessage(123u, uId)
@@ -389,19 +395,19 @@ class MessageServicesTest {
         assertEquals(MessageError.MessageNotFound, getMessage.value, "Message error is different")
     }
 
-
-
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to send a message to non-existent channel`(manager: TransactionManager) {
-        val user = checkNotNull(makeUser(manager,"Writer"))
+        val user = checkNotNull(makeUser(manager, "Writer"))
         val uId = checkNotNull(user.uId) { "User id is null" }
-        val newMessage = MessageServices(manager).createMessage(
-            "Hello, World!",
-            uId,
-            123u,
-            "2024-09-01 12:00:00",
-        )
+        val newMessage =
+            MessageServices(manager)
+                .createMessage(
+                    "Hello, World!",
+                    uId,
+                    123u,
+                    "2024-09-01 12:00:00",
+                )
         assertIs<Failure<MessageError.ChannelNotFound>>(newMessage, "Message creation should have failed")
         assertEquals(MessageError.ChannelNotFound, newMessage.value, "Message error is different")
     }
@@ -409,17 +415,20 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to send a message to non-existent user`(manager: TransactionManager) {
-        val channel = makeChannel(
-            manager,
-            checkNotNull(makeUser(manager)) { "Owner is null" },
-        )
+        val channel =
+            makeChannel(
+                manager,
+                checkNotNull(makeUser(manager)) { "Owner is null" },
+            )
         checkNotNull(channel) { "Channel is null" }
-        val newMessage = MessageServices(manager).createMessage(
-            "Hello, World!",
-            123u,
-            checkNotNull(channel.channelId) { "Channel id is null" },
-            "2024-09-01 12:00:00",
-        )
+        val newMessage =
+            MessageServices(manager)
+                .createMessage(
+                    "Hello, World!",
+                    123u,
+                    checkNotNull(channel.channelId) { "Channel id is null" },
+                    "2024-09-01 12:00:00",
+                )
         assertIs<Failure<MessageError.UserNotFound>>(newMessage, "Message creation should have failed")
         assertEquals(MessageError.UserNotFound, newMessage.value, "Message error is different")
     }
