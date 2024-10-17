@@ -2,7 +2,6 @@ package services
 
 import TransactionManager
 import errors.ChannelError.ChannelNotFound
-import errors.ChannelError.UserNotFound
 import errors.Error
 import errors.UserError
 import errors.UserError.InvitationCodeHasExpired
@@ -84,7 +83,7 @@ class UserServices(
         return repoManager.run {
             val channel =
                 channelRepo.findById(channelId) ?: return@run failure(ChannelNotFound)
-            userRepo.findById(userId) ?: return@run failure(UserNotFound)
+            userRepo.findById(userId) ?: return@run failure(UserError.UserNotFound)
             if (channelRepo.isUserInChannel(channelId, userId)) {
                 return@run success(Unit)
             }
@@ -93,10 +92,10 @@ class UserServices(
                 return@run success(Unit)
             }
             val invitation =
-                channelRepo.findInvitation(channelId) ?: return@run failure(InvitationCodeIsInvalid)
+                channelRepo.findInvitation(channelId) ?: return@run failure(UserError.InvitationCodeIsInvalid)
             if (invitation.isExpired) {
                 channelRepo.deleteInvitation(channelId)
-                return@run failure(InvitationCodeHasExpired)
+                return@run failure(UserError.InvitationCodeHasExpired)
             }
             if (invitation.maxUses == 0u) {
                 channelRepo.deleteInvitation(channelId)

@@ -160,6 +160,7 @@ class UserServicesTest {
             userServices
                 .createUser("", validPassword, invitation.invitationCode.toString(), invitation.inviterId)
         assertIs<Failure<UserError.UsernameIsEmpty>>(newUser)
+        assertEquals(newUser.value, UserError.UsernameIsEmpty)
     }
 
     @ParameterizedTest
@@ -178,6 +179,7 @@ class UserServicesTest {
                     invitation.inviterId,
                 )
         assertIs<Failure<UserError.PasswordIsInvalid>>(newUser)
+        assertEquals(newUser.value, UserError.PasswordIsInvalid)
     }
 
     @ParameterizedTest
@@ -189,11 +191,12 @@ class UserServicesTest {
             userServices
                 .createUser(
                     usernameDefault1,
-                    invalidPassword,
+                    validPassword,
                     invitation.invitationCode.toString(),
                     0u,
                 )
         assertIs<Failure<UserError.InviterNotFound>>(newUser)
+        assertEquals(newUser.value, UserError.InviterNotFound)
     }
 
     @ParameterizedTest
@@ -206,12 +209,13 @@ class UserServicesTest {
         val newUser =
             userServices
                 .createUser(
-                    usernameDefault1,
+                    "newUser",
                     validPassword,
-                    "0f7ed58e-89c0-4331-b22d-0d075b3563156",
+                    "invalid",
                     invitation.inviterId,
                 )
         assertIs<Failure<UserError.InvitationCodeIsInvalid>>(newUser)
+        assertEquals(newUser.value, UserError.InvitationCodeIsInvalid)
     }
 
     @ParameterizedTest
@@ -225,12 +229,13 @@ class UserServicesTest {
         val newUser =
             userServices
                 .createUser(
-                    usernameDefault1,
+                    "newUser",
                     validPassword,
                     invitation.invitationCode.toString(),
                     invitation.inviterId,
                 )
         assertIs<Failure<UserError.InvitationCodeHasExpired>>(newUser)
+        assertEquals(newUser.value, UserError.InvitationCodeHasExpired)
     }
 
     @ParameterizedTest
@@ -249,6 +254,7 @@ class UserServicesTest {
                     invitation.inviterId,
                 )
         assertIs<Failure<UserError.UsernameAlreadyExists>>(newUser)
+        assertEquals(newUser.value, UserError.UsernameAlreadyExists)
     }
 
     @ParameterizedTest
@@ -268,6 +274,7 @@ class UserServicesTest {
         val userId = checkNotNull(user.value.uId)
         val result = userServices.deleteUser(userId)
         assertIs<Success<Unit>>(result)
+        assertEquals(Unit, result.value)
     }
 
     @ParameterizedTest
@@ -276,6 +283,7 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val result = userServices.deleteUser(0u)
         assertIs<Failure<UserError.UserNotFound>>(result)
+        assertEquals(UserError.UserNotFound, result.value)
     }
 
     @ParameterizedTest
@@ -304,6 +312,7 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val result = userServices.getUser(0u)
         assertIs<Failure<UserError.UserNotFound>>(result)
+        assertEquals(UserError.UserNotFound, result.value)
     }
 
     @ParameterizedTest
@@ -316,6 +325,7 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val result = channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.toString()) }
         assertIs<Success<Unit>>(result)
+        assertEquals(Unit, result.value)
     }
 
     @ParameterizedTest
@@ -328,6 +338,7 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val result = channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.toString()) }
         assertIs<Success<Unit>>(result)
+        assertEquals(Unit, result.value)
     }
 
     @ParameterizedTest
@@ -340,6 +351,7 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val result = userServices.joinChannel(userId, 0u, "")
         assertIs<Failure<ChannelError.ChannelNotFound>>(result)
+        assertEquals(ChannelError.ChannelNotFound, result.value)
     }
 
     @ParameterizedTest
@@ -350,6 +362,7 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val result = channel.channelId?.let { userServices.joinChannel(0u, it, invitationCode.toString()) }
         assertIs<Failure<UserError.UserNotFound>>(result)
+        assertEquals(UserError.UserNotFound, result.value)
     }
 
     @ParameterizedTest
@@ -364,8 +377,10 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val result = channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.toString()) }
         assertIs<Success<Unit>>(result)
+        assertEquals(Unit, result.value)
         val result2 = channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.toString()) }
         assertIs<Success<Unit>>(result2)
+        assertEquals(Unit, result2.value)
     }
 
     @ParameterizedTest
@@ -378,6 +393,7 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val result = channel.channelId?.let { userServices.joinChannel(userId, it, "") }
         assertIs<Success<Unit>>(result)
+        assertEquals(Unit, result.value)
     }
 
     @ParameterizedTest
@@ -392,6 +408,7 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val result = channel.channelId?.let { userServices.joinChannel(userId, it, "") }
         assertIs<Failure<UserError.InvitationCodeIsInvalid>>(result)
+        assertEquals(UserError.InvitationCodeIsInvalid, result.value)
     }
 
     @ParameterizedTest
@@ -412,6 +429,7 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val result = channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.toString()) }
         assertIs<Failure<UserError.InvitationCodeHasExpired>>(result)
+        assertEquals(UserError.InvitationCodeHasExpired, result.value)
     }
 
     @ParameterizedTest
@@ -435,6 +453,7 @@ class UserServicesTest {
         val user2Id = checkNotNull(user2.uId)
         val result2 = channel.channelId?.let { userServices.joinChannel(user2Id, it, invitationCode.toString()) }
         assertIs<Failure<InvitationCodeMaxUsesReached>>(result2)
+        assertEquals(InvitationCodeMaxUsesReached, result2.value)
     }
 
     @ParameterizedTest
@@ -487,6 +506,7 @@ class UserServicesTest {
                 invitation.invitationCode.toString(),
             )
         assertIs<Failure<UserError.InviterNotFound>>(result)
+        assertEquals(UserError.InviterNotFound, result.value)
     }
 
     @ParameterizedTest
@@ -505,6 +525,7 @@ class UserServicesTest {
                 "0f7ed58e-89c0-4331-b22d-0d075b356317",
             )
         assertIs<Failure<UserError.InvitationNotFound>>(result)
+        assertEquals(UserError.InvitationNotFound, result.value)
     }
 
     @ParameterizedTest
@@ -524,6 +545,7 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val result = userServices.login("invalid_username", validPassword)
         assertIs<Failure<UserError.UserNotFound>>(result)
+        assertEquals(UserError.UserNotFound, result.value)
     }
 
     @ParameterizedTest
@@ -533,6 +555,7 @@ class UserServicesTest {
         val user = checkNotNull(ChannelServicesTest.makeUser(manager))
         val result = userServices.login(user.username, invalidPassword)
         assertIs<Failure<UserError.PasswordIsInvalid>>(result)
+        assertEquals(UserError.PasswordIsInvalid, result.value)
     }
 
     @ParameterizedTest
@@ -543,6 +566,7 @@ class UserServicesTest {
         val token = userServices.login(user.username, validPassword) as Success<UserToken>
         val result = userServices.logout(token.value.token.toString())
         assertIs<Success<Unit>>(result)
+        assertEquals(Unit, result.value)
     }
 
     @ParameterizedTest
@@ -551,5 +575,48 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val result = userServices.deleteUser(0u)
         assertIs<Failure<UserError.UserNotFound>>(result)
+        assertEquals(UserError.UserNotFound, result.value)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `getting a user by token should return the user`(manager: TransactionManager) {
+        val userServices = UserServices(manager)
+        val user = checkNotNull(ChannelServicesTest.makeUser(manager))
+        val token = userServices.login(user.username, validPassword) as Success<UserToken>
+        val result = userServices.getUserByToken(token.value.token.toString())
+        assertIs<Success<User>>(result)
+        assertEquals(user, result.value)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `trying to get a user by token that does not exist should return UserNotFound`(manager: TransactionManager) {
+        val userServices = UserServices(manager)
+        val result = userServices.getUserByToken("nonexistent_token")
+        assertIs<Failure<UserError.UserNotFound>>(result)
+        assertEquals(UserError.UserNotFound, result.value)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `creating an invitation should return the invitation`(manager: TransactionManager) {
+        val userServices = UserServices(manager)
+        val inviter = checkNotNull(ChannelServicesTest.makeUser(manager))
+        val inviterId = checkNotNull(inviter.uId)
+        val result = userServices.createInvitation(inviterId)
+        assertIs<Success<UserInvitation>>(result)
+        assertEquals(inviter.uId, result.value.inviterId)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `trying to create an invitation with an invalid inviter id should return InviterNotFound`(
+        manager: TransactionManager,
+    ) {
+        val userServices = UserServices(manager)
+        val result = userServices.createInvitation(0u)
+        assertIs<Failure<UserError.InviterNotFound>>(result)
+        assertEquals(UserError.InviterNotFound, result.value)
     }
 }
