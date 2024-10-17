@@ -4,7 +4,7 @@ import TransactionManager
 import com.example.appWeb.controller.UserController
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
-import com.example.appWeb.model.problem.Problem
+import com.example.appWeb.model.problem.UserProblem
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import jdbc.transactionManager.TransactionManagerJDBC
@@ -108,6 +108,6 @@ class UserControllerTest {
 
         val response = userController.getUser(userIdToGet, authenticated)
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
-        assertIs<Problem.UserNotFound>(response.body)
+        assertIs<UserProblem.UserNotFound>(response.body)
     }
 }

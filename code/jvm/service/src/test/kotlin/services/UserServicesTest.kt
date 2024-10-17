@@ -136,7 +136,7 @@ class UserServicesTest {
                     "userToJoinChannel",
                     validPassword,
                     invitation.invitationCode.toString(),
-                    invitation.userId,
+                    invitation.inviterId,
                 )
                 as Success<User>
         return user.value
@@ -150,7 +150,7 @@ class UserServicesTest {
 
         val newUser =
             userServices
-                .createUser(usernameDefault2, validPassword, invitation.invitationCode.toString(), invitation.userId)
+                .createUser(usernameDefault2, validPassword, invitation.invitationCode.toString(), invitation.inviterId)
 
         assertIs<Success<User>>(newUser, "User creation failed with error" + (newUser as? Failure)?.value)
         assertNotNull(newUser.value.uId, "User id is null")
@@ -167,7 +167,7 @@ class UserServicesTest {
         val invitation = makeInviterAndInvitation(manager)
         val newUser =
             userServices
-                .createUser("", validPassword, invitation.invitationCode.toString(), invitation.userId)
+                .createUser("", validPassword, invitation.invitationCode.toString(), invitation.inviterId)
         assertIs<Failure<UserError.UsernameIsEmpty>>(newUser)
     }
 
@@ -180,7 +180,12 @@ class UserServicesTest {
         val invitation = makeInviterAndInvitation(manager)
         val newUser =
             userServices
-                .createUser(usernameDefault1, invalidPassword, invitation.invitationCode.toString(), invitation.userId)
+                .createUser(
+                    usernameDefault1,
+                    invalidPassword,
+                    invitation.invitationCode.toString(),
+                    invitation.inviterId,
+                )
         assertIs<Failure<UserError.PasswordIsInvalid>>(newUser)
     }
 
@@ -213,7 +218,7 @@ class UserServicesTest {
                     usernameDefault1,
                     validPassword,
                     "0f7ed58e-89c0-4331-b22d-0d075b3563156",
-                    invitation.userId,
+                    invitation.inviterId,
                 )
         assertIs<Failure<UserError.InvitationCodeIsInvalid>>(newUser)
     }
@@ -232,7 +237,7 @@ class UserServicesTest {
                     usernameDefault1,
                     validPassword,
                     invitation.invitationCode.toString(),
-                    invitation.userId,
+                    invitation.inviterId,
                 )
         assertIs<Failure<UserError.InvitationCodeHasExpired>>(newUser)
     }
@@ -250,7 +255,7 @@ class UserServicesTest {
                     usernameDefault1,
                     validPassword,
                     invitation.invitationCode.toString(),
-                    invitation.userId,
+                    invitation.inviterId,
                 )
         assertIs<Failure<UserError.UsernameAlreadyExists>>(newUser)
     }
@@ -266,7 +271,7 @@ class UserServicesTest {
                     "userToDelete",
                     validPassword,
                     invitation.invitationCode.toString(),
-                    invitation.userId,
+                    invitation.inviterId,
                 )
                 as Success<User>
         val userId = checkNotNull(user.value.uId)
@@ -293,7 +298,7 @@ class UserServicesTest {
                     "userToGet",
                     validPassword,
                     invitation.invitationCode.toString(),
-                    invitation.userId,
+                    invitation.inviterId,
                 )
                 as Success<User>
         val userId = checkNotNull(user.value.uId)
@@ -467,11 +472,11 @@ class UserServicesTest {
             )
         val result =
             userServices.getInvitation(
-                invitation.userId,
+                invitation.inviterId,
                 invitation.invitationCode.toString(),
             )
         assertIs<Success<UserInvitation>>(result)
-        assertEquals(invitation.userId, result.value.userId)
+        assertEquals(invitation.inviterId, result.value.inviterId)
         assertEquals(invitation.invitationCode, result.value.invitationCode)
     }
 
@@ -505,7 +510,7 @@ class UserServicesTest {
             )
         val result =
             userServices.getInvitation(
-                invitation.userId,
+                invitation.inviterId,
                 "0f7ed58e-89c0-4331-b22d-0d075b356317",
             )
         assertIs<Failure<UserError.InvitationNotFound>>(result)
@@ -537,5 +542,23 @@ class UserServicesTest {
         val user = checkNotNull(ChannelServicesTest.makeUser(manager))
         val result = userServices.login(user.username, invalidPassword)
         assertIs<Failure<UserError.PasswordIsInvalid>>(result)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `logging out a user successfully should return Unit`(manager: TransactionManager) {
+        val userServices = UserServices(manager)
+        val user = checkNotNull(ChannelServicesTest.makeUser(manager))
+        val token = userServices.login(user.username, validPassword) as Success<UserToken>
+        val result = userServices.logout(token.value.token.toString())
+        assertIs<Success<Unit>>(result)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `trying to logout with a nonexistent token should return TokenNotFound`(manager: TransactionManager) {
+        val userServices = UserServices(manager)
+        val result = userServices.deleteUser(0u)
+        assertIs<Failure<UserError.UserNotFound>>(result)
     }
 }

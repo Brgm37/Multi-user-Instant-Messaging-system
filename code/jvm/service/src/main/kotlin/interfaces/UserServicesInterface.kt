@@ -80,4 +80,16 @@ interface UserServicesInterface {
         username: String,
         password: String,
     ): Either<UserError, UserToken>
+
+    /**
+     * Logs out a user.
+     * @param token The authentication token of the user.
+     */
+    fun logout(token: String): Either<UserError, Unit>
+
+    /**
+     * Creates an invitation.
+     * @param inviterUId The id of the inviter.
+     */
+    fun createInvitation(inviterUId: UInt): Either<UserError, UserInvitation>
 }
