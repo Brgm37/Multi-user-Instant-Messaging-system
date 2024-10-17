@@ -10,6 +10,7 @@ import model.channels.Visibility.PRIVATE
 import model.channels.Visibility.PUBLIC
 import model.channels.toChannelName
 import model.users.UserInfo
+import utils.encryption.DummyEncrypt
 import utils.encryption.Encrypt
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -127,7 +128,7 @@ private const val CHANNELS_INVITATIONS_MAX_USES = "max_uses"
  */
 class ChannelJDBC(
     private val connection: Connection,
-    private val encrypt: Encrypt,
+    private val encrypt: Encrypt = DummyEncrypt,
 ) : ChannelRepositoryInterface {
     /**
      * Converts the [ResultSet] to a [Channel].

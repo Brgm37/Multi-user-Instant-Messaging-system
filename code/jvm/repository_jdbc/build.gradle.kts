@@ -11,11 +11,10 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
     api(project(":domain"))
     implementation(project(":repository"))
-    api("com.zaxxer:HikariCP:5.1.0")
     implementation("jakarta.inject:jakarta.inject-api:2.0.1")
+    testImplementation(kotlin("test"))
     testImplementation("org.slf4j:slf4j-simple:1.7.32")
     testImplementation("ch.qos.logback:logback-classic:1.5.8")
     testImplementation(group = "org.postgresql", name = "postgresql", version = "42.+")

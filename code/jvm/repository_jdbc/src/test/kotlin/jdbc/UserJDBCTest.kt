@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
-import org.postgresql.ds.PGSimpleDataSource
-import utils.encryption.DummyEncrypt
 import java.sql.Connection
 import java.sql.SQLException
 import java.sql.Timestamp
@@ -24,8 +22,8 @@ class UserJDBCTest {
 
     companion object {
         private fun runWithConnection(block: (Connection) -> Unit) =
-            PGSimpleDataSource()
-                .apply { setURL(Environment.getDbUrl()) }
+            TestSetup
+                .dataSource
                 .connection
                 .let(block)
     }
@@ -33,7 +31,7 @@ class UserJDBCTest {
     @BeforeEach
     fun clean() {
         runWithConnection { connection ->
-            ChannelJDBC(connection, DummyEncrypt).clear()
+            ChannelJDBC(connection).clear()
             UserJDBC(connection).clear()
             MessageJDBC(connection).clear()
             UserJDBC(connection).clear()
