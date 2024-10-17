@@ -2,12 +2,12 @@ package services
 
 import TransactionManager
 import errors.ChannelError.ChannelNotFound
-import errors.ChannelError.InvitationCodeHasExpired
-import errors.ChannelError.InvitationCodeIsInvalid
-import errors.ChannelError.InvitationCodeMaxUsesReached
 import errors.ChannelError.UserNotFound
 import errors.Error
 import errors.UserError
+import errors.UserError.InvitationCodeHasExpired
+import errors.UserError.InvitationCodeIsInvalid
+import errors.UserError.InvitationCodeMaxUsesReached
 import interfaces.UserServicesInterface
 import jakarta.inject.Named
 import model.channels.Channel
@@ -50,10 +50,10 @@ class UserServices(
             val invitation =
                 userRepo
                     .findInvitation(inviterUId, invitationCode)
-                    ?: return@run failure(UserError.InvitationCodeIsInvalid)
+                    ?: return@run failure(InvitationCodeIsInvalid)
             if (invitation.isExpired) {
                 userRepo.deleteInvitation(invitation)
-                return@run failure(UserError.InvitationCodeHasExpired)
+                return@run failure(InvitationCodeHasExpired)
             }
             val createdUser = userRepo.createUser(user) ?: return@run failure(UserError.UnableToCreateUser)
             userRepo.deleteInvitation(invitation)
@@ -150,12 +150,11 @@ class UserServices(
         }
     }
 
-    override fun logout(token: String): Either<UserError, Unit> {
-        return repoManager.run {
+    override fun logout(token: String): Either<UserError, Unit> =
+        repoManager.run {
             if (userRepo.deleteToken(token)) success(Unit) else failure(UserError.TokenNotFound)
             success(Unit)
         }
-    }
 
     override fun createInvitation(inviterUId: UInt): Either<UserError, UserInvitation> {
         return repoManager.run {

@@ -23,6 +23,7 @@ import utils.Either
 import utils.failure
 import utils.success
 import java.sql.Timestamp
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -46,7 +47,7 @@ class ChannelServices(
         accessControl: String,
         visibility: String,
     ): Either<ChannelError, Channel> {
-        if (name.isEmpty() || visibility.isEmpty() || accessControl.isEmpty()) {
+        if (name.isBlank() || visibility.isBlank() || accessControl.isBlank()) {
             return failure(InvalidChannelInfo)
         }
         if (accessControl.uppercase() !in AccessControl.entries.map(AccessControl::name)) {
@@ -159,7 +160,11 @@ class ChannelServices(
 
     private fun makeTimeStamp(expirationDate: String) =
         try {
-            Timestamp.valueOf(expirationDate)
+            Timestamp.valueOf(
+                LocalDate
+                    .parse(expirationDate)
+                    .atStartOfDay(),
+            )
         } catch (e: IllegalArgumentException) {
             null
         }

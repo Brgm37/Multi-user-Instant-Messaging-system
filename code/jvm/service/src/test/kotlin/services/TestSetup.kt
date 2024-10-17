@@ -1,4 +1,4 @@
-package jdbc
+package services
 
 import org.postgresql.ds.PGSimpleDataSource
 

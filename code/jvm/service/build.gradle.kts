@@ -15,10 +15,8 @@ dependencies {
     api(project(":repository"))
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     testImplementation(kotlin("test"))
-    testImplementation("io.mockk:mockk:1.13.12")
     testImplementation("org.slf4j:slf4j-simple:1.7.32")
     testImplementation("ch.qos.logback:logback-classic:1.5.8")
-    testImplementation("com.zaxxer:HikariCP:5.1.0")
     testImplementation(project(":repository_jdbc"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.0")
@@ -27,6 +25,10 @@ dependencies {
 }
 
 tasks.test {
+    environment(
+        "DB_URL",
+        "jdbc:postgresql://localhost:5433/daw_test?user=postgres&password=password",
+    )
     useJUnitPlatform()
     dependsOn(":repository_jdbc:dbTestWait")
     finalizedBy(":repository_jdbc:dbTestDown")

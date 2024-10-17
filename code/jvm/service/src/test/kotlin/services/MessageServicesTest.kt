@@ -1,8 +1,6 @@
 package services
 
 import TransactionManager
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import errors.MessageError
 import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
@@ -22,6 +20,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import utils.Failure
 import utils.Success
+import utils.encryption.DummyEncrypt
 import java.sql.Timestamp
 import java.util.stream.Stream
 import kotlin.test.assertEquals
@@ -30,20 +29,11 @@ import kotlin.test.assertNotNull
 
 class MessageServicesTest {
     companion object {
-        private val hikari =
-            HikariConfig()
-                .apply {
-                    jdbcUrl = Environment.connectionUrl
-                    username = Environment.username
-                    password = Environment.password
-                    maximumPoolSize = Environment.poolSize
-                }.let { HikariDataSource(it) }
-
         @JvmStatic
         fun transactionManagers(): Stream<TransactionManager> =
             Stream.of(
                 TransactionManagerInMem().also { cleanup(it) },
-                TransactionManagerJDBC(hikari).also { cleanup(it) },
+                TransactionManagerJDBC(TestSetup.dataSource, DummyEncrypt).also { cleanup(it) },
             )
 
         private fun cleanup(manager: TransactionManager) =

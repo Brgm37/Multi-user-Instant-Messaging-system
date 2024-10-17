@@ -1,10 +1,9 @@
 package services
 
 import TransactionManager
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import errors.ChannelError
 import errors.UserError
+import errors.UserError.InvitationCodeMaxUsesReached
 import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
 import model.channels.AccessControl
@@ -19,6 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import utils.Failure
 import utils.Success
+import utils.encryption.DummyEncrypt
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.UUID
@@ -35,20 +35,11 @@ class UserServicesTest {
     private val usernameDefault2 = "name2"
 
     companion object {
-        private val hikari =
-            HikariConfig()
-                .apply {
-                    jdbcUrl = Environment.connectionUrl
-                    username = Environment.username
-                    password = Environment.password
-                    maximumPoolSize = Environment.poolSize
-                }.let { HikariDataSource(it) }
-
         @JvmStatic
         fun transactionManagers(): Stream<TransactionManager> =
             Stream.of(
                 TransactionManagerInMem().also { cleanup(it) },
-                TransactionManagerJDBC(hikari).also { cleanup(it) },
+                TransactionManagerJDBC(TestSetup.dataSource, DummyEncrypt).also { cleanup(it) },
             )
 
         private fun cleanup(manager: TransactionManager) =
@@ -443,7 +434,7 @@ class UserServicesTest {
         val user2 = checkNotNull(ChannelServicesTest.makeUser(manager, "user2"))
         val user2Id = checkNotNull(user2.uId)
         val result2 = channel.channelId?.let { userServices.joinChannel(user2Id, it, invitationCode.toString()) }
-        assertIs<Failure<ChannelError.InvitationCodeMaxUsesReached>>(result2)
+        assertIs<Failure<InvitationCodeMaxUsesReached>>(result2)
     }
 
     @ParameterizedTest
