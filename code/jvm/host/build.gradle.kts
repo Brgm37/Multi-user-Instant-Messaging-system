@@ -14,6 +14,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.postgresql:postgresql:42.7.2")
     implementation(project(":httpApi"))
     implementation(project(":http_pipeline"))
     api(project(":repository_jdbc"))
@@ -48,8 +49,8 @@ tasks.test {
         "AES_KEY",
         "My_Secret_Key",
     )
-    dependsOn(":repository_jdbc:dbTestWait")
-    finalizedBy(":repository_jdbc:dbTestDown")
+//    dependsOn(":repository_jdbc:dbTestWait")
+//    finalizedBy(":repository_jdbc:dbTestDown")
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {

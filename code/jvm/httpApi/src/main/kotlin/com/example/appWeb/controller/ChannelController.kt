@@ -6,7 +6,7 @@ import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
-import com.example.appWeb.model.problem.Problem
+import com.example.appWeb.model.problem.UserProblem
 import errors.ChannelError
 import errors.ChannelError.InvalidChannelAccessControl
 import errors.ChannelError.InvalidChannelInfo
@@ -93,7 +93,7 @@ class ChannelController(
                     InvalidChannelInfo -> ChannelProblem.InvalidChannelInfo.response(BAD_REQUEST)
                     InvalidChannelAccessControl -> ChannelProblem.InvalidChannelAccessControl.response(BAD_REQUEST)
                     InvalidChannelVisibility -> ChannelProblem.InvalidChannelVisibility.response(BAD_REQUEST)
-                    UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
+                    UserNotFound -> UserProblem.UserNotFound.response(NOT_FOUND)
                     else -> ChannelProblem.UnableToCreateChannel.response(BAD_REQUEST)
                 }
             }
@@ -120,7 +120,7 @@ class ChannelController(
 
             is Failure -> {
                 when (response.value) {
-                    UserNotFound -> Problem.UserNotFound.response(NOT_FOUND)
+                    UserNotFound -> UserProblem.UserNotFound.response(NOT_FOUND)
                     ChannelError.ChannelNotFound -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
                     else -> ChannelProblem.InvalidChannelInfo.response(BAD_REQUEST)
                 }

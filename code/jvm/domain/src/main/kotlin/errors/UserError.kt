@@ -27,4 +27,8 @@ abstract class UserError : Error() {
     data object UsernameAlreadyExists : UserError()
 
     data object UnableToCreateToken : UserError()
+
+    data object TokenNotFound : UserError()
+
+    data object UnableToCreateInvitation : UserError()
 }

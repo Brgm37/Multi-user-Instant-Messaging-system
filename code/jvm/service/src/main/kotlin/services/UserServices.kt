@@ -22,6 +22,11 @@ import utils.success
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
+/**
+ * The number of days an invitation is valid.
+ */
+private const val INVITATION_EXPIRATION_DAYS = 7L
+
 @Named("UserServices")
 class UserServices(
     private val repoManager: TransactionManager,
@@ -41,6 +46,7 @@ class UserServices(
             )
         return repoManager.run {
             userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
+            if (userRepo.findByUsername(username) != null) return@run failure(UserError.UsernameAlreadyExists)
             val invitation =
                 userRepo
                     .findInvitation(inviterUId, invitationCode)
@@ -49,7 +55,6 @@ class UserServices(
                 userRepo.deleteInvitation(invitation)
                 return@run failure(UserError.InvitationCodeHasExpired)
             }
-            if (userRepo.findByUsername(username) != null) return@run failure(UserError.UsernameAlreadyExists)
             val createdUser = userRepo.createUser(user) ?: return@run failure(UserError.UnableToCreateUser)
             userRepo.deleteInvitation(invitation)
             success(createdUser)
@@ -142,6 +147,29 @@ class UserServices(
                     expirationDate = Timestamp.valueOf(LocalDateTime.now().plusWeeks(1)),
                 )
             if (userRepo.createToken(token)) success(token) else failure(UserError.UnableToCreateToken)
+        }
+    }
+
+    override fun logout(token: String): Either<UserError, Unit> {
+        return repoManager.run {
+            if (userRepo.deleteToken(token)) success(Unit) else failure(UserError.TokenNotFound)
+            success(Unit)
+        }
+    }
+
+    override fun createInvitation(inviterUId: UInt): Either<UserError, UserInvitation> {
+        return repoManager.run {
+            userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
+            val invitation =
+                UserInvitation(
+                    inviterId = inviterUId,
+                    expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(INVITATION_EXPIRATION_DAYS)),
+                )
+            if (userRepo.createInvitation(invitation)) {
+                success(invitation)
+            } else {
+                failure(UserError.UnableToCreateInvitation)
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.appWeb.model.dto.input.user
 
+import jakarta.validation.constraints.AssertTrue
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import model.users.Password
@@ -17,4 +18,7 @@ data class UserSignUpInputModel(
     val password: String,
     @get:NotBlank val invitationCode: String,
     val inviterUId: UInt,
-)
+) {
+    @AssertTrue
+    fun validatePassword() = Password.isValidPassword(password)
+}

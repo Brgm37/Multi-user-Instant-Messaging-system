@@ -31,6 +31,7 @@ dependencies {
     testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.postgresql:postgresql:42.7.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

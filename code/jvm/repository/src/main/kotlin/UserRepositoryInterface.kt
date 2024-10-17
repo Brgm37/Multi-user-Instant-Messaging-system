@@ -30,7 +30,7 @@ interface UserRepositoryInterface : Repository<User> {
      * Creates an invitation for the user
      * @param invitation The invitation to create
      */
-    fun createInvitation(invitation: UserInvitation)
+    fun createInvitation(invitation: UserInvitation): Boolean
 
     /**
      * Validates if a token exists and is not expired
@@ -50,6 +50,12 @@ interface UserRepositoryInterface : Repository<User> {
      * @param token The token to create
      */
     fun createToken(token: UserToken): Boolean
+
+    /**
+     * Deletes the token associated to the user
+     * @param token The token to delete
+     */
+    fun deleteToken(token: String): Boolean
 
     /**
      * Finds a user by its token

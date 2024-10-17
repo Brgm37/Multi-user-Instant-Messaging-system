@@ -36,6 +36,7 @@ class UserJDBCTest {
             ChannelJDBC(connection, DummyEncrypt).clear()
             UserJDBC(connection).clear()
             MessageJDBC(connection).clear()
+            UserJDBC(connection).clear()
         }
     }
 
@@ -213,8 +214,8 @@ class UserJDBCTest {
             val userInvitation = UserInvitation(userId, Timestamp.valueOf(LocalDateTime.now().plusDays(1)))
             UserJDBC(connection).createInvitation(userInvitation)
             val result = UserJDBC(connection).findInvitation(userId, userInvitation.invitationCode.toString())
-            val resultID = checkNotNull(result?.userId)
-            assertEquals(userInvitation.userId, resultID)
+            val resultID = checkNotNull(result?.inviterId)
+            assertEquals(userInvitation.inviterId, resultID)
         }
     }
 
@@ -239,7 +240,7 @@ class UserJDBCTest {
             val userInvitation = UserInvitation(userId, Timestamp.valueOf(LocalDateTime.now().plusDays(1)))
             UserJDBC(connection).createInvitation(userInvitation)
             val result = UserJDBC(connection).findInvitation(userId, userInvitation.invitationCode.toString())
-            assertEquals(userInvitation.userId, result?.userId)
+            assertEquals(userInvitation.inviterId, result?.inviterId)
         }
     }
 
@@ -259,6 +260,27 @@ class UserJDBCTest {
     fun `validating an invalid token should return false`() {
         runWithConnection { connection ->
             val result = UserJDBC(connection).validateToken("invalid")
+            assertEquals(false, result)
+        }
+    }
+
+    @Test
+    fun `deleting a token successfully should delete the token from DB`() {
+        runWithConnection { connection ->
+            val user = createUser(connection)
+            val userId = checkNotNull(user.uId)
+            val token = UserToken(userId)
+            UserJDBC(connection).createToken(token)
+            UserJDBC(connection).deleteToken(token.token.toString())
+            val result = UserJDBC(connection).validateToken(token.token.toString())
+            assertEquals(false, result)
+        }
+    }
+
+    @Test
+    fun `trying to delete a non-existent token should return false`() {
+        runWithConnection { connection ->
+            val result = UserJDBC(connection).deleteToken("nonExistentToken")
             assertEquals(false, result)
         }
     }

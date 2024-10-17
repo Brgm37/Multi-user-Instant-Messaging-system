@@ -32,7 +32,7 @@ class UserJDBC(
 
     private fun ResultSet.toUserInvitation(): UserInvitation =
         UserInvitation(
-            userId = getInt("user_id").toUInt(),
+            inviterId = getInt("user_id").toUInt(),
             invitationCode = UUID.fromString(encrypt.decrypt(getString("invitation"))),
             expirationDate = getTimestamp("expiration_date"),
         )
@@ -83,22 +83,22 @@ class UserJDBC(
             WHERE user_id = ? AND invitation = ?
             """.trimIndent()
         val stm = connection.prepareStatement(deleteQuery)
-        stm.setInt(1, invitation.userId.toInt())
+        stm.setInt(1, invitation.inviterId.toInt())
         stm.setString(2, invitation.invitationCode.toString())
         stm.executeUpdate()
     }
 
-    override fun createInvitation(invitation: UserInvitation) {
+    override fun createInvitation(invitation: UserInvitation): Boolean {
         val insertQuery =
             """
             INSERT INTO users_invitations (user_id, invitation, expiration_date)
             VALUES (?, ?, ?)
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
-        stm.setInt(1, invitation.userId.toInt())
+        stm.setInt(1, invitation.inviterId.toInt())
         stm.setString(2, encrypt.encrypt(invitation.invitationCode.toString()))
         stm.setTimestamp(3, invitation.expirationDate)
-        stm.executeUpdate()
+        return stm.executeUpdate() > 0
     }
 
     override fun validateToken(token: String): Boolean {
@@ -181,6 +181,17 @@ class UserJDBC(
         stm.setString(idx++, token.token.toString())
         stm.setTimestamp(idx++, token.creationDate)
         stm.setTimestamp(idx, token.expirationDate)
+        return stm.executeUpdate() > 0
+    }
+
+    override fun deleteToken(token: String): Boolean {
+        val deleteQuery =
+            """
+            DELETE FROM users_tokens
+            WHERE token = ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(deleteQuery)
+        stm.setString(1, token)
         return stm.executeUpdate() > 0
     }
 
