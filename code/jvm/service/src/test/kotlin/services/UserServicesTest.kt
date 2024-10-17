@@ -99,7 +99,7 @@ class UserServicesTest {
         val invitationChannel =
             ChannelInvitation(
                 channelId = checkNotNull(channel.channelId),
-                expirationDate = invitationTimestamp.toLocalDateTime().toLocalDate(),
+                expirationDate = invitationTimestamp,
                 maxUses = 1u,
                 accessControl = AccessControl.valueOf(invitationAccessControl),
             )

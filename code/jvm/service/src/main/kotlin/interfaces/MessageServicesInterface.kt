@@ -1,7 +1,6 @@
 package interfaces
 
-import errors.ChannelError
-import errors.Error
+import errors.MessageError
 import model.messages.Message
 import utils.Either
 
@@ -11,31 +10,49 @@ import utils.Either
 interface MessageServicesInterface {
     /**
      * Creates a new message.
-     * @param msg The message info to create.
-     * @return The created [Message].
+     * @param msg The message to create.
+     * @param user The user that created the message.
+     * @param channel The channel in which the message is present.
+     * @param creationTime The timestamp of when the message is created.
      */
-    fun createMessage(msg: Message): Either<Error, Message>
+    fun createMessage(
+        msg: String,
+        user: UInt,
+        channel: UInt,
+        creationTime: String,
+    ): Either<MessageError, Message>
 
     /**
      * Deletes a user.
-     * @param id The id of the message to delete.
+     * @param msgId The id of the message to delete.
+     * @param uId The id of the user trying to delete the message.
      */
-    fun deleteMessage(id: UInt): Either<Error, String>
+    fun deleteMessage(
+        msgId: UInt,
+        uId: UInt,
+    ): Either<MessageError, Unit>
 
     /**
      * Gets a message by its id.
-     * @param id The id of the message to get.
+     * @param msgId The id of the message to get.
+     * @param uId The id of the user trying to access the message.
      */
-    fun getMessage(id: UInt): Either<Error, Message>
+    fun getMessage(
+        msgId: UInt,
+        uId: UInt,
+    ): Either<MessageError, Message>
 
     /**
-     * Gets the latest messages of a channel.
-     * @param id The id of the channel.
+     * Gets limit amount of messages of a channel.
+     * @param channelId The id of the channel.
+     * @param uId The id of the user.
+     * @param offset The offset of the messages.
      * @param limit The quantity of messages to get.
      */
     fun latestMessages(
-        id: UInt,
+        channelId: UInt,
+        uId: UInt,
         offset: Int,
         limit: Int,
-    ): Either<ChannelError, List<Message>>
+    ): Either<MessageError, List<Message>>
 }

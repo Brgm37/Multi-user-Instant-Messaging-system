@@ -57,17 +57,18 @@ class ChannelServices(
         }
         return repoManager.run {
             val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
-            val id = checkNotNull(user.uId) { "User id is null" }
+            val uId = checkNotNull(user.uId) { "User id is null" }
             val channel =
                 createChannel(
-                    owner = UserInfo(id, user.username),
+                    owner = UserInfo(uId, user.username),
                     name = ChannelName(name, user.username),
                     accessControl = AccessControl.valueOf(accessControl.uppercase()),
                     visibility = Visibility.valueOf(visibility.uppercase()),
                 )
-            channelRepo.createChannel(channel)?.let {
-                success(it)
-            } ?: failure(UnableToCreateChannel)
+            val createdChannel = channelRepo.createChannel(channel) ?: return@run failure(UnableToCreateChannel)
+            val chId = checkNotNull(createdChannel.channelId)
+            channelRepo.joinChannel(chId, uId, AccessControl.READ_WRITE)
+            success(createdChannel)
         }
     }
 
@@ -139,14 +140,14 @@ class ChannelServices(
                     if (accessControl == null) {
                         ChannelInvitation(
                             channelId = channelId,
-                            expirationDate = timestamp.toLocalDateTime().toLocalDate(),
+                            expirationDate = timestamp,
                             maxUses = maxUses,
                             accessControl = channel.accessControl,
                         )
                     } else {
                         ChannelInvitation(
                             channelId = channelId,
-                            expirationDate = timestamp.toLocalDateTime().toLocalDate(),
+                            expirationDate = timestamp,
                             maxUses = maxUses,
                             accessControl = AccessControl.valueOf(accessControl.uppercase()),
                         )

@@ -14,8 +14,10 @@ import model.users.UserInfo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.postgresql.ds.PGSimpleDataSource
+import utils.encryption.DummyEncrypt
 import java.sql.Connection
-import java.time.LocalDate
+import java.sql.Timestamp
+import java.time.LocalDateTime
 import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -33,12 +35,15 @@ class ChannelJDBCTest {
                 .apply { setURL(Environment.getDbUrl()) }
                 .connection
                 .let(block)
+
+        private val expirationDate: Timestamp
+            get() = Timestamp.valueOf(LocalDateTime.now().plusWeeks(1))
     }
 
     @BeforeEach
     fun clean() {
         runWithConnection { connection ->
-            ChannelJDBC(connection).clear()
+            ChannelJDBC(connection, DummyEncrypt).clear()
             UserJDBC(connection).clear()
             MessageJDBC(connection).clear()
         }
@@ -58,7 +63,7 @@ class ChannelJDBCTest {
                 assertNotNull(user)
                 assertNotNull(user.uId)
                 val id = requireNotNull(user.uId) { "User id is null" }
-                ChannelJDBC(connection)
+                ChannelJDBC(connection, DummyEncrypt)
                     .createChannel(
                         Channel
                             .createChannel(
@@ -81,7 +86,7 @@ class ChannelJDBCTest {
         runWithConnection { connection ->
             val channel = createChannel(connection)
             val id = requireNotNull(channel?.channelId) { "Channel id is null" }
-            val foundChannel = ChannelJDBC(connection).findById(id)
+            val foundChannel = ChannelJDBC(connection, DummyEncrypt).findById(id)
             assertNotNull(foundChannel)
         }
 
@@ -106,10 +111,10 @@ class ChannelJDBCTest {
                                 accessControl = READ_WRITE,
                                 visibility = PUBLIC,
                             ).let { channel ->
-                                ChannelJDBC(connection).createChannel(channel)
+                                ChannelJDBC(connection, DummyEncrypt).createChannel(channel)
                             }
                     }
-                    ChannelJDBC(connection)
+                    ChannelJDBC(connection, DummyEncrypt)
                         .findByUserId(id, 0, 10)
                         .let { channels ->
                             assertTrue(channels.isNotEmpty())
@@ -128,8 +133,8 @@ class ChannelJDBCTest {
                 channel.copy(
                     name = ChannelName("new name", channel.owner.username),
                 )
-            ChannelJDBC(connection).save(updatedChannel)
-            val foundChannel = ChannelJDBC(connection).findById(id)
+            ChannelJDBC(connection, DummyEncrypt).save(updatedChannel)
+            val foundChannel = ChannelJDBC(connection, DummyEncrypt).findById(id)
             assertEquals(updatedChannel, foundChannel)
         }
     }
@@ -143,11 +148,11 @@ class ChannelJDBCTest {
             val invitation =
                 ChannelInvitation(
                     channelId = channelId,
-                    expirationDate = LocalDate.of(2027, 1, 1),
+                    expirationDate = expirationDate,
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
-            val channelRepo = ChannelJDBC(connection)
+            val channelRepo = ChannelJDBC(connection, DummyEncrypt)
             channelRepo.createInvitation(invitation)
         }
     }
@@ -161,11 +166,11 @@ class ChannelJDBCTest {
             val invitation =
                 ChannelInvitation(
                     channelId = channelId,
-                    expirationDate = LocalDate.of(2027, 1, 1),
+                    expirationDate = expirationDate,
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
-            val channelRepo = ChannelJDBC(connection)
+            val channelRepo = ChannelJDBC(connection, DummyEncrypt)
             channelRepo.createInvitation(invitation)
             val foundInvitation = channelRepo.findInvitation(channelId)
             assertEquals(invitation, foundInvitation)
@@ -181,11 +186,11 @@ class ChannelJDBCTest {
             val invitation =
                 ChannelInvitation(
                     channelId = channelId,
-                    expirationDate = LocalDate.of(2027, 1, 1),
+                    expirationDate = expirationDate,
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
-            val channelRepo = ChannelJDBC(connection)
+            val channelRepo = ChannelJDBC(connection, DummyEncrypt)
             channelRepo.createInvitation(invitation)
             val updatedInvitation = invitation.decrementUses()
             channelRepo.updateInvitation(updatedInvitation)
@@ -203,11 +208,11 @@ class ChannelJDBCTest {
             val invitation =
                 ChannelInvitation(
                     channelId = channelId,
-                    expirationDate = LocalDate.of(2027, 1, 1),
+                    expirationDate = expirationDate,
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
-            val channelRepo = ChannelJDBC(connection)
+            val channelRepo = ChannelJDBC(connection, DummyEncrypt)
             channelRepo.createInvitation(invitation)
             channelRepo.deleteInvitation(channelId)
             assertNull(channelRepo.findInvitation(channelId))
@@ -219,8 +224,8 @@ class ChannelJDBCTest {
         runWithConnection { connection ->
             val channel = createChannel(connection)
             val id = requireNotNull(channel?.channelId) { "Channel id is null" }
-            ChannelJDBC(connection).deleteById(id)
-            assertNull(ChannelJDBC(connection).findById(id))
+            ChannelJDBC(connection, DummyEncrypt).deleteById(id)
+            assertNull(ChannelJDBC(connection, DummyEncrypt).findById(id))
         }
     }
 
@@ -237,9 +242,9 @@ class ChannelJDBCTest {
                     assertIs<Channel.Private>(channel)
                     assertNotNull(channel.channelId)
                     val id = requireNotNull(channel.channelId) { "Channel id is null" }
-                    assertNotNull(ChannelJDBC(connection).deleteById(id))
+                    assertNotNull(ChannelJDBC(connection, DummyEncrypt).deleteById(id))
                 }
-            val foundChannels = ChannelJDBC(connection).findAll(0, 10)
+            val foundChannels = ChannelJDBC(connection, DummyEncrypt).findAll(0, 10)
             assertEquals(numberOfChannels, foundChannels.size)
             assertEquals(channels, foundChannels)
         }
@@ -254,7 +259,7 @@ class ChannelJDBCTest {
             assertNotNull(user, "User is null")
             val uId = checkNotNull(user.uId) { "User id is null" }
             val cId = checkNotNull(channel.channelId) { "Channel id is null" }
-            ChannelJDBC(connection).joinChannel(cId, uId, READ_WRITE)
+            ChannelJDBC(connection, DummyEncrypt).joinChannel(cId, uId, READ_WRITE)
         }
     }
 
@@ -267,8 +272,8 @@ class ChannelJDBCTest {
             assertNotNull(user, "User is null")
             val uId = checkNotNull(user.uId) { "User id is null" }
             val cId = checkNotNull(channel.channelId) { "Channel id is null" }
-            ChannelJDBC(connection).joinChannel(cId, uId, READ_WRITE)
-            assertTrue(ChannelJDBC(connection).isUserInChannel(cId, uId))
+            ChannelJDBC(connection, DummyEncrypt).joinChannel(cId, uId, READ_WRITE)
+            assertTrue(ChannelJDBC(connection, DummyEncrypt).isUserInChannel(cId, uId))
         }
     }
 
@@ -281,8 +286,8 @@ class ChannelJDBCTest {
             assertNotNull(user, "User is null")
             val uId = checkNotNull(user.uId) { "User id is null" }
             val cId = checkNotNull(channel.channelId) { "Channel id is null" }
-            ChannelJDBC(connection).joinChannel(cId, uId, READ_WRITE)
-            assertEquals(READ_WRITE, ChannelJDBC(connection).findUserAccessControl(cId, uId))
+            ChannelJDBC(connection, DummyEncrypt).joinChannel(cId, uId, READ_WRITE)
+            assertEquals(READ_WRITE, ChannelJDBC(connection, DummyEncrypt).findUserAccessControl(cId, uId))
         }
     }
 }

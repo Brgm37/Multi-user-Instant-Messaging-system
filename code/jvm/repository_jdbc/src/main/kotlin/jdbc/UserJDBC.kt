@@ -33,7 +33,7 @@ class UserJDBC(
     private fun ResultSet.toUserInvitation(): UserInvitation =
         UserInvitation(
             userId = getInt("user_id").toUInt(),
-            invitationCode = UUID.fromString(getString("invitation")),
+            invitationCode = UUID.fromString(encrypt.decrypt(getString("invitation"))),
             expirationDate = getTimestamp("expiration_date"),
         )
 
@@ -46,7 +46,7 @@ class UserJDBC(
         val stm = connection.prepareStatement(insertQuery)
         var idx = 1
         stm.setString(idx++, user.username)
-        stm.setString(idx, (user.password.value))
+        stm.setString(idx, encrypt.encrypt(user.password.value))
         val rs = stm.executeQuery()
         return if (rs.next()) {
             user.copy(uId = rs.getInt("id").toUInt())
@@ -96,7 +96,7 @@ class UserJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         stm.setInt(1, invitation.userId.toInt())
-        stm.setString(2, invitation.invitationCode.toString())
+        stm.setString(2, encrypt.encrypt(invitation.invitationCode.toString()))
         stm.setTimestamp(3, invitation.expirationDate)
         stm.executeUpdate()
     }

@@ -9,7 +9,6 @@ import utils.encryption.DummyEncrypt
 import utils.encryption.Encrypt
 import java.sql.Connection
 import java.sql.ResultSet
-import java.sql.Timestamp
 
 /**
  * MessageJDBC is a JDBC implementation of MessageRepositoryInterface
@@ -22,21 +21,29 @@ class MessageJDBC(
     private fun ResultSet.toMessage(): Message {
         val author =
             UserInfo(
-                uId = getInt("authorId").toUInt(),
-                username = getString("authorUsername"),
+                uId = getInt("msgAuthorId").toUInt(),
+                username = getString("msgAuthorUsername"),
             )
         val channel =
             ChannelInfo(
-                uId = getInt("msgChannelId").toUInt(),
+                channelId = getInt("msgChannelId").toUInt(),
                 channelName = getString("msgChannelName").toChannelName(),
             )
         return Message(
             msgId = getInt("msgId").toUInt(),
-            msg = getString("msgContent"),
+            msg = encrypt.decrypt(getString("msgContent")),
             user = author,
             channel = channel,
-            creationTime = getTimestamp("msgTimestamp").toLocalDateTime(),
+            creationTime = getTimestamp("msgTimestamp"),
         )
+    }
+
+    private fun ResultSet.toMessageList(): List<Message> {
+        val messages = mutableListOf<Message>()
+        while (next()) {
+            messages.add(toMessage())
+        }
+        return messages
     }
 
     override fun createMessage(message: Message): Message? {
@@ -49,8 +56,8 @@ class MessageJDBC(
         var idx = 1
         stm.setString(idx++, encrypt.encrypt(message.msg))
         stm.setInt(idx++, message.user.uId.toInt())
-        stm.setInt(idx++, message.channel.uId.toInt())
-        stm.setTimestamp(idx, Timestamp.valueOf(message.creationTime))
+        stm.setInt(idx++, message.channel.channelId.toInt())
+        stm.setTimestamp(idx, message.creationTime)
         val rs = stm.executeQuery()
         return if (rs.next()) {
             message.copy(msgId = rs.getInt("id").toUInt())
@@ -63,13 +70,32 @@ class MessageJDBC(
         channelId: UInt,
         limit: UInt,
         offset: UInt,
-    ): List<Message> = emptyList()
+    ): List<Message> {
+        val selectQuery =
+            """
+            SELECT 
+                msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
+                msgChannelName, msgAuthorUsername
+            FROM v_message
+            WHERE msgChannelId = ?
+            ORDER BY msgTimestamp DESC
+            LIMIT ? OFFSET ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, channelId.toInt())
+        stm.setInt(idx++, limit.toInt())
+        stm.setInt(idx, offset.toInt())
+        val rs = stm.executeQuery()
+        return rs.toMessageList()
+    }
 
     override fun findById(id: UInt): Message? {
         val selectQuery =
             """
-            SELECT msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
-             msgChannelName, msgAuthorUsername
+            SELECT 
+                msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
+                msgChannelName, msgAuthorUsername
             FROM v_message
             WHERE msgid = ?
             """.trimIndent()
@@ -89,8 +115,9 @@ class MessageJDBC(
     ): List<Message> {
         val selectQuery =
             """
-            SELECT msgId, msgChannelId, msgContent, msgauthorid, msgTimestamp,
-             msgChannelName, msgAuthorUsername
+            SELECT 
+                msgId, msgChannelId, msgContent, msgauthorid, msgTimestamp,
+                msgChannelName, msgAuthorUsername
             FROM v_message
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
@@ -111,11 +138,11 @@ class MessageJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(updateQuery)
         var idx = 1
-        stm.setString(idx++, entity.msg)
-        stm.setString(idx++, entity.user.username)
-        stm.setString(idx++, entity.channel.channelName.fullName)
+        stm.setInt(idx++, entity.channel.channelId.toInt())
+        stm.setInt(idx++, entity.user.uId.toInt())
+        stm.setString(idx++, encrypt.encrypt(entity.msg))
         stm.setString(idx++, entity.creationTime.toString())
-        val id = requireNotNull(entity.msgId) { "Message id is null" }
+        val id = checkNotNull(entity.msgId) { "Message id is null" }
         stm.setInt(idx, id.toInt())
         stm.executeUpdate()
     }

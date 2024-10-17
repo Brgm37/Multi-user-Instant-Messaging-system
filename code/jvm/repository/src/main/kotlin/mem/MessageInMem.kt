@@ -3,38 +3,53 @@ package mem
 import MessageRepositoryInterface
 import model.messages.Message
 
+/**
+ * In-memory implementation of the message repository
+ */
+
 class MessageInMem : MessageRepositoryInterface {
-    override fun createMessage(message: Message): Message? {
-        TODO("Not yet implemented")
+    private val messages = mutableListOf<Message>()
+    private val channelMessages = mutableMapOf<UInt, MutableList<UInt>>()
+    private var nextId = 1u
+
+    override fun createMessage(message: Message): Message {
+        val newMessage = message.copy(msgId = nextId++)
+        messages.add(newMessage)
+        val mId = checkNotNull(newMessage.msgId) { "Message id is null" }
+        channelMessages.getOrPut(message.channel.channelId) { mutableListOf() }.add(mId)
+        return newMessage
     }
 
     override fun findMessagesByChannelId(
         channelId: UInt,
         limit: UInt,
         offset: UInt,
-    ): List<Message> = emptyList()
-
-    override fun findById(id: UInt): Message? {
-        TODO("Not yet implemented")
+    ): List<Message> {
+        val messageIds = channelMessages[channelId] ?: return emptyList()
+        return messageIds
+            .drop(offset.toInt())
+            .take(limit.toInt())
+            .mapNotNull { msgId -> messages.find { it.msgId == msgId } }
     }
+
+    override fun findById(id: UInt): Message? = messages.find { it.msgId == id }
 
     override fun findAll(
         offset: Int,
         limit: Int,
-    ): List<Message> {
-        TODO("Not yet implemented")
-    }
+    ): List<Message> = messages.drop(offset).take(limit)
 
     override fun save(entity: Message) {
-        TODO("Not yet implemented")
+        messages.removeIf { it.msgId == entity.msgId }
+        messages.add(entity)
     }
 
     override fun deleteById(id: UInt) {
-        TODO("Not yet implemented")
+        messages.removeIf { it.msgId == id }
     }
 
     override fun clear() {
-        // TODO: Implement this method
-        return
+        messages.clear()
+        channelMessages.clear()
     }
 }

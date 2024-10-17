@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
 import org.postgresql.ds.PGSimpleDataSource
+import utils.encryption.DummyEncrypt
 import java.sql.Connection
 import java.sql.SQLException
 import java.sql.Timestamp
@@ -32,7 +33,7 @@ class UserJDBCTest {
     @BeforeEach
     fun clean() {
         runWithConnection { connection ->
-            ChannelJDBC(connection).clear()
+            ChannelJDBC(connection, DummyEncrypt).clear()
             UserJDBC(connection).clear()
             MessageJDBC(connection).clear()
         }

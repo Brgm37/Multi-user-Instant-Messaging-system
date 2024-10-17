@@ -42,7 +42,11 @@ tasks.test {
     )
     environment(
         "DB_POOL_SIZE",
-        "1000",
+        "100",
+    )
+    environment(
+        "AES_KEY",
+        "My_Secret_Key",
     )
     dependsOn(":repository_jdbc:dbTestWait")
     finalizedBy(":repository_jdbc:dbTestDown")
