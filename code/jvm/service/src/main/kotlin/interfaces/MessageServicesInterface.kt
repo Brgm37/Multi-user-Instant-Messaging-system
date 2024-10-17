@@ -3,7 +3,6 @@ package interfaces
 import errors.MessageError
 import model.messages.Message
 import utils.Either
-import java.sql.Timestamp
 
 /**
  * Represents the services available for the user entity.
