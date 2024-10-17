@@ -18,8 +18,8 @@ class MessageJDBC(
     private fun ResultSet.toMessage(): Message {
         val author =
             UserInfo(
-                uId = getInt("authorId").toUInt(),
-                username = getString("authorUsername"),
+                uId = getInt("msgAuthorId").toUInt(),
+                username = getString("msgAuthorUsername"),
             )
         val channel =
             ChannelInfo(

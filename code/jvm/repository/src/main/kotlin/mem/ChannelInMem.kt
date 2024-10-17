@@ -21,6 +21,12 @@ class ChannelInMem : ChannelRepositoryInterface {
                 is Channel.Private -> channel.copy(channelId = nextId++)
             }
         channels.add(newChannel)
+        val cId = checkNotNull(newChannel.channelId)
+        usersInChannels.getOrPut(cId) {
+            mutableListOf(
+                Pair(newChannel.owner.uId, AccessControl.READ_WRITE)
+            )
+        }
         return newChannel
     }
 

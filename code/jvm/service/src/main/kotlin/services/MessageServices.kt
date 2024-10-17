@@ -38,7 +38,8 @@ class MessageServices(
                     channel = ChannelInfo(channelId, msgChannel.name),
                     creationTime = timeOfCreation,
                 )
-            val createdMessage = messageRepo.createMessage(message)
+            val createdMessage =
+                messageRepo.createMessage(message) ?: return@run failure(MessageError.UnableToCreateMessage)
             val userAccessControl =
                 channelRepo.findUserAccessControl(channelId, uId) ?: return@run failure(MessageError.UserNotInChannel)
             if (msgChannel is Channel.Public &&
@@ -46,17 +47,14 @@ class MessageServices(
                 msgChannel.owner.uId != uId
             ) {
                 return@run failure(MessageError.UserDoesNotHaveAccess)
-            } else {
-                success(createdMessage)
+            }
+            if (msgChannel is Channel.Public) {
+                return@run success(createdMessage)
             }
             if (userAccessControl == AccessControl.READ_ONLY) {
-                failure(MessageError.UserDoesNotHaveAccess)
+                return@run failure(MessageError.UserDoesNotHaveAccess)
             }
-            if (createdMessage == null) {
-                failure(MessageError.UnableToCreateMessage)
-            } else {
-                success(createdMessage)
-            }
+            success(createdMessage)
         }
     }
 
@@ -69,8 +67,8 @@ class MessageServices(
             val channel =
                 channelRepo.findById(message.channel.channelId) ?: return@run failure(MessageError.ChannelNotFound)
             val channelId = checkNotNull(channel.channelId) { "Channel id is null" }
-            if (!channelRepo.isUserInChannel(uId, channelId)) return@run failure(MessageError.UserNotInChannel)
-            if (message.user.uId != uId || channel.owner.uId != uId) {
+            if (!channelRepo.isUserInChannel(channelId, uId)) return@run failure(MessageError.UserNotInChannel)
+            if (message.user.uId != uId && channel.owner.uId != uId) {
                 return@run failure(MessageError.UserDoesNotHaveAccess)
             }
             messageRepo.deleteById(msgId)
