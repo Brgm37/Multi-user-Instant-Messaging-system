@@ -14,6 +14,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.postgresql:postgresql:42.7.2")
     implementation(project(":httpApi"))
     implementation(project(":http_pipeline"))
     api(project(":repository_jdbc"))
@@ -44,8 +45,8 @@ tasks.test {
         "DB_POOL_SIZE",
         "1000",
     )
-    dependsOn(":repository_jdbc:dbTestWait")
-    finalizedBy(":repository_jdbc:dbTestDown")
+//    dependsOn(":repository_jdbc:dbTestWait")
+//    finalizedBy(":repository_jdbc:dbTestDown")
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
