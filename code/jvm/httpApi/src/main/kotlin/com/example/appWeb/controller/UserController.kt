@@ -150,10 +150,9 @@ class UserController(
                     UserError.InvitationCodeIsInvalid -> UserProblem.InvitationCodeIsInvalid.response(BAD_REQUEST)
                     UserError.InvitationCodeHasExpired -> UserProblem.InvitationCodeHasExpired.response(BAD_REQUEST)
                     UserError.InvitationCodeMaxUsesReached ->
-                        UserProblem
-                            .InvitationCodeMaxUsesReached
-                            .response(BAD_REQUEST)
-
+                        UserProblem.InvitationCodeMaxUsesReached.response(
+                            BAD_REQUEST,
+                        )
                     else -> UserProblem.UnableToJoinChannel.response(BAD_REQUEST)
                 }
             }

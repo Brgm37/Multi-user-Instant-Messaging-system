@@ -99,7 +99,7 @@ class UserServices(
             }
             if (invitation.maxUses == 0u) {
                 channelRepo.deleteInvitation(channelId)
-                return@run failure(InvitationCodeMaxUsesReached)
+                return@run failure(UserError.InvitationCodeMaxUsesReached)
             }
             channelRepo.updateInvitation(invitation.decrementUses())
             channelRepo.joinChannel(channelId, userId, invitation.accessControl)
