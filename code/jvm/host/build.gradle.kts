@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":httpApi"))
     implementation(project(":http_pipeline"))
     api(project(":repository_jdbc"))
+    implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -29,6 +30,10 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    environment(
+        "DB_URL_TEST",
+        "jdbc:postgresql://localhost:5433/daw_test?user=postgres&password=password",
+    )
     environment(
         "DB_URL",
         "jdbc:postgresql://localhost:5433/daw_test",
@@ -49,8 +54,8 @@ tasks.test {
         "AES_KEY",
         "My_Secret_Key",
     )
-//    dependsOn(":repository_jdbc:dbTestWait")
-//    finalizedBy(":repository_jdbc:dbTestDown")
+    dependsOn(":repository_jdbc:dbTestWait")
+    finalizedBy(":repository_jdbc:dbTestDown")
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {

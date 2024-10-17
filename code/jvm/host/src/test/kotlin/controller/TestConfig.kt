@@ -7,6 +7,8 @@ import org.postgresql.ds.PGSimpleDataSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
+import utils.encryption.DummyEncrypt
+import utils.encryption.Encrypt
 
 @Component
 class TestConfig {
@@ -16,13 +18,16 @@ class TestConfig {
 
     @Bean
     @Profile("jdbc_test")
-    fun trxManagerJDBC(): TransactionManager =
+    fun encrypt(): Encrypt = DummyEncrypt
+
+    @Bean
+    @Profile("jdbc_test")
+    fun trxManagerJDBC(encrypt: Encrypt): TransactionManager =
         TransactionManagerJDBC(
             PGSimpleDataSource()
                 .apply {
-                    setURL(System.getenv("DB_URL"))
-                    user = System.getenv("DB_USER")
-                    password = System.getenv("DB_PASSWORD")
+                    setURL(System.getenv("DB_URL_TEST"))
                 },
+            encrypt,
         )
 }
