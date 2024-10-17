@@ -244,4 +244,45 @@ class ChannelJDBCTest {
             assertEquals(channels, foundChannels)
         }
     }
+
+    @Test
+    fun `test join Channel`() {
+        runWithConnection { connection ->
+            val channel = createChannel(connection)
+            assertNotNull(channel, "Channel is null")
+            val user = UserJDBC(connection).createUser(User(username = "newUser", password = passwordDefault))
+            assertNotNull(user, "User is null")
+            val uId = checkNotNull(user.uId) { "User id is null" }
+            val cId = checkNotNull(channel.channelId) { "Channel id is null" }
+            ChannelJDBC(connection).joinChannel(cId, uId, READ_WRITE)
+        }
+    }
+
+    @Test
+    fun `test is user in channel`() {
+        runWithConnection { connection ->
+            val channel = createChannel(connection)
+            assertNotNull(channel, "Channel is null")
+            val user = UserJDBC(connection).createUser(User(username = "newUser", password = passwordDefault))
+            assertNotNull(user, "User is null")
+            val uId = checkNotNull(user.uId) { "User id is null" }
+            val cId = checkNotNull(channel.channelId) { "Channel id is null" }
+            ChannelJDBC(connection).joinChannel(cId, uId, READ_WRITE)
+            assertTrue(ChannelJDBC(connection).isUserInChannel(cId, uId))
+        }
+    }
+
+    @Test
+    fun `find user access control in channel`() {
+        runWithConnection { connection ->
+            val channel = createChannel(connection)
+            assertNotNull(channel, "Channel is null")
+            val user = UserJDBC(connection).createUser(User(username = "newUser", password = passwordDefault))
+            assertNotNull(user, "User is null")
+            val uId = checkNotNull(user.uId) { "User id is null" }
+            val cId = checkNotNull(channel.channelId) { "Channel id is null" }
+            ChannelJDBC(connection).joinChannel(cId, uId, READ_WRITE)
+            assertEquals(READ_WRITE, ChannelJDBC(connection).findUserAccessControl(cId, uId))
+        }
+    }
 }
