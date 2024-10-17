@@ -22,12 +22,11 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import utils.Failure
 import utils.Success
-import java.sql.Timestamp
-import java.time.LocalDateTime
 
 @Controller
 class MessageController
@@ -35,7 +34,7 @@ class MessageController
     constructor(
         @Named("MessageServices") private val messageService: MessageServicesInterface,
     ) {
-        @GetMapping(MESSAGE_CREATE_URL)
+        @PostMapping(MESSAGE_CREATE_URL)
         fun createMessage(
             @Valid @RequestBody message: CreateMessageInputModel,
         ) {
@@ -45,7 +44,6 @@ class MessageController
                         msg = message.msg,
                         user = message.user,
                         channel = message.channel,
-                        creationTime = Timestamp.valueOf(LocalDateTime.now()).toString(),
                     )
             when (response) {
                 is Success -> {
