@@ -37,31 +37,18 @@ interface MessageRepositoryInterface {
     + findMessages(channelId: Uint, limit: UInt, offset: UInt): List<Message>
 }
 
-namespace users {
-    class User
-    class UserInvitation
-    class UserToken
-}
-
-namespace channels {
-    class Channel
-    class ChannelInvitation
-}
-
-namespace messages {
-    class Message
-}
-
 Repository <|-- UserRepositoryInterface
 Repository <|-- ChannelRepositoryInterface
 Repository <|-- MessageRepositoryInterface
 
-MessageRepositoryInterface o-- messages.Message
-UserRepositoryInterface o-- users.User
-UserRepositoryInterface o-- users.UserInvitation
-UserRepositoryInterface o-- users.UserToken
-ChannelRepositoryInterface o-- channels.Channel
-ChannelRepositoryInterface o-- channels.ChannelInvitation
+namespace model.channel {}
+namespace model.message {}
+namespace model.user {}
+
+MessageRepositoryInterface o-- message
+UserRepositoryInterface o-- user
+ChannelRepositoryInterface o-- channel
+
 
 
 interface Transaction {

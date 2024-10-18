@@ -37,6 +37,11 @@ private const val MSG_OFFSET = 0u
  */
 private const val MSG_LIMIT = 100u
 
+/**
+ * The ChannelServices class.
+ *
+ * @property repoManager the transaction manager
+ */
 @Named("ChannelServices")
 class ChannelServices(
     private val repoManager: TransactionManager,
