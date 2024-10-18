@@ -132,11 +132,10 @@ class UserController(
     @PutMapping(CHANNEL_ID_USER_ID_URL)
     fun joinChannel(
         @PathVariable channelId: UInt,
-        @PathVariable userId: UInt,
         @RequestParam invitationCode: String = "",
         authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
-        when (val response = userService.joinChannel(userId, channelId, invitationCode)) {
+        when (val response = userService.joinChannel(authenticated.uId, channelId, invitationCode)) {
             is Success -> {
                 ResponseEntity.ok().build<Any>()
             }
@@ -170,7 +169,7 @@ class UserController(
         /**
          * The URL for the user with the given id, the channel with the given id and invitation code.
          */
-        const val CHANNEL_ID_USER_ID_URL = "${ChannelController.CHANNEL_ID_URL}$USER_ID_URL"
+        const val CHANNEL_ID_USER_ID_URL = "${ChannelController.CHANNEL_ID_URL}$USER_BASE_URL"
 
         /**
          * The URL for the user to make an invitation to make a login.
