@@ -13,13 +13,11 @@ interface MessageServicesInterface {
      * @param msg The message to create.
      * @param user The user that created the message.
      * @param channel The channel in which the message is present.
-     * @param creationTime The timestamp of when the message is created.
      */
     fun createMessage(
         msg: String,
         user: UInt,
         channel: UInt,
-        creationTime: String,
     ): Either<MessageError, Message>
 
     /**

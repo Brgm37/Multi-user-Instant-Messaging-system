@@ -30,6 +30,7 @@ class MessageInMem : MessageRepositoryInterface {
             .drop(offset.toInt())
             .take(limit.toInt())
             .mapNotNull { msgId -> messages.find { it.msgId == msgId } }
+            .reversed()
     }
 
     override fun findById(id: UInt): Message? = messages.find { it.msgId == id }
