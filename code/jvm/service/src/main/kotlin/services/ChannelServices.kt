@@ -64,7 +64,7 @@ class ChannelServices(
                     visibility = Visibility.valueOf(upperCaseVisibility),
                 )
             val createdChannel = channelRepo.createChannel(channel) ?: return@run failure(UnableToCreateChannel)
-            val chId = checkNotNull(createdChannel.channelId)
+            val chId = checkNotNull(createdChannel.cId)
             channelRepo.joinChannel(chId, uId, AccessControl.READ_WRITE)
             success(createdChannel)
         }
@@ -135,14 +135,14 @@ class ChannelServices(
                 val invitation =
                     if (accessControl == null) {
                         ChannelInvitation(
-                            channelId = channelId,
+                            cId = channelId,
                             expirationDate = timestamp,
                             maxUses = maxUses,
                             accessControl = channel.accessControl,
                         )
                     } else {
                         ChannelInvitation(
-                            channelId = channelId,
+                            cId = channelId,
                             expirationDate = timestamp,
                             maxUses = maxUses,
                             accessControl = AccessControl.valueOf(accessControl.uppercase()),

@@ -56,7 +56,7 @@ class TransactionManagerJDBCTest {
                         ),
                     )
             assertNotNull(channel)
-            val channelId = requireNotNull(channel.channelId)
+            val channelId = requireNotNull(channel.cId)
             val message =
                 messageRepo
                     .createMessage(

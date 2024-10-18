@@ -24,7 +24,7 @@ data class MessageOutputModel(
                 id = requireNotNull(message.msgId) { "Message id is null" },
                 message = message.msg,
                 user = message.user.uId,
-                channel = message.channel.channelId,
+                channel = message.channel.cId,
                 creationTime = message.creationTime.toString(),
             )
     }

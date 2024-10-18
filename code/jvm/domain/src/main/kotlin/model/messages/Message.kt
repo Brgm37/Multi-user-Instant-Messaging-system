@@ -9,10 +9,10 @@ import java.time.LocalDateTime
  * Represents a Message.
  *
  * @property msgId The unique identifier of the message.
- * @param msg the message.
- * @param user the user that created the message.
- * @param channel the channel in which it is present.
- * @param creationTime the timestamp of when the message is created.
+ * @property msg the message.
+ * @property user the user that created the message.
+ * @property channel the channel in which it is present.
+ * @property creationTime the timestamp of when the message is created.
  */
 
 data class Message(

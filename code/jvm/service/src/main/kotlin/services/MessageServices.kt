@@ -27,7 +27,7 @@ class MessageServices(
         if (msg.isEmpty()) return failure(MessageError.InvalidMessageInfo)
         return repoManager.run {
             val msgChannel = channelRepo.findById(channel) ?: return@run failure(MessageError.ChannelNotFound)
-            val channelId = checkNotNull(msgChannel.channelId) { "Channel id is null" }
+            val channelId = checkNotNull(msgChannel.cId) { "Channel id is null" }
             val msgUser = userRepo.findById(user) ?: return@run failure(MessageError.UserNotFound)
             val uId = checkNotNull(msgUser.uId) { "User id is null" }
             val timeOfCreation = Timestamp.valueOf(creationTime) ?: return@run failure(MessageError.InvalidMessageInfo)
@@ -65,8 +65,8 @@ class MessageServices(
         repoManager.run {
             val message = messageRepo.findById(msgId) ?: return@run failure(MessageError.MessageNotFound)
             val channel =
-                channelRepo.findById(message.channel.channelId) ?: return@run failure(MessageError.ChannelNotFound)
-            val channelId = checkNotNull(channel.channelId) { "Channel id is null" }
+                channelRepo.findById(message.channel.cId) ?: return@run failure(MessageError.ChannelNotFound)
+            val channelId = checkNotNull(channel.cId) { "Channel id is null" }
             if (!channelRepo.isUserInChannel(channelId, uId)) return@run failure(MessageError.UserNotInChannel)
             if (message.user.uId != uId && channel.owner.uId != uId) {
                 return@run failure(MessageError.UserDoesNotHaveAccess)
@@ -82,8 +82,8 @@ class MessageServices(
         repoManager.run {
             val message = messageRepo.findById(msgId) ?: return@run failure(MessageError.MessageNotFound)
             val channel =
-                channelRepo.findById(message.channel.channelId) ?: return@run failure(MessageError.ChannelNotFound)
-            val channelId = checkNotNull(channel.channelId) { "Channel id is null" }
+                channelRepo.findById(message.channel.cId) ?: return@run failure(MessageError.ChannelNotFound)
+            val channelId = checkNotNull(channel.cId) { "Channel id is null" }
             if (!channelRepo.isUserInChannel(uId, channelId) && channel is Channel.Private) {
                 return@run failure(MessageError.UserDoesNotHaveAccess)
             }
@@ -98,7 +98,7 @@ class MessageServices(
     ): Either<MessageError, List<Message>> {
         return repoManager.run {
             val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
-            val chId = checkNotNull(channel.channelId) { "Channel id is null" }
+            val chId = checkNotNull(channel.cId) { "Channel id is null" }
             if (!channelRepo.isUserInChannel(uId, chId) && channel is Channel.Private) {
                 return@run failure(MessageError.UserDoesNotHaveAccess)
             }

@@ -16,7 +16,7 @@ class MessageInMem : MessageRepositoryInterface {
         val newMessage = message.copy(msgId = nextId++)
         messages.add(newMessage)
         val mId = checkNotNull(newMessage.msgId) { "Message id is null" }
-        channelMessages.getOrPut(message.channel.channelId) { mutableListOf() }.add(mId)
+        channelMessages.getOrPut(message.channel.cId) { mutableListOf() }.add(mId)
         return newMessage
     }
 

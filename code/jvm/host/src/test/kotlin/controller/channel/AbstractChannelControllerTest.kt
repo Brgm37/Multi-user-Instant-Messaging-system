@@ -147,7 +147,7 @@ abstract class AbstractChannelControllerTest {
                     ?: throw IllegalStateException("Channel not created")
             }
 
-        val channelId = checkNotNull(channel.channelId) { "Channel not created" }
+        val channelId = checkNotNull(channel.cId) { "Channel not created" }
 
         client
             .post()
@@ -277,7 +277,7 @@ abstract class AbstractChannelControllerTest {
                     ?: throw IllegalStateException("Channel not created")
             }
 
-        val channelId = checkNotNull(channel.channelId) { "Channel not created" }
+        val channelId = checkNotNull(channel.cId) { "Channel not created" }
 
         client
             .post()
@@ -331,7 +331,7 @@ abstract class AbstractChannelControllerTest {
                     ?: throw IllegalStateException("Channel not created")
             }
 
-        val channelId = checkNotNull(channel.channelId) { "Channel not created" }
+        val channelId = checkNotNull(channel.cId) { "Channel not created" }
 
         client
             .get()
