@@ -1,7 +1,6 @@
-package com.example.appWeb
+package com.example.appWeb.controller
 
 import TransactionManager
-import com.example.appWeb.controller.ChannelController
 import com.example.appWeb.model.dto.input.channel.CreateChannelInputModel
 import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputModel
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel

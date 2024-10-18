@@ -151,7 +151,7 @@ abstract class AbstractChannelControllerTest {
 
         client
             .post()
-            .uri(ChannelController.CHANNEL_INVITATION_BASE_URL)
+            .uri("${ChannelController.CHANNEL_BASE_URL}${ChannelController.CHANNEL_INVITATION_URL}")
             .header("Authorization", "Bearer ${token.token}")
             .bodyValue(
                 mapOf(
@@ -170,7 +170,7 @@ abstract class AbstractChannelControllerTest {
 
         client
             .post()
-            .uri(ChannelController.CHANNEL_INVITATION_BASE_URL)
+            .uri("${ChannelController.CHANNEL_BASE_URL}${ChannelController.CHANNEL_INVITATION_URL}")
             .header("Authorization", "Bearer ${token.token}")
             .bodyValue(
                 mapOf(
@@ -189,7 +189,7 @@ abstract class AbstractChannelControllerTest {
 
         client
             .post()
-            .uri(ChannelController.CHANNEL_INVITATION_BASE_URL)
+            .uri("${ChannelController.CHANNEL_BASE_URL}${ChannelController.CHANNEL_INVITATION_URL}")
             .header("Authorization", "Bearer invalid")
             .bodyValue(
                 mapOf(
@@ -208,7 +208,7 @@ abstract class AbstractChannelControllerTest {
 
         client
             .post()
-            .uri(ChannelController.CHANNEL_INVITATION_BASE_URL)
+            .uri("${ChannelController.CHANNEL_BASE_URL}${ChannelController.CHANNEL_INVITATION_URL}")
             .bodyValue(
                 mapOf(
                     "channelId" to 0,
@@ -226,7 +226,7 @@ abstract class AbstractChannelControllerTest {
 
         client
             .post()
-            .uri(ChannelController.CHANNEL_INVITATION_BASE_URL)
+            .uri("${ChannelController.CHANNEL_BASE_URL}${ChannelController.CHANNEL_INVITATION_URL}")
             .header("Authorization", "Bearer ${token.token}")
             .bodyValue(
                 mapOf(
@@ -245,7 +245,7 @@ abstract class AbstractChannelControllerTest {
 
         client
             .post()
-            .uri(ChannelController.CHANNEL_INVITATION_BASE_URL)
+            .uri("${ChannelController.CHANNEL_BASE_URL}${ChannelController.CHANNEL_INVITATION_URL}")
             .header("Authorization", "Bearer ${token.token}")
             .bodyValue(
                 mapOf(
@@ -281,7 +281,7 @@ abstract class AbstractChannelControllerTest {
 
         client
             .post()
-            .uri(ChannelController.CHANNEL_INVITATION_BASE_URL)
+            .uri("${ChannelController.CHANNEL_BASE_URL}${ChannelController.CHANNEL_INVITATION_URL}")
             .header("Authorization", "Bearer ${token.token}")
             .bodyValue(
                 mapOf(

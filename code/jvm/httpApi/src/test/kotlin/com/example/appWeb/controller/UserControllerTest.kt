@@ -1,7 +1,6 @@
-package com.example.appWeb
+package com.example.appWeb.controller
 
 import TransactionManager
-import com.example.appWeb.controller.UserController
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
 import com.example.appWeb.model.problem.UserProblem
