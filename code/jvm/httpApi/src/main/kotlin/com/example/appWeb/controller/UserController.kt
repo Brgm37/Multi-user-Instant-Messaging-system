@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import utils.Failure
@@ -32,6 +33,7 @@ import utils.Success
  * @param userService The user service
  */
 @RestController
+@RequestMapping(UserController.USER_BASE_URL)
 class UserController(
     private val userService: UserServicesInterface,
 ) {
@@ -129,7 +131,7 @@ class UserController(
             }
         }
 
-    @PutMapping(CHANNEL_ID_USER_ID_URL)
+    @PutMapping(CHANNELS_CHANNEL_ID_URL)
     fun joinChannel(
         @PathVariable channelId: UInt,
         @RequestParam invitationCode: String = "",
@@ -159,22 +161,32 @@ class UserController(
         /**
          * The base URL for the user endpoints.
          */
-        const val USER_BASE_URL = "/users"
+        const val USER_BASE_URL = "/api/users"
 
         /**
          * The URL for the user with the given id.
          */
-        const val USER_ID_URL = "$USER_BASE_URL/{userId}"
+        const val USER_ID_URL = "/{userId}"
+
+        /**
+         * The URL for the channel with the given id.
+         */
+        const val CHANNEL_ID_URL = "/{channelId}"
+
+        /**
+         * The URL for the channels.
+         */
+        const val CHANNELS_URL = "/channels"
 
         /**
          * The URL for the user with the given id, the channel with the given id and invitation code.
          */
-        const val CHANNEL_ID_USER_ID_URL = "${ChannelController.CHANNEL_ID_URL}$USER_BASE_URL"
+        const val CHANNELS_CHANNEL_ID_URL = "$CHANNELS_URL$CHANNEL_ID_URL"
 
         /**
          * The URL for the user to make an invitation to make a login.
          */
-        const val INVITATION_URL = "$USER_BASE_URL/invitation"
+        const val INVITATION_URL = "/invitation"
 
         /**
          * The URL for the login.
