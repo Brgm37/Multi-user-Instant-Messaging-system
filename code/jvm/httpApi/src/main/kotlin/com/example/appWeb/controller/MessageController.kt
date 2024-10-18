@@ -27,6 +27,11 @@ import utils.Success
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
+/**
+ * Represents the controller for the message
+ *
+ * @property messageService The message service
+ */
 @Controller
 class MessageController(
     private val messageService: MessageServicesInterface,

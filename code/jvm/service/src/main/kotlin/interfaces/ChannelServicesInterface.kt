@@ -25,7 +25,6 @@ interface ChannelServicesInterface {
      * @param name The name of the channel.
      * @param accessControl The access control of the channel.
      * @param visibility The visibility of the channel.
-     * @return The created [Channel].
      */
     fun createChannel(
         owner: UInt,
@@ -64,6 +63,14 @@ interface ChannelServicesInterface {
         limit: UInt = LIMIT,
     ): Either<ChannelError, List<Channel>>
 
+    /**
+     * Creates a new channel invitation.
+     * @param channelId The id of the channel.
+     * @param maxUses The maximum uses of the invitation.
+     * @param expirationDate The expiration date of the invitation.
+     * @param accessControl The access control of the invitation.
+     * @param owner The owner of the invitation.
+     */
     fun createChannelInvitation(
         channelId: UInt,
         maxUses: UInt,

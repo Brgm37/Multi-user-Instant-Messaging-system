@@ -8,9 +8,9 @@ import model.channels.Visibility
 /**
  * Data class representing the input model for creating a channel.
  *
- * @property name The name of the channel.
- * @property visibility The visibility of the channel.
- * @property accessControl The access control of the channel.
+ * @property name The name of the channel to create.
+ * @property visibility The visibility of the channel to create.
+ * @property accessControl The access control of the channel to create.
  */
 data class CreateChannelInputModel(
     @get:NotBlank val name: String,

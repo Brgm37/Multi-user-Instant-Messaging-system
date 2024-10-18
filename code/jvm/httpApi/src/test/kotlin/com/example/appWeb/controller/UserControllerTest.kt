@@ -363,7 +363,7 @@ class UserControllerTest {
                     AccessControl.READ_WRITE.name,
                     Visibility.PRIVATE.name,
                 ) as Success<Channel>
-        val channelId = checkNotNull(channel.value.channelId)
+        val channelId = checkNotNull(channel.value.cId)
         val invitationCode =
             channelServices.createChannelInvitation(
                 channelId,
@@ -398,7 +398,7 @@ class UserControllerTest {
                     AccessControl.READ_WRITE.name,
                     Visibility.PUBLIC.name,
                 ) as Success<Channel>
-        val channelId = checkNotNull(channel.value.channelId)
+        val channelId = checkNotNull(channel.value.cId)
         val invitationCode =
             channelServices.createChannelInvitation(
                 channelId,
@@ -453,7 +453,7 @@ class UserControllerTest {
                     AccessControl.READ_WRITE.name,
                     Visibility.PRIVATE.name,
                 ) as Success<Channel>
-        val channelId = checkNotNull(channel.value.channelId)
+        val channelId = checkNotNull(channel.value.cId)
 
         val response = userController.joinChannel(channelId, "invalidInvitationCode", authenticated)
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -481,7 +481,7 @@ class UserControllerTest {
                     AccessControl.READ_WRITE.name,
                     Visibility.PRIVATE.name,
                 ) as Success<Channel>
-        val channelId = checkNotNull(channel.value.channelId)
+        val channelId = checkNotNull(channel.value.cId)
         val invitationCode =
             channelServices.createChannelInvitation(
                 channelId,
@@ -517,7 +517,7 @@ class UserControllerTest {
                     AccessControl.READ_WRITE.name,
                     Visibility.PRIVATE.name,
                 ) as Success<Channel>
-        val channelId = checkNotNull(channel.value.channelId)
+        val channelId = checkNotNull(channel.value.cId)
         val invitationCode =
             channelServices.createChannelInvitation(
                 channelId,
