@@ -44,7 +44,10 @@ class HttpApiApplication {
 
     @Bean
     @Profile("aes")
-    fun aesEncryption(): Encrypt = AESEncrypt
+    fun aesEncryption(): Encrypt {
+        val key = System.getenv("AES_KEY") ?: throw Exception("Missing env var AES_KEY")
+        return AESEncrypt(key)
+    }
 
     @Bean
     @Profile("hikari")

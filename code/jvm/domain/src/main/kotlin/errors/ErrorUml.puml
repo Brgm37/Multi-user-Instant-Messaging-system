@@ -1,0 +1,12 @@
+@startuml
+
+class Error
+class ChannelError
+class UserError
+class MessageError
+
+Error <|-- ChannelError
+Error <|-- UserError
+Error <|-- MessageError
+
+@enduml

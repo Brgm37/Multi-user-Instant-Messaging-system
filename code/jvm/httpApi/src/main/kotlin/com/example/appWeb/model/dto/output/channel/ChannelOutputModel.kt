@@ -26,7 +26,7 @@ data class ChannelOutputModel(
     companion object {
         fun fromDomain(channel: Channel): ChannelOutputModel =
             ChannelOutputModel(
-                id = requireNotNull(channel.channelId) { "Channel id is null" },
+                id = requireNotNull(channel.cId) { "Channel id is null" },
                 owner = OwnerOutputModel.fromDomain(channel.owner),
                 name = ChannelNameOutputModel.fromDomain(channel.name),
                 accessControl = channel.accessControl.name,

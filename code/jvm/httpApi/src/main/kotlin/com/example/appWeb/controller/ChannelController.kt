@@ -21,10 +21,21 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import utils.Failure
 import utils.Success
+
+/**
+ * The default limit for the channel list.
+ */
+private const val LIMIT = 10u
+
+/**
+ * The default offset for the channel list.
+ */
+private const val OFFSET = 0u
 
 /**
  * Represents the controller for the channel
@@ -32,6 +43,7 @@ import utils.Success
  * @param channelService The channel service
  */
 @RestController
+@RequestMapping(ChannelController.CHANNEL_BASE_URL)
 class ChannelController(
     private val channelService: ChannelServicesInterface,
 ) {
@@ -50,11 +62,11 @@ class ChannelController(
             }
         }
 
-    @GetMapping(CHANNEL_BASE_URL)
+    @GetMapping
     fun getChannels(
         authenticated: AuthenticatedUserInputModel,
-        @RequestParam offset: UInt = 0u,
-        @RequestParam limit: UInt = 10u,
+        @RequestParam offset: UInt = OFFSET,
+        @RequestParam limit: UInt = LIMIT,
     ): ResponseEntity<*> =
         when (val response = channelService.getChannels(offset, limit)) {
             is Failure -> {
@@ -71,7 +83,7 @@ class ChannelController(
             }
         }
 
-    @PostMapping(CHANNEL_BASE_URL)
+    @PostMapping
     fun createChannel(
         @Valid @RequestBody channel: CreateChannelInputModel,
         authenticated: AuthenticatedUserInputModel,
@@ -100,7 +112,7 @@ class ChannelController(
         }
     }
 
-    @PostMapping(CHANNEL_INVITATION_BASE_URL)
+    @PostMapping(CHANNEL_INVITATION_URL)
     fun createChannelInvitation(
         @Valid @RequestBody invitation: CreateChannelInvitationInputModel,
         authenticated: AuthenticatedUserInputModel,
@@ -131,16 +143,16 @@ class ChannelController(
         /**
          * The base URL for the channel endpoints.
          */
-        const val CHANNEL_BASE_URL = "/channels"
+        const val CHANNEL_BASE_URL = "/api/channels"
 
         /**
          * The URL for the channel with the given id.
          */
-        const val CHANNEL_ID_URL = "$CHANNEL_BASE_URL/{channelId}"
+        const val CHANNEL_ID_URL = "/{channelId}"
 
         /**
          * The URL for the channel invitations.
          */
-        const val CHANNEL_INVITATION_BASE_URL = "$CHANNEL_BASE_URL/invitations"
+        const val CHANNEL_INVITATION_URL = "/invitations"
     }
 }

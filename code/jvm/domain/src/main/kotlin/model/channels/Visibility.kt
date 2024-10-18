@@ -9,4 +9,11 @@ package model.channels
 enum class Visibility {
     PUBLIC,
     PRIVATE,
+    ;
+
+    companion object {
+        private val names = entries.map(Visibility::name)
+
+        fun validate(visibility: String) = visibility.uppercase() in names
+    }
 }

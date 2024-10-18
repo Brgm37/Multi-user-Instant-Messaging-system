@@ -17,11 +17,11 @@ class ChannelInMem : ChannelRepositoryInterface {
     override fun createChannel(channel: Channel): Channel {
         val newChannel =
             when (channel) {
-                is Channel.Public -> channel.copy(channelId = nextId++)
-                is Channel.Private -> channel.copy(channelId = nextId++)
+                is Channel.Public -> channel.copy(cId = nextId++)
+                is Channel.Private -> channel.copy(cId = nextId++)
             }
         channels.add(newChannel)
-        val cId = checkNotNull(newChannel.channelId) { "Channel ID is null" }
+        val cId = checkNotNull(newChannel.cId) { "Channel ID is null" }
         usersInChannels.getOrPut(cId) {
             mutableListOf(
                 Pair(newChannel.owner.uId, AccessControl.READ_WRITE),
@@ -41,7 +41,7 @@ class ChannelInMem : ChannelRepositoryInterface {
         userId: UInt,
         accessControl: AccessControl,
     ) {
-        if (!channels.any { it.channelId == channelId }) {
+        if (!channels.any { it.cId == channelId }) {
             return
         }
         usersInChannels
@@ -54,15 +54,15 @@ class ChannelInMem : ChannelRepositoryInterface {
         userId: UInt,
     ): Boolean = usersInChannels[channelId]?.any { it.first == userId } ?: false
 
-    override fun findInvitation(channelId: UInt): ChannelInvitation? = invitations.find { it.channelId == channelId }
+    override fun findInvitation(channelId: UInt): ChannelInvitation? = invitations.find { it.cId == channelId }
 
     override fun updateInvitation(invitation: ChannelInvitation) {
-        invitations.removeIf { it.channelId == invitation.channelId }
+        invitations.removeIf { it.cId == invitation.cId }
         invitations.add(invitation)
     }
 
     override fun deleteInvitation(channelId: UInt) {
-        invitations.removeIf { it.channelId == channelId }
+        invitations.removeIf { it.cId == channelId }
     }
 
     override fun createInvitation(invitation: ChannelInvitation) {
@@ -74,7 +74,7 @@ class ChannelInMem : ChannelRepositoryInterface {
         userId: UInt,
     ): AccessControl? = usersInChannels[channelId]?.find { it.first == userId }?.second
 
-    override fun findById(id: UInt): Channel? = channels.find { it.channelId == id }
+    override fun findById(id: UInt): Channel? = channels.find { it.cId == id }
 
     override fun findAll(
         offset: Int,
@@ -86,12 +86,12 @@ class ChannelInMem : ChannelRepositoryInterface {
             .take(limit)
 
     override fun save(entity: Channel) {
-        channels.removeIf { it.channelId == entity.channelId }
+        channels.removeIf { it.cId == entity.cId }
         channels.add(entity)
     }
 
     override fun deleteById(id: UInt) {
-        channels.removeIf { it.channelId == id }
+        channels.removeIf { it.cId == id }
     }
 
     override fun clear() {

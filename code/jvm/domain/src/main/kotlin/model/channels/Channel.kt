@@ -6,13 +6,13 @@ import model.users.UserInfo
 /**
  * A channel is a container for user messages.
  *
- * @property channelId The unique identifier of the channel.
+ * @property cId The unique identifier of the channel.
  * @property owner The user that created the channel.
  * @property name The name of the channel.
  * @property accessControl The access control settings of the channel.
  */
 sealed class Channel {
-    abstract val channelId: UInt?
+    abstract val cId: UInt?
     abstract val owner: UserInfo
     abstract val name: ChannelName
     abstract val accessControl: AccessControl
@@ -21,13 +21,13 @@ sealed class Channel {
     /**
      * A public channel is visible to all users.
      *
-     * @property channelId The unique identifier of the channel.
+     * @property cId The unique identifier of the channel.
      * @property owner The user that created the channel.
      * @property name The name of the channel.
      * @property accessControl The access control settings of the channel.
      */
     data class Public(
-        override val channelId: UInt? = null,
+        override val cId: UInt? = null,
         override val owner: UserInfo,
         override val name: ChannelName,
         override val accessControl: AccessControl,
@@ -38,13 +38,13 @@ sealed class Channel {
      * A private channel is only visible to the owner
      * and the users invited to the channel by the owner.
      *
-     * @property channelId The unique identifier of the channel.
+     * @property cId The unique identifier of the channel.
      * @property owner The user that created the channel.
      * @property name The name of the channel.
      * @property accessControl The access control settings of the channel.
      */
     data class Private(
-        override val channelId: UInt? = null,
+        override val cId: UInt? = null,
         override val owner: UserInfo,
         override val name: ChannelName,
         override val accessControl: AccessControl,

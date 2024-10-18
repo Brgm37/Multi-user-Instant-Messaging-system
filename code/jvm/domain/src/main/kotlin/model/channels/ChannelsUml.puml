@@ -1,0 +1,70 @@
+@startuml
+class Channel #line.dashed
+{
+    + cId: Uint?
+    + owner: UserInfo
+    + name: ChannelName
+    + accessControl: AccessControl
+    + messages: List<Message>
+    + createChannel(...): Channel
+}
+
+namespace users {
+    class UserInfo
+}
+
+namespace messages {
+    class Message
+}
+
+class Public
+class Private
+
+class ChannelName
+{
+    + name: String
+    + ownerName: String
+    + fullName: String
+}
+
+enum AccessControl
+{
+    + READ_ONLY
+    + READ_WRITE
+    - names: List<String>
+    + validate(accessControl: String): Boolean
+}
+
+enum Visibility
+{
+    + PUBLIC
+    + PRIVATE
+    + validate(visibility: String): Boolean
+}
+
+class ChannelInfo
+{
+    + cId: Uint
+    + name: ChannelName
+}
+
+class ChannelInvitation
+{
+    + cId: Uint
+    + expirationData: Timestamp
+    + maxUses: Uint
+    + accessControl: AccessControl
+    + invitationCode: UUID
+    + isExpired: Boolean
+    + decrementUses(): ChannelInvitation
+}
+
+Channel <|-- Public
+Channel <|-- Private
+
+ChannelName <.. Channel
+AccessControl <.. Channel
+UserInfo <.. Channel
+Message <.. Channel
+AccessControl <.. ChannelInvitation
+@enduml

@@ -65,7 +65,7 @@ class MessageServicesTest {
         ) = manager
             .run {
                 val userId = checkNotNull(user.uId) { "User id is null" }
-                val channelId = checkNotNull(channel.channelId) { "Channel id is null" }
+                val channelId = checkNotNull(channel.cId) { "Channel id is null" }
                 channelRepo.joinChannel(channelId, userId, accessControl)
             }
 
@@ -127,15 +127,15 @@ class MessageServicesTest {
                     .createMessage(
                         "Hello, World!",
                         checkNotNull(user.uId) { "User id is null" },
-                        checkNotNull(channel.channelId) { "Channel id is null" },
+                        checkNotNull(channel.cId) { "Channel id is null" },
                         "2024-09-01 12:00:00",
                     )
             assertIs<Success<Message>>(newMessage, "Message creation failed with error")
             assertNotNull(newMessage.value.msgId, "Message id is null")
             assertEquals(user.uId, newMessage.value.user.uId, "User id is different")
             assertEquals(
-                channel.channelId,
-                newMessage.value.channel.channelId,
+                channel.cId,
+                newMessage.value.channel.cId,
                 "Channel id is different",
             )
             assertEquals("Hello, World!", newMessage.value.msg, "Message is different")
@@ -157,7 +157,7 @@ class MessageServicesTest {
                     .createMessage(
                         "",
                         checkNotNull(user.uId) { "User id is null" },
-                        checkNotNull(channel.channelId) { "Channel id is null" },
+                        checkNotNull(channel.cId) { "Channel id is null" },
                         "2024-09-01 12:00:00",
                     )
             assertIs<Failure<MessageError.InvalidMessageInfo>>(newMessage, "Message creation should have failed")
@@ -174,7 +174,7 @@ class MessageServicesTest {
                     .createMessage(
                         "Hello, World!",
                         checkNotNull(user.uId) { "User id is null" },
-                        checkNotNull(channel.channelId) { "Channel id is null" },
+                        checkNotNull(channel.cId) { "Channel id is null" },
                         "2024-09-01 12:00:00",
                     )
             assertIs<Failure<MessageError.UserNotInChannel>>(newMessage, "Message creation should have failed")
@@ -192,7 +192,7 @@ class MessageServicesTest {
                     .createMessage(
                         "Hello, World!",
                         checkNotNull(user.uId) { "User id is null" },
-                        checkNotNull(channel.channelId) { "Channel id is null" },
+                        checkNotNull(channel.cId) { "Channel id is null" },
                         "2024-09-01 12:00:00",
                     )
             val newMessageSuccess =
@@ -200,15 +200,15 @@ class MessageServicesTest {
                     .createMessage(
                         "Hello, World!",
                         checkNotNull(owner.uId) { "Owner id is null" },
-                        checkNotNull(channel.channelId) { "Channel id is null" },
+                        checkNotNull(channel.cId) { "Channel id is null" },
                         "2024-09-01 12:00:01",
                     )
             assertIs<Success<Message>>(newMessageSuccess, "Message creation failed with error")
             assertNotNull(newMessageSuccess.value.msgId, "Message id is null")
             assertEquals(owner.uId, newMessageSuccess.value.user.uId, "User id is different")
             assertEquals(
-                channel.channelId,
-                newMessageSuccess.value.channel.channelId,
+                channel.cId,
+                newMessageSuccess.value.channel.cId,
                 "Channel id is different",
             )
             assertEquals("Hello, World!", newMessageSuccess.value.msg, "Message is different")
@@ -235,7 +235,7 @@ class MessageServicesTest {
                     .createMessage(
                         "Hello, World!",
                         checkNotNull(owner.uId) { "User id is null" },
-                        checkNotNull(channel.channelId) { "Channel id is null" },
+                        checkNotNull(channel.cId) { "Channel id is null" },
                         "2024-09-01 12:00:00",
                     )
             val newMessageFailure =
@@ -243,15 +243,15 @@ class MessageServicesTest {
                     .createMessage(
                         "Hello, World!",
                         checkNotNull(user.uId) { "User id is null" },
-                        checkNotNull(channel.channelId) { "Channel id is null" },
+                        checkNotNull(channel.cId) { "Channel id is null" },
                         "2024-09-01 12:00:01",
                     )
             assertIs<Success<Message>>(newMessageSuccess, "Message creation failed with error")
             assertNotNull(newMessageSuccess.value.msgId, "Message id is null")
             assertEquals(owner.uId, newMessageSuccess.value.user.uId, "User id is different")
             assertEquals(
-                channel.channelId,
-                newMessageSuccess.value.channel.channelId,
+                channel.cId,
+                newMessageSuccess.value.channel.cId,
                 "Channel id is different",
             )
             assertEquals("Hello, World!", newMessageSuccess.value.msg, "Message is different")
@@ -278,7 +278,7 @@ class MessageServicesTest {
                     .createMessage(
                         "Hello, World!",
                         checkNotNull(user.uId) { "User id is null" },
-                        checkNotNull(channel.channelId) { "Channel id is null" },
+                        checkNotNull(channel.cId) { "Channel id is null" },
                         "2024-09-01 12:00:00",
                     )
             assertIs<Success<Message>>(newMessage, "Message creation failed")
@@ -393,7 +393,7 @@ class MessageServicesTest {
                     .createMessage(
                         "Hello, World!",
                         checkNotNull(user.uId),
-                        checkNotNull(channel.channelId),
+                        checkNotNull(channel.cId),
                         "2024-09-01 12:00:00",
                     )
             assertIs<Success<Message>>(newMessage, "Message creation failed")
@@ -431,7 +431,7 @@ class MessageServicesTest {
                     .createMessage(
                         "Hello, World!",
                         123u,
-                        checkNotNull(channel.channelId) { "Channel id is null" },
+                        checkNotNull(channel.cId) { "Channel id is null" },
                         "2024-09-01 12:00:00",
                     )
             assertIs<Failure<MessageError.UserNotFound>>(newMessage, "Message creation should have failed")

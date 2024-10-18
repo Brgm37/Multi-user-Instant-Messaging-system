@@ -26,7 +26,7 @@ class MessageJDBC(
             )
         val channel =
             ChannelInfo(
-                channelId = getInt("msgChannelId").toUInt(),
+                cId = getInt("msgChannelId").toUInt(),
                 channelName = getString("msgChannelName").toChannelName(),
             )
         return Message(
@@ -56,7 +56,7 @@ class MessageJDBC(
         var idx = 1
         stm.setString(idx++, encrypt.encrypt(message.msg))
         stm.setInt(idx++, message.user.uId.toInt())
-        stm.setInt(idx++, message.channel.channelId.toInt())
+        stm.setInt(idx++, message.channel.cId.toInt())
         stm.setTimestamp(idx, message.creationTime)
         val rs = stm.executeQuery()
         return if (rs.next()) {
@@ -138,7 +138,7 @@ class MessageJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(updateQuery)
         var idx = 1
-        stm.setInt(idx++, entity.channel.channelId.toInt())
+        stm.setInt(idx++, entity.channel.cId.toInt())
         stm.setInt(idx++, entity.user.uId.toInt())
         stm.setString(idx++, encrypt.encrypt(entity.msg))
         stm.setString(idx++, entity.creationTime.toString())

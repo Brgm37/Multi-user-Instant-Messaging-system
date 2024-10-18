@@ -1,7 +1,6 @@
-package com.example.appWeb
+package com.example.appWeb.controller
 
 import TransactionManager
-import com.example.appWeb.controller.ChannelController
 import com.example.appWeb.model.dto.input.channel.CreateChannelInputModel
 import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputModel
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
@@ -91,7 +90,7 @@ class ChannelControllerTest {
                 channelServices
                     .createChannel(authenticated.uId, "name", READ_WRITE.name, PUBLIC.name)
             assertIs<Success<Channel>>(newChannel, "Channel creation failed")
-            val cId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
+            val cId = checkNotNull(newChannel.value.cId) { "Channel id is null" }
             getChannel(cId, authenticated).let { resp ->
                 assertEquals(HttpStatus.OK, resp.statusCode, "Status code is different")
                 assertIs<ChannelOutputModel>(resp.body, "Body is not a ChannelOutputModel")
@@ -252,7 +251,7 @@ class ChannelControllerTest {
                 channelServices
                     .createChannel(authenticated.uId, "name", READ_WRITE.name, PUBLIC.name)
             assertIs<Success<Channel>>(newChannel, "Channel creation failed")
-            val cId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
+            val cId = checkNotNull(newChannel.value.cId) { "Channel id is null" }
             createChannelInvitation(
                 CreateChannelInvitationInputModel(
                     channelId = cId,
@@ -275,7 +274,7 @@ class ChannelControllerTest {
                 channelServices
                     .createChannel(authenticated.uId, "name", READ_WRITE.name, PUBLIC.name)
             assertIs<Success<Channel>>(newChannel, "Channel creation failed")
-            val cId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
+            val cId = checkNotNull(newChannel.value.cId) { "Channel id is null" }
             createChannelInvitation(
                 CreateChannelInvitationInputModel(
                     channelId = cId,

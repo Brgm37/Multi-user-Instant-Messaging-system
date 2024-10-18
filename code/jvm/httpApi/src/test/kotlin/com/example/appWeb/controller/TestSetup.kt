@@ -1,4 +1,4 @@
-package com.example.appWeb
+package com.example.appWeb.controller
 
 import org.postgresql.ds.PGSimpleDataSource
 

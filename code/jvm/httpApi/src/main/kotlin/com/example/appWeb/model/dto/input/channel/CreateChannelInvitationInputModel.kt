@@ -18,10 +18,5 @@ data class CreateChannelInvitationInputModel(
     val accessControl: String? = null,
 ) {
     @AssertTrue(message = "Invalid access control")
-    fun isValidAccessControl(): Boolean =
-        AccessControl
-            .entries
-            .map(AccessControl::name)
-            .contains(accessControl?.uppercase()) ||
-            accessControl == null
+    fun isValidAccessControl(): Boolean = accessControl == null || AccessControl.validate(accessControl)
 }

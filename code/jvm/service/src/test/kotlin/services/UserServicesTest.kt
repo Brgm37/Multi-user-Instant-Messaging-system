@@ -130,7 +130,7 @@ class UserServicesTest {
         val channel = checkNotNull(channelRepo.createChannel(privateChannel))
         val invitation =
             ChannelInvitation(
-                channelId = checkNotNull(channel.channelId),
+                cId = checkNotNull(channel.cId),
                 expirationDate = expirationDate,
                 maxUses = 1u,
                 accessControl = AccessControl.READ_WRITE,
@@ -326,10 +326,10 @@ class UserServicesTest {
     fun `joining a Public channel successfully should return Unit`(manager: TransactionManager) {
         val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
         val channel = checkNotNull(createChannelPublic(manager, owner))
-        val channelId = checkNotNull(channel.channelId)
+        val cId = checkNotNull(channel.cId)
         val user = createUserWithInvitation(manager)
         val userId = checkNotNull(user.uId)
-        val result = UserServices(manager).joinChannel(userId, channelId, null)
+        val result = UserServices(manager).joinChannel(userId, cId, null)
         assertIs<Success<Unit>>(result)
         assertEquals(Unit, result.value)
     }
@@ -343,7 +343,7 @@ class UserServicesTest {
         val userId = checkNotNull(user.uId)
         val userServices = UserServices(manager)
         val result =
-            channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.invitationCode.toString()) }
+            channel.cId?.let { userServices.joinChannel(userId, it, invitationCode.invitationCode.toString()) }
         assertIs<Success<Unit>>(result)
         assertEquals(Unit, result.value)
     }
@@ -367,7 +367,7 @@ class UserServicesTest {
         val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
         val channel = checkNotNull(createChannelPublic(manager, owner))
         val userServices = UserServices(manager)
-        val result = channel.channelId?.let { userServices.joinChannel(0u, it, null) }
+        val result = channel.cId?.let { userServices.joinChannel(0u, it, null) }
         assertIs<Failure<UserError.UserNotFound>>(result)
         assertEquals(UserError.UserNotFound, result.value)
     }
@@ -382,10 +382,10 @@ class UserServicesTest {
         val user = createUserWithInvitation(manager)
         val userId = checkNotNull(user.uId)
         val userServices = UserServices(manager)
-        val result = channel.channelId?.let { userServices.joinChannel(userId, it, null) }
+        val result = channel.cId?.let { userServices.joinChannel(userId, it, null) }
         assertIs<Success<Unit>>(result)
         assertEquals(Unit, result.value)
-        val result2 = channel.channelId?.let { userServices.joinChannel(userId, it, null) }
+        val result2 = channel.cId?.let { userServices.joinChannel(userId, it, null) }
         assertIs<Success<Unit>>(result2)
         assertEquals(Unit, result2.value)
     }
@@ -398,7 +398,7 @@ class UserServicesTest {
         val user = createUserWithInvitation(manager)
         val userId = checkNotNull(user.uId)
         val userServices = UserServices(manager)
-        val result = channel.channelId?.let { userServices.joinChannel(userId, it, null) }
+        val result = channel.cId?.let { userServices.joinChannel(userId, it, null) }
         assertIs<Success<Unit>>(result)
         assertEquals(Unit, result.value)
     }
@@ -413,7 +413,7 @@ class UserServicesTest {
         val user = createUserWithInvitation(manager)
         val userId = checkNotNull(user.uId)
         val userServices = UserServices(manager)
-        val result = channel.channelId?.let { userServices.joinChannel(userId, it, null) }
+        val result = channel.cId?.let { userServices.joinChannel(userId, it, null) }
         assertIs<Failure<UserError.InvitationCodeIsInvalid>>(result)
         assertEquals(UserError.InvitationCodeIsInvalid, result.value)
     }
@@ -434,7 +434,7 @@ class UserServicesTest {
         val userId = checkNotNull(user.uId)
         val userServices = UserServices(manager)
         val result =
-            channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.invitationCode.toString()) }
+            channel.cId?.let { userServices.joinChannel(userId, it, invitationCode.invitationCode.toString()) }
         assertIs<Failure<UserError.InvitationCodeHasExpired>>(result)
         assertEquals(UserError.InvitationCodeHasExpired, result.value)
     }
@@ -454,12 +454,12 @@ class UserServicesTest {
         val userId = checkNotNull(user.uId)
         val userServices = UserServices(manager)
         val result =
-            channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.invitationCode.toString()) }
+            channel.cId?.let { userServices.joinChannel(userId, it, invitationCode.invitationCode.toString()) }
         assertIs<Success<Unit>>(result)
         val user2 = checkNotNull(ChannelServicesTest.makeUser(manager, "user2"))
         val user2Id = checkNotNull(user2.uId)
         val result2 =
-            channel.channelId?.let { userServices.joinChannel(user2Id, it, invitationCode.invitationCode.toString()) }
+            channel.cId?.let { userServices.joinChannel(user2Id, it, invitationCode.invitationCode.toString()) }
         assertIs<Failure<UserError.InvitationCodeMaxUsesReached>>(result2)
         assertEquals(UserError.InvitationCodeMaxUsesReached, result2.value)
     }
