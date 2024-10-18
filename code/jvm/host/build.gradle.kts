@@ -48,7 +48,7 @@ tasks.test {
     )
     environment(
         "DB_POOL_SIZE",
-        "100",
+        "10",
     )
     environment(
         "AES_KEY",
