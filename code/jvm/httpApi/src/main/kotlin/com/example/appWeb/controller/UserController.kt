@@ -116,7 +116,7 @@ class UserController(
     fun logout(authenticated: AuthenticatedUserInputModel): ResponseEntity<*> =
         when (val response = userService.logout(authenticated.token, authenticated.uId)) {
             is Success -> {
-                ResponseEntity.ok(response.value)
+                ResponseEntity.ok().build<Any>()
             }
 
             is Failure -> {
@@ -138,7 +138,7 @@ class UserController(
     ): ResponseEntity<*> =
         when (val response = userService.joinChannel(userId, channelId, invitationCode)) {
             is Success -> {
-                ResponseEntity.ok(response.value)
+                ResponseEntity.ok().build<Any>()
             }
 
             is Failure -> {

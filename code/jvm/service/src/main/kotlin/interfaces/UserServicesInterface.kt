@@ -46,7 +46,7 @@ interface UserServicesInterface {
     fun joinChannel(
         userId: UInt,
         channelId: UInt,
-        invitationCode: String,
+        invitationCode: String?,
     ): Either<Error, Unit>
 
     /**
@@ -83,9 +83,13 @@ interface UserServicesInterface {
 
     /**
      * Logs out a user.
-     * @param token The authentication token of the user.
+     * @param token The authentication token of the user logging out.
+     * @param uId The id of the user logging out.
      */
-    fun logout(token: String): Either<UserError, Unit>
+    fun logout(
+        token: String,
+        uId: UInt,
+    ): Either<UserError, Unit>
 
     /**
      * Creates an invitation.

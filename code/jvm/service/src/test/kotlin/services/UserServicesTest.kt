@@ -3,15 +3,15 @@ package services
 import TransactionManager
 import errors.ChannelError
 import errors.UserError
-import errors.UserError.InvitationCodeMaxUsesReached
 import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
 import model.channels.AccessControl
 import model.channels.Channel
 import model.channels.ChannelInvitation
-import model.channels.Visibility
+import model.channels.ChannelName
 import model.users.Password
 import model.users.User
+import model.users.UserInfo
 import model.users.UserInvitation
 import model.users.UserToken
 import org.junit.jupiter.params.ParameterizedTest
@@ -21,7 +21,6 @@ import utils.Success
 import utils.encryption.DummyEncrypt
 import java.sql.Timestamp
 import java.time.LocalDateTime
-import java.util.UUID
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -70,50 +69,6 @@ class UserServicesTest {
     }
 
     /**
-     * Create a channel with an invitation
-     * @param manager The transaction manager.
-     * @param owner The owner of the channel
-     * @return The channel created and the invitation code
-     */
-    private fun createChannelWithInvitation(
-        manager: TransactionManager,
-        owner: User,
-        channelVisibility: String = Visibility.PUBLIC.name,
-        invitationExpirationDate: String = Timestamp.valueOf(LocalDateTime.now().plusHours(1)).toString(),
-        invitationAccessControl: String = AccessControl.READ_WRITE.name,
-    ): Pair<Channel, UUID> {
-        val channel = createChannelWithoutInvitation(manager, owner, channelVisibility)
-        val invitationCode = UUID.randomUUID()
-        val inviterId = checkNotNull(owner.uId)
-        val invitationTimestamp = Timestamp.valueOf(invitationExpirationDate)
-        val invitationUser = UserInvitation(inviterId, invitationTimestamp)
-        val invitationChannel =
-            ChannelInvitation(
-                channelId = checkNotNull(channel.channelId),
-                expirationDate = invitationTimestamp,
-                maxUses = 1u,
-                accessControl = AccessControl.valueOf(invitationAccessControl),
-            )
-        manager.run {
-            userRepo.createInvitation(invitationUser)
-            channelRepo.createInvitation(invitationChannel)
-        }
-        return Pair(channel, invitationCode)
-    }
-
-    private fun createChannelWithoutInvitation(
-        manager: TransactionManager,
-        owner: User,
-        channelVisibility: String = Visibility.PUBLIC.name,
-    ): Channel {
-        val channelServices = ChannelServices(manager)
-        val ownerId = checkNotNull(owner.uId) { "Owner id is null" }
-        return channelServices
-            .createChannel(ownerId, "name", AccessControl.READ_WRITE.name, channelVisibility)
-            .let { (it as Success).value }
-    }
-
-    /**
      * Create a user with an invitation
      * @param manager The transaction manager.
      * @return The user created
@@ -131,6 +86,57 @@ class UserServicesTest {
                 )
                 as Success<User>
         return user.value
+    }
+
+    /**
+     * Create a public channel with an invitation
+     * @param manager The transaction manager.
+     * @param owner The owner of the channel
+     * @return The channel and the invitation code
+     */
+    private fun createChannelPublic(
+        manager: TransactionManager,
+        owner: User,
+    ) = manager.run {
+        val ownerId = checkNotNull(owner.uId)
+        val channel =
+            Channel.Public(
+                owner = UserInfo(ownerId, owner.username),
+                name = ChannelName("channel", owner.username),
+                accessControl = AccessControl.READ_WRITE,
+            )
+        return@run channelRepo.createChannel(channel)
+    }
+
+    /**
+     * Create a private channel with an invitation
+     * @param manager The transaction manager.
+     * @param owner The owner of the channel
+     * @param expirationDate The expiration date of the invitation
+     * @return a Private channel and a ChannelInvitation to join that channel
+     */
+    private fun createPrivateChannel(
+        manager: TransactionManager,
+        owner: User,
+        expirationDate: Timestamp = Timestamp.valueOf(LocalDateTime.now().plusHours(1)),
+    ) = manager.run {
+        val ownerId = checkNotNull(owner.uId)
+        val privateChannel =
+            Channel.Private(
+                owner = UserInfo(ownerId, owner.username),
+                name = ChannelName("channel", owner.username),
+                accessControl = AccessControl.READ_WRITE,
+            )
+        val channel = checkNotNull(channelRepo.createChannel(privateChannel))
+        val invitation =
+            ChannelInvitation(
+                channelId = checkNotNull(channel.channelId),
+                expirationDate = expirationDate,
+                maxUses = 1u,
+                accessControl = AccessControl.READ_WRITE,
+            )
+        channelRepo.createInvitation(invitation)
+        return@run Pair(channel, invitation)
     }
 
     @ParameterizedTest
@@ -319,11 +325,11 @@ class UserServicesTest {
     @MethodSource("transactionManagers")
     fun `joining a Public channel successfully should return Unit`(manager: TransactionManager) {
         val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val (channel, invitationCode) = createChannelWithInvitation(manager, owner)
+        val channel = checkNotNull(createChannelPublic(manager, owner))
+        val channelId = checkNotNull(channel.channelId)
         val user = createUserWithInvitation(manager)
         val userId = checkNotNull(user.uId)
-        val userServices = UserServices(manager)
-        val result = channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.toString()) }
+        val result = UserServices(manager).joinChannel(userId, channelId, null)
         assertIs<Success<Unit>>(result)
         assertEquals(Unit, result.value)
     }
@@ -332,11 +338,12 @@ class UserServicesTest {
     @MethodSource("transactionManagers")
     fun `joining a Private channel successfully should return Unit`(manager: TransactionManager) {
         val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val (channel, invitationCode) = createChannelWithInvitation(manager, owner, Visibility.PRIVATE.name)
+        val (channel, invitationCode) = createPrivateChannel(manager, owner)
         val user = createUserWithInvitation(manager)
         val userId = checkNotNull(user.uId)
         val userServices = UserServices(manager)
-        val result = channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.toString()) }
+        val result =
+            channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.invitationCode.toString()) }
         assertIs<Success<Unit>>(result)
         assertEquals(Unit, result.value)
     }
@@ -358,9 +365,9 @@ class UserServicesTest {
     @MethodSource("transactionManagers")
     fun `trying to join a channel with a nonexistent user should return UserNotFound`(manager: TransactionManager) {
         val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val (channel, invitationCode) = createChannelWithInvitation(manager, owner)
+        val channel = checkNotNull(createChannelPublic(manager, owner))
         val userServices = UserServices(manager)
-        val result = channel.channelId?.let { userServices.joinChannel(0u, it, invitationCode.toString()) }
+        val result = channel.channelId?.let { userServices.joinChannel(0u, it, null) }
         assertIs<Failure<UserError.UserNotFound>>(result)
         assertEquals(UserError.UserNotFound, result.value)
     }
@@ -371,14 +378,14 @@ class UserServicesTest {
         manager: TransactionManager,
     ) {
         val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val (channel, invitationCode) = createChannelWithInvitation(manager, owner)
+        val channel = checkNotNull(createChannelPublic(manager, owner))
         val user = createUserWithInvitation(manager)
         val userId = checkNotNull(user.uId)
         val userServices = UserServices(manager)
-        val result = channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.toString()) }
+        val result = channel.channelId?.let { userServices.joinChannel(userId, it, null) }
         assertIs<Success<Unit>>(result)
         assertEquals(Unit, result.value)
-        val result2 = channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.toString()) }
+        val result2 = channel.channelId?.let { userServices.joinChannel(userId, it, null) }
         assertIs<Success<Unit>>(result2)
         assertEquals(Unit, result2.value)
     }
@@ -387,11 +394,11 @@ class UserServicesTest {
     @MethodSource("transactionManagers")
     fun `joining a public channel should return Unit`(manager: TransactionManager) {
         val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val (channel, _) = createChannelWithInvitation(manager, owner, Visibility.PUBLIC.name)
+        val channel = checkNotNull(createChannelPublic(manager, owner))
         val user = createUserWithInvitation(manager)
         val userId = checkNotNull(user.uId)
         val userServices = UserServices(manager)
-        val result = channel.channelId?.let { userServices.joinChannel(userId, it, "") }
+        val result = channel.channelId?.let { userServices.joinChannel(userId, it, null) }
         assertIs<Success<Unit>>(result)
         assertEquals(Unit, result.value)
     }
@@ -402,11 +409,11 @@ class UserServicesTest {
         manager: TransactionManager,
     ) {
         val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val channel = createChannelWithoutInvitation(manager, owner, Visibility.PRIVATE.name)
+        val (channel, _) = createPrivateChannel(manager, owner)
         val user = createUserWithInvitation(manager)
         val userId = checkNotNull(user.uId)
         val userServices = UserServices(manager)
-        val result = channel.channelId?.let { userServices.joinChannel(userId, it, "") }
+        val result = channel.channelId?.let { userServices.joinChannel(userId, it, null) }
         assertIs<Failure<UserError.InvitationCodeIsInvalid>>(result)
         assertEquals(UserError.InvitationCodeIsInvalid, result.value)
     }
@@ -418,16 +425,16 @@ class UserServicesTest {
     ) {
         val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
         val (channel, invitationCode) =
-            createChannelWithInvitation(
+            createPrivateChannel(
                 manager = manager,
                 owner = owner,
-                channelVisibility = Visibility.PRIVATE.name,
-                invitationExpirationDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5)).toString(),
+                expirationDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5)),
             )
         val user = createUserWithInvitation(manager)
         val userId = checkNotNull(user.uId)
         val userServices = UserServices(manager)
-        val result = channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.toString()) }
+        val result =
+            channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.invitationCode.toString()) }
         assertIs<Failure<UserError.InvitationCodeHasExpired>>(result)
         assertEquals(UserError.InvitationCodeHasExpired, result.value)
     }
@@ -439,21 +446,22 @@ class UserServicesTest {
     ) {
         val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
         val (channel, invitationCode) =
-            createChannelWithInvitation(
+            createPrivateChannel(
                 manager = manager,
                 owner = owner,
-                channelVisibility = Visibility.PRIVATE.name,
             )
         val user = createUserWithInvitation(manager)
         val userId = checkNotNull(user.uId)
         val userServices = UserServices(manager)
-        val result = channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.toString()) }
+        val result =
+            channel.channelId?.let { userServices.joinChannel(userId, it, invitationCode.invitationCode.toString()) }
         assertIs<Success<Unit>>(result)
         val user2 = checkNotNull(ChannelServicesTest.makeUser(manager, "user2"))
         val user2Id = checkNotNull(user2.uId)
-        val result2 = channel.channelId?.let { userServices.joinChannel(user2Id, it, invitationCode.toString()) }
-        assertIs<Failure<InvitationCodeMaxUsesReached>>(result2)
-        assertEquals(InvitationCodeMaxUsesReached, result2.value)
+        val result2 =
+            channel.channelId?.let { userServices.joinChannel(user2Id, it, invitationCode.invitationCode.toString()) }
+        assertIs<Failure<UserError.InvitationCodeMaxUsesReached>>(result2)
+        assertEquals(UserError.InvitationCodeMaxUsesReached, result2.value)
     }
 
     @ParameterizedTest
@@ -564,7 +572,7 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val user = checkNotNull(ChannelServicesTest.makeUser(manager))
         val token = userServices.login(user.username, validPassword) as Success<UserToken>
-        val result = userServices.logout(token.value.token.toString())
+        val result = userServices.logout(token.value.token.toString(), checkNotNull(user.uId))
         assertIs<Success<Unit>>(result)
         assertEquals(Unit, result.value)
     }
@@ -573,7 +581,19 @@ class UserServicesTest {
     @MethodSource("transactionManagers")
     fun `trying to logout with a nonexistent token should return TokenNotFound`(manager: TransactionManager) {
         val userServices = UserServices(manager)
-        val result = userServices.deleteUser(0u)
+        val user = checkNotNull(ChannelServicesTest.makeUser(manager))
+        val result = userServices.logout("nonexistent_token", checkNotNull(user.uId))
+        assertIs<Failure<UserError.TokenNotFound>>(result)
+        assertEquals(UserError.TokenNotFound, result.value)
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `trying to logout with a nonexistent user should return UserNotFound`(manager: TransactionManager) {
+        val userServices = UserServices(manager)
+        val user = checkNotNull(ChannelServicesTest.makeUser(manager))
+        val token = userServices.login(user.username, validPassword) as Success<UserToken>
+        val result = userServices.logout(token.value.token.toString(), 0u)
         assertIs<Failure<UserError.UserNotFound>>(result)
         assertEquals(UserError.UserNotFound, result.value)
     }
