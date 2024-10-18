@@ -11,10 +11,74 @@ import java.sql.Connection
 import java.sql.ResultSet
 import java.util.UUID
 
-/**
- * Represent the maximum number of authentication tokens that a user can have.
- */
+private val USERS_TABLE = "users"
 
+/**
+ * The name of the column in the [USERS_TABLE] that stores the user id
+ */
+private const val USERS_TABLE_ID = "id"
+
+/**
+ * The name of the column in the [USERS_TABLE] that stores the username
+ */
+private const val USERS_TABLE_NAME = "name"
+
+/**
+ * The name of the column in the [USERS_TABLE] that stores the password
+ */
+private const val USERS_TABLE_PASSWORD = "password"
+
+/**
+ * The name of the table that stores the user invitations
+ */
+private const val USERS_INVITATIONS_TABLE = "users_invitations"
+
+/**
+ * The name of the column in the [USERS_INVITATIONS_TABLE] that stores the user id
+ */
+private const val USERS_INVITATIONS_TABLE_USER_ID = "user_id"
+
+/**
+ * The name of the column in the [USERS_INVITATIONS_TABLE] that stores the invitation code
+ */
+private const val USERS_INVITATIONS_TABLE_INVITATION = "invitation"
+
+/**
+ * The name of the column in the [USERS_INVITATIONS_TABLE] that stores the expiration date
+ */
+private const val USERS_INVITATIONS_TABLE_EXPIRATION_DATE = "expiration_date"
+
+/**
+ * The name of the table that stores the user tokens
+ */
+private const val USERS_TOKENS_TABLE = "users_tokens"
+
+/**
+ * The name of the column in the [USERS_TOKENS_TABLE] that stores the user id
+ */
+private const val USERS_TOKENS_TABLE_USER_ID = "user_id"
+
+/**
+ * The name of the column in the [USERS_TOKENS_TABLE] that stores the token
+ */
+private const val USERS_TOKENS_TABLE_TOKEN = "token"
+
+/**
+ * The name of the column in the [USERS_TOKENS_TABLE] that stores the creation date
+ */
+private const val USERS_TOKENS_TABLE_CREATION = "creation"
+
+/**
+ * The name of the column in the [USERS_TOKENS_TABLE] that stores the expiration date
+ */
+private const val USERS_TOKENS_TABLE_EXPIRATION = "expiration"
+
+/**
+ * UserJDBC is a JDBC implementation of UserRepositoryInterface
+ *
+ * @property connection a JDBC Connection
+ * @property encrypt an encryption utility to use
+ */
 class UserJDBC(
     private val connection: Connection,
     private val encrypt: Encrypt = DummyEncrypt,
@@ -25,16 +89,16 @@ class UserJDBC(
 
     private fun ResultSet.toUser(): User =
         User(
-            uId = getInt("id").toUInt(),
-            username = getString("name"),
-            password = Password(getString(("password"))),
+            uId = getInt(USERS_TABLE_ID).toUInt(),
+            username = getString(USERS_TABLE_NAME),
+            password = Password(getString((USERS_TABLE_PASSWORD))),
         )
 
     private fun ResultSet.toUserInvitation(): UserInvitation =
         UserInvitation(
-            inviterId = getInt("user_id").toUInt(),
-            invitationCode = UUID.fromString(encrypt.decrypt(getString("invitation"))),
-            expirationDate = getTimestamp("expiration_date"),
+            inviterId = getInt(USERS_INVITATIONS_TABLE_USER_ID).toUInt(),
+            invitationCode = UUID.fromString(encrypt.decrypt(getString(USERS_INVITATIONS_TABLE_INVITATION))),
+            expirationDate = getTimestamp(USERS_INVITATIONS_TABLE_EXPIRATION_DATE),
         )
 
     override fun createUser(user: User): User? {
@@ -49,7 +113,7 @@ class UserJDBC(
         stm.setString(idx, encrypt.encrypt(user.password.value))
         val rs = stm.executeQuery()
         return if (rs.next()) {
-            user.copy(uId = rs.getInt("id").toUInt())
+            user.copy(uId = rs.getInt(USERS_TABLE_ID).toUInt())
         } else {
             null
         }
@@ -125,7 +189,7 @@ class UserJDBC(
         stm.setString(1, token)
         val rs = stm.executeQuery()
         return if (rs.next()) {
-            findById(rs.getInt("user_id").toUInt())
+            findById(rs.getInt(USERS_INVITATIONS_TABLE_USER_ID).toUInt())
         } else {
             null
         }
@@ -278,7 +342,7 @@ class UserJDBC(
 
     @Suppress("SqlWithoutWhere")
     override fun clear() {
-        val tables = listOf("users_tokens", "users_invitations", "users")
+        val tables = listOf(USERS_TOKENS_TABLE, USERS_INVITATIONS_TABLE, USERS_TABLE)
 
         for (table in tables) {
             val deleteQuery = "DELETE FROM $table"

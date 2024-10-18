@@ -7,10 +7,11 @@ import model.users.Password
 
 /**
  * Represents the user input model for the sign-up operation.
- * @param username The username of the user
- * @param password The password of the user
- * @param invitationCode The invitation code to join the app
- * @param inviterUId The inviter user id
+ *
+ * @property username The username of the user signing up.
+ * @property password The password of the user signing up.
+ * @property invitationCode The invitation code used to sign up.
+ * @property inviterUId The id of the user that invited the user signing up.
  */
 data class UserSignUpInputModel(
     @get:NotBlank val username: String,

@@ -4,7 +4,8 @@ import model.users.User
 
 /**
  * Represents the output model for a user
- * @param username The username of the user
+ *
+ * @property username The username of the user
  */
 data class UserInfoOutputModel(
     val username: String,

@@ -8,6 +8,9 @@ import javax.sql.DataSource
 
 /**
  * TransactionManager implementation using JDBC
+ *
+ * @property dataSource the data source to connect to the database
+ * @property encrypt the encryption utility to use
  */
 class TransactionManagerJDBC(
     private val dataSource: DataSource,

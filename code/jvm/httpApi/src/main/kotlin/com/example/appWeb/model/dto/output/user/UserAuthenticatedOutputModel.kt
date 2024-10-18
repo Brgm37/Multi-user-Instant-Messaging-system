@@ -4,8 +4,9 @@ import model.users.UserToken
 
 /**
  * Represents the output model for a user authenticated
- * @param uId The user id
- * @param token The token of the user
+ *
+ * @property uId The user id of the authenticated user
+ * @property token The authentication token of the user authenticated
  */
 data class UserAuthenticatedOutputModel(
     val uId: UInt,

@@ -14,6 +14,10 @@ import utils.failure
 import utils.success
 import java.sql.Timestamp
 
+/**
+ * The services available for the message entity.
+ * @property repoManager The transaction manager.
+ */
 @Named("MessageServices")
 class MessageServices(
     private val repoManager: TransactionManager,

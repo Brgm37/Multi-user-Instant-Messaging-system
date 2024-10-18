@@ -167,7 +167,7 @@ class ChannelJDBCTest {
             val invitation =
                 ChannelInvitation(
                     cId = id,
-                    expirationDate = expirationDate,
+                    expirationDate = Timestamp(expirationDate.time),
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
@@ -183,7 +183,7 @@ class ChannelJDBCTest {
             val invitation =
                 ChannelInvitation(
                     cId = id,
-                    expirationDate = expirationDate,
+                    expirationDate = Timestamp(expirationDate.time),
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
@@ -201,7 +201,7 @@ class ChannelJDBCTest {
             val invitation =
                 ChannelInvitation(
                     cId = id,
-                    expirationDate = expirationDate,
+                    expirationDate = Timestamp(expirationDate.time),
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
