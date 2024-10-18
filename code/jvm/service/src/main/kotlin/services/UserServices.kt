@@ -78,7 +78,7 @@ class UserServices(
     override fun joinChannel(
         userId: UInt,
         channelId: UInt,
-        invitationCode: String,
+        invitationCode: String?,
     ): Either<Error, Unit> {
         return repoManager.run {
             val channel =
@@ -91,15 +91,17 @@ class UserServices(
                 channelRepo.joinChannel(channelId, userId, channel.accessControl)
                 return@run success(Unit)
             }
-            val invitation =
-                channelRepo.findInvitation(channelId) ?: return@run failure(UserError.InvitationCodeIsInvalid)
+            val invitation = channelRepo.findInvitation(channelId) ?: return@run failure(InvitationCodeIsInvalid)
+            if (invitationCode != invitation.invitationCode.toString()) {
+                return@run failure(InvitationCodeIsInvalid)
+            }
             if (invitation.isExpired) {
                 channelRepo.deleteInvitation(channelId)
-                return@run failure(UserError.InvitationCodeHasExpired)
+                return@run failure(InvitationCodeHasExpired)
             }
             if (invitation.maxUses == 0u) {
                 channelRepo.deleteInvitation(channelId)
-                return@run failure(UserError.InvitationCodeMaxUsesReached)
+                return@run failure(InvitationCodeMaxUsesReached)
             }
             channelRepo.updateInvitation(invitation.decrementUses())
             channelRepo.joinChannel(channelId, userId, invitation.accessControl)
@@ -149,9 +151,14 @@ class UserServices(
         }
     }
 
-    override fun logout(token: String): Either<UserError, Unit> =
+    override fun logout(
+        token: String,
+        uId: UInt,
+    ): Either<UserError, Unit> =
         repoManager.run {
-            if (userRepo.deleteToken(token)) success(Unit) else failure(UserError.TokenNotFound)
+            if (!userRepo.validateToken(token)) return@run failure(UserError.TokenNotFound)
+            if (userRepo.findById(uId) == null) return@run failure(UserError.UserNotFound)
+            if (!userRepo.deleteToken(token)) return@run failure(UserError.UnableToDeleteToken)
             success(Unit)
         }
 
