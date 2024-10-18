@@ -8,13 +8,9 @@ sealed class UserError : Error() {
 
     data object UnableToCreateUser : UserError()
 
-    data object InvalidUserInfo : UserError()
-
     data object UsernameIsEmpty : UserError()
 
     data object PasswordIsInvalid : UserError()
-
-    data object InvalidInviter : UserError()
 
     data object InviterNotFound : UserError()
 
@@ -33,4 +29,6 @@ sealed class UserError : Error() {
     data object UnableToCreateInvitation : UserError()
 
     data object InvitationCodeMaxUsesReached : UserError()
+
+    data object UnableToDeleteToken : UserError()
 }

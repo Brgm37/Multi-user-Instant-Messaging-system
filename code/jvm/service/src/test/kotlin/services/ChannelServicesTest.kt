@@ -71,7 +71,7 @@ class ChannelServicesTest {
             val name = "name"
             val newChannel = createChannel(uId, name, READ_WRITE.name, PUBLIC.name)
             assertIs<Success<Channel>>(newChannel, "Channel creation failed")
-            assertNotNull(newChannel.value.channelId, "Channel id is null")
+            assertNotNull(newChannel.value.cId, "Channel id is null")
             assertEquals(uId, newChannel.value.owner.uId, "Owner id is different")
             val expectedName = ChannelName(name, user.username)
             assertEquals(
@@ -128,8 +128,8 @@ class ChannelServicesTest {
             val uId = checkNotNull(user.uId) { "Owner id is null" }
             val newChannel = createChannel(uId, "name", READ_WRITE.name, PUBLIC.name)
             assertIs<Success<Channel>>(newChannel, "Channel creation failed")
-            assertNotNull(newChannel.value.channelId, "Channel id is null")
-            val newChannelId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
+            assertNotNull(newChannel.value.cId, "Channel id is null")
+            val newChannelId = checkNotNull(newChannel.value.cId) { "Channel id is null" }
             val result = deleteChannel(newChannelId)
             assertIs<Success<Unit>>(result, "Channel deletion failed")
         }
@@ -150,8 +150,8 @@ class ChannelServicesTest {
             val uId = checkNotNull(user.uId) { "Owner id is null" }
             val newChannel = createChannel(uId, "name", READ_WRITE.name, PUBLIC.name)
             assertIs<Success<Channel>>(newChannel, "Channel creation failed")
-            assertNotNull(newChannel.value.channelId, "Channel id is null")
-            val newChannelId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
+            assertNotNull(newChannel.value.cId, "Channel id is null")
+            val newChannelId = checkNotNull(newChannel.value.cId) { "Channel id is null" }
             val result = getChannel(newChannelId)
             assertIs<Success<Channel>>(result, "Channel retrieval failed")
             assertEquals(newChannel.value, result.value, "Channel is different")
@@ -175,7 +175,7 @@ class ChannelServicesTest {
             repeat(nr) {
                 val newChannel = createChannel(ownerId, "name$it", READ_WRITE.name, PUBLIC.name)
                 assertIs<Success<Channel>>(newChannel, "Channel creation failed")
-                assertNotNull(newChannel.value.channelId, "Channel id is null")
+                assertNotNull(newChannel.value.cId, "Channel id is null")
             }
             val result = getChannels(0u, nr.toUInt())
             assertIs<Success<List<Channel>>>(result, "Channels retrieval failed")
@@ -191,7 +191,7 @@ class ChannelServicesTest {
             repeat(nr) {
                 val newChannel = createChannel(ownerId, "name$it", READ_WRITE.name, PUBLIC.name)
                 assertIs<Success<Channel>>(newChannel, "Channel creation failed")
-                assertNotNull(newChannel.value.channelId, "Channel id is null")
+                assertNotNull(newChannel.value.cId, "Channel id is null")
             }
             val result = getChannels(ownerId, 0u, nr.toUInt())
             assertIs<Success<List<Channel>>>(result, "Channels retrieval failed")
@@ -207,7 +207,7 @@ class ChannelServicesTest {
             repeat(nr) {
                 val newChannel = createChannel(uId, "name$it", READ_WRITE.name, PRIVATE.name)
                 assertIs<Success<Channel>>(newChannel, "Channel creation failed")
-                assertNotNull(newChannel.value.channelId, "Channel id is null")
+                assertNotNull(newChannel.value.cId, "Channel id is null")
             }
             val result = getChannels(0u, 0u, nr.toUInt())
             assertIs<Failure<ChannelError>>(result, "Channels retrieval should have failed")
@@ -221,8 +221,8 @@ class ChannelServicesTest {
             val uId = checkNotNull(user.uId) { "Owner id is null" }
             val newChannel = createChannel(uId, "name", READ_WRITE.name, PUBLIC.name)
             assertIs<Success<Channel>>(newChannel, "Channel creation failed")
-            assertNotNull(newChannel.value.channelId, "Channel id is null")
-            val newChannelId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
+            assertNotNull(newChannel.value.cId, "Channel id is null")
+            val newChannelId = checkNotNull(newChannel.value.cId) { "Channel id is null" }
             val result =
                 createChannelInvitation(
                     newChannelId,
@@ -241,8 +241,8 @@ class ChannelServicesTest {
             val uId = checkNotNull(user.uId) { "Owner id is null" }
             val newChannel = createChannel(uId, "name", READ_WRITE.name, PUBLIC.name)
             assertIs<Success<Channel>>(newChannel, "Channel creation failed")
-            assertNotNull(newChannel.value.channelId, "Channel id is null")
-            val newChannelId = checkNotNull(newChannel.value.channelId) { "Channel id is null" }
+            assertNotNull(newChannel.value.cId, "Channel id is null")
+            val newChannelId = checkNotNull(newChannel.value.cId) { "Channel id is null" }
             val result =
                 createChannelInvitation(
                     newChannelId,

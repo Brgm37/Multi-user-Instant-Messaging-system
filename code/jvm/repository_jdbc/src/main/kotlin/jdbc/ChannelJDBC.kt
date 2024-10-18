@@ -124,6 +124,7 @@ private const val CHANNELS_INVITATIONS_MAX_USES = "max_uses"
 /**
  * A JDBC implementation of the [ChannelRepositoryInterface].
  * @property connection The connection to the database.
+ * @property encrypt The encryption algorithm.
  * @constructor Creates a [ChannelJDBC] with the given connection.
  */
 class ChannelJDBC(
@@ -162,7 +163,7 @@ class ChannelJDBC(
         val accessControl = AccessControl.valueOf(getString(CHANNELS_INVITATIONS_ACCESS_CONTROL).uppercase())
         val maxUses = getInt(CHANNELS_INVITATIONS_MAX_USES)
         return ChannelInvitation(
-            channelId = id,
+            cId = id,
             expirationDate = expirationDate,
             invitationCode = UUID.fromString(invitation),
             accessControl = accessControl,
@@ -202,7 +203,7 @@ class ChannelJDBC(
                 setString(idx++, PRIVATE.name)
             }
         }
-        val id = channel.channelId
+        val id = channel.cId
         if (id != null) {
             setInt(idx, id.toInt())
         }
@@ -219,8 +220,8 @@ class ChannelJDBC(
         val rs = stm.executeQuery()
         return if (rs.next()) {
             when (channel) {
-                is Channel.Public -> channel.copy(channelId = rs.getInt(CHANNELS_TABLE_ID).toUInt())
-                is Channel.Private -> channel.copy(channelId = rs.getInt(CHANNELS_TABLE_ID).toUInt())
+                is Channel.Public -> channel.copy(cId = rs.getInt(CHANNELS_TABLE_ID).toUInt())
+                is Channel.Private -> channel.copy(cId = rs.getInt(CHANNELS_TABLE_ID).toUInt())
             }
         } else {
             null
@@ -313,7 +314,7 @@ class ChannelJDBC(
         val stm = connection.prepareStatement(updateQuery)
         var idx = 1
         stm.setInt(idx++, invitation.maxUses.toInt())
-        stm.setInt(idx, invitation.channelId.toInt())
+        stm.setInt(idx, invitation.cId.toInt())
         stm.executeUpdate()
     }
 
@@ -336,7 +337,7 @@ class ChannelJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         var idx = 1
-        stm.setInt(idx++, invitation.channelId.toInt())
+        stm.setInt(idx++, invitation.cId.toInt())
         stm.setTimestamp(idx++, invitation.expirationDate)
         stm.setString(idx++, encrypt.encrypt(invitation.invitationCode.toString()))
         stm.setString(idx++, invitation.accessControl.toString())

@@ -111,7 +111,7 @@ class ChannelJDBCTest {
     @Test
     fun `find a channel by id`() =
         testSetup { _, channel ->
-            val id = checkNotNull(channel.channelId) { "Channel id is null" }
+            val id = checkNotNull(channel.cId) { "Channel id is null" }
             val foundChannel = findById(id)
             assertEquals(channel, foundChannel)
         }
@@ -138,7 +138,7 @@ class ChannelJDBCTest {
     @Test
     fun `test update a channel`() =
         testSetup { user, channel ->
-            val id = checkNotNull(channel.channelId) { "Channel id is null" }
+            val id = checkNotNull(channel.cId) { "Channel id is null" }
             assertIs<Channel.Private>(channel, "Channel is not private")
             val updatedChannel = channel.copy(name = ChannelName("newName", user.username))
             save(updatedChannel)
@@ -149,10 +149,10 @@ class ChannelJDBCTest {
     @Test
     fun `test create a channel invitation`() =
         testSetup { _, channel ->
-            val id = checkNotNull(channel.channelId) { "Channel id is null" }
+            val id = checkNotNull(channel.cId) { "Channel id is null" }
             val invitation =
                 ChannelInvitation(
-                    channelId = id,
+                    cId = id,
                     expirationDate = expirationDate,
                     maxUses = 1u,
                     accessControl = READ_WRITE,
@@ -163,11 +163,11 @@ class ChannelJDBCTest {
     @Test
     fun `test find a channel invitation`() =
         testSetup { _, channel ->
-            val id = checkNotNull(channel.channelId) { "Channel id is null" }
+            val id = checkNotNull(channel.cId) { "Channel id is null" }
             val invitation =
                 ChannelInvitation(
-                    channelId = id,
-                    expirationDate = expirationDate,
+                    cId = id,
+                    expirationDate = Timestamp(expirationDate.time),
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
@@ -179,11 +179,11 @@ class ChannelJDBCTest {
     @Test
     fun `test update channel invitation`() =
         testSetup { _, channel ->
-            val id = checkNotNull(channel.channelId) { "Channel id is null" }
+            val id = checkNotNull(channel.cId) { "Channel id is null" }
             val invitation =
                 ChannelInvitation(
-                    channelId = id,
-                    expirationDate = expirationDate,
+                    cId = id,
+                    expirationDate = Timestamp(expirationDate.time),
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
@@ -197,11 +197,11 @@ class ChannelJDBCTest {
     @Test
     fun `test delete channel invitation`() =
         testSetup { _, channel ->
-            val id = checkNotNull(channel.channelId) { "Channel id is null" }
+            val id = checkNotNull(channel.cId) { "Channel id is null" }
             val invitation =
                 ChannelInvitation(
-                    channelId = id,
-                    expirationDate = expirationDate,
+                    cId = id,
+                    expirationDate = Timestamp(expirationDate.time),
                     maxUses = 1u,
                     accessControl = READ_WRITE,
                 )
@@ -214,7 +214,7 @@ class ChannelJDBCTest {
     @Test
     fun `test delete a channel`() =
         testSetup { _, channel ->
-            val id = checkNotNull(channel.channelId) { "Channel id is null" }
+            val id = checkNotNull(channel.cId) { "Channel id is null" }
             assertNotNull(findById(id))
             assertNotNull(deleteById(id))
             assertNull(findById(id))
@@ -236,7 +236,7 @@ class ChannelJDBCTest {
                 )
             assertNotNull(newUser, "User is null")
             val uId = checkNotNull(newUser.uId) { "User id is null" }
-            val cId = checkNotNull(channel.channelId) { "Channel id is null" }
+            val cId = checkNotNull(channel.cId) { "Channel id is null" }
             joinChannel(cId, uId, READ_WRITE)
             assertTrue(isUserInChannel(cId, uId))
         }
@@ -245,7 +245,7 @@ class ChannelJDBCTest {
     fun `test is user in channel`() =
         testSetup { user, channel ->
             val uId = checkNotNull(user.uId) { "User id is null" }
-            val cId = checkNotNull(channel.channelId) { "Channel id is null" }
+            val cId = checkNotNull(channel.cId) { "Channel id is null" }
             assertTrue(isUserInChannel(cId, uId))
         }
 
@@ -253,7 +253,7 @@ class ChannelJDBCTest {
     fun `find user access control in channel`() =
         testSetup { user, channel ->
             val uId = checkNotNull(user.uId) { "User id is null" }
-            val cId = checkNotNull(channel.channelId) { "Channel id is null" }
+            val cId = checkNotNull(channel.cId) { "Channel id is null" }
             assertEquals(READ_WRITE, findUserAccessControl(cId, uId))
         }
 

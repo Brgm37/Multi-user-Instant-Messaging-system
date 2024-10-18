@@ -8,7 +8,7 @@ package model.users
  * - At least one uppercase letter.
  * - At least one lowercase letter.
  *
- * @param value the password value.
+ * @property value the password value.
  * @throws IllegalArgumentException if the password is invalid.
  */
 data class Password(

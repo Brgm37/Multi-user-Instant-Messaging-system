@@ -1,7 +1,6 @@
-package com.example.appWeb
+package com.example.appWeb.controller
 
 import TransactionManager
-import com.example.appWeb.controller.MessageController
 import com.example.appWeb.model.dto.input.message.CreateMessageInputModel
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.output.message.MessageOutputModel
@@ -68,7 +67,7 @@ class MessageControllerTest {
         ) = manager
             .run {
                 val userId = checkNotNull(user.uId) { "User id is null" }
-                val channelId = checkNotNull(channel.channelId) { "Channel id is null" }
+                val channelId = checkNotNull(channel.cId) { "Channel id is null" }
                 channelRepo.joinChannel(channelId, userId, READ_WRITE)
             }
 
@@ -146,7 +145,7 @@ class MessageControllerTest {
             createMessage(
                 CreateMessageInputModel(
                     "Hello, World!",
-                    checkNotNull(channel.channelId),
+                    checkNotNull(channel.cId),
                 ),
                 user,
             ).let { resp ->
@@ -155,7 +154,7 @@ class MessageControllerTest {
                 val message = resp.body as MessageOutputModel
                 assertEquals("Hello, World!", message.message, "Message is not correct")
                 assertEquals(user.uId, message.user, "User is not correct")
-                assertEquals(channel.channelId, message.channel, "Channel is not correct")
+                assertEquals(channel.cId, message.channel, "Channel is not correct")
             }
         }
 
@@ -166,7 +165,7 @@ class MessageControllerTest {
             createMessage(
                 CreateMessageInputModel(
                     "",
-                    checkNotNull(channel.channelId),
+                    checkNotNull(channel.cId),
                 ),
                 owner,
             ).let { resp ->
@@ -182,7 +181,7 @@ class MessageControllerTest {
             createMessage(
                 CreateMessageInputModel(
                     "Hello, World!",
-                    checkNotNull(channel.channelId),
+                    checkNotNull(channel.cId),
                 ),
                 AuthenticatedUserInputModel(0u, "token"),
             ).let { resp ->
@@ -218,7 +217,7 @@ class MessageControllerTest {
                 messageServices.createMessage(
                     "Hello, World!",
                     checkNotNull(owner.uId),
-                    checkNotNull(channel.channelId),
+                    checkNotNull(channel.cId),
                 )
             assertIs<Success<Message>>(message, "Message was not created")
             val msgId = checkNotNull(message.value.msgId)
@@ -229,7 +228,7 @@ class MessageControllerTest {
                 assertEquals(msgId, msgOutputModel.id, "Message id is not correct")
                 assertEquals("Hello, World!", msgOutputModel.message, "Message is not correct")
                 assertEquals(owner.uId, msgOutputModel.user, "User is not correct")
-                assertEquals(channel.channelId, msgOutputModel.channel, "Channel is not correct")
+                assertEquals(channel.cId, msgOutputModel.channel, "Channel is not correct")
             }
         }
 
@@ -254,11 +253,11 @@ class MessageControllerTest {
                     messageServices.createMessage(
                         "Hello, World! $it",
                         checkNotNull(owner.uId),
-                        checkNotNull(channel.channelId),
+                        checkNotNull(channel.cId),
                     )
                 assertIs<Success<Message>>(message, "Message was not created")
             }
-            getChannelMessages(checkNotNull(channel.channelId), 5, 10, user).let { resp ->
+            getChannelMessages(checkNotNull(channel.cId), 5, 10, user).let { resp ->
                 assertEquals(HttpStatus.OK, resp.statusCode, "Status code is not OK")
                 assertIs<List<MessageOutputModel>>(
                     resp.body,
@@ -273,7 +272,7 @@ class MessageControllerTest {
                         "Message is not correct",
                     )
                     assertEquals(owner.uId, message.user, "User is not correct")
-                    assertEquals(channel.channelId, message.channel, "Channel is not correct")
+                    assertEquals(channel.cId, message.channel, "Channel is not correct")
                 }
             }
         }
@@ -282,7 +281,7 @@ class MessageControllerTest {
     @MethodSource("transactionManager")
     fun `fail to get channel messages`(m: TransactionManager) =
         makeTest(m) { _, _, user, channel, _ ->
-            getChannelMessages(checkNotNull(channel.channelId), 0, 10, user).let { resp ->
+            getChannelMessages(checkNotNull(channel.cId), 0, 10, user).let { resp ->
                 assertEquals(HttpStatus.NOT_FOUND, resp.statusCode, "Status code is not NOT_FOUND")
                 assertIs<MessageProblem.MessageNotFound>(resp.body, "Body is not a MessageNotFound")
             }

@@ -1,0 +1,78 @@
+@startuml
+
+interface Repository <T> {
+    + findById(id: String): T
+    + findAll(offset: Int, limit: Int): List<T>
+    + save(entity: T)
+    + deleteById(id: UInt)
+    + clear()
+}
+
+interface ChannelRepositoryInterface {
+    + createChannel(channel: Channel): Channel?
+    + findByUserId(userId: String, offset: Int, limit: Int): List<Channel>
+    + joinChannel(channelId: UInt, userId: Uint, accessControl: AccessControl)
+    + isUserInChannel(channelId: UInt, userId: UInt): Boolean
+    + findInvitation(channelId: UInt): ChannelInvitation?
+    + updateInvitation(invitation: ChannelInvitation)
+    + deleteInvitation(invitation: ChannelInvitation)
+    + createInvitation(invitation: ChannelInvitation)
+    + findUserAccessControl(channelId: UInt, userId: UInt): AccessControl?
+}
+
+interface UserRepositoryInterface {
+    + createUser(user: User): User?
+    + findInvitation(inviterId: UInt, invitationCode: String): UserInvitation?
+    + deleteInvitation(invitation: UserInvitation)
+    + createInvitation(invitation: UserInvitation): Boolean
+    + validateToken(token: String): Boolean
+    + findByUserName(userName: String): User?
+    + createToken(token: UserToken): Boolean
+    + deleteToken(token: String): Boolean
+    + findByToken(token: String): User?
+}
+
+interface MessageRepositoryInterface {
+    + createMessage(message: Message): Message?
+    + findMessages(channelId: Uint, limit: UInt, offset: UInt): List<Message>
+}
+
+namespace users {
+    class User
+    class UserInvitation
+    class UserToken
+}
+
+namespace channels {
+    class Channel
+    class ChannelInvitation
+}
+
+namespace messages {
+    class Message
+}
+
+Repository <|-- UserRepositoryInterface
+Repository <|-- ChannelRepositoryInterface
+Repository <|-- MessageRepositoryInterface
+
+MessageRepositoryInterface o-- messages.Message
+UserRepositoryInterface o-- users.User
+UserRepositoryInterface o-- users.UserInvitation
+UserRepositoryInterface o-- users.UserToken
+ChannelRepositoryInterface o-- channels.Channel
+ChannelRepositoryInterface o-- channels.ChannelInvitation
+
+
+interface Transaction {
+    + channelRepo: ChannelRepositoryInterface
+    + userRepo: UserRepositoryInterface
+    + messageRepo: MessageRepositoryInterface
+    + rollback()
+}
+
+interface TransactionManager {
+    + <R>run(block: Transaction.() -> R): R
+}
+
+@enduml

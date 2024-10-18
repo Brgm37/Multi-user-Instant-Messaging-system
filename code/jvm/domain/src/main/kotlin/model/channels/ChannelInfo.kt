@@ -3,12 +3,12 @@ package model.channels
 /**
  * Represents a Channel.
  *
- * @param channelId the channel’s identifier (unique).
- * @param channelName the username of the user.
+ * @property cId the channel’s identifier (unique).
+ * @property channelName the username of the user.
  * @throws IllegalArgumentException if the username is empty.
  */
 data class ChannelInfo(
-    val channelId: UInt,
+    val cId: UInt,
     val channelName: ChannelName,
 ) {
     init {

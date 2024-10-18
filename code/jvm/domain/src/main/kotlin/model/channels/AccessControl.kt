@@ -13,5 +13,11 @@ enum class AccessControl {
     },
     READ_WRITE {
         override fun toString() = "READ_WRITE"
-    },
+    }, ;
+
+    companion object {
+        private val names = entries.map(AccessControl::name)
+
+        fun validate(accessControl: String) = accessControl.uppercase() in names
+    }
 }

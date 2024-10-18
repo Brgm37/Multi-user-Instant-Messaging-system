@@ -1,7 +1,5 @@
-package model
+package model.channels
 
-import model.channels.ChannelInfo
-import model.channels.ChannelName
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 

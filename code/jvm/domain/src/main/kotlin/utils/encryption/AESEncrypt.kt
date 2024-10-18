@@ -5,11 +5,16 @@ import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
-object AESEncrypt : Encrypt {
-    private const val ALGORITHM = "AES"
-    private val KEY = System.getenv("AES_KEY") ?: throw IllegalStateException("AES_KEY not found")
-    private val key: Key = SecretKeySpec(KEY.toByteArray(), ALGORITHM)
-    private val cipher: Cipher = Cipher.getInstance(ALGORITHM)
+/**
+ * AESEncrypt is an implementation of Encrypt using AES encryption.
+ * @param key the key used for encryption
+ */
+class AESEncrypt(
+    key: String,
+) : Encrypt {
+    private val algorithm = "AES"
+    private val key: Key = SecretKeySpec(key.toByteArray(), algorithm)
+    private val cipher: Cipher = Cipher.getInstance(algorithm)
 
     override fun encrypt(value: String): String {
         cipher.init(Cipher.ENCRYPT_MODE, key)

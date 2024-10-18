@@ -3,8 +3,8 @@ package model.users
 /**
  * Represents a User.
  *
- * @param uId the user’s identifier (unique).
- * @param username the username of the user.
+ * @property uId the user’s identifier (unique).
+ * @property username the username of the user.
  * @throws IllegalArgumentException if the username is empty.
  */
 data class UserInfo(

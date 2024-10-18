@@ -6,9 +6,9 @@ import java.util.UUID
 
 /**
  * Represents a user invitation to access the app.
- * @param inviterId The ID of the inviter.
- * @param expirationDate The expiration date of the invitation.
- * @param invitationCode The invitation code to join the app.
+ * @property inviterId The ID of the inviter.
+ * @property expirationDate The expiration date of the invitation.
+ * @property invitationCode The invitation code to join the app.
  */
 data class UserInvitation(
     val inviterId: UInt,
