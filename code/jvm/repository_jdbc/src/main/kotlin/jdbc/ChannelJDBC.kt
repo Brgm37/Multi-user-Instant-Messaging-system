@@ -124,6 +124,7 @@ private const val CHANNELS_INVITATIONS_MAX_USES = "max_uses"
 /**
  * A JDBC implementation of the [ChannelRepositoryInterface].
  * @property connection The connection to the database.
+ * @property encrypt The encryption algorithm.
  * @constructor Creates a [ChannelJDBC] with the given connection.
  */
 class ChannelJDBC(

@@ -27,6 +27,18 @@ import utils.Failure
 import utils.Success
 
 /**
+ * The default limit for the channel list.
+ */
+private const val LIMIT = 10u
+
+/**
+ * The default offset for the channel list.
+ */
+private const val OFFSET = 0u
+
+// TODO: Add annotation to simplify the controller paths
+
+/**
  * Represents the controller for the channel
  *
  * @param channelService The channel service
@@ -53,8 +65,8 @@ class ChannelController(
     @GetMapping(CHANNEL_BASE_URL)
     fun getChannels(
         authenticated: AuthenticatedUserInputModel,
-        @RequestParam offset: UInt = 0u,
-        @RequestParam limit: UInt = 10u,
+        @RequestParam offset: UInt = OFFSET,
+        @RequestParam limit: UInt = LIMIT,
     ): ResponseEntity<*> =
         when (val response = channelService.getChannels(offset, limit)) {
             is Failure -> {

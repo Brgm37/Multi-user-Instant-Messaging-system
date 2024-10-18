@@ -6,6 +6,16 @@ import utils.Either
 import java.util.UUID
 
 /**
+ * The offset for the channels.
+ */
+private const val OFFSET = 0u
+
+/**
+ * The limit for the channels.
+ */
+private const val LIMIT = 100u
+
+/**
  * Represents the services available for the channel entity.
  */
 interface ChannelServicesInterface {
@@ -42,16 +52,16 @@ interface ChannelServicesInterface {
      */
     fun getChannels(
         owner: UInt,
-        offset: UInt,
-        limit: UInt,
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
     ): Either<ChannelError, List<Channel>>
 
     /**
      * Gets all channels.
      */
     fun getChannels(
-        offset: UInt,
-        limit: UInt,
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
     ): Either<ChannelError, List<Channel>>
 
     fun createChannelInvitation(

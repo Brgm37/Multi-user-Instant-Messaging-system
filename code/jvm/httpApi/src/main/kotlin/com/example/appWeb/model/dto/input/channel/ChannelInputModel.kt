@@ -21,16 +21,8 @@ data class ChannelInputModel(
     @get:NotBlank val accessControl: String,
 ) {
     @AssertTrue(message = "Invalid visibility")
-    fun isValidVisibility(): Boolean =
-        Visibility
-            .entries
-            .map(Visibility::name)
-            .contains(visibility.uppercase())
+    fun isValidVisibility(): Boolean = Visibility.validate(visibility)
 
     @AssertTrue(message = "Invalid access control")
-    fun isValidAccessControl(): Boolean =
-        AccessControl
-            .entries
-            .map(AccessControl::name)
-            .contains(accessControl.uppercase())
+    fun isValidAccessControl(): Boolean = AccessControl.validate(accessControl)
 }

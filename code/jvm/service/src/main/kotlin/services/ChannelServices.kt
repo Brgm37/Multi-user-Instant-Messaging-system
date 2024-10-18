@@ -28,14 +28,14 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 /**
- * The offset for the channels.
+ * The offset for the channels message.
  */
-private const val OFFSET = 0u
+private const val MSG_OFFSET = 0u
 
 /**
- * The limit for the channels.
+ * The limit for the channels message.
  */
-private const val LIMIT = 100u
+private const val MSG_LIMIT = 100u
 
 @Named("ChannelServices")
 class ChannelServices(
@@ -47,15 +47,12 @@ class ChannelServices(
         accessControl: String,
         visibility: String,
     ): Either<ChannelError, Channel> {
-        if (name.isBlank() || visibility.isBlank() || accessControl.isBlank()) {
-            return failure(InvalidChannelInfo)
-        }
-        if (accessControl.uppercase() !in AccessControl.entries.map(AccessControl::name)) {
-            return failure(InvalidChannelAccessControl)
-        }
-        if (visibility.uppercase() !in Visibility.entries.map(Visibility::name)) {
-            return failure(InvalidChannelVisibility)
-        }
+        val args: Array<String> = arrayOf(name, visibility, accessControl)
+        if (args.any(String::isBlank)) return failure(InvalidChannelInfo)
+        if (!AccessControl.validate(accessControl)) return failure(InvalidChannelAccessControl)
+        val upperCaseVisibility = visibility.uppercase()
+        if (!Visibility.validate(visibility)) return failure(InvalidChannelVisibility)
+        val upperCaseAccessControl = accessControl.uppercase()
         return repoManager.run {
             val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
             val uId = checkNotNull(user.uId) { "User id is null" }
@@ -63,8 +60,8 @@ class ChannelServices(
                 createChannel(
                     owner = UserInfo(uId, user.username),
                     name = ChannelName(name, user.username),
-                    accessControl = AccessControl.valueOf(accessControl.uppercase()),
-                    visibility = Visibility.valueOf(visibility.uppercase()),
+                    accessControl = AccessControl.valueOf(upperCaseAccessControl),
+                    visibility = Visibility.valueOf(upperCaseVisibility),
                 )
             val createdChannel = channelRepo.createChannel(channel) ?: return@run failure(UnableToCreateChannel)
             val chId = checkNotNull(createdChannel.channelId)
@@ -85,7 +82,7 @@ class ChannelServices(
         repoManager
             .run {
                 val channel = channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
-                val messages = messageRepo.findMessagesByChannelId(id, LIMIT, OFFSET)
+                val messages = messageRepo.findMessagesByChannelId(id, MSG_LIMIT, MSG_OFFSET)
                 return@run when (channel) {
                     is Public -> success(channel.copy(messages = messages))
                     is Private -> success(channel.copy(messages = messages))
@@ -134,9 +131,7 @@ class ChannelServices(
         return repoManager
             .run {
                 val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelNotFound)
-                if (channel.owner.uId != owner) {
-                    return@run failure(InvalidChannelInfo)
-                }
+                if (channel.owner.uId != owner) return@run failure(InvalidChannelInfo)
                 val invitation =
                     if (accessControl == null) {
                         ChannelInvitation(
