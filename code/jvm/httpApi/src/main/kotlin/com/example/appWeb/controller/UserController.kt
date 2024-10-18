@@ -11,9 +11,9 @@ import com.example.appWeb.model.problem.UserProblem
 import errors.ChannelError.ChannelNotFound
 import errors.UserError
 import interfaces.UserServicesInterface
-import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -38,7 +38,6 @@ class UserController(
     @PostMapping(SIGNUP_URL)
     fun signUp(
         @Valid @RequestBody user: UserSignUpInputModel,
-        res: HttpServletResponse,
     ): ResponseEntity<*> {
         val response =
             userService.createUser(
@@ -54,12 +53,11 @@ class UserController(
 
             is Failure -> {
                 when (response.value) {
-                    UserError.InvalidUserInfo -> UserProblem.InvalidUserInfo.response(BAD_REQUEST)
                     UserError.UsernameAlreadyExists -> UserProblem.UsernameAlreadyExists.response(BAD_REQUEST)
                     UserError.InviterNotFound -> UserProblem.InviterNotFound.response(BAD_REQUEST)
                     UserError.InvitationCodeIsInvalid -> UserProblem.InvitationCodeIsInvalid.response(BAD_REQUEST)
                     UserError.InvitationCodeHasExpired -> UserProblem.InvitationCodeHasExpired.response(BAD_REQUEST)
-                    else -> UserProblem.UnableToCreateUser.response(BAD_REQUEST)
+                    else -> UserProblem.UnableToCreateUser.response(INTERNAL_SERVER_ERROR)
                 }
             }
         }
@@ -83,7 +81,6 @@ class UserController(
     @PostMapping(LOGIN_URL)
     fun login(
         @Valid @RequestBody user: UserLogInInputModel,
-        authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
         when (val response = userService.login(user.username, user.password)) {
             is Success -> {
@@ -94,8 +91,8 @@ class UserController(
                 when (response.value) {
                     UserError.UserNotFound -> UserProblem.UserNotFound.response(NOT_FOUND)
                     UserError.PasswordIsInvalid -> UserProblem.PasswordIsInvalid.response(BAD_REQUEST)
-                    UserError.UnableToCreateToken -> UserProblem.UnableToCreateToken.response(BAD_REQUEST)
-                    else -> UserProblem.UnableToLogin.response(BAD_REQUEST)
+                    UserError.UnableToCreateToken -> UserProblem.UnableToCreateToken.response(INTERNAL_SERVER_ERROR)
+                    else -> UserProblem.UnableToLogin.response(INTERNAL_SERVER_ERROR)
                 }
             }
         }
@@ -109,24 +106,25 @@ class UserController(
 
             is Failure -> {
                 when (response.value) {
-                    UserError.UserNotFound -> UserProblem.UserNotFound.response(NOT_FOUND)
-                    else -> UserProblem.UnableToCreateInvitation.response(BAD_REQUEST)
+                    UserError.InviterNotFound -> UserProblem.InviterNotFound.response(NOT_FOUND)
+                    else -> UserProblem.UnableToCreateInvitation.response(INTERNAL_SERVER_ERROR)
                 }
             }
         }
 
     @DeleteMapping(LOGOUT_URL)
     fun logout(authenticated: AuthenticatedUserInputModel): ResponseEntity<*> =
-        when (val response = userService.logout(authenticated.token)) {
+        when (val response = userService.logout(authenticated.token, authenticated.uId)) {
             is Success -> {
-                ResponseEntity.ok().build<Any>()
+                ResponseEntity.ok(response.value)
             }
 
             is Failure -> {
                 when (response.value) {
-                    UserError.UserNotFound -> UserProblem.UserNotFound.response(NOT_FOUND)
                     UserError.TokenNotFound -> UserProblem.TokenNotFound.response(BAD_REQUEST)
-                    else -> UserProblem.UnableToLogout.response(BAD_REQUEST)
+                    UserError.UserNotFound -> UserProblem.UserNotFound.response(NOT_FOUND)
+                    UserError.UnableToDeleteToken -> UserProblem.UnableToLogout.response(INTERNAL_SERVER_ERROR)
+                    else -> UserProblem.UnableToLogout.response(INTERNAL_SERVER_ERROR)
                 }
             }
         }
@@ -153,7 +151,7 @@ class UserController(
                         UserProblem.InvitationCodeMaxUsesReached.response(
                             BAD_REQUEST,
                         )
-                    else -> UserProblem.UnableToJoinChannel.response(BAD_REQUEST)
+                    else -> UserProblem.UnableToJoinChannel.response(INTERNAL_SERVER_ERROR)
                 }
             }
         }
