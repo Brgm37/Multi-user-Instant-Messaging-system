@@ -21,7 +21,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import utils.Failure
 import utils.Success
 import utils.encryption.DummyEncrypt
-import java.sql.Timestamp
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs

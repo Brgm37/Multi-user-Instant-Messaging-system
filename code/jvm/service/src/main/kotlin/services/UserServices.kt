@@ -26,6 +26,10 @@ import java.time.LocalDateTime
  */
 private const val INVITATION_EXPIRATION_DAYS = 7L
 
+/**
+ * The services available for the user entity.
+ * @property repoManager The transaction manager.
+ */
 @Named("UserServices")
 class UserServices(
     private val repoManager: TransactionManager,

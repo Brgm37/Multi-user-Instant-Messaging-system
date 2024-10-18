@@ -40,7 +40,7 @@ private const val OFFSET = 0u
 /**
  * Represents the controller for the channel
  *
- * @param channelService The channel service
+ * @property channelService The channel service
  */
 @RestController
 @RequestMapping(ChannelController.CHANNEL_BASE_URL)

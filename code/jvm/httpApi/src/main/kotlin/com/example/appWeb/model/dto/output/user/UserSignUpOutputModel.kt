@@ -4,7 +4,8 @@ import model.users.User
 
 /**
  * Represents the output model for a user sign up
- * @param uId The user id
+ *
+ * @property uId The user id of the user signed up
  */
 data class UserSignUpOutputModel(
     val uId: UInt,

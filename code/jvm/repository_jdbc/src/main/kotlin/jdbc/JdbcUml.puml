@@ -4,9 +4,7 @@ class ChannelJDBC
 class MessageJDBC
 class UserJDBC
 
-namespace domain.model.utils.encrypt {
-    interface Encrypt
-}
+namespace domain.utils.encrypt {}
 
 namespace repository {
     interface ChannelRepositoryInterface
@@ -18,9 +16,9 @@ ChannelJDBC --|> repository.ChannelRepositoryInterface
 MessageJDBC --|> repository.MessageRepositoryInterface
 UserJDBC --|> repository.UserRepositoryInterface
 
-Encrypt ..> ChannelJDBC
-Encrypt ..> MessageJDBC
-Encrypt ..> UserJDBC
+domain.utils.encrypt ...> ChannelJDBC
+domain.utils.encrypt ...> MessageJDBC
+domain.utils.encrypt ...> UserJDBC
 
 Connection ..> ChannelJDBC
 Connection ..> MessageJDBC

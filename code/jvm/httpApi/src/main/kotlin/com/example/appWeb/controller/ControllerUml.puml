@@ -1,0 +1,38 @@
+@startuml
+
+class ChannelController
+{
+    + getChannel(...): ResponseEntity<*>
+    + getChannels(...): ResponseEntity<*>
+    + createChannel(...): ResponseEntity<*>
+    + createChannelInvitation(...): ResponseEntity<*>
+}
+
+class MessageController
+{
+    + createMessage(...): ResponseEntity<*>
+    + getSingleMessage(...): ResponseEntity<*>
+    + getChannelMessages(...): ResponseEntity<*>
+}
+
+class UserController
+{
+    + signUp(...): ResponseEntity<*>
+    + getUser(...): ResponseEntity<*>
+    + login(...): ResponseEntity<*>
+    + createInvitation(...): ResponseEntity<*>
+    + logout(...): ResponseEntity<*>
+    + joinChannel(...): ResponseEntity<*>
+}
+
+namespace interfaces {
+    interface ChannelServiceInterface
+    interface MessageServiceInterface
+    interface UserServiceInterface
+}
+
+UserServiceInterface ..> UserController
+MessageServiceInterface ..> MessageController
+ChannelServiceInterface ..> ChannelController
+
+@enduml

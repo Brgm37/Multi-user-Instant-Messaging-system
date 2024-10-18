@@ -5,6 +5,11 @@ import java.net.URI
 private const val PROBLEM_URI_PATH =
     "https://github.com/isel-leic-daw/2024-daw-leic52d-im-i52d-2425-g04/tree/main/docs/problems/channel"
 
+/**
+ * Represents a ChannelProblem.
+ *
+ * @param typeUri the URI of the problem type.
+ */
 sealed class ChannelProblem(
     typeUri: URI,
 ) : Problem(typeUri) {

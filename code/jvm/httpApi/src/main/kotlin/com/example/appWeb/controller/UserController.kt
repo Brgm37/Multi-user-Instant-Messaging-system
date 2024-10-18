@@ -30,7 +30,8 @@ import utils.Success
 
 /**
  * Represents the controller for the user
- * @param userService The user service
+ *
+ * @property userService The user service
  */
 @RestController
 @RequestMapping(UserController.USER_BASE_URL)

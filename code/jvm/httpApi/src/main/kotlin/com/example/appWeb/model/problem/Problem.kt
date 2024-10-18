@@ -7,6 +7,11 @@ import java.net.URI
 private const val MEDIA_TYPE = "application/problem+json"
 private const val PROBLEM_URI_PATH = "https://github.com/isel-leic-daw/2024-daw-leic52d-im-i52d-2425-g04/tree/main/docs"
 
+/**
+ * Represents a Problem.
+ *
+ * @param typeUri the URI of the problem type.
+ */
 sealed class Problem(
     typeUri: URI,
 ) {

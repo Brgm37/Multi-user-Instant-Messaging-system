@@ -11,6 +11,11 @@ import utils.encryption.DummyEncrypt
 import utils.encryption.Encrypt
 import java.sql.Connection
 
+/**
+ * Represents the JDBC transaction
+ *
+ * @property connection the connection to the database
+ */
 class TransactionJDBC(
     private val connection: Connection,
     encrypt: Encrypt = DummyEncrypt,

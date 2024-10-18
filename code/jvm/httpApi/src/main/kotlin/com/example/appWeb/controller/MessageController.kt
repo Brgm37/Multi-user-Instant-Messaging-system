@@ -25,6 +25,11 @@ import org.springframework.web.bind.annotation.RequestParam
 import utils.Failure
 import utils.Success
 
+/**
+ * Represents the controller for the message
+ *
+ * @property messageService The message service
+ */
 @Controller
 class MessageController(
     private val messageService: MessageServicesInterface,

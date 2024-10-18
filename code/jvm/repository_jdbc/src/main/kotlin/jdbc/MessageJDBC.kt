@@ -12,7 +12,9 @@ import java.sql.ResultSet
 
 /**
  * MessageJDBC is a JDBC implementation of MessageRepositoryInterface
+ *
  * @property connection a JDBC Connection
+ * @property encrypt an encryption utility to use
  */
 class MessageJDBC(
     private val connection: Connection,

@@ -1,0 +1,43 @@
+@startuml
+
+interface ChannelServicesInterface
+{
+    + createChannel(...): Either<ChannelError, Channel>
+    + deleteChannel(id: UInt): Either<ChannelError, Unit>
+    + getChannel(id: UInt): Either<ChannelError, Channel>
+    + getChannels(...): Either<ChannelError, List<Channel>>
+    + getChannels(...): Either<ChannelError, List<Channel>>
+    + createChannelInvitation(...): Either<ChannelError, Unit>
+}
+
+interface MessagesServiceInterface
+{
+    + createMessage(...): Either<ChannelError, Message>
+    + deleteMessage(...): Either<ChannelError, Unit>
+    + getMessages(...): Either<ChannelError, List<Message>>
+    + latestMessages(...): Either<ChannelError, List<Message>>
+}
+
+interface UserServiceInterface
+{
+    + createUser(...): Either<UserError, User>
+    + deleteUser(id: UInt): Either<UserError, Unit>
+    + getUser(id: UInt): Either<UserError, User>
+    + joinChannel(...): Either<UserError, Unit>
+    + getUserByToken(...): Either<UserError, User>
+    + isValidToken(...): Either<UserError, Boolean>
+    + getInvitations(...): Either<UserError, UserInvitation>
+    + login(...): Either<UserError, UserToken>
+    + logout(...): Either<UserError, Unit>
+    + createUserInvitation(...): Either<UserError, UserInvitation>
+}
+
+namespace model.channel {}
+namespace model.message {}
+namespace model.user {}
+
+ChannelServicesInterface o-- model.channel
+MessagesServiceInterface o-- model.message
+UserServiceInterface o-- model.user
+
+@enduml
