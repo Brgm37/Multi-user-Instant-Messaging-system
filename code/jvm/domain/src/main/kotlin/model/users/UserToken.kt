@@ -3,6 +3,14 @@ package model.users
 import java.sql.Timestamp
 import java.util.UUID
 
+/**
+ * Represents a user token.
+ *
+ * @property userId The ID of the user.
+ * @property token The token.
+ * @property creationDate The creation date of the token.
+ * @property expirationDate The expiration date of the token.
+ */
 data class UserToken(
     val userId: UInt,
     val token: UUID = UUID.randomUUID(),

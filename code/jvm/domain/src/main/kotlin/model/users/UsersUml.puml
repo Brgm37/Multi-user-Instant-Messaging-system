@@ -30,6 +30,15 @@ class UserInvitation
     + isExpired: Boolean
 }
 
+class UserToken
+{
+    + userId: UInt
+    + token: UUID
+    + creationDate: Timestamp
+    + expirationDate: Timestamp
+    + isExpired(): Boolean
+}
+
 User ..> Password
 
 @enduml
