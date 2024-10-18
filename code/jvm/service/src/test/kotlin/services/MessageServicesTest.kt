@@ -1,8 +1,6 @@
 package services
 
 import TransactionManager
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import errors.MessageError
 import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
@@ -23,7 +21,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import utils.Failure
 import utils.Success
 import utils.encryption.DummyEncrypt
-import java.sql.Timestamp
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -91,7 +88,7 @@ class MessageServicesTest {
             }
     }
 
-    private fun makeTestEnv(
+    private fun makeTest(
         visibility: Visibility,
         accessControl: AccessControl,
         manager: TransactionManager,
@@ -122,7 +119,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `create a new message`(m: TransactionManager) {
-        makeTestEnv(PUBLIC, READ_WRITE, m) { manager, _, user, channel, messageServices ->
+        makeTest(PUBLIC, READ_WRITE, m) { manager, _, user, channel, messageServices ->
             userJoinChannel(manager, user, channel, READ_WRITE)
             val newMessage =
                 messageServices
@@ -146,7 +143,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to create a new message due to blank message`(m: TransactionManager) {
-        makeTestEnv(PUBLIC, READ_WRITE, m) { manager, _, user, channel, messageServices ->
+        makeTest(PUBLIC, READ_WRITE, m) { manager, _, user, channel, messageServices ->
             userJoinChannel(manager, user, channel, READ_WRITE)
             val newMessage =
                 messageServices
@@ -166,7 +163,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to create message due to user not belonging to the channel`(m: TransactionManager) {
-        makeTestEnv(PUBLIC, READ_WRITE, m) { _, _, user, channel, messageServices ->
+        makeTest(PUBLIC, READ_WRITE, m) { _, _, user, channel, messageServices ->
             val newMessage =
                 messageServices
                     .createMessage(
@@ -182,7 +179,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `Public channel READ_ONLY message creation success and fail due to access control`(m: TransactionManager) {
-        makeTestEnv(PUBLIC, READ_ONLY, m) { manager, owner, user, channel, messageServices ->
+        makeTest(PUBLIC, READ_ONLY, m) { manager, owner, user, channel, messageServices ->
             userJoinChannel(manager, user, channel, READ_WRITE)
             val newMessageFailure =
                 messageServices
@@ -222,7 +219,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `Private channel message creation success and fail due to access control`(manager: TransactionManager) {
-        makeTestEnv(PRIVATE, READ_WRITE, manager) { m, owner, user, channel, messageServices ->
+        makeTest(PRIVATE, READ_WRITE, manager) { m, owner, user, channel, messageServices ->
             userJoinChannel(m, user, channel, READ_ONLY)
             val newMessageSuccess =
                 messageServices
@@ -262,7 +259,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `delete a message`(m: TransactionManager) {
-        makeTestEnv(PUBLIC, READ_WRITE, m) { manager, owner, user, channel, messageServices ->
+        makeTest(PUBLIC, READ_WRITE, m) { manager, owner, user, channel, messageServices ->
             userJoinChannel(manager, user, channel, READ_WRITE)
             val newMessage =
                 messageServices
@@ -286,7 +283,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to delete a message due to user not having access to message`(m: TransactionManager) {
-        makeTestEnv(PUBLIC, READ_WRITE, m) { manager, owner, user, channel, messageServices ->
+        makeTest(PUBLIC, READ_WRITE, m) { manager, owner, user, channel, messageServices ->
             userJoinChannel(manager, user, channel, READ_WRITE)
             val newMessage =
                 messageServices
@@ -314,7 +311,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `get message`(m: TransactionManager) {
-        makeTestEnv(PUBLIC, READ_WRITE, m) { manager, _, user, channel, messageServices ->
+        makeTest(PUBLIC, READ_WRITE, m) { manager, _, user, channel, messageServices ->
             userJoinChannel(manager, user, channel, READ_WRITE)
             val newMessage =
                 messageServices
@@ -342,7 +339,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to get message due to user not in channel`(m: TransactionManager) {
-        makeTestEnv(PUBLIC, READ_WRITE, m) { _, owner, user, channel, messageServices ->
+        makeTest(PUBLIC, READ_WRITE, m) { _, owner, user, channel, messageServices ->
             val newMessage =
                 messageServices
                     .createMessage(
@@ -369,7 +366,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `get latest messages`(m: TransactionManager) {
-        makeTestEnv(PUBLIC, READ_WRITE, m) { manager, _, user, channel, messageServices ->
+        makeTest(PUBLIC, READ_WRITE, m) { manager, _, user, channel, messageServices ->
             userJoinChannel(manager, user, channel, READ_WRITE)
             repeat(17) {
                 val newMessage =
@@ -393,7 +390,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to get latest messages due to user not in channel`(m: TransactionManager) {
-        makeTestEnv(PUBLIC, READ_WRITE, m) { _, owner, user, channel, messageServices ->
+        makeTest(PUBLIC, READ_WRITE, m) { _, owner, user, channel, messageServices ->
             repeat(17) {
                 val newMessage =
                     messageServices
@@ -416,7 +413,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to get message due to invalid id`(m: TransactionManager) {
-        makeTestEnv(PUBLIC, READ_WRITE, m) { manager, _, user, channel, messageServices ->
+        makeTest(PUBLIC, READ_WRITE, m) { manager, _, user, channel, messageServices ->
             userJoinChannel(manager, user, channel, READ_WRITE)
             val newMessage =
                 messageServices
@@ -436,7 +433,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to send a message to non-existent channel`(m: TransactionManager) {
-        makeTestEnv(PUBLIC, READ_WRITE, m) { manager, _, user, channel, messageServices ->
+        makeTest(PUBLIC, READ_WRITE, m) { manager, _, user, channel, messageServices ->
             userJoinChannel(manager, user, channel, READ_WRITE)
             val newMessage =
                 messageServices
@@ -453,7 +450,7 @@ class MessageServicesTest {
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `fail to send a message to non-existent user`(m: TransactionManager) {
-        makeTestEnv(PUBLIC, READ_WRITE, m) { _, _, _, channel, messageServices ->
+        makeTest(PUBLIC, READ_WRITE, m) { _, _, _, channel, messageServices ->
             val newMessage =
                 messageServices
                     .createMessage(
