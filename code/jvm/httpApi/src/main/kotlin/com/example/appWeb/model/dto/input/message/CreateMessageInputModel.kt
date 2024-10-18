@@ -8,6 +8,5 @@ import jakarta.validation.constraints.Positive
  */
 data class CreateMessageInputModel(
     @get:NotBlank val msg: String,
-    @get:Positive val user: UInt,
     @get:Positive val channel: UInt,
 )
