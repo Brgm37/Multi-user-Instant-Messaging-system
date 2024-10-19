@@ -1,5 +1,6 @@
 plugins {
-    kotlin("jvm") version "2.0.20"
+    kotlin("jvm") version "1.9.25"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
 group = "org.example"
@@ -10,6 +11,7 @@ repositories {
 }
 
 dependencies {
+//    implementation("jakarta.inject:jakarta.inject-api:2.0.1")
     implementation(project(":domain"))
     testImplementation(kotlin("test"))
 }

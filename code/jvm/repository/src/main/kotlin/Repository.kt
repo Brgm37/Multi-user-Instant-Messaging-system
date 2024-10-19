@@ -1,9 +1,17 @@
 /**
+ * The default offset for the repository.
+ */
+private const val OFFSET = 0
+
+/**
+ * The default limit for the repository.
+ */
+private const val LIMIT = 100
+
+/**
  * Generic repository interface for basic CRUD operations
  */
-//TODO: Check if is reasonable to return a sequence of entities in findAll method
 interface Repository<T> {
-
     /**
      * Retrieves an entity by its ID
      * @param id The ID of the entity to retrieve
@@ -13,11 +21,16 @@ interface Repository<T> {
 
     /**
      * Retrieves all entities
+     * @param offset The offset to start retrieving entities
+     * @param limit The maximum number of entities to retrieve
      * @return A list with all entities
      */
-    fun findAll(): List<T>
+    fun findAll(
+        offset: Int = OFFSET,
+        limit: Int = LIMIT,
+    ): List<T>
 
-	/**
+    /**
      * Saves a new or existing entity
      * @param entity The entity to save
      */
@@ -28,4 +41,9 @@ interface Repository<T> {
      * @param id The entity to delete
      */
     fun deleteById(id: UInt)
+
+    /**
+     * Deletes all entities
+     */
+    fun clear()
 }

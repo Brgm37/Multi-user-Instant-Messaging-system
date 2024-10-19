@@ -1,0 +1,22 @@
+@startuml
+class ChannelServices
+class MessageServices
+class UserServices
+
+namespace interfaces {
+    interface ChannelServicesInterface
+    interface MessageServicesInterface
+    interface UserServicesInterface
+}
+
+namespace jdbc.transactionManager {}
+
+ChannelServices --|> interfaces.ChannelServicesInterface
+MessageServices --|> interfaces.MessageServicesInterface
+UserServices --|> interfaces.UserServicesInterface
+
+jdbc.transactionManager ...> ChannelServices
+jdbc.transactionManager ...> MessageServices
+jdbc.transactionManager ...> UserServices
+
+@enduml

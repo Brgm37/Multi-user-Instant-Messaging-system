@@ -1,0 +1,14 @@
+@startuml
+
+interface Encryption {
+    fun encrypt(data: String): String
+    fun decrypt(data: String): String
+}
+
+class AesEncryption
+object DummyEncryption
+
+Encryption <|-- AesEncryption
+Encryption <|-- DummyEncryption
+
+@enduml

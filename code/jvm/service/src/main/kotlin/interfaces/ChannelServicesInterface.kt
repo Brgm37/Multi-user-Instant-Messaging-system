@@ -1,65 +1,81 @@
 package interfaces
 
 import errors.ChannelError
-import model.Channel
-import model.Message
+import model.channels.Channel
 import utils.Either
+import java.util.UUID
+
+/**
+ * The offset for the channels.
+ */
+private const val OFFSET = 0u
+
+/**
+ * The limit for the channels.
+ */
+private const val LIMIT = 100u
 
 /**
  * Represents the services available for the channel entity.
  */
 interface ChannelServicesInterface {
-	/**
-	 * Creates a new channel.
-	 * @param owner The owner of the channel.
-	 * @param name The name of the channel.
-	 * @param accessControl The access control of the channel.
-	 * @param visibility The visibility of the channel.
-	 * @return The created [Channel].
-	 */
-	fun createChannel(
-		owner: UInt,
-		name: String,
-		accessControl: String,
-		visibility: String
-	): Either<ChannelError, Channel>
+    /**
+     * Creates a new channel.
+     * @param owner The owner of the channel.
+     * @param name The name of the channel.
+     * @param accessControl The access control of the channel.
+     * @param visibility The visibility of the channel.
+     */
+    fun createChannel(
+        owner: UInt,
+        name: String,
+        accessControl: String,
+        visibility: String,
+    ): Either<ChannelError, Channel>
 
-	/**
-	 * Deletes a channel.
-	 * @param id The id of the channel to delete.
-	 */
-	fun deleteChannel(
-		id: UInt
-	): Either<ChannelError, Unit>
+    /**
+     * Deletes a channel.
+     * @param id The id of the channel to delete.
+     */
+    fun deleteChannel(id: UInt): Either<ChannelError, Unit>
 
-	/**
-	 * Gets a channel by its id.
-	 * @param id The id of the channel to get.
-	 */
-	fun getChannel(
-		id: UInt
-	): Either<ChannelError, Channel>
+    /**
+     * Gets a channel by its id.
+     * @param id The id of the channel to get.
+     */
+    fun getChannel(id: UInt): Either<ChannelError, Channel>
 
-	/**
-	 * Gets all channels that owner owns.
-	 * @param owner The owner of the channels.
-	 */
-	fun getChannels(
-		owner: UInt
-	): Either<ChannelError, Sequence<Channel>>
+    /**
+     * Gets all channels that owner owns.
+     * @param owner The owner of the channels.
+     */
+    fun getChannels(
+        owner: UInt,
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
+    ): Either<ChannelError, List<Channel>>
 
-	/**
-	 * Gets all channels.
-	 */
-	fun getChannels(): Either<ChannelError, List<Channel>>
+    /**
+     * Gets all channels.
+     */
+    fun getChannels(
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
+    ): Either<ChannelError, List<Channel>>
 
-	/**
-	 * Gets the latest messages of a channel.
-	 * @param id The id of the channel.
-	 * @param quantity The quantity of messages to get.
-	 */
-	fun latestMessages(
-		id: UInt,
-		quantity: Int
-	): Either<ChannelError, List<Message>>
+    /**
+     * Creates a new channel invitation.
+     * @param channelId The id of the channel.
+     * @param maxUses The maximum uses of the invitation.
+     * @param expirationDate The expiration date of the invitation.
+     * @param accessControl The access control of the invitation.
+     * @param owner The owner of the invitation.
+     */
+    fun createChannelInvitation(
+        channelId: UInt,
+        maxUses: UInt,
+        expirationDate: String?,
+        accessControl: String?,
+        owner: UInt,
+    ): Either<ChannelError, UUID>
 }

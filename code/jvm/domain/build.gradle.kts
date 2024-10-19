@@ -1,24 +1,22 @@
 plugins {
-	kotlin("jvm") version "2.0.20"
-	kotlin("plugin.serialization") version "1.8.10"
+    kotlin("jvm") version "1.9.25"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
 group = "org.example"
 version = "unspecified"
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	testImplementation(kotlin("test"))
-	api("org.eclipse.jetty:jetty-security:12.0.10")
-	api(group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.5.+")
+    testImplementation(kotlin("test"))
 }
 
 tasks.test {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 kotlin {
-	jvmToolchain(21)
+    jvmToolchain(21)
 }
