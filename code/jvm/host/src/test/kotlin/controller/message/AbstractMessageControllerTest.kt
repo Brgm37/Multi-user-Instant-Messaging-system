@@ -1,7 +1,7 @@
 package controller.message
 
 import TransactionManager
-import com.example.appWeb.controller.MessageController.Companion.MESSAGE_CREATE_URL
+import com.example.appWeb.controller.MessageController.Companion.MESSAGE_BASE_URL
 import controller.TestConfig
 import model.channels.AccessControl
 import model.channels.Channel
@@ -83,7 +83,7 @@ abstract class AbstractMessageControllerTest {
 
         client
             .post()
-            .uri(MESSAGE_CREATE_URL)
+            .uri(MESSAGE_BASE_URL)
             .header("Authorization", "Bearer ${token.token}")
             .bodyValue(
                 mapOf(
@@ -101,7 +101,7 @@ abstract class AbstractMessageControllerTest {
 
         client
             .post()
-            .uri(MESSAGE_CREATE_URL)
+            .uri(MESSAGE_BASE_URL)
             .header("Authorization", "Bearer invalid")
             .bodyValue(
                 mapOf(
@@ -114,12 +114,12 @@ abstract class AbstractMessageControllerTest {
     }
 
     @Test
-    fun `fail to create message due to invalid channel`() {
+    fun `fail to create message due to empty token`() {
         val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
 
         client
             .post()
-            .uri(MESSAGE_CREATE_URL)
+            .uri(MESSAGE_BASE_URL)
             .bodyValue(
                 mapOf(
                     "msg" to "Hello, World!",
@@ -159,40 +159,43 @@ abstract class AbstractMessageControllerTest {
 
         client
             .get()
-            .uri("$MESSAGE_CREATE_URL/$messageId")
+            .uri("$MESSAGE_BASE_URL/$messageId")
             .header("Authorization", "Bearer ${token.token}")
             .exchange()
             .expectStatus()
             .isOk
     }
 
-//    @Test
-//    fun `get channel messages`() {
-//        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
-//            repeat(10) {
-//                manager
-//                    .run {
-//                        messageRepo
-//                            .createMessage(
-//                                Message(
-//                                    msg = "Hello, World!",
-//                                    user = UserInfo(usId, "owner"),
-//                                    channel = ChannelInfo(chId, ChannelName(
-//                                        "channel",
-//                                        "owner",
-//                                        )
-//                                    ),
-//                                ),
-//                            )
-//                            ?: throw IllegalStateException("Message not created")
-//                    }
-//            }
-//        client
-//            .get()
-//            .uri("$CHANNEL_BASE_URL/$chId/messages")
-//            .header("Authorization", "Bearer ${token.token}")
-//            .exchange()
-//            .expectStatus()
-//            .isOk
-//    }
+    @Test
+    fun `get channel messages`() {
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
+        repeat(10) {
+            manager
+                .run {
+                    messageRepo
+                        .createMessage(
+                            Message(
+                                msg = "Hello, World!",
+                                user = UserInfo(usId, "owner"),
+                                channel =
+                                    ChannelInfo(
+                                        chId,
+                                        ChannelName(
+                                            "channel",
+                                            "owner",
+                                        ),
+                                    ),
+                            ),
+                        )
+                        ?: throw IllegalStateException("Message not created")
+                }
+        }
+        client
+            .get()
+            .uri("$MESSAGE_BASE_URL/channel/$chId")
+            .header("Authorization", "Bearer ${token.token}")
+            .exchange()
+            .expectStatus()
+            .isOk
+    }
 }
