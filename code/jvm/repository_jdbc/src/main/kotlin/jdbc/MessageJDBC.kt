@@ -11,6 +11,41 @@ import java.sql.Connection
 import java.sql.ResultSet
 
 /**
+ * @property AUTHOR_ID the author id column of the v_message table
+ */
+private const val AUTHOR_ID = "msgAuthorId"
+
+/**
+ * @property AUTHOR_USERNAME the author username column of the v_message table
+ */
+private const val AUTHOR_USERNAME = "msgAuthorUsername"
+
+/**
+ * @property CHANNEL_ID the channel id column of the v_message table
+ */
+private const val CHANNEL_ID = "msgChannelId"
+
+/**
+ * @property CHANNEL_NAME the channel name column of the v_message table
+ */
+private const val CHANNEL_NAME = "msgChannelName"
+
+/**
+ * @property CONTENT the content column of the v_message table
+ */
+private const val CONTENT = "msgContent"
+
+/**
+ * @property ID the id column of the v_message table
+ */
+private const val ID = "msgId"
+
+/**
+ * @property TIMESTAMP the timestamp column of the v_message table
+ */
+private const val TIMESTAMP = "msgTimestamp"
+
+/**
  * MessageJDBC is a JDBC implementation of MessageRepositoryInterface
  *
  * @property connection a JDBC Connection
@@ -23,20 +58,20 @@ class MessageJDBC(
     private fun ResultSet.toMessage(): Message {
         val author =
             UserInfo(
-                uId = getInt("msgAuthorId").toUInt(),
-                username = getString("msgAuthorUsername"),
+                uId = getInt(AUTHOR_ID).toUInt(),
+                username = getString(AUTHOR_USERNAME),
             )
         val channel =
             ChannelInfo(
-                cId = getInt("msgChannelId").toUInt(),
-                channelName = getString("msgChannelName").toChannelName(),
+                cId = getInt(CHANNEL_ID).toUInt(),
+                channelName = getString(CHANNEL_NAME).toChannelName(),
             )
         return Message(
-            msgId = getInt("msgId").toUInt(),
-            msg = encrypt.decrypt(getString("msgContent")),
+            msgId = getInt(ID).toUInt(),
+            msg = encrypt.decrypt(getString(CONTENT)),
             user = author,
             channel = channel,
-            creationTime = getTimestamp("msgTimestamp"),
+            creationTime = getTimestamp(TIMESTAMP),
         )
     }
 
