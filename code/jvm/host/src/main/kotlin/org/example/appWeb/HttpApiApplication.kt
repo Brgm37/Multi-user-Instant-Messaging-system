@@ -63,7 +63,7 @@ class HttpApiApplication {
                 username = config.username
                 password = config.password
                 maximumPoolSize = config.poolSize
-            }.let { HikariDataSource(it) }
+            }.let(::HikariDataSource)
 
     @Bean
     @Profile("jdbc")
