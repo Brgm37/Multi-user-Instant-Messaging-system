@@ -12,6 +12,8 @@ import model.users.UserInfo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.sql.Connection
+import java.sql.Timestamp
+import java.time.LocalDate
 import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -154,17 +156,16 @@ class MessageJDBCTest {
         }
     }
 
-//    @Test
-//    fun `update a message`() {
-//        testSetup { _, _, message ->
-//            val id = checkNotNull(message.msgId) { "Message id is null" }
-//            val updatedMessage = message.copy(creationTime = Timestamp.valueOf(LocalDateTime.now()))
-//            save(updatedMessage)
-//            val foundMessage = findById(id)
-//            assertEquals(updatedMessage, foundMessage)
-//
-//        }
-//    }
+    @Test
+    fun `update a message`() {
+        testSetup { _, _, message ->
+            val id = checkNotNull(message.msgId) { "Message id is null" }
+            val updatedMessage = message.copy(creationTime = Timestamp.valueOf(LocalDate.now().atStartOfDay()))
+            save(updatedMessage)
+            val foundMessage = findById(id)
+            assertEquals(updatedMessage, foundMessage)
+        }
+    }
 
     @Test
     fun `delete a message by id`() {
