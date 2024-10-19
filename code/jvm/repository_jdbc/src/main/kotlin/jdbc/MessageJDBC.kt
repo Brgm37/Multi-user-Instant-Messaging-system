@@ -143,7 +143,7 @@ class MessageJDBC(
         stm.setInt(idx++, entity.channel.cId.toInt())
         stm.setInt(idx++, entity.user.uId.toInt())
         stm.setString(idx++, encrypt.encrypt(entity.msg))
-        stm.setString(idx++, entity.creationTime.toString())
+        stm.setTimestamp(idx++, entity.creationTime)
         val id = checkNotNull(entity.msgId) { "Message id is null" }
         stm.setInt(idx, id.toInt())
         stm.executeUpdate()

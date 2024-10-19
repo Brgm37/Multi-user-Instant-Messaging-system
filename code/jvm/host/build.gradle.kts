@@ -47,7 +47,7 @@ tasks.test {
         "password",
     )
     environment(
-        "DB_POOL_SIZE",
+        "DB_POLL_SIZE",
         "10",
     )
     environment(
