@@ -26,6 +26,16 @@ import utils.Failure
 import utils.Success
 
 /**
+ * The default limit for the message list.
+ */
+private const val OFFSET = 0u
+
+/**
+ * The default offset for the message list.
+ */
+private const val LIMIT = 100u
+
+/**
  * Represents the controller for the message
  *
  * @property messageService The message service
@@ -84,8 +94,8 @@ class MessageController(
     @MessageSwaggerConfig.GetChannelMessages
     fun getChannelMessages(
         @PathVariable channelId: UInt,
-        @RequestParam offset: Int = 0,
-        @RequestParam limit: Int = 10,
+        @RequestParam offset: UInt = OFFSET,
+        @RequestParam limit: UInt = LIMIT,
         authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
         when (val response = messageService.latestMessages(channelId, authenticated.uId, offset, limit)) {

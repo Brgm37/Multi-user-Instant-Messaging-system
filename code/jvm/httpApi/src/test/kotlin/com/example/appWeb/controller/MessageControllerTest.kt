@@ -259,7 +259,7 @@ class MessageControllerTest {
                     )
                 assertIs<Success<Message>>(message, "Message was not created")
             }
-            getChannelMessages(checkNotNull(channel.cId), 5, 10, user).let { resp ->
+            getChannelMessages(checkNotNull(channel.cId), 5u, 10u, user).let { resp ->
                 assertEquals(HttpStatus.OK, resp.statusCode, "Status code is not OK")
                 assertIs<List<MessageOutputModel>>(
                     resp.body,
@@ -283,7 +283,7 @@ class MessageControllerTest {
     @MethodSource("transactionManager")
     fun `fail to get channel messages`(m: TransactionManager) =
         makeTest(m) { _, _, user, channel, _ ->
-            getChannelMessages(checkNotNull(channel.cId), 0, 10, user).let { resp ->
+            getChannelMessages(checkNotNull(channel.cId), 0u, 10u, user).let { resp ->
                 assertEquals(HttpStatus.NOT_FOUND, resp.statusCode, "Status code is not NOT_FOUND")
                 assertIs<MessageProblem.MessageNotFound>(resp.body, "Body is not a MessageNotFound")
             }

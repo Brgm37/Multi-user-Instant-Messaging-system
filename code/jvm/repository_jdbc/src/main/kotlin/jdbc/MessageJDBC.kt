@@ -41,6 +41,11 @@ private const val CONTENT = "msgContent"
 private const val ID = "msgId"
 
 /**
+ * @property MESSAGE_TABLE_ID id column of the message table
+ */
+private const val MESSAGE_TABLE_ID = "id"
+
+/**
  * @property TIMESTAMP the timestamp column of the v_message table
  */
 private const val TIMESTAMP = "msgTimestamp"
@@ -97,7 +102,7 @@ class MessageJDBC(
         stm.setTimestamp(idx, message.creationTime)
         val rs = stm.executeQuery()
         return if (rs.next()) {
-            message.copy(msgId = rs.getInt("id").toUInt())
+            message.copy(msgId = rs.getInt(MESSAGE_TABLE_ID).toUInt())
         } else {
             null
         }

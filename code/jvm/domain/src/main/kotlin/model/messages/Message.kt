@@ -13,6 +13,7 @@ import java.time.LocalDateTime
  * @property user the user that created the message.
  * @property channel the channel in which it is present.
  * @property creationTime the timestamp of when the message is created.
+ * @throws IllegalArgumentException if the message is empty.
  */
 data class Message(
     val msgId: UInt? = null,

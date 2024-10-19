@@ -1,5 +1,5 @@
 @startuml
-class Channel #line.dashed
+interface Channel
 {
     + cId: Uint?
     + owner: UserInfo
@@ -59,12 +59,16 @@ class ChannelInvitation
     + decrementUses(): ChannelInvitation
 }
 
-Channel <|-- Public
-Channel <|-- Private
+Public --|> Channel
+Private --|> Channel
 
-ChannelName <.. Channel
-AccessControl <.. Channel
-UserInfo <.. Channel
-Message <.. Channel
+ChannelName <.. Public
+ChannelName <.. Private
+AccessControl <.. Public
+AccessControl <.. Private
+UserInfo <.. Public
+UserInfo <.. Private
+Message <.. Public
+Message <.. Private
 AccessControl <.. ChannelInvitation
 @enduml

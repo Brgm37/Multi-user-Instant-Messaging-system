@@ -11,12 +11,12 @@ import model.users.UserInfo
  * @property name The name of the channel.
  * @property accessControl The access control settings of the channel.
  */
-sealed class Channel {
-    abstract val cId: UInt?
-    abstract val owner: UserInfo
-    abstract val name: ChannelName
-    abstract val accessControl: AccessControl
-    abstract val messages: List<Message>
+sealed interface Channel {
+    val cId: UInt?
+    val owner: UserInfo
+    val name: ChannelName
+    val accessControl: AccessControl
+    val messages: List<Message>
 
     /**
      * A public channel is visible to all users.
@@ -32,7 +32,7 @@ sealed class Channel {
         override val name: ChannelName,
         override val accessControl: AccessControl,
         override val messages: List<Message> = emptyList(),
-    ) : Channel()
+    ) : Channel
 
     /**
      * A private channel is only visible to the owner
@@ -49,7 +49,7 @@ sealed class Channel {
         override val name: ChannelName,
         override val accessControl: AccessControl,
         override val messages: List<Message> = emptyList(),
-    ) : Channel()
+    ) : Channel
 
     companion object {
         /**
@@ -60,7 +60,7 @@ sealed class Channel {
          * @param name The name of the channel.
          * @param accessControl The access control settings of the channel.
          * @param visibility The visibility of the channel. Must be either "PUBLIC" or "PRIVATE".
-         * @return A new channel.
+         * @return A new [Channel].
          */
         fun createChannel(
             id: UInt? = null,

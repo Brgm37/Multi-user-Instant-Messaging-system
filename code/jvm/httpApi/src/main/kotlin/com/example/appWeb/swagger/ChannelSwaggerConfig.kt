@@ -10,6 +10,12 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 
+/**
+ * Swagger configuration for the channel controller
+ *
+ * @see UserSwaggerConfig
+ * @see MessageSwaggerConfig
+ */
 object ChannelSwaggerConfig {
     @Operation(summary = "Get a channel by ID")
     @ApiResponses(
