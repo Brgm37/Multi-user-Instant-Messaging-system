@@ -1,6 +1,5 @@
 package jdbc
 
-import jdbc.ChannelJDBCTest.Companion
 import model.channels.AccessControl
 import model.channels.Channel
 import model.channels.ChannelInfo
@@ -18,7 +17,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class MessageJDBCTest {
-    companion object{
+    companion object {
         private const val VALID_PASSWORD = "Password123"
         private val passwordDefault = Password(VALID_PASSWORD)
 
@@ -76,9 +75,7 @@ class MessageJDBCTest {
         }
     }
 
-    private fun createMessage(
-        connection: Connection,
-    ): Message? =
+    private fun createMessage(connection: Connection): Message? =
         UserJDBC(connection)
             .createUser(
                 User(
@@ -131,7 +128,7 @@ class MessageJDBCTest {
     @Test
     fun `find messages by channel id`() {
         runWithConnection { connection ->
-            repeat(5){
+            repeat(5) {
                 createMessage(connection)
             }
         }
@@ -145,7 +142,7 @@ class MessageJDBCTest {
     @Test
     fun `find all messages`() {
         runWithConnection { connection ->
-            repeat(5){
+            repeat(5) {
                 createMessage(connection)
             }
         }

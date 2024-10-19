@@ -1,9 +1,7 @@
 package controller.message
 
 import TransactionManager
-import com.example.appWeb.controller.ChannelController.Companion.CHANNEL_BASE_URL
 import com.example.appWeb.controller.MessageController.Companion.MESSAGE_CREATE_URL
-import com.example.appWeb.controller.MessageController.Companion.MESSAGE_ID_URL
 import controller.TestConfig
 import model.channels.AccessControl
 import model.channels.Channel
@@ -144,11 +142,14 @@ abstract class AbstractMessageControllerTest {
                             Message(
                                 msg = "Hello, World!",
                                 user = UserInfo(usId, "owner"),
-                                channel = ChannelInfo(chId, ChannelName(
-                                    "channel",
-                                    "owner",
-                                    )
-                                ),
+                                channel =
+                                    ChannelInfo(
+                                        chId,
+                                        ChannelName(
+                                            "channel",
+                                            "owner",
+                                        ),
+                                    ),
                             ),
                         )
                         ?: throw IllegalStateException("Message not created")
