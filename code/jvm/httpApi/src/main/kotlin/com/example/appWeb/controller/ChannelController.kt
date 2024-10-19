@@ -7,6 +7,7 @@ import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.UserProblem
+import com.example.appWeb.swagger.ChannelSwaggerConfig
 import errors.ChannelError
 import errors.ChannelError.InvalidChannelAccessControl
 import errors.ChannelError.InvalidChannelInfo
@@ -14,6 +15,7 @@ import errors.ChannelError.InvalidChannelVisibility
 import errors.ChannelError.UserNotFound
 import interfaces.ChannelServicesInterface
 import jakarta.validation.Valid
+import org.hibernate.validator.constraints.Range
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
@@ -48,8 +50,9 @@ class ChannelController(
     private val channelService: ChannelServicesInterface,
 ) {
     @GetMapping(CHANNEL_ID_URL)
+    @ChannelSwaggerConfig.GetChannel
     fun getChannel(
-        @PathVariable channelId: UInt,
+        @PathVariable @Range(min = 1) channelId: UInt,
         authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
         when (val response = channelService.getChannel(channelId)) {
@@ -63,6 +66,7 @@ class ChannelController(
         }
 
     @GetMapping
+    @ChannelSwaggerConfig.GetChannels
     fun getChannels(
         authenticated: AuthenticatedUserInputModel,
         @RequestParam offset: UInt = OFFSET,
@@ -84,6 +88,7 @@ class ChannelController(
         }
 
     @PostMapping
+    @ChannelSwaggerConfig.CreateChannel
     fun createChannel(
         @Valid @RequestBody channel: CreateChannelInputModel,
         authenticated: AuthenticatedUserInputModel,
@@ -113,6 +118,7 @@ class ChannelController(
     }
 
     @PostMapping(CHANNEL_INVITATION_URL)
+    @ChannelSwaggerConfig.CreateChannelInvitation
     fun createChannelInvitation(
         @Valid @RequestBody invitation: CreateChannelInvitationInputModel,
         authenticated: AuthenticatedUserInputModel,

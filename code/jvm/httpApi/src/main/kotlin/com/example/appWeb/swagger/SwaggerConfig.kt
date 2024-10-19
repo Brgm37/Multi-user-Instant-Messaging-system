@@ -1,40 +1,25 @@
 package com.example.appWeb.swagger
 
-import io.swagger.v3.core.util.Json
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
-import org.springdoc.core.GroupedOpenApi
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationContext
+import org.springdoc.core.models.GroupedOpenApi
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.bind.annotation.RestController
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
 
 @Configuration
-class OpenApiGenerator {
-    @Autowired
-    private lateinit var applicationContext: ApplicationContext
-
+class SwaggerConfig {
     @Bean
-    fun customOpenAPI(): OpenAPI {
-        val openAPI =
-            OpenAPI()
-                .info(
-                    Info()
-                        .title("Your API Title")
-                        .version("1.0")
-                        .description("Your API Description"),
-                )
-
-        // Generate the OpenAPI JSON file
-        val openApiJson = Json.pretty(openAPI)
-        Files.write(Paths.get("openapi.json"), openApiJson.toByteArray())
-
-        return openAPI
-    }
+    fun customOpenAPI(): OpenAPI =
+        OpenAPI()
+            .info(
+                Info()
+                    .title("CHimp API")
+                    .version("1.0")
+                    .description(
+                        "API for CHimp (Chelas Instant Messaging Project) application that allows " +
+                            "users to create and manage channels.",
+                    ),
+            )
 
     @Bean
     fun publicApi(): GroupedOpenApi =
@@ -43,15 +28,4 @@ class OpenApiGenerator {
             .group("public")
             .pathsToMatch("/api/**")
             .build()
-
-    @Bean
-    fun generateOpenApiJson(): Path {
-        val openApi = customOpenAPI()
-        val restControllers = applicationContext.getBeansWithAnnotation(RestController::class.java)
-        restControllers.forEach { (name, bean) ->
-            // Process each RestController to include its API documentation
-        }
-        val openApiJson = Json.pretty(openApi)
-        return Files.write(Paths.get("openapi.json"), openApiJson.toByteArray())
-    }
 }

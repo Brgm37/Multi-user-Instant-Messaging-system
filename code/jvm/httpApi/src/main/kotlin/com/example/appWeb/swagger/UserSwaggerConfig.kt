@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 
 /**
  * Represents the Swagger configuration for the user endpoints in the application.
- * @see ChannelSwaggerConfig
+ * @see MessageSwaggerConfig
  */
 object UserSwaggerConfig {
     @Operation(summary = "Sign up a new user")
