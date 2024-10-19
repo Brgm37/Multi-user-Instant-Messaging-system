@@ -86,4 +86,4 @@ Data access is facilitated through the repository_jdbc module, with the relevant
 
 # OpenAPI Specification
 
-The OpenAPI Specification is available [here](./openapi/README.md).
+The OpenAPI Specification is available [here](http://localhost:8080/swagger-ui/index.html#/).

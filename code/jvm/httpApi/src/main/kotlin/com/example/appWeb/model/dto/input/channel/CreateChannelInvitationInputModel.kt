@@ -1,6 +1,7 @@
 package com.example.appWeb.model.dto.input.channel
 
 import jakarta.validation.constraints.AssertTrue
+import jakarta.validation.constraints.Pattern
 import model.channels.AccessControl
 import org.hibernate.validator.constraints.Range
 
@@ -14,6 +15,7 @@ import org.hibernate.validator.constraints.Range
 data class CreateChannelInvitationInputModel(
     @get:Range(min = 1) val channelId: UInt,
     @get:Range(min = 1) val maxUses: UInt = 1u,
+    @get:Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "Invalid date format, expected YYYY-MM-DD")
     val expirationDate: String? = null,
     val accessControl: String? = null,
 ) {

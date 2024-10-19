@@ -6,6 +6,7 @@ import com.example.appWeb.model.dto.output.message.MessageOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.MessageProblem
 import com.example.appWeb.model.problem.UserProblem
+import com.example.appWeb.swagger.MessageSwaggerConfig
 import errors.MessageError.ChannelNotFound
 import errors.MessageError.InvalidMessageInfo
 import errors.MessageError.UserNotFound
@@ -35,6 +36,7 @@ class MessageController(
     private val messageService: MessageServicesInterface,
 ) {
     @PostMapping
+    @MessageSwaggerConfig.CreateMessage
     fun createMessage(
         @Valid @RequestBody message: CreateMessageInputModel,
         authenticated: AuthenticatedUserInputModel,
@@ -63,6 +65,7 @@ class MessageController(
     }
 
     @GetMapping(MESSAGE_ID_URL)
+    @MessageSwaggerConfig.GetSingleMessage
     fun getSingleMessage(
         @PathVariable msgId: UInt,
         authenticated: AuthenticatedUserInputModel,
@@ -78,6 +81,7 @@ class MessageController(
         }
 
     @GetMapping(CHANNEL_MESSAGES_URL)
+    @MessageSwaggerConfig.GetChannelMessages
     fun getChannelMessages(
         @PathVariable channelId: UInt,
         @RequestParam offset: Int = 0,

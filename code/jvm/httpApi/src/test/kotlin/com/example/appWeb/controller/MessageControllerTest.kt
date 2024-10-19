@@ -196,16 +196,17 @@ class MessageControllerTest {
         val owner = AuthenticatedUserInputModel(0u, "token")
         val messageServices = MessageServices(m)
         val channelController = MessageController(messageServices)
-        channelController.createMessage(
-            CreateMessageInputModel(
-                "Hello, World!",
-                0u,
-            ),
-            owner,
-        ).let { resp ->
-            assertEquals(HttpStatus.NOT_FOUND, resp.statusCode, "Status code is different")
-            assertIs<ChannelProblem.ChannelNotFound>(resp.body, "Body is not a UserNotFound")
-        }
+        channelController
+            .createMessage(
+                CreateMessageInputModel(
+                    "Hello, World!",
+                    0u,
+                ),
+                owner,
+            ).let { resp ->
+                assertEquals(HttpStatus.NOT_FOUND, resp.statusCode, "Status code is different")
+                assertIs<ChannelProblem.ChannelNotFound>(resp.body, "Body is not a UserNotFound")
+            }
     }
 
     @ParameterizedTest
@@ -244,6 +245,7 @@ class MessageControllerTest {
 
     @ParameterizedTest
     @MethodSource("transactionManager")
+    @Suppress("UNCHECKED_CAST")
     fun `get channel messages`(m: TransactionManager) =
         makeTest(m) { manager, owner, user, channel, messageServices ->
             val nr = 20

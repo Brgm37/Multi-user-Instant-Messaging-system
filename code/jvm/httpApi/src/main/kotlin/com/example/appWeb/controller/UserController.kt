@@ -8,6 +8,7 @@ import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
 import com.example.appWeb.model.dto.output.user.UserSignUpOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.UserProblem
+import com.example.appWeb.swagger.UserSwaggerConfig
 import errors.ChannelError.ChannelNotFound
 import errors.UserError
 import interfaces.UserServicesInterface
@@ -39,6 +40,7 @@ class UserController(
     private val userService: UserServicesInterface,
 ) {
     @PostMapping(SIGNUP_URL)
+    @UserSwaggerConfig.SignUp
     fun signUp(
         @Valid @RequestBody user: UserSignUpInputModel,
     ): ResponseEntity<*> {
@@ -67,6 +69,7 @@ class UserController(
     }
 
     @GetMapping(USER_ID_URL)
+    @UserSwaggerConfig.GetUser
     fun getUser(
         @PathVariable userId: UInt,
         authenticated: AuthenticatedUserInputModel,
@@ -82,6 +85,7 @@ class UserController(
         }
 
     @PostMapping(LOGIN_URL)
+    @UserSwaggerConfig.Login
     fun login(
         @Valid @RequestBody user: UserLogInInputModel,
     ): ResponseEntity<*> =
@@ -101,6 +105,7 @@ class UserController(
         }
 
     @PostMapping(INVITATION_URL)
+    @UserSwaggerConfig.CreateInvitation
     fun createInvitation(authenticated: AuthenticatedUserInputModel): ResponseEntity<*> =
         when (val response = userService.createInvitation(authenticated.uId)) {
             is Success -> {
@@ -116,6 +121,7 @@ class UserController(
         }
 
     @DeleteMapping(LOGOUT_URL)
+    @UserSwaggerConfig.Logout
     fun logout(authenticated: AuthenticatedUserInputModel): ResponseEntity<*> =
         when (val response = userService.logout(authenticated.token, authenticated.uId)) {
             is Success -> {
@@ -133,6 +139,7 @@ class UserController(
         }
 
     @PutMapping(CHANNELS_CHANNEL_ID_URL)
+    @UserSwaggerConfig.JoinChannel
     fun joinChannel(
         @PathVariable channelId: UInt,
         @RequestParam invitationCode: String = "",
