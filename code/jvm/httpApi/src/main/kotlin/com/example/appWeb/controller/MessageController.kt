@@ -1,7 +1,5 @@
 package com.example.appWeb.controller
 
-import com.example.appWeb.controller.ChannelController.Companion.CHANNEL_BASE_URL
-import com.example.appWeb.controller.ChannelController.Companion.CHANNEL_ID_URL
 import com.example.appWeb.model.dto.input.message.CreateMessageInputModel
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.output.message.MessageOutputModel
@@ -17,12 +15,13 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import utils.Failure
 import utils.Success
 
@@ -31,12 +30,12 @@ import utils.Success
  *
  * @property messageService The message service
  */
-@Controller
+@RestController
+@RequestMapping(MessageController.MESSAGE_BASE_URL)
 class MessageController(
     private val messageService: MessageServicesInterface,
 ) {
-    @PostMapping(MESSAGE_CREATE_URL)
-    @ChannelSwaggerConfig.CreateMessage
+    @PostMapping
     fun createMessage(
         @Valid @RequestBody message: CreateMessageInputModel,
         authenticated: AuthenticatedUserInputModel,
@@ -65,7 +64,6 @@ class MessageController(
     }
 
     @GetMapping(MESSAGE_ID_URL)
-    @ChannelSwaggerConfig.GetSingleMessage
     fun getSingleMessage(
         @PathVariable msgId: UInt,
         authenticated: AuthenticatedUserInputModel,
@@ -81,11 +79,10 @@ class MessageController(
         }
 
     @GetMapping(CHANNEL_MESSAGES_URL)
-    @ChannelSwaggerConfig.GetChannelMessages
     fun getChannelMessages(
         @PathVariable channelId: UInt,
-        @RequestParam offset: Int,
-        @RequestParam limit: Int,
+        @RequestParam offset: Int = 0,
+        @RequestParam limit: Int = 10,
         authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
         when (val response = messageService.latestMessages(channelId, authenticated.uId, offset, limit)) {
@@ -99,8 +96,8 @@ class MessageController(
         }
 
     companion object {
-        const val MESSAGE_CREATE_URL = "$CHANNEL_BASE_URL/messages"
-        const val MESSAGE_ID_URL = "$CHANNEL_BASE_URL/messages/{msgId}"
-        const val CHANNEL_MESSAGES_URL = "$CHANNEL_ID_URL/messages"
+        const val MESSAGE_BASE_URL = "api/messages"
+        const val MESSAGE_ID_URL = "/{msgId}"
+        const val CHANNEL_MESSAGES_URL = "/channel/{channelId}"
     }
 }
