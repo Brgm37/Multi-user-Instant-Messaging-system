@@ -1,7 +1,7 @@
 # DAW project
 ---
 
-#Introduction
+# Introduction
 
 ---
 
@@ -17,3 +17,9 @@ The application should allow the user to:
 - View messages from different channels the user belongs to.
 - Generate invitations for user registration.
 - Generate invitations for channel join.
+
+---
+
+## Documentation
+
+- [Project Documentation](docs/README.md)
