@@ -44,9 +44,7 @@ class UserInMem : UserRepositoryInterface {
         return true
     }
 
-    override fun deleteToken(token: String): Boolean {
-        return tokens.removeIf { it.token == UUID.fromString(token) }
-    }
+    override fun deleteToken(token: String): Boolean = tokens.removeIf { it.token == UUID.fromString(token) }
 
     override fun findByToken(token: String): User? {
         val tokenObj =
@@ -79,5 +77,6 @@ class UserInMem : UserRepositoryInterface {
     override fun clear() {
         users.clear()
         invitations.clear()
+        tokens.clear()
     }
 }

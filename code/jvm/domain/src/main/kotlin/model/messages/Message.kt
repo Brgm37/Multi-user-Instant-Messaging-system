@@ -14,7 +14,6 @@ import java.time.LocalDateTime
  * @property channel the channel in which it is present.
  * @property creationTime the timestamp of when the message is created.
  */
-
 data class Message(
     val msgId: UInt? = null,
     val msg: String,
