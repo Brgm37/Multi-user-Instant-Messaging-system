@@ -45,26 +45,26 @@ Current scope:     <a href="../../index.html">all classes</a>
   <td class="name">ChannelServices</td>
 <td class="coverageStat">
   <span class="percent">
-    62.5%
+    100%
   </span>
   <span class="absValue">
-    (5/8)
+    (8/8)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    40%
+    90%
   </span>
   <span class="absValue">
-    (4/10)
+    (9/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    64.5%
+    93,5%
   </span>
   <span class="absValue">
-    (20/31)
+    (29/31)
   </span>
 </td>
 </tr>
@@ -80,10 +80,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    50%
+    62,5%
   </span>
   <span class="absValue">
-    (4/8)
+    (5/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -107,10 +107,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    62.5%
+    87,5%
   </span>
   <span class="absValue">
-    (5/8)
+    (7/8)
   </span>
 </td>
 <td class="coverageStat">
@@ -126,26 +126,26 @@ Current scope:     <a href="../../index.html">all classes</a>
     <td class="name">ChannelServices$deleteChannel$1</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/2)
+    (2/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/3)
+    (3/3)
   </span>
 </td>
   </tr>
@@ -161,10 +161,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    33.3%
+    50%
   </span>
   <span class="absValue">
-    (2/6)
+    (3/6)
   </span>
 </td>
 <td class="coverageStat">
@@ -180,26 +180,26 @@ Current scope:     <a href="../../index.html">all classes</a>
     <td class="name">ChannelServices$getChannels$1</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    75%
   </span>
   <span class="absValue">
-    (0/4)
+    (3/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/4)
+    (4/4)
   </span>
 </td>
   </tr>
@@ -226,26 +226,26 @@ Current scope:     <a href="../../index.html">all classes</a>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    64.3%
+    100%
   </span>
   <span class="absValue">
-    (9/14)
+    (14/14)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    39.5%
+    76,3%
   </span>
   <span class="absValue">
-    (15/38)
+    (29/38)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    74.7%
+    96%
   </span>
   <span class="absValue">
-    (56/75)
+    (72/75)
   </span>
 </td>
 </tr>
@@ -310,13 +310,13 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        visibility: String,
 &nbsp;    ): Either&lt;ChannelError, Channel&gt; {
 <b class="fc">&nbsp;        val args: Array&lt;String&gt; = arrayOf(name, visibility, accessControl)</b>
-<b class="pc">&nbsp;        if (args.any(String::isBlank)) return failure(InvalidChannelInfo)</b>
-<b class="pc">&nbsp;        if (!AccessControl.validate(accessControl)) return failure(InvalidChannelAccessControl)</b>
+<b class="fc">&nbsp;        if (args.any(String::isBlank)) return failure(InvalidChannelInfo)</b>
+<b class="fc">&nbsp;        if (!AccessControl.validate(accessControl)) return failure(InvalidChannelAccessControl)</b>
 <b class="fc">&nbsp;        val upperCaseVisibility = visibility.uppercase()</b>
-<b class="pc">&nbsp;        if (!Visibility.validate(visibility)) return failure(InvalidChannelVisibility)</b>
+<b class="fc">&nbsp;        if (!Visibility.validate(visibility)) return failure(InvalidChannelVisibility)</b>
 <b class="fc">&nbsp;        val upperCaseAccessControl = accessControl.uppercase()</b>
 <b class="fc">&nbsp;        return repoManager.run {</b>
-<b class="pc">&nbsp;            val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)</b>
+<b class="fc">&nbsp;            val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)</b>
 <b class="pc">&nbsp;            val uId = checkNotNull(user.uId) { &quot;User id is null&quot; }</b>
 <b class="fc">&nbsp;            val channel =</b>
 <b class="fc">&nbsp;                createChannel(</b>
@@ -333,17 +333,17 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun deleteChannel(id: UInt): Either&lt;ChannelError, Unit&gt; =
-<b class="nc">&nbsp;        repoManager</b>
-<b class="nc">&nbsp;            .run {</b>
-<b class="nc">&nbsp;                channelRepo.findById(id) ?: return@run failure(ChannelNotFound)</b>
-<b class="nc">&nbsp;                channelRepo.deleteById(id)</b>
-<b class="nc">&nbsp;                success(Unit)</b>
+<b class="fc">&nbsp;        repoManager</b>
+<b class="fc">&nbsp;            .run {</b>
+<b class="fc">&nbsp;                channelRepo.findById(id) ?: return@run failure(ChannelNotFound)</b>
+<b class="fc">&nbsp;                channelRepo.deleteById(id)</b>
+<b class="fc">&nbsp;                success(Unit)</b>
 &nbsp;            }
 &nbsp;
 &nbsp;    override fun getChannel(id: UInt): Either&lt;ChannelError, Channel&gt; =
 <b class="fc">&nbsp;        repoManager</b>
 <b class="fc">&nbsp;            .run {</b>
-<b class="pc">&nbsp;                val channel = channelRepo.findById(id) ?: return@run failure(ChannelNotFound)</b>
+<b class="fc">&nbsp;                val channel = channelRepo.findById(id) ?: return@run failure(ChannelNotFound)</b>
 <b class="fc">&nbsp;                val messages = messageRepo.findMessagesByChannelId(id, MSG_LIMIT, MSG_OFFSET)</b>
 <b class="fc">&nbsp;                return@run when (channel) {</b>
 <b class="pc">&nbsp;                    is Public -&gt; success(channel.copy(messages = messages))</b>
@@ -356,12 +356,12 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        offset: UInt,
 &nbsp;        limit: UInt,
 &nbsp;    ): Either&lt;ChannelError, List&lt;Channel&gt;&gt; =
-<b class="nc">&nbsp;        repoManager</b>
-<b class="nc">&nbsp;            .run {</b>
-<b class="nc">&nbsp;                val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)</b>
-<b class="nc">&nbsp;                val id = checkNotNull(user.uId) { &quot;User id is null&quot; }</b>
-<b class="nc">&nbsp;                val channels = channelRepo.findByUserId(id, offset.toInt(), limit.toInt())</b>
-<b class="nc">&nbsp;                success(channels)</b>
+<b class="fc">&nbsp;        repoManager</b>
+<b class="fc">&nbsp;            .run {</b>
+<b class="fc">&nbsp;                val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)</b>
+<b class="pc">&nbsp;                val id = checkNotNull(user.uId) { &quot;User id is null&quot; }</b>
+<b class="fc">&nbsp;                val channels = channelRepo.findByUserId(id, offset.toInt(), limit.toInt())</b>
+<b class="fc">&nbsp;                success(channels)</b>
 &nbsp;            }
 &nbsp;
 &nbsp;    override fun getChannels(
@@ -382,8 +382,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        owner: UInt,
 &nbsp;    ): Either&lt;ChannelError, UUID&gt; {
 <b class="fc">&nbsp;        val timestamp =</b>
-<b class="pc">&nbsp;            if (expirationDate != null) {</b>
-<b class="nc">&nbsp;                makeTimeStamp(expirationDate) ?: return failure(InvalidChannelInfo)</b>
+<b class="fc">&nbsp;            if (expirationDate != null) {</b>
+<b class="pc">&nbsp;                makeTimeStamp(expirationDate) ?: return failure(InvalidChannelInfo)</b>
 &nbsp;            } else {
 &nbsp;                LocalDateTime
 <b class="fc">&nbsp;                    .now()</b>
@@ -392,8 +392,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;            }
 <b class="fc">&nbsp;        return repoManager</b>
 <b class="fc">&nbsp;            .run {</b>
-<b class="pc">&nbsp;                val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelNotFound)</b>
-<b class="pc">&nbsp;                if (channel.owner.uId != owner) return@run failure(InvalidChannelInfo)</b>
+<b class="fc">&nbsp;                val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelNotFound)</b>
+<b class="fc">&nbsp;                if (channel.owner.uId != owner) return@run failure(InvalidChannelInfo)</b>
 <b class="fc">&nbsp;                val invitation =</b>
 <b class="fc">&nbsp;                    if (accessControl == null) {</b>
 <b class="fc">&nbsp;                        ChannelInvitation(</b>
@@ -418,11 +418,11 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun makeTimeStamp(expirationDate: String) =
-<b class="nc">&nbsp;        try {</b>
-<b class="nc">&nbsp;            Timestamp.valueOf(</b>
+<b class="fc">&nbsp;        try {</b>
+<b class="fc">&nbsp;            Timestamp.valueOf(</b>
 &nbsp;                LocalDate
-<b class="nc">&nbsp;                    .parse(expirationDate)</b>
-<b class="nc">&nbsp;                    .atStartOfDay(),</b>
+<b class="fc">&nbsp;                    .parse(expirationDate)</b>
+<b class="fc">&nbsp;                    .atStartOfDay(),</b>
 &nbsp;            )
 <b class="nc">&nbsp;        } catch (e: IllegalArgumentException) {</b>
 <b class="nc">&nbsp;            null</b>
@@ -451,7 +451,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-10-21 22:04</div>
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
 </div>
 </body>
 </html>

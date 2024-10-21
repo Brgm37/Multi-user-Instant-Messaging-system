@@ -53,18 +53,18 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    51.8%
+    82,1%
   </span>
   <span class="absValue">
-    (29/56)
+    (46/56)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    69.4%
+    88,7%
   </span>
   <span class="absValue">
-    (43/62)
+    (55/62)
   </span>
 </td>
 </tr>
@@ -83,18 +83,18 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    51.8%
+    82,1%
   </span>
   <span class="absValue">
-    (29/56)
+    (46/56)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    69.4%
+    88,7%
   </span>
   <span class="absValue">
-    (43/62)
+    (55/62)
   </span>
 </td>
 </tr>
@@ -205,8 +205,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 <b class="fc">&nbsp;            is Failure -&gt; {</b>
 <b class="fc">&nbsp;                when (response.value) {</b>
-<b class="pc">&nbsp;                    UserError.UserNotFound -&gt; UserProblem.UserNotFound.response(NOT_FOUND)</b>
-<b class="nc">&nbsp;                    UserError.PasswordIsInvalid -&gt; UserProblem.PasswordIsInvalid.response(BAD_REQUEST)</b>
+<b class="fc">&nbsp;                    UserError.UserNotFound -&gt; UserProblem.UserNotFound.response(NOT_FOUND)</b>
+<b class="pc">&nbsp;                    UserError.PasswordIsInvalid -&gt; UserProblem.PasswordIsInvalid.response(BAD_REQUEST)</b>
 <b class="nc">&nbsp;                    UserError.UnableToCreateToken -&gt; UserProblem.UnableToCreateToken.response(INTERNAL_SERVER_ERROR)</b>
 <b class="nc">&nbsp;                    else -&gt; UserProblem.UnableToLogin.response(INTERNAL_SERVER_ERROR)</b>
 &nbsp;                }
@@ -219,13 +219,13 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
 &nbsp;    ): ResponseEntity&lt;*&gt; =
 <b class="fc">&nbsp;        when (val response = userService.createInvitation(authenticated.uId)) {</b>
-<b class="pc">&nbsp;            is Success -&gt; {</b>
+<b class="fc">&nbsp;            is Success -&gt; {</b>
 <b class="fc">&nbsp;                ResponseEntity.ok(UserInvitationOutputModel.fromDomain(response.value))</b>
 &nbsp;            }
 &nbsp;
-<b class="nc">&nbsp;            is Failure -&gt; {</b>
-<b class="nc">&nbsp;                when (response.value) {</b>
-<b class="nc">&nbsp;                    UserError.InviterNotFound -&gt; UserProblem.InviterNotFound.response(NOT_FOUND)</b>
+<b class="fc">&nbsp;            is Failure -&gt; {</b>
+<b class="fc">&nbsp;                when (response.value) {</b>
+<b class="pc">&nbsp;                    UserError.InviterNotFound -&gt; UserProblem.InviterNotFound.response(NOT_FOUND)</b>
 <b class="nc">&nbsp;                    else -&gt; UserProblem.UnableToCreateInvitation.response(INTERNAL_SERVER_ERROR)</b>
 &nbsp;                }
 &nbsp;            }
@@ -237,14 +237,14 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
 &nbsp;    ): ResponseEntity&lt;*&gt; =
 <b class="fc">&nbsp;        when (val response = userService.logout(authenticated.token, authenticated.uId)) {</b>
-<b class="pc">&nbsp;            is Success -&gt; {</b>
+<b class="fc">&nbsp;            is Success -&gt; {</b>
 <b class="fc">&nbsp;                ResponseEntity.ok().build&lt;Any&gt;()</b>
 &nbsp;            }
 &nbsp;
-<b class="nc">&nbsp;            is Failure -&gt; {</b>
-<b class="nc">&nbsp;                when (response.value) {</b>
-<b class="nc">&nbsp;                    UserError.TokenNotFound -&gt; UserProblem.TokenNotFound.response(BAD_REQUEST)</b>
-<b class="nc">&nbsp;                    UserError.UserNotFound -&gt; UserProblem.UserNotFound.response(NOT_FOUND)</b>
+<b class="fc">&nbsp;            is Failure -&gt; {</b>
+<b class="fc">&nbsp;                when (response.value) {</b>
+<b class="fc">&nbsp;                    UserError.TokenNotFound -&gt; UserProblem.TokenNotFound.response(BAD_REQUEST)</b>
+<b class="pc">&nbsp;                    UserError.UserNotFound -&gt; UserProblem.UserNotFound.response(NOT_FOUND)</b>
 <b class="nc">&nbsp;                    UserError.UnableToDeleteToken -&gt; UserProblem.UnableToLogout.response(INTERNAL_SERVER_ERROR)</b>
 <b class="nc">&nbsp;                    else -&gt; UserProblem.UnableToLogout.response(INTERNAL_SERVER_ERROR)</b>
 &nbsp;                }
@@ -265,13 +265,13 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 <b class="fc">&nbsp;            is Failure -&gt; {</b>
 <b class="fc">&nbsp;                when (response.value) {</b>
-<b class="pc">&nbsp;                    UserError.UserNotFound -&gt; UserProblem.UserNotFound.response(NOT_FOUND)</b>
+<b class="fc">&nbsp;                    UserError.UserNotFound -&gt; UserProblem.UserNotFound.response(NOT_FOUND)</b>
 <b class="fc">&nbsp;                    ChannelNotFound -&gt; ChannelProblem.ChannelNotFound.response(NOT_FOUND)</b>
-<b class="pc">&nbsp;                    UserError.InvitationCodeIsInvalid -&gt; UserProblem.InvitationCodeIsInvalid.response(BAD_REQUEST)</b>
-<b class="nc">&nbsp;                    UserError.InvitationCodeHasExpired -&gt; UserProblem.InvitationCodeHasExpired.response(BAD_REQUEST)</b>
-<b class="nc">&nbsp;                    UserError.InvitationCodeMaxUsesReached -&gt;</b>
-<b class="nc">&nbsp;                        UserProblem.InvitationCodeMaxUsesReached.response(</b>
-<b class="nc">&nbsp;                            BAD_REQUEST,</b>
+<b class="fc">&nbsp;                    UserError.InvitationCodeIsInvalid -&gt; UserProblem.InvitationCodeIsInvalid.response(BAD_REQUEST)</b>
+<b class="fc">&nbsp;                    UserError.InvitationCodeHasExpired -&gt; UserProblem.InvitationCodeHasExpired.response(BAD_REQUEST)</b>
+<b class="pc">&nbsp;                    UserError.InvitationCodeMaxUsesReached -&gt;</b>
+<b class="fc">&nbsp;                        UserProblem.InvitationCodeMaxUsesReached.response(</b>
+<b class="fc">&nbsp;                            BAD_REQUEST,</b>
 &nbsp;                        )
 &nbsp;
 <b class="nc">&nbsp;                    else -&gt; UserProblem.UnableToJoinChannel.response(INTERNAL_SERVER_ERROR)</b>
@@ -349,7 +349,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-10-21 22:04</div>
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
 </div>
 </body>
 </html>

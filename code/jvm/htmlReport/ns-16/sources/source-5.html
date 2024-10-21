@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Coverage Report > UserServicesKt</title>
+  <title>Coverage Report > ChannelServicesKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,14 +22,14 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">services</a>
 </div>
 
-<h1>Coverage Summary for Class: UserServicesKt (services)</h1>
+<h1>Coverage Summary for Class: ChannelServicesKt (services)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 </tr>
 <tr>
-  <td class="name">UserServicesKt</td>
+  <td class="name">ChannelServicesKt</td>
 </tr>
 
 </table>
@@ -42,191 +42,174 @@ Current scope:     <a href="../../index.html">all classes</a>
 <code class="sourceCode" id="sourceCode">&nbsp;package services
 &nbsp;
 &nbsp;import TransactionManager
+&nbsp;import errors.ChannelError
 &nbsp;import errors.ChannelError.ChannelNotFound
-&nbsp;import errors.Error
-&nbsp;import errors.UserError
-&nbsp;import errors.UserError.InvitationCodeHasExpired
-&nbsp;import errors.UserError.InvitationCodeIsInvalid
-&nbsp;import errors.UserError.InvitationCodeMaxUsesReached
-&nbsp;import interfaces.UserServicesInterface
+&nbsp;import errors.ChannelError.InvalidChannelAccessControl
+&nbsp;import errors.ChannelError.InvalidChannelInfo
+&nbsp;import errors.ChannelError.InvalidChannelVisibility
+&nbsp;import errors.ChannelError.UnableToCreateChannel
+&nbsp;import errors.ChannelError.UserNotFound
+&nbsp;import interfaces.ChannelServicesInterface
 &nbsp;import jakarta.inject.Named
+&nbsp;import model.channels.AccessControl
 &nbsp;import model.channels.Channel
-&nbsp;import model.channels.decrementUses
-&nbsp;import model.users.Password
-&nbsp;import model.users.User
-&nbsp;import model.users.UserInvitation
-&nbsp;import model.users.UserToken
+&nbsp;import model.channels.Channel.Companion.createChannel
+&nbsp;import model.channels.Channel.Private
+&nbsp;import model.channels.Channel.Public
+&nbsp;import model.channels.ChannelInvitation
+&nbsp;import model.channels.ChannelName
+&nbsp;import model.channels.Visibility
+&nbsp;import model.users.UserInfo
 &nbsp;import utils.Either
 &nbsp;import utils.failure
 &nbsp;import utils.success
 &nbsp;import java.sql.Timestamp
+&nbsp;import java.time.LocalDate
 &nbsp;import java.time.LocalDateTime
+&nbsp;import java.util.UUID
 &nbsp;
 &nbsp;/**
-&nbsp; * The number of days an invitation is valid.
+&nbsp; * The offset for the channels message.
 &nbsp; */
-&nbsp;private const val INVITATION_EXPIRATION_DAYS = 7L
+&nbsp;private const val MSG_OFFSET = 0u
 &nbsp;
 &nbsp;/**
-&nbsp; * The number of days a token is valid.
+&nbsp; * The limit for the channels message.
 &nbsp; */
-&nbsp;private const val TOKEN_EXPIRATION_DAYS = 7L
+&nbsp;private const val MSG_LIMIT = 100u
 &nbsp;
 &nbsp;/**
-&nbsp; * The services available for the user entity.
+&nbsp; * The services available for the channel entity.
 &nbsp; * @property repoManager The transaction manager.
 &nbsp; */
-&nbsp;@Named(&quot;UserServices&quot;)
-&nbsp;class UserServices(
+&nbsp;@Named(&quot;ChannelServices&quot;)
+&nbsp;class ChannelServices(
 &nbsp;    private val repoManager: TransactionManager,
-&nbsp;) : UserServicesInterface {
-&nbsp;    override fun createUser(
-&nbsp;        username: String,
-&nbsp;        password: String,
-&nbsp;        invitationCode: String,
-&nbsp;        inviterUId: UInt,
-&nbsp;    ): Either&lt;UserError, User&gt; {
-&nbsp;        if (username.isEmpty()) return failure(UserError.UsernameIsEmpty)
-&nbsp;        if (!Password.isValidPassword(password)) return failure(UserError.PasswordIsInvalid)
-&nbsp;        val user =
-&nbsp;            User(
-&nbsp;                username = username,
-&nbsp;                password = Password(password),
-&nbsp;            )
+&nbsp;) : ChannelServicesInterface {
+&nbsp;    override fun createChannel(
+&nbsp;        owner: UInt,
+&nbsp;        name: String,
+&nbsp;        accessControl: String,
+&nbsp;        visibility: String,
+&nbsp;    ): Either&lt;ChannelError, Channel&gt; {
+&nbsp;        val args: Array&lt;String&gt; = arrayOf(name, visibility, accessControl)
+&nbsp;        if (args.any(String::isBlank)) return failure(InvalidChannelInfo)
+&nbsp;        if (!AccessControl.validate(accessControl)) return failure(InvalidChannelAccessControl)
+&nbsp;        val upperCaseVisibility = visibility.uppercase()
+&nbsp;        if (!Visibility.validate(visibility)) return failure(InvalidChannelVisibility)
+&nbsp;        val upperCaseAccessControl = accessControl.uppercase()
 &nbsp;        return repoManager.run {
-&nbsp;            userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
-&nbsp;            if (userRepo.findByUsername(username) != null) return@run failure(UserError.UsernameAlreadyExists)
-&nbsp;            val invitation =
-&nbsp;                userRepo
-&nbsp;                    .findInvitation(inviterUId, invitationCode)
-&nbsp;                    ?: return@run failure(InvitationCodeIsInvalid)
-&nbsp;            if (invitation.isExpired) {
-&nbsp;                userRepo.deleteInvitation(invitation)
-&nbsp;                return@run failure(InvitationCodeHasExpired)
-&nbsp;            }
-&nbsp;            val createdUser = userRepo.createUser(user) ?: return@run failure(UserError.UnableToCreateUser)
-&nbsp;            userRepo.deleteInvitation(invitation)
-&nbsp;            success(createdUser)
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun deleteUser(id: UInt): Either&lt;UserError, Unit&gt; {
-&nbsp;        return repoManager.run {
-&nbsp;            userRepo.findById(id) ?: return@run failure(UserError.UserNotFound)
-&nbsp;            userRepo.deleteById(id)
-&nbsp;            success(Unit)
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun getUser(id: UInt): Either&lt;UserError, User&gt; {
-&nbsp;        return repoManager.run {
-&nbsp;            val user = userRepo.findById(id) ?: return@run failure(UserError.UserNotFound)
-&nbsp;            success(user)
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun joinChannel(
-&nbsp;        userId: UInt,
-&nbsp;        channelId: UInt,
-&nbsp;        invitationCode: String?,
-&nbsp;    ): Either&lt;Error, Unit&gt; {
-&nbsp;        return repoManager.run {
+&nbsp;            val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
+&nbsp;            val uId = checkNotNull(user.uId) { &quot;User id is null&quot; }
 &nbsp;            val channel =
-&nbsp;                channelRepo.findById(channelId) ?: return@run failure(ChannelNotFound)
-&nbsp;            userRepo.findById(userId) ?: return@run failure(UserError.UserNotFound)
-&nbsp;            if (channelRepo.isUserInChannel(channelId, userId)) {
-&nbsp;                return@run success(Unit)
-&nbsp;            }
-&nbsp;            if (channel is Channel.Public) {
-&nbsp;                channelRepo.joinChannel(channelId, userId, channel.accessControl)
-&nbsp;                return@run success(Unit)
-&nbsp;            }
-&nbsp;            val invitation = channelRepo.findInvitation(channelId) ?: return@run failure(InvitationCodeIsInvalid)
-&nbsp;            if (invitationCode != invitation.invitationCode.toString()) {
-&nbsp;                return@run failure(InvitationCodeIsInvalid)
-&nbsp;            }
-&nbsp;            if (invitation.isExpired) {
-&nbsp;                channelRepo.deleteInvitation(channelId)
-&nbsp;                return@run failure(InvitationCodeHasExpired)
-&nbsp;            }
-&nbsp;            if (invitation.maxUses == 0u) {
-&nbsp;                channelRepo.deleteInvitation(channelId)
-&nbsp;                return@run failure(InvitationCodeMaxUsesReached)
-&nbsp;            }
-&nbsp;            channelRepo.updateInvitation(invitation.decrementUses())
-&nbsp;            channelRepo.joinChannel(channelId, userId, invitation.accessControl)
-&nbsp;            success(Unit)
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun getUserByToken(token: String): Either&lt;UserError, User&gt; =
-&nbsp;        repoManager.run {
-&nbsp;            val user = userRepo.findByToken(token) ?: return@run failure(UserError.UserNotFound)
-&nbsp;            success(user)
-&nbsp;        }
-&nbsp;
-&nbsp;    override fun isValidToken(token: String): Either&lt;UserError, Boolean&gt; =
-&nbsp;        repoManager.run {
-&nbsp;            val session = userRepo.validateToken(token)
-&nbsp;            success(session)
-&nbsp;        }
-&nbsp;
-&nbsp;    override fun getInvitation(
-&nbsp;        inviterUId: UInt,
-&nbsp;        invitationCode: String,
-&nbsp;    ): Either&lt;UserError, UserInvitation&gt; {
-&nbsp;        return repoManager.run {
-&nbsp;            userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
-&nbsp;            val invitation =
-&nbsp;                userRepo
-&nbsp;                    .findInvitation(inviterUId, invitationCode) ?: return@run failure(UserError.InvitationNotFound)
-&nbsp;            success(invitation)
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    override fun login(
-&nbsp;        username: String,
-&nbsp;        password: String,
-&nbsp;    ): Either&lt;UserError, UserToken&gt; {
-&nbsp;        return repoManager.run {
-&nbsp;            val user = userRepo.findByUsername(username) ?: return@run failure(UserError.UserNotFound)
-&nbsp;            if (!user.password.matches(password)) return@run failure(UserError.PasswordIsInvalid)
-&nbsp;            val userId = checkNotNull(user.uId)
-&nbsp;            val token =
-&nbsp;                UserToken(
-&nbsp;                    userId = userId,
-&nbsp;                    expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(TOKEN_EXPIRATION_DAYS)),
+&nbsp;                createChannel(
+&nbsp;                    owner = UserInfo(uId, user.username),
+&nbsp;                    name = ChannelName(name, user.username),
+&nbsp;                    accessControl = AccessControl.valueOf(upperCaseAccessControl),
+&nbsp;                    visibility = Visibility.valueOf(upperCaseVisibility),
 &nbsp;                )
-&nbsp;            if (userRepo.createToken(token)) success(token) else failure(UserError.UnableToCreateToken)
+&nbsp;            val createdChannel = channelRepo.createChannel(channel) ?: return@run failure(UnableToCreateChannel)
+&nbsp;            val chId = checkNotNull(createdChannel.cId)
+&nbsp;            channelRepo.joinChannel(chId, uId, AccessControl.READ_WRITE)
+&nbsp;            success(createdChannel)
 &nbsp;        }
 &nbsp;    }
 &nbsp;
-&nbsp;    override fun logout(
-&nbsp;        token: String,
-&nbsp;        uId: UInt,
-&nbsp;    ): Either&lt;UserError, Unit&gt; =
-&nbsp;        repoManager.run {
-&nbsp;            if (!userRepo.validateToken(token)) return@run failure(UserError.TokenNotFound)
-&nbsp;            if (userRepo.findById(uId) == null) return@run failure(UserError.UserNotFound)
-&nbsp;            if (!userRepo.deleteToken(token)) return@run failure(UserError.UnableToDeleteToken)
-&nbsp;            success(Unit)
-&nbsp;        }
+&nbsp;    override fun deleteChannel(id: UInt): Either&lt;ChannelError, Unit&gt; =
+&nbsp;        repoManager
+&nbsp;            .run {
+&nbsp;                channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
+&nbsp;                channelRepo.deleteById(id)
+&nbsp;                success(Unit)
+&nbsp;            }
 &nbsp;
-&nbsp;    override fun createInvitation(inviterUId: UInt): Either&lt;UserError, UserInvitation&gt; {
-&nbsp;        return repoManager.run {
-&nbsp;            userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
-&nbsp;            val invitation =
-&nbsp;                UserInvitation(
-&nbsp;                    inviterId = inviterUId,
-&nbsp;                    expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(INVITATION_EXPIRATION_DAYS)),
-&nbsp;                )
-&nbsp;            if (userRepo.createInvitation(invitation)) {
-&nbsp;                success(invitation)
+&nbsp;    override fun getChannel(id: UInt): Either&lt;ChannelError, Channel&gt; =
+&nbsp;        repoManager
+&nbsp;            .run {
+&nbsp;                val channel = channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
+&nbsp;                val messages = messageRepo.findMessagesByChannelId(id, MSG_LIMIT, MSG_OFFSET)
+&nbsp;                return@run when (channel) {
+&nbsp;                    is Public -&gt; success(channel.copy(messages = messages))
+&nbsp;                    is Private -&gt; success(channel.copy(messages = messages))
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;    override fun getChannels(
+&nbsp;        owner: UInt,
+&nbsp;        offset: UInt,
+&nbsp;        limit: UInt,
+&nbsp;    ): Either&lt;ChannelError, List&lt;Channel&gt;&gt; =
+&nbsp;        repoManager
+&nbsp;            .run {
+&nbsp;                val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
+&nbsp;                val id = checkNotNull(user.uId) { &quot;User id is null&quot; }
+&nbsp;                val channels = channelRepo.findByUserId(id, offset.toInt(), limit.toInt())
+&nbsp;                success(channels)
+&nbsp;            }
+&nbsp;
+&nbsp;    override fun getChannels(
+&nbsp;        offset: UInt,
+&nbsp;        limit: UInt,
+&nbsp;    ): Either&lt;ChannelError, List&lt;Channel&gt;&gt; =
+&nbsp;        repoManager
+&nbsp;            .run {
+&nbsp;                val channels = channelRepo.findAll(offset.toInt(), limit.toInt())
+&nbsp;                success(channels)
+&nbsp;            }
+&nbsp;
+&nbsp;    override fun createChannelInvitation(
+&nbsp;        channelId: UInt,
+&nbsp;        maxUses: UInt,
+&nbsp;        expirationDate: String?,
+&nbsp;        accessControl: String?,
+&nbsp;        owner: UInt,
+&nbsp;    ): Either&lt;ChannelError, UUID&gt; {
+&nbsp;        val timestamp =
+&nbsp;            if (expirationDate != null) {
+&nbsp;                makeTimeStamp(expirationDate) ?: return failure(InvalidChannelInfo)
 &nbsp;            } else {
-&nbsp;                failure(UserError.UnableToCreateInvitation)
+&nbsp;                LocalDateTime
+&nbsp;                    .now()
+&nbsp;                    .plusWeeks(1)
+&nbsp;                    .let(Timestamp::valueOf)
 &nbsp;            }
-&nbsp;        }
+&nbsp;        return repoManager
+&nbsp;            .run {
+&nbsp;                val channel = channelRepo.findById(channelId) ?: return@run failure(ChannelNotFound)
+&nbsp;                if (channel.owner.uId != owner) return@run failure(InvalidChannelInfo)
+&nbsp;                val invitation =
+&nbsp;                    if (accessControl == null) {
+&nbsp;                        ChannelInvitation(
+&nbsp;                            cId = channelId,
+&nbsp;                            expirationDate = timestamp,
+&nbsp;                            maxUses = maxUses,
+&nbsp;                            accessControl = channel.accessControl,
+&nbsp;                        )
+&nbsp;                    } else {
+&nbsp;                        ChannelInvitation(
+&nbsp;                            cId = channelId,
+&nbsp;                            expirationDate = timestamp,
+&nbsp;                            maxUses = maxUses,
+&nbsp;                            accessControl = AccessControl.valueOf(accessControl.uppercase()),
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;                val oldInvitation = channelRepo.findInvitation(channelId)
+&nbsp;                if (oldInvitation != null) channelRepo.deleteInvitation(channelId)
+&nbsp;                channelRepo.createInvitation(invitation)
+&nbsp;                success(invitation.invitationCode)
+&nbsp;            }
 &nbsp;    }
+&nbsp;
+&nbsp;    private fun makeTimeStamp(expirationDate: String) =
+&nbsp;        try {
+&nbsp;            Timestamp.valueOf(
+&nbsp;                LocalDate
+&nbsp;                    .parse(expirationDate)
+&nbsp;                    .atStartOfDay(),
+&nbsp;            )
+&nbsp;        } catch (e: IllegalArgumentException) {
+&nbsp;            null
+&nbsp;        }
 &nbsp;}
 </code>
 </pre>
@@ -251,7 +234,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-10-21 22:04</div>
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
 </div>
 </body>
 </html>

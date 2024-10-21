@@ -45,26 +45,26 @@ Current scope:     <a href="../../index.html">all classes</a>
   <td class="name">ChannelInMem</td>
 <td class="coverageStat">
   <span class="percent">
-    73.3%
+    100%
   </span>
   <span class="absValue">
-    (11/15)
+    (15/15)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    71.4%
+    83,3%
   </span>
   <span class="absValue">
-    (30/42)
+    (35/42)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86.8%
+    100%
   </span>
   <span class="absValue">
-    (33/38)
+    (38/38)
   </span>
 </td>
 </tr>
@@ -72,26 +72,26 @@ Current scope:     <a href="../../index.html">all classes</a>
     <td class="name">ChannelInMem$deleteById$1</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/4)
+    (2/4)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
   </tr>
@@ -99,26 +99,26 @@ Current scope:     <a href="../../index.html">all classes</a>
     <td class="name">ChannelInMem$deleteInvitation$1</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
   </tr>
@@ -145,26 +145,26 @@ Current scope:     <a href="../../index.html">all classes</a>
     <td class="name">ChannelInMem$updateInvitation$1</td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    50%
   </span>
   <span class="absValue">
-    (0/2)
+    (1/2)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    0%
+    100%
   </span>
   <span class="absValue">
-    (0/1)
+    (1/1)
   </span>
 </td>
   </tr>
@@ -172,26 +172,26 @@ Current scope:     <a href="../../index.html">all classes</a>
   <td class="name"><strong>Total</strong></td>
 <td class="coverageStat">
   <span class="percent">
-    63.2%
+    100%
   </span>
   <span class="absValue">
-    (12/19)
+    (19/19)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    60%
+    78%
   </span>
   <span class="absValue">
-    (30/50)
+    (39/50)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    81%
+    100%
   </span>
   <span class="absValue">
-    (34/42)
+    (42/42)
   </span>
 </td>
 </tr>
@@ -238,7 +238,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        userId: UInt,
 &nbsp;        offset: Int,
 &nbsp;        limit: Int,
-<b class="nc">&nbsp;    ): List&lt;Channel&gt; = channels.filter { it.owner.uId == userId }</b>
+<b class="pc">&nbsp;    ): List&lt;Channel&gt; = channels.filter { it.owner.uId == userId }</b>
 &nbsp;
 &nbsp;    override fun joinChannel(
 &nbsp;        channelId: UInt,
@@ -261,12 +261,12 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;    override fun findInvitation(channelId: UInt): ChannelInvitation? = invitations.find { it.cId == channelId }</b>
 &nbsp;
 &nbsp;    override fun updateInvitation(invitation: ChannelInvitation) {
-<b class="nc">&nbsp;        invitations.removeIf { it.cId == invitation.cId }</b>
-<b class="nc">&nbsp;        invitations.add(invitation)</b>
+<b class="pc">&nbsp;        invitations.removeIf { it.cId == invitation.cId }</b>
+<b class="fc">&nbsp;        invitations.add(invitation)</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun deleteInvitation(channelId: UInt) {
-<b class="nc">&nbsp;        invitations.removeIf { it.cId == channelId }</b>
+<b class="pc">&nbsp;        invitations.removeIf { it.cId == channelId }</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun createInvitation(invitation: ChannelInvitation) {
@@ -295,7 +295,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun deleteById(id: UInt) {
-<b class="nc">&nbsp;        channels.removeIf { it.cId == id }</b>
+<b class="pc">&nbsp;        channels.removeIf { it.cId == id }</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun clear() {
@@ -327,7 +327,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-10-21 22:04</div>
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
 </div>
 </body>
 </html>

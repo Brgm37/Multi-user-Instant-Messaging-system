@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Coverage Report > ChannelRepositoryInterface</title>
+  <title>Coverage Report > Transaction</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,14 +22,14 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">&lt;empty package name&gt;</a>
 </div>
 
-<h1>Coverage Summary for Class: ChannelRepositoryInterface (&lt;empty package name&gt;)</h1>
+<h1>Coverage Summary for Class: Transaction (&lt;empty package name&gt;)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 </tr>
 <tr>
-  <td class="name">ChannelRepositoryInterface</td>
+  <td class="name">Transaction</td>
 </tr>
 
 </table>
@@ -39,92 +39,12 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;import model.channels.AccessControl
-&nbsp;import model.channels.Channel
-&nbsp;import model.channels.ChannelInvitation
+<code class="sourceCode" id="sourceCode">&nbsp;interface Transaction {
+&nbsp;    val channelRepo: ChannelRepositoryInterface
+&nbsp;    val userRepo: UserRepositoryInterface
+&nbsp;    val messageRepo: MessageRepositoryInterface
 &nbsp;
-&nbsp;/**
-&nbsp; * Interface for the channel repository
-&nbsp; */
-&nbsp;interface ChannelRepositoryInterface : Repository&lt;Channel&gt; {
-&nbsp;    /**
-&nbsp;     * Creates a new channel
-&nbsp;     * @param channel The channel to create
-&nbsp;     * @return The created channel with its ID
-&nbsp;     */
-&nbsp;    fun createChannel(channel: Channel): Channel?
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Retrieves all channels owned by a user
-&nbsp;     * @param userId The ID of the user
-&nbsp;     * @param offset The offset to start retrieving channels
-&nbsp;     * @param limit The maximum number of channels to retrieve
-&nbsp;     * @return A list with all channels owned by the user
-&nbsp;     */
-&nbsp;    fun findByUserId(
-&nbsp;        userId: UInt,
-&nbsp;        offset: Int,
-&nbsp;        limit: Int,
-&nbsp;    ): List&lt;Channel&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Joins a user to a channel
-&nbsp;     * @param channelId The ID of the channel
-&nbsp;     * @param userId The ID of the user
-&nbsp;     * @param accessControl The access control settings for the user
-&nbsp;     */
-&nbsp;    fun joinChannel(
-&nbsp;        channelId: UInt,
-&nbsp;        userId: UInt,
-&nbsp;        accessControl: AccessControl,
-&nbsp;    )
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Checks if a user is in a channel
-&nbsp;     * @param channelId The ID of the channel
-&nbsp;     * @param userId The ID of the user
-&nbsp;     * @return True if the user is in the channel, false otherwise
-&nbsp;     */
-&nbsp;    fun isUserInChannel(
-&nbsp;        channelId: UInt,
-&nbsp;        userId: UInt,
-&nbsp;    ): Boolean
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Retrieves a channel invitation associated with a channel
-&nbsp;     * @param channelId The ID of the channel
-&nbsp;     */
-&nbsp;    fun findInvitation(channelId: UInt): ChannelInvitation?
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Updates a channel invitation
-&nbsp;     * @param invitation The updated invitation
-&nbsp;     */
-&nbsp;    fun updateInvitation(invitation: ChannelInvitation)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Deletes a channel invitation
-&nbsp;     * @param channelId The ID of the channel
-&nbsp;     */
-&nbsp;    fun deleteInvitation(channelId: UInt)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Creates a channel invitation
-&nbsp;     * @param invitation The invitation to create
-&nbsp;     * @return The created invitation
-&nbsp;     */
-&nbsp;    fun createInvitation(invitation: ChannelInvitation)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Retrieves the access control settings for a user in a channel
-&nbsp;     * @param channelId The ID of the channel
-&nbsp;     * @param userId The ID of the user
-&nbsp;     * @return The access control settings for the user in the channel
-&nbsp;     */
-&nbsp;    fun findUserAccessControl(
-&nbsp;        channelId: UInt,
-&nbsp;        userId: UInt,
-&nbsp;    ): AccessControl?
+&nbsp;    fun rollback()
 &nbsp;}
 </code>
 </pre>
@@ -149,7 +69,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-10-21 22:04</div>
+    <div style="float:right;">generated on 2024-10-21 22:15</div>
 </div>
 </body>
 </html>

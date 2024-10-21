@@ -56,26 +56,26 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    80%
+    100%
   </span>
   <span class="absValue">
-    (16/20)
+    (20/20)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    66.7%
+    83,3%
   </span>
   <span class="absValue">
-    (16/24)
+    (20/24)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    80.9%
+    99,2%
   </span>
   <span class="absValue">
-    (106/131)
+    (130/131)
   </span>
 </td>
 </tr>
@@ -324,8 +324,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 &nbsp;    override fun createToken(token: UserToken): Boolean {
 <b class="fc">&nbsp;        val tokenCount = countUserTokens(token.userId)</b>
-<b class="pc">&nbsp;        if (tokenCount &gt;= MAX_TOKENS) {</b>
-<b class="nc">&nbsp;            deleteOldestToken(token.userId)</b>
+<b class="fc">&nbsp;        if (tokenCount &gt;= MAX_TOKENS) {</b>
+<b class="fc">&nbsp;            deleteOldestToken(token.userId)</b>
 &nbsp;        }
 <b class="fc">&nbsp;        val insertQuery =</b>
 &nbsp;            &quot;&quot;&quot;
@@ -349,7 +349,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
 <b class="fc">&nbsp;        val stm = connection.prepareStatement(deleteQuery)</b>
 <b class="fc">&nbsp;        stm.setString(1, token)</b>
-<b class="pc">&nbsp;        return stm.executeUpdate() &gt; 0</b>
+<b class="fc">&nbsp;        return stm.executeUpdate() &gt; 0</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun countUserTokens(userId: UInt): Int {
@@ -362,7 +362,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun deleteOldestToken(userId: UInt) {
-<b class="nc">&nbsp;        val deleteOldestQuery =</b>
+<b class="fc">&nbsp;        val deleteOldestQuery =</b>
 &nbsp;            &quot;&quot;&quot;
 &nbsp;            DELETE FROM users_tokens
 &nbsp;            WHERE token IN (
@@ -373,32 +373,32 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;                    FETCH 
 &nbsp;                    FIRST 1 ROWS ONLY
 &nbsp;            )
-<b class="nc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
-<b class="nc">&nbsp;        val stmDelete = connection.prepareStatement(deleteOldestQuery)</b>
-<b class="nc">&nbsp;        stmDelete.setInt(1, userId.toInt())</b>
-<b class="nc">&nbsp;        stmDelete.executeUpdate()</b>
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
+<b class="fc">&nbsp;        val stmDelete = connection.prepareStatement(deleteOldestQuery)</b>
+<b class="fc">&nbsp;        stmDelete.setInt(1, userId.toInt())</b>
+<b class="fc">&nbsp;        stmDelete.executeUpdate()</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun findAll(
 &nbsp;        offset: Int,
 &nbsp;        limit: Int,
 &nbsp;    ): List&lt;User&gt; {
-<b class="nc">&nbsp;        val selectQuery =</b>
+<b class="fc">&nbsp;        val selectQuery =</b>
 &nbsp;            &quot;&quot;&quot;
 &nbsp;            SELECT id, name, password
 &nbsp;            FROM users
 &nbsp;            OFFSET ?
 &nbsp;            LIMIT ?
-<b class="nc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
-<b class="nc">&nbsp;        val stm = connection.prepareStatement(selectQuery)</b>
-<b class="nc">&nbsp;        stm.setInt(1, offset)</b>
-<b class="nc">&nbsp;        stm.setInt(2, limit)</b>
-<b class="nc">&nbsp;        val rs = stm.executeQuery()</b>
-<b class="nc">&nbsp;        val users = mutableListOf&lt;User&gt;()</b>
-<b class="nc">&nbsp;        while (rs.next()) {</b>
-<b class="nc">&nbsp;            users.add(rs.toUser())</b>
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
+<b class="fc">&nbsp;        val stm = connection.prepareStatement(selectQuery)</b>
+<b class="fc">&nbsp;        stm.setInt(1, offset)</b>
+<b class="fc">&nbsp;        stm.setInt(2, limit)</b>
+<b class="fc">&nbsp;        val rs = stm.executeQuery()</b>
+<b class="fc">&nbsp;        val users = mutableListOf&lt;User&gt;()</b>
+<b class="fc">&nbsp;        while (rs.next()) {</b>
+<b class="fc">&nbsp;            users.add(rs.toUser())</b>
 &nbsp;        }
-<b class="nc">&nbsp;        return users</b>
+<b class="fc">&nbsp;        return users</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun save(entity: User) {
@@ -417,20 +417,20 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun deleteById(id: UInt) {
-<b class="nc">&nbsp;        executeDeleteQuery(&quot;DELETE FROM users_invitations WHERE user_id = ?&quot;, id)</b>
-<b class="nc">&nbsp;        executeDeleteQuery(&quot;DELETE FROM users_tokens WHERE user_id = ?&quot;, id)</b>
-<b class="nc">&nbsp;        executeDeleteQuery(&quot;DELETE FROM messages WHERE author = ?&quot;, id)</b>
-<b class="nc">&nbsp;        executeDeleteQuery(&quot;DELETE FROM channel_members WHERE member = ?&quot;, id)</b>
-<b class="nc">&nbsp;        executeDeleteQuery(&quot;DELETE FROM users WHERE id = ?&quot;, id)</b>
+<b class="fc">&nbsp;        executeDeleteQuery(&quot;DELETE FROM users_invitations WHERE user_id = ?&quot;, id)</b>
+<b class="fc">&nbsp;        executeDeleteQuery(&quot;DELETE FROM users_tokens WHERE user_id = ?&quot;, id)</b>
+<b class="fc">&nbsp;        executeDeleteQuery(&quot;DELETE FROM messages WHERE author = ?&quot;, id)</b>
+<b class="fc">&nbsp;        executeDeleteQuery(&quot;DELETE FROM channel_members WHERE member = ?&quot;, id)</b>
+<b class="fc">&nbsp;        executeDeleteQuery(&quot;DELETE FROM users WHERE id = ?&quot;, id)</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    private fun executeDeleteQuery(
 &nbsp;        query: String,
 &nbsp;        id: UInt,
 &nbsp;    ) {
-<b class="nc">&nbsp;        val stm = connection.prepareStatement(query)</b>
-<b class="nc">&nbsp;        stm.setInt(1, id.toInt())</b>
-<b class="nc">&nbsp;        stm.executeUpdate()</b>
+<b class="fc">&nbsp;        val stm = connection.prepareStatement(query)</b>
+<b class="fc">&nbsp;        stm.setInt(1, id.toInt())</b>
+<b class="fc">&nbsp;        stm.executeUpdate()</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    @Suppress(&quot;SqlWithoutWhere&quot;)
@@ -467,7 +467,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-10-21 22:04</div>
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
 </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Coverage Report > RepositoryKt</title>
+  <title>Coverage Report > TransactionManager</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,14 +22,14 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">&lt;empty package name&gt;</a>
 </div>
 
-<h1>Coverage Summary for Class: RepositoryKt (&lt;empty package name&gt;)</h1>
+<h1>Coverage Summary for Class: TransactionManager (&lt;empty package name&gt;)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 </tr>
 <tr>
-  <td class="name">RepositoryKt</td>
+  <td class="name">TransactionManager</td>
 </tr>
 
 </table>
@@ -39,54 +39,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 
 <pre>
-<code class="sourceCode" id="sourceCode">&nbsp;/**
-&nbsp; * The default offset for the repository.
-&nbsp; */
-&nbsp;private const val OFFSET = 0
-&nbsp;
-&nbsp;/**
-&nbsp; * The default limit for the repository.
-&nbsp; */
-&nbsp;private const val LIMIT = 100
-&nbsp;
-&nbsp;/**
-&nbsp; * Generic repository interface for basic CRUD operations
-&nbsp; */
-&nbsp;interface Repository&lt;T&gt; {
-&nbsp;    /**
-&nbsp;     * Retrieves an entity by its ID
-&nbsp;     * @param id The ID of the entity to retrieve
-&nbsp;     * @return The entity with the given ID or null if it does not exist
-&nbsp;     */
-&nbsp;    fun findById(id: UInt): T?
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Retrieves all entities
-&nbsp;     * @param offset The offset to start retrieving entities
-&nbsp;     * @param limit The maximum number of entities to retrieve
-&nbsp;     * @return A list with all entities
-&nbsp;     */
-&nbsp;    fun findAll(
-&nbsp;        offset: Int = OFFSET,
-&nbsp;        limit: Int = LIMIT,
-&nbsp;    ): List&lt;T&gt;
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Saves a new or existing entity
-&nbsp;     * @param entity The entity to save
-&nbsp;     */
-&nbsp;    fun save(entity: T)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Deletes an entity
-&nbsp;     * @param id The entity to delete
-&nbsp;     */
-&nbsp;    fun deleteById(id: UInt)
-&nbsp;
-&nbsp;    /**
-&nbsp;     * Deletes all entities
-&nbsp;     */
-&nbsp;    fun clear()
+<code class="sourceCode" id="sourceCode">&nbsp;interface TransactionManager {
+&nbsp;    fun &lt;R&gt; run(block: Transaction.() -&gt; R): R
 &nbsp;}
 </code>
 </pre>
@@ -111,7 +65,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-10-21 22:04</div>
+    <div style="float:right;">generated on 2024-10-21 22:15</div>
 </div>
 </body>
 </html>

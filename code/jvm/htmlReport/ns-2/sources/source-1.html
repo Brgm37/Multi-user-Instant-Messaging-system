@@ -53,18 +53,18 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    23.1%
+    92,3%
   </span>
   <span class="absValue">
-    (6/26)
+    (24/26)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    70.2%
+    95,7%
   </span>
   <span class="absValue">
-    (33/47)
+    (45/47)
   </span>
 </td>
 </tr>
@@ -83,18 +83,18 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    23.1%
+    92,3%
   </span>
   <span class="absValue">
-    (6/26)
+    (24/26)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    70.2%
+    95,7%
   </span>
   <span class="absValue">
-    (33/47)
+    (45/47)
   </span>
 </td>
 </tr>
@@ -165,12 +165,12 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
 &nbsp;    ): ResponseEntity&lt;*&gt; =
 <b class="fc">&nbsp;        when (val response = channelService.getChannel(channelId)) {</b>
-<b class="pc">&nbsp;            is Success -&gt; {</b>
+<b class="fc">&nbsp;            is Success -&gt; {</b>
 <b class="fc">&nbsp;                ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))</b>
 &nbsp;            }
 &nbsp;
-<b class="nc">&nbsp;            is Failure -&gt; {</b>
-<b class="nc">&nbsp;                ChannelProblem.ChannelNotFound.response(NOT_FOUND)</b>
+<b class="fc">&nbsp;            is Failure -&gt; {</b>
+<b class="fc">&nbsp;                ChannelProblem.ChannelNotFound.response(NOT_FOUND)</b>
 &nbsp;            }
 &nbsp;        }
 &nbsp;
@@ -210,16 +210,16 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;                accessControl = channel.accessControl,</b>
 &nbsp;            )
 <b class="fc">&nbsp;        return when (response) {</b>
-<b class="pc">&nbsp;            is Success -&gt; {</b>
+<b class="fc">&nbsp;            is Success -&gt; {</b>
 <b class="fc">&nbsp;                ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))</b>
 &nbsp;            }
 &nbsp;
-<b class="nc">&nbsp;            is Failure -&gt; {</b>
-<b class="nc">&nbsp;                when (response.value) {</b>
-<b class="nc">&nbsp;                    InvalidChannelInfo -&gt; ChannelProblem.InvalidChannelInfo.response(BAD_REQUEST)</b>
-<b class="nc">&nbsp;                    InvalidChannelAccessControl -&gt; ChannelProblem.InvalidChannelAccessControl.response(BAD_REQUEST)</b>
-<b class="nc">&nbsp;                    InvalidChannelVisibility -&gt; ChannelProblem.InvalidChannelVisibility.response(BAD_REQUEST)</b>
-<b class="nc">&nbsp;                    UserNotFound -&gt; UserProblem.UserNotFound.response(NOT_FOUND)</b>
+<b class="fc">&nbsp;            is Failure -&gt; {</b>
+<b class="fc">&nbsp;                when (response.value) {</b>
+<b class="fc">&nbsp;                    InvalidChannelInfo -&gt; ChannelProblem.InvalidChannelInfo.response(BAD_REQUEST)</b>
+<b class="fc">&nbsp;                    InvalidChannelAccessControl -&gt; ChannelProblem.InvalidChannelAccessControl.response(BAD_REQUEST)</b>
+<b class="fc">&nbsp;                    InvalidChannelVisibility -&gt; ChannelProblem.InvalidChannelVisibility.response(BAD_REQUEST)</b>
+<b class="pc">&nbsp;                    UserNotFound -&gt; UserProblem.UserNotFound.response(NOT_FOUND)</b>
 <b class="nc">&nbsp;                    else -&gt; ChannelProblem.UnableToCreateChannel.response(BAD_REQUEST)</b>
 &nbsp;                }
 &nbsp;            }
@@ -241,14 +241,14 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;                accessControl = invitation.accessControl,</b>
 &nbsp;            )
 <b class="fc">&nbsp;        return when (response) {</b>
-<b class="pc">&nbsp;            is Success -&gt; {</b>
+<b class="fc">&nbsp;            is Success -&gt; {</b>
 <b class="fc">&nbsp;                ResponseEntity.ok(ChannelInvitationOutputModel(response.value.toString()))</b>
 &nbsp;            }
 &nbsp;
-<b class="nc">&nbsp;            is Failure -&gt; {</b>
-<b class="nc">&nbsp;                when (response.value) {</b>
-<b class="nc">&nbsp;                    ChannelError.ChannelNotFound -&gt; ChannelProblem.ChannelNotFound.response(NOT_FOUND)</b>
-<b class="nc">&nbsp;                    else -&gt; ChannelProblem.InvalidChannelInfo.response(BAD_REQUEST)</b>
+<b class="fc">&nbsp;            is Failure -&gt; {</b>
+<b class="fc">&nbsp;                when (response.value) {</b>
+<b class="fc">&nbsp;                    ChannelError.ChannelNotFound -&gt; ChannelProblem.ChannelNotFound.response(NOT_FOUND)</b>
+<b class="fc">&nbsp;                    else -&gt; ChannelProblem.InvalidChannelInfo.response(BAD_REQUEST)</b>
 &nbsp;                }
 &nbsp;            }
 &nbsp;        }
@@ -294,7 +294,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-10-21 22:04</div>
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
 </div>
 </body>
 </html>

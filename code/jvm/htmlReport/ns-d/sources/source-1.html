@@ -56,26 +56,26 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    78.9%
+    100%
   </span>
   <span class="absValue">
-    (15/19)
+    (19/19)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    85%
+    90%
   </span>
   <span class="absValue">
-    (17/20)
+    (18/20)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    82.4%
+    99,4%
   </span>
   <span class="absValue">
-    (131/159)
+    (158/159)
   </span>
 </td>
 </tr>
@@ -322,7 +322,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        offset: Int,
 &nbsp;        limit: Int,
 &nbsp;    ): List&lt;Channel&gt; {
-<b class="nc">&nbsp;        val selectQuery =</b>
+<b class="fc">&nbsp;        val selectQuery =</b>
 &nbsp;            &quot;&quot;&quot;
 &nbsp;            SELECT 
 &nbsp;            	channel_id, channel_name, channel_owner, channel_accessControl,
@@ -331,14 +331,14 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;            WHERE channel_owner = ?
 &nbsp;            LIMIT ?
 &nbsp;            OFFSET ?
-<b class="nc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
-<b class="nc">&nbsp;        val stm = connection.prepareStatement(selectQuery)</b>
-<b class="nc">&nbsp;        var idx = 1</b>
-<b class="nc">&nbsp;        stm.setInt(idx++, userId.toInt())</b>
-<b class="nc">&nbsp;        stm.setInt(idx++, limit)</b>
-<b class="nc">&nbsp;        stm.setInt(idx, offset)</b>
-<b class="nc">&nbsp;        val rs = stm.executeQuery()</b>
-<b class="nc">&nbsp;        return rs.toChannelList()</b>
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
+<b class="fc">&nbsp;        val stm = connection.prepareStatement(selectQuery)</b>
+<b class="fc">&nbsp;        var idx = 1</b>
+<b class="fc">&nbsp;        stm.setInt(idx++, userId.toInt())</b>
+<b class="fc">&nbsp;        stm.setInt(idx++, limit)</b>
+<b class="fc">&nbsp;        stm.setInt(idx, offset)</b>
+<b class="fc">&nbsp;        val rs = stm.executeQuery()</b>
+<b class="fc">&nbsp;        return rs.toChannelList()</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun joinChannel(
@@ -394,28 +394,28 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun updateInvitation(invitation: ChannelInvitation) {
-<b class="nc">&nbsp;        val updateQuery =</b>
+<b class="fc">&nbsp;        val updateQuery =</b>
 &nbsp;            &quot;&quot;&quot;
 &nbsp;            UPDATE channels_invitations
 &nbsp;            SET max_uses = ?
 &nbsp;            WHERE channel_id = ?
-<b class="nc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
-<b class="nc">&nbsp;        val stm = connection.prepareStatement(updateQuery)</b>
-<b class="nc">&nbsp;        var idx = 1</b>
-<b class="nc">&nbsp;        stm.setInt(idx++, invitation.maxUses.toInt())</b>
-<b class="nc">&nbsp;        stm.setInt(idx, invitation.cId.toInt())</b>
-<b class="nc">&nbsp;        stm.executeUpdate()</b>
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
+<b class="fc">&nbsp;        val stm = connection.prepareStatement(updateQuery)</b>
+<b class="fc">&nbsp;        var idx = 1</b>
+<b class="fc">&nbsp;        stm.setInt(idx++, invitation.maxUses.toInt())</b>
+<b class="fc">&nbsp;        stm.setInt(idx, invitation.cId.toInt())</b>
+<b class="fc">&nbsp;        stm.executeUpdate()</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun deleteInvitation(channelId: UInt) {
-<b class="nc">&nbsp;        val deleteQuery =</b>
+<b class="fc">&nbsp;        val deleteQuery =</b>
 &nbsp;            &quot;&quot;&quot;
 &nbsp;            DELETE FROM channels_invitations
 &nbsp;            WHERE channel_id = ?
-<b class="nc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
-<b class="nc">&nbsp;        val stm = connection.prepareStatement(deleteQuery)</b>
-<b class="nc">&nbsp;        stm.setInt(1, channelId.toInt())</b>
-<b class="nc">&nbsp;        stm.executeUpdate()</b>
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
+<b class="fc">&nbsp;        val stm = connection.prepareStatement(deleteQuery)</b>
+<b class="fc">&nbsp;        stm.setInt(1, channelId.toInt())</b>
+<b class="fc">&nbsp;        stm.executeUpdate()</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun createInvitation(invitation: ChannelInvitation) {
@@ -448,10 +448,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        stm.setInt(idx++, channelId.toInt())</b>
 <b class="fc">&nbsp;        stm.setInt(idx, userId.toInt())</b>
 <b class="fc">&nbsp;        val rs = stm.executeQuery()</b>
-<b class="pc">&nbsp;        return if (rs.next()) {</b>
+<b class="fc">&nbsp;        return if (rs.next()) {</b>
 <b class="fc">&nbsp;            AccessControl.valueOf(rs.getString(1).uppercase())</b>
 &nbsp;        } else {
-<b class="nc">&nbsp;            null</b>
+<b class="fc">&nbsp;            null</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -509,14 +509,14 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    }
 &nbsp;
 &nbsp;    override fun deleteById(id: UInt) {
-<b class="nc">&nbsp;        val deleteQuery =</b>
+<b class="fc">&nbsp;        val deleteQuery =</b>
 &nbsp;            &quot;&quot;&quot;
 &nbsp;            DELETE FROM channels
 &nbsp;            WHERE id = ?
-<b class="nc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
-<b class="nc">&nbsp;        val stm = connection.prepareStatement(deleteQuery)</b>
-<b class="nc">&nbsp;        stm.setInt(1, id.toInt())</b>
-<b class="nc">&nbsp;        stm.executeUpdate()</b>
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
+<b class="fc">&nbsp;        val stm = connection.prepareStatement(deleteQuery)</b>
+<b class="fc">&nbsp;        stm.setInt(1, id.toInt())</b>
+<b class="fc">&nbsp;        stm.executeUpdate()</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    @Suppress(&quot;SqlWithoutWhere&quot;)
@@ -570,7 +570,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-10-21 22:04</div>
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
 </div>
 </body>
 </html>

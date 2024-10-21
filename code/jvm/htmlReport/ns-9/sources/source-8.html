@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Coverage Report > ProblemKt</title>
+  <title>Coverage Report > UserProblemKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,14 +22,14 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">com.example.appWeb.model.problem</a>
 </div>
 
-<h1>Coverage Summary for Class: ProblemKt (com.example.appWeb.model.problem)</h1>
+<h1>Coverage Summary for Class: UserProblemKt (com.example.appWeb.model.problem)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 </tr>
 <tr>
-  <td class="name">ProblemKt</td>
+  <td class="name">UserProblemKt</td>
 </tr>
 
 </table>
@@ -41,26 +41,46 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.example.appWeb.model.problem
 &nbsp;
-&nbsp;import org.springframework.http.HttpStatus
-&nbsp;import org.springframework.http.ResponseEntity
 &nbsp;import java.net.URI
 &nbsp;
-&nbsp;private const val MEDIA_TYPE = &quot;application/problem+json&quot;
-&nbsp;private const val PROBLEM_URI_PATH = &quot;https://github.com/isel-leic-daw/2024-daw-leic52d-im-i52d-2425-g04/tree/main/docs&quot;
+&nbsp;private const val PROBLEM_URI_PATH =
+&nbsp;    &quot;https://github.com/isel-leic-daw/2024-daw-leic52d-im-i52d-2425-g04/tree/main/docs/problems/user&quot;
 &nbsp;
 &nbsp;/**
-&nbsp; * Represents a Problem.
+&nbsp; * Represents a UserProblem.
 &nbsp; *
 &nbsp; * @param typeUri the URI of the problem type.
 &nbsp; */
-&nbsp;sealed class Problem(
+&nbsp;sealed class UserProblem(
 &nbsp;    typeUri: URI,
-&nbsp;) {
-&nbsp;    fun response(status: HttpStatus): ResponseEntity&lt;Any&gt; =
-&nbsp;        ResponseEntity
-&nbsp;            .status(status)
-&nbsp;            .header(&quot;Content-Type&quot;, MEDIA_TYPE)
-&nbsp;            .body(this)
+&nbsp;) : Problem(typeUri) {
+&nbsp;    data object UsernameAlreadyExists : Problem(URI(&quot;$PROBLEM_URI_PATH/username-already-exists&quot;))
+&nbsp;
+&nbsp;    data object UserNotFound : Problem(URI(&quot;$PROBLEM_URI_PATH/user-not-found&quot;))
+&nbsp;
+&nbsp;    data object UnableToCreateUser : Problem(URI(&quot;$PROBLEM_URI_PATH/unable-to-create-user&quot;))
+&nbsp;
+&nbsp;    data object UnableToJoinChannel : Problem(URI(&quot;$PROBLEM_URI_PATH/unable-to-join-channel&quot;))
+&nbsp;
+&nbsp;    data object InviterNotFound : Problem(URI(&quot;$PROBLEM_URI_PATH/inviter-not-found&quot;))
+&nbsp;
+&nbsp;    data object InvitationCodeHasExpired : Problem(URI(&quot;$PROBLEM_URI_PATH/invitation-code-has-expired&quot;))
+&nbsp;
+&nbsp;    data object InvitationCodeIsInvalid : Problem(URI(&quot;$PROBLEM_URI_PATH/invitation-code-is-invalid&quot;))
+&nbsp;
+&nbsp;    data object InvitationCodeMaxUsesReached : Problem(URI(&quot;$PROBLEM_URI_PATH/invitation-code-max-uses-reached&quot;))
+&nbsp;
+&nbsp;    data object UnableToLogin : Problem(URI(&quot;$PROBLEM_URI_PATH/unable-to-login&quot;))
+&nbsp;
+&nbsp;    data object PasswordIsInvalid : Problem(URI(&quot;$PROBLEM_URI_PATH/password-is-invalid&quot;))
+&nbsp;
+&nbsp;    data object UnableToCreateToken : Problem(URI(&quot;$PROBLEM_URI_PATH/unable-to-create-token&quot;))
+&nbsp;
+&nbsp;    data object TokenNotFound : Problem(URI(&quot;$PROBLEM_URI_PATH/token-not-found&quot;))
+&nbsp;
+&nbsp;    data object UnableToLogout : Problem(URI(&quot;$PROBLEM_URI_PATH/unable-to-logout&quot;))
+&nbsp;
+&nbsp;    data object UnableToCreateInvitation : Problem(URI(&quot;$PROBLEM_URI_PATH/unable-to-create-invitation&quot;))
 &nbsp;}
 </code>
 </pre>
@@ -85,7 +105,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-10-21 22:04</div>
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
 </div>
 </body>
 </html>

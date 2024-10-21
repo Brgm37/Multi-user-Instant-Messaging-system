@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Coverage Report > MessageServicesInterfaceKt</title>
+  <title>Coverage Report > UserServicesInterface</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,14 +22,14 @@ Current scope:     <a href="../../index.html">all classes</a>
     <a href="../index.html">interfaces</a>
 </div>
 
-<h1>Coverage Summary for Class: MessageServicesInterfaceKt (interfaces)</h1>
+<h1>Coverage Summary for Class: UserServicesInterface (interfaces)</h1>
 
 <table class="coverageStats">
 <tr>
   <th class="name">Class</th>
 </tr>
 <tr>
-  <td class="name">MessageServicesInterfaceKt</td>
+  <td class="name">UserServicesInterface</td>
 </tr>
 
 </table>
@@ -41,62 +41,102 @@ Current scope:     <a href="../../index.html">all classes</a>
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package interfaces
 &nbsp;
-&nbsp;import errors.MessageError
-&nbsp;import model.messages.Message
+&nbsp;import errors.Error
+&nbsp;import errors.UserError
+&nbsp;import model.users.User
+&nbsp;import model.users.UserInvitation
+&nbsp;import model.users.UserToken
 &nbsp;import utils.Either
-&nbsp;
-&nbsp;private const val MSG_OFFSET = 0u
-&nbsp;private const val MSG_LIMIT = 100u
 &nbsp;
 &nbsp;/**
 &nbsp; * Represents the services available for the user entity.
 &nbsp; */
-&nbsp;interface MessageServicesInterface {
+&nbsp;interface UserServicesInterface {
 &nbsp;    /**
-&nbsp;     * Creates a new message.
-&nbsp;     * @param msg The message to create.
-&nbsp;     * @param user The user that created the message.
-&nbsp;     * @param channel The channel in which the message is present.
+&nbsp;     * Creates a new user.
+&nbsp;     * @param username The username of the user.
+&nbsp;     * @param password The password of the user.
+&nbsp;     * @param invitationCode The invitation code to join the app.
+&nbsp;     * @param inviterUId The inviter user id.
 &nbsp;     */
-&nbsp;    fun createMessage(
-&nbsp;        msg: String,
-&nbsp;        user: UInt,
-&nbsp;        channel: UInt,
-&nbsp;    ): Either&lt;MessageError, Message&gt;
+&nbsp;    fun createUser(
+&nbsp;        username: String,
+&nbsp;        password: String,
+&nbsp;        invitationCode: String,
+&nbsp;        inviterUId: UInt,
+&nbsp;    ): Either&lt;UserError, User&gt;
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Deletes a user.
-&nbsp;     * @param msgId The id of the message to delete.
-&nbsp;     * @param uId The id of the user trying to delete the message.
+&nbsp;     * @param id The id of the user to delete.
 &nbsp;     */
-&nbsp;    fun deleteMessage(
-&nbsp;        msgId: UInt,
-&nbsp;        uId: UInt,
-&nbsp;    ): Either&lt;MessageError, Unit&gt;
+&nbsp;    fun deleteUser(id: UInt): Either&lt;UserError, Unit&gt;
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Gets a message by its id.
-&nbsp;     * @param msgId The id of the message to get.
-&nbsp;     * @param uId The id of the user trying to access the message.
+&nbsp;     * Gets a user by its id.
+&nbsp;     * @param id The id of the user to get.
 &nbsp;     */
-&nbsp;    fun getMessage(
-&nbsp;        msgId: UInt,
-&nbsp;        uId: UInt,
-&nbsp;    ): Either&lt;MessageError, Message&gt;
+&nbsp;    fun getUser(id: UInt): Either&lt;UserError, User&gt;
 &nbsp;
 &nbsp;    /**
-&nbsp;     * Gets limit amount of messages of a channel.
-&nbsp;     * @param channelId The id of the channel.
-&nbsp;     * @param uId The id of the user.
-&nbsp;     * @param offset The offset of the messages.
-&nbsp;     * @param limit The quantity of messages to get.
+&nbsp;     * Associates a user to a channel.
+&nbsp;     * @param userId The id of the user to join the channel.
+&nbsp;     * @param channelId The id of the channel to join.
+&nbsp;     * @param invitationCode The invitation code to join the channel.
 &nbsp;     */
-&nbsp;    fun latestMessages(
+&nbsp;    fun joinChannel(
+&nbsp;        userId: UInt,
 &nbsp;        channelId: UInt,
+&nbsp;        invitationCode: String?,
+&nbsp;    ): Either&lt;Error, Unit&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Validates a token.
+&nbsp;     * @param token The token to validate.
+&nbsp;     */
+&nbsp;    fun getUserByToken(token: String): Either&lt;UserError, User&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Validates a token.
+&nbsp;     * @param token The token to validate.
+&nbsp;     */
+&nbsp;    fun isValidToken(token: String): Either&lt;UserError, Boolean&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets an invitation by inviterId and invitationCode
+&nbsp;     * @param inviterUId inviter userId
+&nbsp;     * @param invitationCode invitation code associated to the invitation
+&nbsp;     */
+&nbsp;    fun getInvitation(
+&nbsp;        inviterUId: UInt,
+&nbsp;        invitationCode: String,
+&nbsp;    ): Either&lt;UserError, UserInvitation&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Logs in a user.
+&nbsp;     * @param username The username of the user.
+&nbsp;     * @param password The password of the user.
+&nbsp;     */
+&nbsp;    fun login(
+&nbsp;        username: String,
+&nbsp;        password: String,
+&nbsp;    ): Either&lt;UserError, UserToken&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Logs out a user.
+&nbsp;     * @param token The authentication token of the user logging out.
+&nbsp;     * @param uId The id of the user logging out.
+&nbsp;     */
+&nbsp;    fun logout(
+&nbsp;        token: String,
 &nbsp;        uId: UInt,
-&nbsp;        offset: UInt = MSG_OFFSET,
-&nbsp;        limit: UInt = MSG_LIMIT,
-&nbsp;    ): Either&lt;MessageError, List&lt;Message&gt;&gt;
+&nbsp;    ): Either&lt;UserError, Unit&gt;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an invitation.
+&nbsp;     * @param inviterUId The id of the inviter.
+&nbsp;     */
+&nbsp;    fun createInvitation(inviterUId: UInt): Either&lt;UserError, UserInvitation&gt;
 &nbsp;}
 </code>
 </pre>
@@ -121,7 +161,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2024-10-21 22:04</div>
+    <div style="float:right;">generated on 2024-10-21 22:15</div>
 </div>
 </body>
 </html>
