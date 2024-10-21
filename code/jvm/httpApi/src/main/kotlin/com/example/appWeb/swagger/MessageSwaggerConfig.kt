@@ -4,6 +4,8 @@ import com.example.appWeb.model.dto.output.message.MessageOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.MessageProblem
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -11,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 
 /**
  * Represents the Swagger configuration for the messages endpoints in the application.
+ * Represents the Swagger configuration for the message endpoints in the application.
  * @see UserSwaggerConfig
  * @see ChannelSwaggerConfig
  */
@@ -60,6 +63,14 @@ object MessageSwaggerConfig {
             ),
         ],
     )
+    @Parameter(
+        name = "Authorization",
+        description = "Authorization token",
+        required = true,
+        schema = Schema(type = "UUID"),
+        `in` = ParameterIn.HEADER,
+        example = "Bearer 123e4567-e89b-12d3-a456-426614174000",
+    )
     annotation class CreateMessage
 
     @Operation(summary = "Get a single message")
@@ -87,6 +98,14 @@ object MessageSwaggerConfig {
             ),
         ],
     )
+    @Parameter(
+        name = "Authorization",
+        description = "Authorization token",
+        required = true,
+        schema = Schema(type = "UUID"),
+        `in` = ParameterIn.HEADER,
+        example = "Bearer 123e4567-e89b-12d3-a456-426614174000",
+    )
     annotation class GetSingleMessage
 
     @Operation(summary = "Get messages from a channel")
@@ -113,6 +132,14 @@ object MessageSwaggerConfig {
                 ],
             ),
         ],
+    )
+    @Parameter(
+        name = "Authorization",
+        description = "Authorization token",
+        required = true,
+        schema = Schema(type = "UUID"),
+        `in` = ParameterIn.HEADER,
+        example = "Bearer 123e4567-e89b-12d3-a456-426614174000",
     )
     annotation class GetChannelMessages
 }

@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -55,7 +54,7 @@ class ChannelController(
     @ChannelSwaggerConfig.GetChannel
     fun getChannel(
         @PathVariable @Range(min = 1) channelId: UInt,
-        @RequestHeader authenticated: AuthenticatedUserInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
         when (val response = channelService.getChannel(channelId)) {
             is Success -> {
@@ -123,7 +122,7 @@ class ChannelController(
     @ChannelSwaggerConfig.CreateChannelInvitation
     fun createChannelInvitation(
         @Valid @RequestBody invitation: CreateChannelInvitationInputModel,
-        authenticated: AuthenticatedUserInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> {
         val response =
             channelService.createChannelInvitation(

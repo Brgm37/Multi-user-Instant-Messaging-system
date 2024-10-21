@@ -12,6 +12,7 @@ import com.example.appWeb.swagger.UserSwaggerConfig
 import errors.ChannelError.ChannelNotFound
 import errors.UserError
 import interfaces.UserServicesInterface
+import io.swagger.v3.oas.annotations.Parameter
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
@@ -72,7 +73,7 @@ class UserController(
     @UserSwaggerConfig.GetUser
     fun getUser(
         @PathVariable userId: UInt,
-        authenticated: AuthenticatedUserInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
         when (val response = userService.getUser(userId)) {
             is Success -> {
@@ -106,7 +107,9 @@ class UserController(
 
     @PostMapping(INVITATION_URL)
     @UserSwaggerConfig.CreateInvitation
-    fun createInvitation(authenticated: AuthenticatedUserInputModel): ResponseEntity<*> =
+    fun createInvitation(
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> =
         when (val response = userService.createInvitation(authenticated.uId)) {
             is Success -> {
                 ResponseEntity.ok(response.value)
@@ -122,7 +125,9 @@ class UserController(
 
     @DeleteMapping(LOGOUT_URL)
     @UserSwaggerConfig.Logout
-    fun logout(authenticated: AuthenticatedUserInputModel): ResponseEntity<*> =
+    fun logout(
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> =
         when (val response = userService.logout(authenticated.token, authenticated.uId)) {
             is Success -> {
                 ResponseEntity.ok().build<Any>()
@@ -143,7 +148,7 @@ class UserController(
     fun joinChannel(
         @PathVariable channelId: UInt,
         @RequestParam invitationCode: String = "",
-        authenticated: AuthenticatedUserInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
         when (val response = userService.joinChannel(authenticated.uId, channelId, invitationCode)) {
             is Success -> {
@@ -160,6 +165,7 @@ class UserController(
                         UserProblem.InvitationCodeMaxUsesReached.response(
                             BAD_REQUEST,
                         )
+
                     else -> UserProblem.UnableToJoinChannel.response(INTERNAL_SERVER_ERROR)
                 }
             }

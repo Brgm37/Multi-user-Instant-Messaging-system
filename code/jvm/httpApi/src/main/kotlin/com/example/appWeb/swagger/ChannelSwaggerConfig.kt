@@ -5,6 +5,8 @@ import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.UserProblem
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -42,6 +44,14 @@ object ChannelSwaggerConfig {
             ),
         ],
     )
+    @Parameter(
+        name = "Authorization",
+        description = "Authorization token",
+        required = true,
+        schema = Schema(type = "UUID"),
+        `in` = ParameterIn.HEADER,
+        example = "Bearer 123e4567-e89b-12d3-a456-426614174000",
+    )
     annotation class GetChannel
 
     @Operation(summary = "Get a list of channels")
@@ -68,6 +78,14 @@ object ChannelSwaggerConfig {
                 ],
             ),
         ],
+    )
+    @Parameter(
+        name = "Authorization",
+        description = "Authorization token",
+        required = true,
+        schema = Schema(type = "UUID"),
+        `in` = ParameterIn.HEADER,
+        example = "Bearer 123e4567-e89b-12d3-a456-426614174000",
     )
     annotation class GetChannels
 
@@ -106,6 +124,14 @@ object ChannelSwaggerConfig {
             ),
         ],
     )
+    @Parameter(
+        name = "Authorization",
+        description = "Authorization token",
+        required = true,
+        schema = Schema(type = "UUID"),
+        `in` = ParameterIn.HEADER,
+        example = "Bearer 123e4567-e89b-12d3-a456-426614174000",
+    )
     annotation class CreateChannel
 
     @Operation(summary = "Create a channel invitation")
@@ -141,6 +167,14 @@ object ChannelSwaggerConfig {
                 ],
             ),
         ],
+    )
+    @Parameter(
+        name = "Authorization",
+        description = "Authorization token",
+        required = true,
+        schema = Schema(type = "UUID"),
+        `in` = ParameterIn.HEADER,
+        example = "Bearer 123e4567-e89b-12d3-a456-426614174000",
     )
     annotation class CreateChannelInvitation
 }
