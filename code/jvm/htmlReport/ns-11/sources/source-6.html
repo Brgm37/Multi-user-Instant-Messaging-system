@@ -1,0 +1,151 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ChannelName</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">model.channels</a>
+</div>
+
+<h1>Coverage Summary for Class: ChannelName (model.channels)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChannelName</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package model.channels
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of a channel.
+&nbsp; * The channel name is unique.
+&nbsp; * It is composed of the name of the user that created the channel and the channel&#39;s name.
+&nbsp; *
+&nbsp; * @property name The name of the channel.
+&nbsp; * @property ownerName The name of the user that created the channel.
+&nbsp; * @property fullName The full name of the channel, which includes the name of the user that created the channel.
+&nbsp; * @throws IllegalArgumentException If the channel name or the owner name is blank.
+&nbsp; */
+<b class="fc">&nbsp;data class ChannelName(</b>
+<b class="fc">&nbsp;    val name: String,</b>
+<b class="fc">&nbsp;    val ownerName: String,</b>
+&nbsp;) {
+<b class="fc">&nbsp;    init {</b>
+<b class="fc">&nbsp;        require(name.isNotBlank()) { &quot;The channel name cannot be blank.&quot; }</b>
+<b class="fc">&nbsp;        require(ownerName.isNotBlank()) { &quot;The owner name cannot be blank.&quot; }</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    val fullName: String
+<b class="fc">&nbsp;        get() = &quot;@$ownerName/$name&quot;</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Converts a string to a channel name.
+&nbsp; *
+&nbsp; * @receiver The string to convert.
+&nbsp; * @return The channel name.
+&nbsp; */
+&nbsp;fun String.toChannelName(): ChannelName {
+&nbsp;    val (ownerName, name) = this.split(&quot;/&quot;)
+&nbsp;    return ChannelName(name, ownerName.drop(1))
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
+</div>
+</body>
+</html>

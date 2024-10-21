@@ -1,0 +1,234 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ChannelControllerKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.appWeb.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: ChannelControllerKt (com.example.appWeb.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ChannelControllerKt</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.appWeb.controller
+&nbsp;
+&nbsp;import com.example.appWeb.model.dto.input.channel.CreateChannelInputModel
+&nbsp;import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputModel
+&nbsp;import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
+&nbsp;import com.example.appWeb.model.dto.output.channel.ChannelInvitationOutputModel
+&nbsp;import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
+&nbsp;import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
+&nbsp;import com.example.appWeb.model.problem.ChannelProblem
+&nbsp;import com.example.appWeb.model.problem.UserProblem
+&nbsp;import com.example.appWeb.swagger.ChannelSwaggerConfig
+&nbsp;import errors.ChannelError
+&nbsp;import errors.ChannelError.InvalidChannelAccessControl
+&nbsp;import errors.ChannelError.InvalidChannelInfo
+&nbsp;import errors.ChannelError.InvalidChannelVisibility
+&nbsp;import errors.ChannelError.UserNotFound
+&nbsp;import interfaces.ChannelServicesInterface
+&nbsp;import io.swagger.v3.oas.annotations.Parameter
+&nbsp;import jakarta.validation.Valid
+&nbsp;import org.hibernate.validator.constraints.Range
+&nbsp;import org.springframework.http.HttpStatus.BAD_REQUEST
+&nbsp;import org.springframework.http.HttpStatus.NOT_FOUND
+&nbsp;import org.springframework.http.ResponseEntity
+&nbsp;import org.springframework.web.bind.annotation.GetMapping
+&nbsp;import org.springframework.web.bind.annotation.PathVariable
+&nbsp;import org.springframework.web.bind.annotation.PostMapping
+&nbsp;import org.springframework.web.bind.annotation.RequestBody
+&nbsp;import org.springframework.web.bind.annotation.RequestMapping
+&nbsp;import org.springframework.web.bind.annotation.RequestParam
+&nbsp;import org.springframework.web.bind.annotation.RestController
+&nbsp;import utils.Failure
+&nbsp;import utils.Success
+&nbsp;
+&nbsp;/**
+&nbsp; * The default limit for the channel list.
+&nbsp; */
+&nbsp;private const val LIMIT = 10u
+&nbsp;
+&nbsp;/**
+&nbsp; * The default offset for the channel list.
+&nbsp; */
+&nbsp;private const val OFFSET = 0u
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents the controller for the channel
+&nbsp; *
+&nbsp; * @property channelService The channel service
+&nbsp; */
+&nbsp;@RestController
+&nbsp;@RequestMapping(ChannelController.CHANNEL_BASE_URL)
+&nbsp;class ChannelController(
+&nbsp;    private val channelService: ChannelServicesInterface,
+&nbsp;) {
+&nbsp;    @GetMapping(CHANNEL_ID_URL)
+&nbsp;    @ChannelSwaggerConfig.GetChannel
+&nbsp;    fun getChannel(
+&nbsp;        @PathVariable @Range(min = 1) channelId: UInt,
+&nbsp;        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+&nbsp;    ): ResponseEntity&lt;*&gt; =
+&nbsp;        when (val response = channelService.getChannel(channelId)) {
+&nbsp;            is Success -&gt; {
+&nbsp;                ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
+&nbsp;            }
+&nbsp;
+&nbsp;            is Failure -&gt; {
+&nbsp;                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    @GetMapping
+&nbsp;    @ChannelSwaggerConfig.GetChannels
+&nbsp;    fun getChannels(
+&nbsp;        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+&nbsp;        @RequestParam offset: UInt = OFFSET,
+&nbsp;        @RequestParam limit: UInt = LIMIT,
+&nbsp;    ): ResponseEntity&lt;*&gt; =
+&nbsp;        when (val response = channelService.getChannels(offset, limit)) {
+&nbsp;            is Failure -&gt; {
+&nbsp;                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+&nbsp;            }
+&nbsp;
+&nbsp;            is Success -&gt; {
+&nbsp;                ResponseEntity
+&nbsp;                    .ok(
+&nbsp;                        response
+&nbsp;                            .value
+&nbsp;                            .map(ChannelListOutputModel::fromDomain),
+&nbsp;                    )
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    @PostMapping
+&nbsp;    @ChannelSwaggerConfig.CreateChannel
+&nbsp;    fun createChannel(
+&nbsp;        @Valid @RequestBody channel: CreateChannelInputModel,
+&nbsp;        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+&nbsp;    ): ResponseEntity&lt;*&gt; {
+&nbsp;        val response =
+&nbsp;            channelService.createChannel(
+&nbsp;                owner = authenticated.uId,
+&nbsp;                name = channel.name,
+&nbsp;                visibility = channel.visibility,
+&nbsp;                accessControl = channel.accessControl,
+&nbsp;            )
+&nbsp;        return when (response) {
+&nbsp;            is Success -&gt; {
+&nbsp;                ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
+&nbsp;            }
+&nbsp;
+&nbsp;            is Failure -&gt; {
+&nbsp;                when (response.value) {
+&nbsp;                    InvalidChannelInfo -&gt; ChannelProblem.InvalidChannelInfo.response(BAD_REQUEST)
+&nbsp;                    InvalidChannelAccessControl -&gt; ChannelProblem.InvalidChannelAccessControl.response(BAD_REQUEST)
+&nbsp;                    InvalidChannelVisibility -&gt; ChannelProblem.InvalidChannelVisibility.response(BAD_REQUEST)
+&nbsp;                    UserNotFound -&gt; UserProblem.UserNotFound.response(NOT_FOUND)
+&nbsp;                    else -&gt; ChannelProblem.UnableToCreateChannel.response(BAD_REQUEST)
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(CHANNEL_INVITATION_URL)
+&nbsp;    @ChannelSwaggerConfig.CreateChannelInvitation
+&nbsp;    fun createChannelInvitation(
+&nbsp;        @Valid @RequestBody invitation: CreateChannelInvitationInputModel,
+&nbsp;        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+&nbsp;    ): ResponseEntity&lt;*&gt; {
+&nbsp;        val response =
+&nbsp;            channelService.createChannelInvitation(
+&nbsp;                channelId = invitation.channelId,
+&nbsp;                owner = authenticated.uId,
+&nbsp;                maxUses = invitation.maxUses,
+&nbsp;                expirationDate = invitation.expirationDate,
+&nbsp;                accessControl = invitation.accessControl,
+&nbsp;            )
+&nbsp;        return when (response) {
+&nbsp;            is Success -&gt; {
+&nbsp;                ResponseEntity.ok(ChannelInvitationOutputModel(response.value.toString()))
+&nbsp;            }
+&nbsp;
+&nbsp;            is Failure -&gt; {
+&nbsp;                when (response.value) {
+&nbsp;                    ChannelError.ChannelNotFound -&gt; ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+&nbsp;                    else -&gt; ChannelProblem.InvalidChannelInfo.response(BAD_REQUEST)
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        /**
+&nbsp;         * The base URL for the channel endpoints.
+&nbsp;         */
+&nbsp;        const val CHANNEL_BASE_URL = &quot;/api/channels&quot;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The URL for the channel with the given id.
+&nbsp;         */
+&nbsp;        const val CHANNEL_ID_URL = &quot;/{channelId}&quot;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The URL for the channel invitations.
+&nbsp;         */
+&nbsp;        const val CHANNEL_INVITATION_URL = &quot;/invitations&quot;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
+</div>
+</body>
+</html>

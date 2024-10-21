@@ -1,0 +1,193 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Password</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">model.users</a>
+</div>
+
+<h1>Coverage Summary for Class: Password (model.users)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Password</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Password$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package model.users
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a password.
+&nbsp; * Passwords must have:
+&nbsp; * - At least 8 characters.
+&nbsp; * - At least one digit.
+&nbsp; * - At least one uppercase letter.
+&nbsp; * - At least one lowercase letter.
+&nbsp; *
+&nbsp; * @property value the password value.
+&nbsp; * @throws IllegalArgumentException if the password is invalid.
+&nbsp; */
+<b class="fc">&nbsp;data class Password(</b>
+<b class="fc">&nbsp;    val value: String,</b>
+&nbsp;) {
+<b class="fc">&nbsp;    override fun toString(): String = value</b>
+&nbsp;
+<b class="fc">&nbsp;    init {</b>
+<b class="fc">&nbsp;        require(isValidPassword(value)) { &quot;Invalid password.&quot; }</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the password matches the given password.
+&nbsp;     *
+&nbsp;     * @param password the password to check.
+&nbsp;     * @return true if the password matches the given password, false otherwise.
+&nbsp;     */
+<b class="fc">&nbsp;    fun matches(password: String): Boolean = value == password</b>
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        private const val PASSWORD_MIN_LENGTH = 8
+&nbsp;        const val PASSWORD_PATTERN = &quot;^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{$PASSWORD_MIN_LENGTH,}$&quot;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Checks if the given password follows the PASSWORD_PATTERN.
+&nbsp;         *
+&nbsp;         * @param password the password to check.
+&nbsp;         * @return true if the password is valid, false otherwise.
+&nbsp;         */
+<b class="fc">&nbsp;        fun isValidPassword(password: String): Boolean = Regex(PASSWORD_PATTERN).matches(password)</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
+</div>
+</body>
+</html>

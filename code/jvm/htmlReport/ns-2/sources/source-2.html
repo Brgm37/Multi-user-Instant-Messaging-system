@@ -1,0 +1,251 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MessageController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.appWeb.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: MessageController (com.example.appWeb.controller)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MessageController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94,4%
+  </span>
+  <span class="absValue">
+    (17/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96,6%
+  </span>
+  <span class="absValue">
+    (28/29)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MessageController$Companion</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94,4%
+  </span>
+  <span class="absValue">
+    (17/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96,6%
+  </span>
+  <span class="absValue">
+    (28/29)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.appWeb.controller
+&nbsp;
+&nbsp;import com.example.appWeb.model.dto.input.message.CreateMessageInputModel
+&nbsp;import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
+&nbsp;import com.example.appWeb.model.dto.output.message.MessageOutputModel
+&nbsp;import com.example.appWeb.model.problem.ChannelProblem
+&nbsp;import com.example.appWeb.model.problem.MessageProblem
+&nbsp;import com.example.appWeb.model.problem.UserProblem
+&nbsp;import com.example.appWeb.swagger.MessageSwaggerConfig
+&nbsp;import errors.MessageError.ChannelNotFound
+&nbsp;import errors.MessageError.InvalidMessageInfo
+&nbsp;import errors.MessageError.UserNotFound
+&nbsp;import interfaces.MessageServicesInterface
+&nbsp;import io.swagger.v3.oas.annotations.Parameter
+&nbsp;import jakarta.validation.Valid
+&nbsp;import org.springframework.http.HttpStatus.BAD_REQUEST
+&nbsp;import org.springframework.http.HttpStatus.NOT_FOUND
+&nbsp;import org.springframework.http.ResponseEntity
+&nbsp;import org.springframework.web.bind.annotation.GetMapping
+&nbsp;import org.springframework.web.bind.annotation.PathVariable
+&nbsp;import org.springframework.web.bind.annotation.PostMapping
+&nbsp;import org.springframework.web.bind.annotation.RequestBody
+&nbsp;import org.springframework.web.bind.annotation.RequestMapping
+&nbsp;import org.springframework.web.bind.annotation.RequestParam
+&nbsp;import org.springframework.web.bind.annotation.RestController
+&nbsp;import utils.Failure
+&nbsp;import utils.Success
+&nbsp;
+&nbsp;/**
+&nbsp; * The default limit for the message list.
+&nbsp; */
+&nbsp;private const val OFFSET = 0u
+&nbsp;
+&nbsp;/**
+&nbsp; * The default offset for the message list.
+&nbsp; */
+&nbsp;private const val LIMIT = 100u
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents the controller for the message
+&nbsp; *
+&nbsp; * @property messageService The message service
+&nbsp; */
+<b class="fc">&nbsp;@RestController</b>
+&nbsp;@RequestMapping(MessageController.MESSAGE_BASE_URL)
+&nbsp;class MessageController(
+<b class="fc">&nbsp;    private val messageService: MessageServicesInterface,</b>
+&nbsp;) {
+&nbsp;    @PostMapping
+&nbsp;    @MessageSwaggerConfig.CreateMessage
+&nbsp;    fun createMessage(
+&nbsp;        @Valid @RequestBody message: CreateMessageInputModel,
+&nbsp;        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+&nbsp;    ): ResponseEntity&lt;*&gt; {
+<b class="fc">&nbsp;        val response =</b>
+<b class="fc">&nbsp;            messageService</b>
+<b class="fc">&nbsp;                .createMessage(</b>
+<b class="fc">&nbsp;                    msg = message.msg,</b>
+<b class="fc">&nbsp;                    user = authenticated.uId,</b>
+<b class="fc">&nbsp;                    channel = message.channel,</b>
+&nbsp;                )
+<b class="fc">&nbsp;        return when (response) {</b>
+<b class="fc">&nbsp;            is Success -&gt; {</b>
+<b class="fc">&nbsp;                ResponseEntity.ok(MessageOutputModel.fromDomain(response.value))</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            is Failure -&gt; {</b>
+<b class="fc">&nbsp;                when (response.value) {</b>
+<b class="fc">&nbsp;                    InvalidMessageInfo -&gt; MessageProblem.InvalidMessageInfo.response(BAD_REQUEST)</b>
+<b class="fc">&nbsp;                    ChannelNotFound -&gt; ChannelProblem.ChannelNotFound.response(NOT_FOUND)</b>
+<b class="pc">&nbsp;                    UserNotFound -&gt; UserProblem.UserNotFound.response(NOT_FOUND)</b>
+<b class="nc">&nbsp;                    else -&gt; MessageProblem.UnableToCreateMessage.response(BAD_REQUEST)</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(MESSAGE_ID_URL)
+&nbsp;    @MessageSwaggerConfig.GetSingleMessage
+&nbsp;    fun getSingleMessage(
+&nbsp;        @PathVariable msgId: UInt,
+&nbsp;        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+&nbsp;    ): ResponseEntity&lt;*&gt; =
+<b class="fc">&nbsp;        when (val response = messageService.getMessage(msgId, authenticated.uId)) {</b>
+<b class="fc">&nbsp;            is Success -&gt; {</b>
+<b class="fc">&nbsp;                ResponseEntity.ok(MessageOutputModel.fromDomain(response.value))</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            is Failure -&gt; {</b>
+<b class="fc">&nbsp;                MessageProblem.MessageNotFound.response(NOT_FOUND)</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    @GetMapping(CHANNEL_MESSAGES_URL)
+&nbsp;    @MessageSwaggerConfig.GetChannelMessages
+&nbsp;    fun getChannelMessages(
+&nbsp;        @PathVariable channelId: UInt,
+<b class="fc">&nbsp;        @RequestParam offset: UInt = OFFSET,</b>
+<b class="fc">&nbsp;        @RequestParam limit: UInt = LIMIT,</b>
+&nbsp;        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+&nbsp;    ): ResponseEntity&lt;*&gt; =
+<b class="fc">&nbsp;        when (val response = messageService.latestMessages(channelId, authenticated.uId, offset, limit)) {</b>
+<b class="fc">&nbsp;            is Success -&gt; {</b>
+<b class="fc">&nbsp;                ResponseEntity.ok(response.value.map(MessageOutputModel::fromDomain))</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            is Failure -&gt; {</b>
+<b class="fc">&nbsp;                MessageProblem.MessageNotFound.response(NOT_FOUND)</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        const val MESSAGE_BASE_URL = &quot;api/messages&quot;
+&nbsp;        const val MESSAGE_ID_URL = &quot;/{msgId}&quot;
+&nbsp;        const val CHANNEL_MESSAGES_URL = &quot;/channel/{channelId}&quot;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
+</div>
+</body>
+</html>

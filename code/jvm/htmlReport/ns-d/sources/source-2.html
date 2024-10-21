@@ -1,0 +1,328 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MessageJDBC</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jdbc</a>
+</div>
+
+<h1>Coverage Summary for Class: MessageJDBC (jdbc)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MessageJDBC</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (8/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98,7%
+  </span>
+  <span class="absValue">
+    (76/77)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jdbc
+&nbsp;
+&nbsp;import MessageRepositoryInterface
+&nbsp;import model.channels.ChannelInfo
+&nbsp;import model.channels.toChannelName
+&nbsp;import model.messages.Message
+&nbsp;import model.users.UserInfo
+&nbsp;import utils.encryption.DummyEncrypt
+&nbsp;import utils.encryption.Encrypt
+&nbsp;import java.sql.Connection
+&nbsp;import java.sql.ResultSet
+&nbsp;
+&nbsp;/**
+&nbsp; * @property AUTHOR_ID the author id column of the v_message table
+&nbsp; */
+&nbsp;private const val AUTHOR_ID = &quot;msgAuthorId&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * @property AUTHOR_USERNAME the author username column of the v_message table
+&nbsp; */
+&nbsp;private const val AUTHOR_USERNAME = &quot;msgAuthorUsername&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * @property CHANNEL_ID the channel id column of the v_message table
+&nbsp; */
+&nbsp;private const val CHANNEL_ID = &quot;msgChannelId&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * @property CHANNEL_NAME the channel name column of the v_message table
+&nbsp; */
+&nbsp;private const val CHANNEL_NAME = &quot;msgChannelName&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * @property CONTENT the content column of the v_message table
+&nbsp; */
+&nbsp;private const val CONTENT = &quot;msgContent&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * @property ID the id column of the v_message table
+&nbsp; */
+&nbsp;private const val ID = &quot;msgId&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * @property MESSAGE_TABLE_ID id column of the message table
+&nbsp; */
+&nbsp;private const val MESSAGE_TABLE_ID = &quot;id&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * @property TIMESTAMP the timestamp column of the v_message table
+&nbsp; */
+&nbsp;private const val TIMESTAMP = &quot;msgTimestamp&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * MessageJDBC is a JDBC implementation of MessageRepositoryInterface
+&nbsp; *
+&nbsp; * @property connection a JDBC Connection
+&nbsp; * @property encrypt an encryption utility to use
+&nbsp; */
+&nbsp;class MessageJDBC(
+<b class="fc">&nbsp;    private val connection: Connection,</b>
+<b class="fc">&nbsp;    private val encrypt: Encrypt = DummyEncrypt,</b>
+&nbsp;) : MessageRepositoryInterface {
+&nbsp;    private fun ResultSet.toMessage(): Message {
+<b class="fc">&nbsp;        val author =</b>
+<b class="fc">&nbsp;            UserInfo(</b>
+<b class="fc">&nbsp;                uId = getInt(AUTHOR_ID).toUInt(),</b>
+<b class="fc">&nbsp;                username = getString(AUTHOR_USERNAME),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        val channel =</b>
+<b class="fc">&nbsp;            ChannelInfo(</b>
+<b class="fc">&nbsp;                cId = getInt(CHANNEL_ID).toUInt(),</b>
+<b class="fc">&nbsp;                channelName = getString(CHANNEL_NAME).toChannelName(),</b>
+&nbsp;            )
+<b class="fc">&nbsp;        return Message(</b>
+<b class="fc">&nbsp;            msgId = getInt(ID).toUInt(),</b>
+<b class="fc">&nbsp;            msg = encrypt.decrypt(getString(CONTENT)),</b>
+<b class="fc">&nbsp;            user = author,</b>
+<b class="fc">&nbsp;            channel = channel,</b>
+<b class="fc">&nbsp;            creationTime = getTimestamp(TIMESTAMP),</b>
+&nbsp;        )
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun ResultSet.toMessageList(): List&lt;Message&gt; {
+<b class="fc">&nbsp;        val messages = mutableListOf&lt;Message&gt;()</b>
+<b class="fc">&nbsp;        while (next()) {</b>
+<b class="fc">&nbsp;            messages.add(toMessage())</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return messages</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun createMessage(message: Message): Message? {
+<b class="fc">&nbsp;        val insertQuery =</b>
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            INSERT INTO messages (content, author, channel, timestamp)
+&nbsp;            VALUES (?, ?, ?, ?) RETURNING id
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
+<b class="fc">&nbsp;        val stm = connection.prepareStatement(insertQuery)</b>
+<b class="fc">&nbsp;        var idx = 1</b>
+<b class="fc">&nbsp;        stm.setString(idx++, encrypt.encrypt(message.msg))</b>
+<b class="fc">&nbsp;        stm.setInt(idx++, message.user.uId.toInt())</b>
+<b class="fc">&nbsp;        stm.setInt(idx++, message.channel.cId.toInt())</b>
+<b class="fc">&nbsp;        stm.setTimestamp(idx, message.creationTime)</b>
+<b class="fc">&nbsp;        val rs = stm.executeQuery()</b>
+<b class="pc">&nbsp;        return if (rs.next()) {</b>
+<b class="fc">&nbsp;            message.copy(msgId = rs.getInt(MESSAGE_TABLE_ID).toUInt())</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            null</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun findMessagesByChannelId(
+&nbsp;        channelId: UInt,
+&nbsp;        limit: UInt,
+&nbsp;        offset: UInt,
+&nbsp;    ): List&lt;Message&gt; {
+<b class="fc">&nbsp;        val selectQuery =</b>
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            SELECT 
+&nbsp;                msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
+&nbsp;                msgChannelName, msgAuthorUsername
+&nbsp;            FROM v_message
+&nbsp;            WHERE msgChannelId = ?
+&nbsp;            ORDER BY msgTimestamp DESC
+&nbsp;            LIMIT ? OFFSET ?
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
+<b class="fc">&nbsp;        val stm = connection.prepareStatement(selectQuery)</b>
+<b class="fc">&nbsp;        var idx = 1</b>
+<b class="fc">&nbsp;        stm.setInt(idx++, channelId.toInt())</b>
+<b class="fc">&nbsp;        stm.setInt(idx++, limit.toInt())</b>
+<b class="fc">&nbsp;        stm.setInt(idx, offset.toInt())</b>
+<b class="fc">&nbsp;        val rs = stm.executeQuery()</b>
+<b class="fc">&nbsp;        return rs.toMessageList()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun findById(id: UInt): Message? {
+<b class="fc">&nbsp;        val selectQuery =</b>
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            SELECT 
+&nbsp;                msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
+&nbsp;                msgChannelName, msgAuthorUsername
+&nbsp;            FROM v_message
+&nbsp;            WHERE msgid = ?
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
+<b class="fc">&nbsp;        val stm = connection.prepareStatement(selectQuery)</b>
+<b class="fc">&nbsp;        stm.setInt(1, id.toInt())</b>
+<b class="fc">&nbsp;        val rs = stm.executeQuery()</b>
+<b class="fc">&nbsp;        return if (rs.next()) {</b>
+<b class="fc">&nbsp;            rs.toMessage()</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            null</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun findAll(
+&nbsp;        offset: Int,
+&nbsp;        limit: Int,
+&nbsp;    ): List&lt;Message&gt; {
+<b class="fc">&nbsp;        val selectQuery =</b>
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            SELECT 
+&nbsp;                msgId, msgChannelId, msgContent, msgauthorid, msgTimestamp,
+&nbsp;                msgChannelName, msgAuthorUsername
+&nbsp;            FROM v_message
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
+<b class="fc">&nbsp;        val stm = connection.prepareStatement(selectQuery)</b>
+<b class="fc">&nbsp;        val rs = stm.executeQuery()</b>
+<b class="fc">&nbsp;        val messages = mutableListOf&lt;Message&gt;()</b>
+<b class="fc">&nbsp;        while (rs.next()) {</b>
+<b class="fc">&nbsp;            messages.add(rs.toMessage())</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return messages</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun save(entity: Message) {
+<b class="fc">&nbsp;        val updateQuery =</b>
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            UPDATE messages
+&nbsp;            SET channel = ?, author = ?, content = ?, timestamp = ?
+&nbsp;            WHERE id = ?
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
+<b class="fc">&nbsp;        val stm = connection.prepareStatement(updateQuery)</b>
+<b class="fc">&nbsp;        var idx = 1</b>
+<b class="fc">&nbsp;        stm.setInt(idx++, entity.channel.cId.toInt())</b>
+<b class="fc">&nbsp;        stm.setInt(idx++, entity.user.uId.toInt())</b>
+<b class="fc">&nbsp;        stm.setString(idx++, encrypt.encrypt(entity.msg))</b>
+<b class="fc">&nbsp;        stm.setTimestamp(idx++, entity.creationTime)</b>
+<b class="pc">&nbsp;        val id = checkNotNull(entity.msgId) { &quot;Message id is null&quot; }</b>
+<b class="fc">&nbsp;        stm.setInt(idx, id.toInt())</b>
+<b class="fc">&nbsp;        stm.executeUpdate()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun deleteById(id: UInt) {
+<b class="fc">&nbsp;        val deleteQuery =</b>
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            DELETE FROM messages
+&nbsp;            WHERE id = ?
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
+<b class="fc">&nbsp;        val stm = connection.prepareStatement(deleteQuery)</b>
+<b class="fc">&nbsp;        stm.setInt(1, id.toInt())</b>
+<b class="fc">&nbsp;        stm.executeUpdate()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Suppress(&quot;SqlWithoutWhere&quot;)
+&nbsp;    override fun clear() {
+<b class="fc">&nbsp;        val deleteQuery =</b>
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            DELETE FROM messages
+<b class="fc">&nbsp;            &quot;&quot;&quot;.trimIndent()</b>
+<b class="fc">&nbsp;        val stm = connection.prepareStatement(deleteQuery)</b>
+<b class="fc">&nbsp;        stm.executeUpdate()</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
+</div>
+</body>
+</html>
