@@ -10,6 +10,7 @@ import java.util.UUID
  * @property token The token.
  * @property creationDate The creation date of the token.
  * @property expirationDate The expiration date of the token.
+ * @throws IllegalArgumentException If the creation date is after the expiration date.
  */
 data class UserToken(
     val userId: UInt,

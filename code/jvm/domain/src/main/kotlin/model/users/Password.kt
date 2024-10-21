@@ -16,6 +16,10 @@ data class Password(
 ) {
     override fun toString(): String = value
 
+    init {
+        require(isValidPassword(value)) { "Invalid password." }
+    }
+
     /**
      * Checks if the password matches the given password.
      *
@@ -23,10 +27,6 @@ data class Password(
      * @return true if the password matches the given password, false otherwise.
      */
     fun matches(password: String): Boolean = value == password
-
-    init {
-        require(isValidPassword(value)) { "Invalid password." }
-    }
 
     companion object {
         private const val PASSWORD_MIN_LENGTH = 8

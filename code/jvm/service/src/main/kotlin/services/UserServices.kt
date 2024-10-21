@@ -27,6 +27,11 @@ import java.time.LocalDateTime
 private const val INVITATION_EXPIRATION_DAYS = 7L
 
 /**
+ * The number of days a token is valid.
+ */
+private const val TOKEN_EXPIRATION_DAYS = 7L
+
+/**
  * The services available for the user entity.
  * @property repoManager The transaction manager.
  */
@@ -149,7 +154,7 @@ class UserServices(
             val token =
                 UserToken(
                     userId = userId,
-                    expirationDate = Timestamp.valueOf(LocalDateTime.now().plusWeeks(1)),
+                    expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(TOKEN_EXPIRATION_DAYS)),
                 )
             if (userRepo.createToken(token)) success(token) else failure(UserError.UnableToCreateToken)
         }

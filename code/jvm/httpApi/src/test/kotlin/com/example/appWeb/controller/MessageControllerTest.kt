@@ -196,16 +196,17 @@ class MessageControllerTest {
         val owner = AuthenticatedUserInputModel(0u, "token")
         val messageServices = MessageServices(m)
         val channelController = MessageController(messageServices)
-        channelController.createMessage(
-            CreateMessageInputModel(
-                "Hello, World!",
-                0u,
-            ),
-            owner,
-        ).let { resp ->
-            assertEquals(HttpStatus.NOT_FOUND, resp.statusCode, "Status code is different")
-            assertIs<ChannelProblem.ChannelNotFound>(resp.body, "Body is not a UserNotFound")
-        }
+        channelController
+            .createMessage(
+                CreateMessageInputModel(
+                    "Hello, World!",
+                    0u,
+                ),
+                owner,
+            ).let { resp ->
+                assertEquals(HttpStatus.NOT_FOUND, resp.statusCode, "Status code is different")
+                assertIs<ChannelProblem.ChannelNotFound>(resp.body, "Body is not a UserNotFound")
+            }
     }
 
     @ParameterizedTest
@@ -244,6 +245,7 @@ class MessageControllerTest {
 
     @ParameterizedTest
     @MethodSource("transactionManager")
+    @Suppress("UNCHECKED_CAST")
     fun `get channel messages`(m: TransactionManager) =
         makeTest(m) { manager, owner, user, channel, messageServices ->
             val nr = 20
@@ -257,7 +259,7 @@ class MessageControllerTest {
                     )
                 assertIs<Success<Message>>(message, "Message was not created")
             }
-            getChannelMessages(checkNotNull(channel.cId), 5, 10, user).let { resp ->
+            getChannelMessages(checkNotNull(channel.cId), 5u, 10u, user).let { resp ->
                 assertEquals(HttpStatus.OK, resp.statusCode, "Status code is not OK")
                 assertIs<List<MessageOutputModel>>(
                     resp.body,
@@ -281,7 +283,7 @@ class MessageControllerTest {
     @MethodSource("transactionManager")
     fun `fail to get channel messages`(m: TransactionManager) =
         makeTest(m) { _, _, user, channel, _ ->
-            getChannelMessages(checkNotNull(channel.cId), 0, 10, user).let { resp ->
+            getChannelMessages(checkNotNull(channel.cId), 0u, 10u, user).let { resp ->
                 assertEquals(HttpStatus.NOT_FOUND, resp.statusCode, "Status code is not NOT_FOUND")
                 assertIs<MessageProblem.MessageNotFound>(resp.body, "Body is not a MessageNotFound")
             }

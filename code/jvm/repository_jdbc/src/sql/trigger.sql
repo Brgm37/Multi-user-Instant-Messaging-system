@@ -3,7 +3,7 @@ create or replace function f_channel_insert()
 $$
 begin
     insert into channel_members (channel, member, access_control)
-    values (new.id, new.owner, new.access_control);
+    values (new.id, new.owner, 'READ_WRITE');
     return new;
 end;
 $$ language plpgsql;

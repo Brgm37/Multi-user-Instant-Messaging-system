@@ -34,8 +34,6 @@ class MessageServices(
                     user = UserInfo(uId, msgUser.username),
                     channel = ChannelInfo(channelId, msgChannel.name),
                 )
-            val createdMessage =
-                messageRepo.createMessage(message) ?: return@run failure(MessageError.UnableToCreateMessage)
             val userAccessControl =
                 channelRepo.findUserAccessControl(channelId, uId) ?: return@run failure(MessageError.UserNotInChannel)
             if (msgChannel is Channel.Public &&
@@ -44,12 +42,9 @@ class MessageServices(
             ) {
                 return@run failure(MessageError.UserDoesNotHaveAccess)
             }
-            if (msgChannel is Channel.Public) {
-                return@run success(createdMessage)
-            }
-            if (userAccessControl == AccessControl.READ_ONLY) {
-                return@run failure(MessageError.UserDoesNotHaveAccess)
-            }
+            if (userAccessControl == AccessControl.READ_ONLY) return@run failure(MessageError.UserDoesNotHaveAccess)
+            val createdMessage = messageRepo.createMessage(message)
+            checkNotNull(createdMessage) { "Message is null" }
             success(createdMessage)
         }
     }
@@ -77,10 +72,11 @@ class MessageServices(
     ): Either<MessageError, Message> =
         repoManager.run {
             val message = messageRepo.findById(msgId) ?: return@run failure(MessageError.MessageNotFound)
-            val channel =
-                channelRepo.findById(message.channel.cId) ?: return@run failure(MessageError.ChannelNotFound)
-            val channelId = checkNotNull(channel.cId) { "Channel id is null" }
-            if (!channelRepo.isUserInChannel(channelId, uId)) {
+            if (!channelRepo.isUserInChannel(
+                    message.channel.cId,
+                    uId,
+                )
+            ) {
                 return@run failure(MessageError.UserNotInChannel)
             }
             success(message)
@@ -89,16 +85,14 @@ class MessageServices(
     override fun latestMessages(
         channelId: UInt,
         uId: UInt,
-        offset: Int,
-        limit: Int,
+        offset: UInt,
+        limit: UInt,
     ): Either<MessageError, List<Message>> {
         return repoManager.run {
             val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
             val chId = checkNotNull(channel.cId) { "Channel id is null" }
-            if (!channelRepo.isUserInChannel(chId, uId)) {
-                return@run failure(MessageError.UserNotInChannel)
-            }
-            val messages = messageRepo.findMessagesByChannelId(chId, limit.toUInt(), offset.toUInt())
+            if (!channelRepo.isUserInChannel(chId, uId)) return@run failure(MessageError.UserNotInChannel)
+            val messages = messageRepo.findMessagesByChannelId(chId, limit, offset)
             success(messages)
         }
     }

@@ -9,6 +9,7 @@ import java.util.UUID
  * @property inviterId The ID of the inviter.
  * @property expirationDate The expiration date of the invitation.
  * @property invitationCode The invitation code to join the app.
+ * @property isExpired Checks if the invitation is expired.
  */
 data class UserInvitation(
     val inviterId: UInt,

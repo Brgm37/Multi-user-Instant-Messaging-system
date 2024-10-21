@@ -5,7 +5,7 @@ class Message
     + msg: String
     + user: UserInfo
     + channel: ChannelInfo
-    + timestamp: Long
+    + timestamp: Timestamp
 }
 
 class MessageInfo

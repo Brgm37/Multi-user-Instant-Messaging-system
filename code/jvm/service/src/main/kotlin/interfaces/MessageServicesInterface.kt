@@ -4,6 +4,9 @@ import errors.MessageError
 import model.messages.Message
 import utils.Either
 
+private const val MSG_OFFSET = 0u
+private const val MSG_LIMIT = 100u
+
 /**
  * Represents the services available for the user entity.
  */
@@ -50,7 +53,7 @@ interface MessageServicesInterface {
     fun latestMessages(
         channelId: UInt,
         uId: UInt,
-        offset: Int,
-        limit: Int,
+        offset: UInt = MSG_OFFSET,
+        limit: UInt = MSG_LIMIT,
     ): Either<MessageError, List<Message>>
 }

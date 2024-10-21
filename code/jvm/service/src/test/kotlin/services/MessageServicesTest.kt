@@ -180,7 +180,7 @@ class MessageServicesTest {
     @MethodSource("transactionManagers")
     fun `Public channel READ_ONLY message creation success and fail due to access control`(m: TransactionManager) {
         makeTest(PUBLIC, READ_ONLY, m) { manager, owner, user, channel, messageServices ->
-            userJoinChannel(manager, user, channel, READ_WRITE)
+            userJoinChannel(manager, user, channel, channel.accessControl)
             val newMessageFailure =
                 messageServices
                     .createMessage(
@@ -381,7 +381,7 @@ class MessageServicesTest {
             }
             val messages =
                 messageServices
-                    .latestMessages(checkNotNull(channel.cId), checkNotNull(user.uId), 5, 10)
+                    .latestMessages(checkNotNull(channel.cId), checkNotNull(user.uId), 5u, 10u)
             assertIs<Success<List<Message>>>(messages, "Message retrieval failed")
             assertEquals(10, messages.value.size, "Number of messages is different")
         }
@@ -404,7 +404,7 @@ class MessageServicesTest {
             }
             val messages =
                 messageServices
-                    .latestMessages(checkNotNull(channel.cId), checkNotNull(user.uId), 5, 10)
+                    .latestMessages(checkNotNull(channel.cId), checkNotNull(user.uId), 5u, 10u)
             assertIs<Failure<MessageError.UserNotInChannel>>(messages, "Message retrieval should have failed")
             assertEquals(MessageError.UserNotInChannel, messages.value, "Message error is different")
         }
