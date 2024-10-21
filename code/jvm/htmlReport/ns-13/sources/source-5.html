@@ -1,0 +1,147 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserToken</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">model.users</a>
+</div>
+
+<h1>Coverage Summary for Class: UserToken (model.users)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserToken</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83,3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package model.users
+&nbsp;
+&nbsp;import java.sql.Timestamp
+&nbsp;import java.util.UUID
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a user token.
+&nbsp; *
+&nbsp; * @property userId The ID of the user.
+&nbsp; * @property token The token.
+&nbsp; * @property creationDate The creation date of the token.
+&nbsp; * @property expirationDate The expiration date of the token.
+&nbsp; * @throws IllegalArgumentException If the creation date is after the expiration date.
+&nbsp; */
+<b class="fc">&nbsp;data class UserToken(</b>
+<b class="fc">&nbsp;    val userId: UInt,</b>
+<b class="fc">&nbsp;    val token: UUID = UUID.randomUUID(),</b>
+<b class="fc">&nbsp;    val creationDate: Timestamp = Timestamp(System.currentTimeMillis()),</b>
+<b class="fc">&nbsp;    val expirationDate: Timestamp = Timestamp.valueOf(creationDate.toLocalDateTime().plusWeeks(1)),</b>
+&nbsp;) {
+<b class="fc">&nbsp;    init {</b>
+<b class="fc">&nbsp;        require(creationDate &lt; expirationDate) { &quot;The creation date must be before the expiration date&quot; }</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the token is valid.
+&nbsp;     *
+&nbsp;     * @return true if the token is valid, false otherwise.
+&nbsp;     */
+<b class="pc">&nbsp;    fun isExpired(): Boolean = expirationDate &lt; Timestamp(System.currentTimeMillis())</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
+</div>
+</body>
+</html>

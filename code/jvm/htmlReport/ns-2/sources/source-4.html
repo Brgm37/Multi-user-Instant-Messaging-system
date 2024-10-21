@@ -1,0 +1,185 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MessageControllerKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.appWeb.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: MessageControllerKt (com.example.appWeb.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">MessageControllerKt</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.appWeb.controller
+&nbsp;
+&nbsp;import com.example.appWeb.model.dto.input.message.CreateMessageInputModel
+&nbsp;import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
+&nbsp;import com.example.appWeb.model.dto.output.message.MessageOutputModel
+&nbsp;import com.example.appWeb.model.problem.ChannelProblem
+&nbsp;import com.example.appWeb.model.problem.MessageProblem
+&nbsp;import com.example.appWeb.model.problem.UserProblem
+&nbsp;import com.example.appWeb.swagger.MessageSwaggerConfig
+&nbsp;import errors.MessageError.ChannelNotFound
+&nbsp;import errors.MessageError.InvalidMessageInfo
+&nbsp;import errors.MessageError.UserNotFound
+&nbsp;import interfaces.MessageServicesInterface
+&nbsp;import io.swagger.v3.oas.annotations.Parameter
+&nbsp;import jakarta.validation.Valid
+&nbsp;import org.springframework.http.HttpStatus.BAD_REQUEST
+&nbsp;import org.springframework.http.HttpStatus.NOT_FOUND
+&nbsp;import org.springframework.http.ResponseEntity
+&nbsp;import org.springframework.web.bind.annotation.GetMapping
+&nbsp;import org.springframework.web.bind.annotation.PathVariable
+&nbsp;import org.springframework.web.bind.annotation.PostMapping
+&nbsp;import org.springframework.web.bind.annotation.RequestBody
+&nbsp;import org.springframework.web.bind.annotation.RequestMapping
+&nbsp;import org.springframework.web.bind.annotation.RequestParam
+&nbsp;import org.springframework.web.bind.annotation.RestController
+&nbsp;import utils.Failure
+&nbsp;import utils.Success
+&nbsp;
+&nbsp;/**
+&nbsp; * The default limit for the message list.
+&nbsp; */
+&nbsp;private const val OFFSET = 0u
+&nbsp;
+&nbsp;/**
+&nbsp; * The default offset for the message list.
+&nbsp; */
+&nbsp;private const val LIMIT = 100u
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents the controller for the message
+&nbsp; *
+&nbsp; * @property messageService The message service
+&nbsp; */
+&nbsp;@RestController
+&nbsp;@RequestMapping(MessageController.MESSAGE_BASE_URL)
+&nbsp;class MessageController(
+&nbsp;    private val messageService: MessageServicesInterface,
+&nbsp;) {
+&nbsp;    @PostMapping
+&nbsp;    @MessageSwaggerConfig.CreateMessage
+&nbsp;    fun createMessage(
+&nbsp;        @Valid @RequestBody message: CreateMessageInputModel,
+&nbsp;        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+&nbsp;    ): ResponseEntity&lt;*&gt; {
+&nbsp;        val response =
+&nbsp;            messageService
+&nbsp;                .createMessage(
+&nbsp;                    msg = message.msg,
+&nbsp;                    user = authenticated.uId,
+&nbsp;                    channel = message.channel,
+&nbsp;                )
+&nbsp;        return when (response) {
+&nbsp;            is Success -&gt; {
+&nbsp;                ResponseEntity.ok(MessageOutputModel.fromDomain(response.value))
+&nbsp;            }
+&nbsp;
+&nbsp;            is Failure -&gt; {
+&nbsp;                when (response.value) {
+&nbsp;                    InvalidMessageInfo -&gt; MessageProblem.InvalidMessageInfo.response(BAD_REQUEST)
+&nbsp;                    ChannelNotFound -&gt; ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+&nbsp;                    UserNotFound -&gt; UserProblem.UserNotFound.response(NOT_FOUND)
+&nbsp;                    else -&gt; MessageProblem.UnableToCreateMessage.response(BAD_REQUEST)
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(MESSAGE_ID_URL)
+&nbsp;    @MessageSwaggerConfig.GetSingleMessage
+&nbsp;    fun getSingleMessage(
+&nbsp;        @PathVariable msgId: UInt,
+&nbsp;        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+&nbsp;    ): ResponseEntity&lt;*&gt; =
+&nbsp;        when (val response = messageService.getMessage(msgId, authenticated.uId)) {
+&nbsp;            is Success -&gt; {
+&nbsp;                ResponseEntity.ok(MessageOutputModel.fromDomain(response.value))
+&nbsp;            }
+&nbsp;
+&nbsp;            is Failure -&gt; {
+&nbsp;                MessageProblem.MessageNotFound.response(NOT_FOUND)
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    @GetMapping(CHANNEL_MESSAGES_URL)
+&nbsp;    @MessageSwaggerConfig.GetChannelMessages
+&nbsp;    fun getChannelMessages(
+&nbsp;        @PathVariable channelId: UInt,
+&nbsp;        @RequestParam offset: UInt = OFFSET,
+&nbsp;        @RequestParam limit: UInt = LIMIT,
+&nbsp;        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+&nbsp;    ): ResponseEntity&lt;*&gt; =
+&nbsp;        when (val response = messageService.latestMessages(channelId, authenticated.uId, offset, limit)) {
+&nbsp;            is Success -&gt; {
+&nbsp;                ResponseEntity.ok(response.value.map(MessageOutputModel::fromDomain))
+&nbsp;            }
+&nbsp;
+&nbsp;            is Failure -&gt; {
+&nbsp;                MessageProblem.MessageNotFound.response(NOT_FOUND)
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    companion object {
+&nbsp;        const val MESSAGE_BASE_URL = &quot;api/messages&quot;
+&nbsp;        const val MESSAGE_ID_URL = &quot;/{msgId}&quot;
+&nbsp;        const val CHANNEL_MESSAGES_URL = &quot;/channel/{channelId}&quot;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
+</div>
+</body>
+</html>

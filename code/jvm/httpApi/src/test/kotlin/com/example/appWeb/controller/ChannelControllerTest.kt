@@ -4,6 +4,7 @@ import TransactionManager
 import com.example.appWeb.model.dto.input.channel.CreateChannelInputModel
 import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputModel
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
+import com.example.appWeb.model.dto.output.channel.ChannelInvitationOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
@@ -32,8 +33,8 @@ class ChannelControllerTest {
         @JvmStatic
         fun transactionManager(): Stream<TransactionManager> =
             Stream.of(
-                TransactionManagerInMem().also { cleanup(it) },
-                TransactionManagerJDBC(TestSetup.dataSource, DummyEncrypt).also { cleanup(it) },
+                TransactionManagerInMem().also(::cleanup),
+                TransactionManagerJDBC(TestSetup.dataSource, DummyEncrypt).also(::cleanup),
             )
 
         private fun cleanup(manager: TransactionManager) {
@@ -262,7 +263,7 @@ class ChannelControllerTest {
                 authenticated,
             ).let { resp ->
                 assertEquals(HttpStatus.OK, resp.statusCode, "Status code is different")
-                assertIs<UUID>(resp.body, "Body is not a UUID")
+                assertIs<ChannelInvitationOutputModel>(resp.body, "Body is not a UUID")
             }
         }
 

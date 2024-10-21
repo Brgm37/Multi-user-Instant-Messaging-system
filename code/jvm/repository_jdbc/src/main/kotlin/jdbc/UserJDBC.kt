@@ -11,7 +11,15 @@ import java.sql.Connection
 import java.sql.ResultSet
 import java.util.UUID
 
-private val USERS_TABLE = "users"
+/**
+ * The maximum number of tokens a user can have
+ */
+private const val MAX_TOKENS = 5
+
+/**
+ * The name of the table that stores the users
+ */
+private const val USERS_TABLE = "users"
 
 /**
  * The name of the column in the [USERS_TABLE] that stores the user id
@@ -83,10 +91,6 @@ class UserJDBC(
     private val connection: Connection,
     private val encrypt: Encrypt = DummyEncrypt,
 ) : UserRepositoryInterface {
-    companion object {
-        const val MAX_TOKENS = 5
-    }
-
     private fun ResultSet.toUser(): User =
         User(
             uId = getInt(USERS_TABLE_ID).toUInt(),

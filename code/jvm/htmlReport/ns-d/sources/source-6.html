@@ -1,0 +1,425 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserJDBCKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jdbc</a>
+</div>
+
+<h1>Coverage Summary for Class: UserJDBCKt (jdbc)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">UserJDBCKt</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jdbc
+&nbsp;
+&nbsp;import UserRepositoryInterface
+&nbsp;import model.users.Password
+&nbsp;import model.users.User
+&nbsp;import model.users.UserInvitation
+&nbsp;import model.users.UserToken
+&nbsp;import utils.encryption.DummyEncrypt
+&nbsp;import utils.encryption.Encrypt
+&nbsp;import java.sql.Connection
+&nbsp;import java.sql.ResultSet
+&nbsp;import java.util.UUID
+&nbsp;
+&nbsp;/**
+&nbsp; * The maximum number of tokens a user can have
+&nbsp; */
+&nbsp;private const val MAX_TOKENS = 5
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of the table that stores the users
+&nbsp; */
+&nbsp;private const val USERS_TABLE = &quot;users&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of the column in the [USERS_TABLE] that stores the user id
+&nbsp; */
+&nbsp;private const val USERS_TABLE_ID = &quot;id&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of the column in the [USERS_TABLE] that stores the username
+&nbsp; */
+&nbsp;private const val USERS_TABLE_NAME = &quot;name&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of the column in the [USERS_TABLE] that stores the password
+&nbsp; */
+&nbsp;private const val USERS_TABLE_PASSWORD = &quot;password&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of the table that stores the user invitations
+&nbsp; */
+&nbsp;private const val USERS_INVITATIONS_TABLE = &quot;users_invitations&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of the column in the [USERS_INVITATIONS_TABLE] that stores the user id
+&nbsp; */
+&nbsp;private const val USERS_INVITATIONS_TABLE_USER_ID = &quot;user_id&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of the column in the [USERS_INVITATIONS_TABLE] that stores the invitation code
+&nbsp; */
+&nbsp;private const val USERS_INVITATIONS_TABLE_INVITATION = &quot;invitation&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of the column in the [USERS_INVITATIONS_TABLE] that stores the expiration date
+&nbsp; */
+&nbsp;private const val USERS_INVITATIONS_TABLE_EXPIRATION_DATE = &quot;expiration_date&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of the table that stores the user tokens
+&nbsp; */
+&nbsp;private const val USERS_TOKENS_TABLE = &quot;users_tokens&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of the column in the [USERS_TOKENS_TABLE] that stores the user id
+&nbsp; */
+&nbsp;private const val USERS_TOKENS_TABLE_USER_ID = &quot;user_id&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of the column in the [USERS_TOKENS_TABLE] that stores the token
+&nbsp; */
+&nbsp;private const val USERS_TOKENS_TABLE_TOKEN = &quot;token&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of the column in the [USERS_TOKENS_TABLE] that stores the creation date
+&nbsp; */
+&nbsp;private const val USERS_TOKENS_TABLE_CREATION = &quot;creation&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * The name of the column in the [USERS_TOKENS_TABLE] that stores the expiration date
+&nbsp; */
+&nbsp;private const val USERS_TOKENS_TABLE_EXPIRATION = &quot;expiration&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * UserJDBC is a JDBC implementation of UserRepositoryInterface
+&nbsp; *
+&nbsp; * @property connection a JDBC Connection
+&nbsp; * @property encrypt an encryption utility to use
+&nbsp; */
+&nbsp;class UserJDBC(
+&nbsp;    private val connection: Connection,
+&nbsp;    private val encrypt: Encrypt = DummyEncrypt,
+&nbsp;) : UserRepositoryInterface {
+&nbsp;    private fun ResultSet.toUser(): User =
+&nbsp;        User(
+&nbsp;            uId = getInt(USERS_TABLE_ID).toUInt(),
+&nbsp;            username = getString(USERS_TABLE_NAME),
+&nbsp;            password = Password(getString((USERS_TABLE_PASSWORD))),
+&nbsp;        )
+&nbsp;
+&nbsp;    private fun ResultSet.toUserInvitation(): UserInvitation =
+&nbsp;        UserInvitation(
+&nbsp;            inviterId = getInt(USERS_INVITATIONS_TABLE_USER_ID).toUInt(),
+&nbsp;            invitationCode = UUID.fromString(encrypt.decrypt(getString(USERS_INVITATIONS_TABLE_INVITATION))),
+&nbsp;            expirationDate = getTimestamp(USERS_INVITATIONS_TABLE_EXPIRATION_DATE),
+&nbsp;        )
+&nbsp;
+&nbsp;    override fun createUser(user: User): User? {
+&nbsp;        val insertQuery =
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            INSERT INTO users (name, password)
+&nbsp;            VALUES (?, ?) RETURNING id
+&nbsp;            &quot;&quot;&quot;.trimIndent()
+&nbsp;        val stm = connection.prepareStatement(insertQuery)
+&nbsp;        var idx = 1
+&nbsp;        stm.setString(idx++, user.username)
+&nbsp;        stm.setString(idx, encrypt.encrypt(user.password.value))
+&nbsp;        val rs = stm.executeQuery()
+&nbsp;        return if (rs.next()) {
+&nbsp;            user.copy(uId = rs.getInt(USERS_TABLE_ID).toUInt())
+&nbsp;        } else {
+&nbsp;            null
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun findInvitation(
+&nbsp;        inviterUId: UInt,
+&nbsp;        invitationCode: String,
+&nbsp;    ): UserInvitation? {
+&nbsp;        val selectQuery =
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            SELECT user_id, invitation, expiration_date
+&nbsp;            FROM users_invitations
+&nbsp;            WHERE user_id = ? AND invitation = ?
+&nbsp;            &quot;&quot;&quot;.trimIndent()
+&nbsp;        val stm = connection.prepareStatement(selectQuery)
+&nbsp;        stm.setInt(1, inviterUId.toInt())
+&nbsp;        stm.setString(2, invitationCode)
+&nbsp;        val rs = stm.executeQuery()
+&nbsp;        return if (rs.next()) {
+&nbsp;            rs.toUserInvitation()
+&nbsp;        } else {
+&nbsp;            null
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun deleteInvitation(invitation: UserInvitation) {
+&nbsp;        val deleteQuery =
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            DELETE FROM users_invitations
+&nbsp;            WHERE user_id = ? AND invitation = ?
+&nbsp;            &quot;&quot;&quot;.trimIndent()
+&nbsp;        val stm = connection.prepareStatement(deleteQuery)
+&nbsp;        stm.setInt(1, invitation.inviterId.toInt())
+&nbsp;        stm.setString(2, invitation.invitationCode.toString())
+&nbsp;        stm.executeUpdate()
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun createInvitation(invitation: UserInvitation): Boolean {
+&nbsp;        val insertQuery =
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            INSERT INTO users_invitations (user_id, invitation, expiration_date)
+&nbsp;            VALUES (?, ?, ?)
+&nbsp;            &quot;&quot;&quot;.trimIndent()
+&nbsp;        val stm = connection.prepareStatement(insertQuery)
+&nbsp;        stm.setInt(1, invitation.inviterId.toInt())
+&nbsp;        stm.setString(2, encrypt.encrypt(invitation.invitationCode.toString()))
+&nbsp;        stm.setTimestamp(3, invitation.expirationDate)
+&nbsp;        return stm.executeUpdate() &gt; 0
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun validateToken(token: String): Boolean {
+&nbsp;        val selectQuery =
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            SELECT user_id
+&nbsp;            FROM users_tokens
+&nbsp;            WHERE token = ?
+&nbsp;            &quot;&quot;&quot;.trimIndent()
+&nbsp;        val stm = connection.prepareStatement(selectQuery)
+&nbsp;        stm.setString(1, token)
+&nbsp;        val rs = stm.executeQuery()
+&nbsp;        return rs.next()
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun findByToken(token: String): User? {
+&nbsp;        val selectQuery =
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            SELECT user_id
+&nbsp;            FROM users_tokens
+&nbsp;            WHERE token = ?
+&nbsp;            &quot;&quot;&quot;.trimIndent()
+&nbsp;        val stm = connection.prepareStatement(selectQuery)
+&nbsp;        stm.setString(1, token)
+&nbsp;        val rs = stm.executeQuery()
+&nbsp;        return if (rs.next()) {
+&nbsp;            findById(rs.getInt(USERS_INVITATIONS_TABLE_USER_ID).toUInt())
+&nbsp;        } else {
+&nbsp;            null
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun findById(id: UInt): User? {
+&nbsp;        val selectQuery =
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            SELECT id, name, password
+&nbsp;            FROM users
+&nbsp;            WHERE id = ?
+&nbsp;            &quot;&quot;&quot;.trimIndent()
+&nbsp;        val stm = connection.prepareStatement(selectQuery)
+&nbsp;        stm.setInt(1, id.toInt())
+&nbsp;        val rs = stm.executeQuery()
+&nbsp;        return if (rs.next()) {
+&nbsp;            rs.toUser()
+&nbsp;        } else {
+&nbsp;            null
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun findByUsername(username: String): User? {
+&nbsp;        val selectQuery =
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            SELECT id, name, password
+&nbsp;            FROM users
+&nbsp;            WHERE name = ?
+&nbsp;            &quot;&quot;&quot;.trimIndent()
+&nbsp;        val stm = connection.prepareStatement(selectQuery)
+&nbsp;        stm.setString(1, username)
+&nbsp;        val rs = stm.executeQuery()
+&nbsp;        return if (rs.next()) {
+&nbsp;            rs.toUser()
+&nbsp;        } else {
+&nbsp;            null
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun createToken(token: UserToken): Boolean {
+&nbsp;        val tokenCount = countUserTokens(token.userId)
+&nbsp;        if (tokenCount &gt;= MAX_TOKENS) {
+&nbsp;            deleteOldestToken(token.userId)
+&nbsp;        }
+&nbsp;        val insertQuery =
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            INSERT INTO users_tokens (user_id, token, creation, expiration)
+&nbsp;            VALUES (?, ?, ?, ?)
+&nbsp;            &quot;&quot;&quot;.trimIndent()
+&nbsp;        val stm = connection.prepareStatement(insertQuery)
+&nbsp;        var idx = 1
+&nbsp;        stm.setInt(idx++, token.userId.toInt())
+&nbsp;        stm.setString(idx++, token.token.toString())
+&nbsp;        stm.setTimestamp(idx++, token.creationDate)
+&nbsp;        stm.setTimestamp(idx, token.expirationDate)
+&nbsp;        return stm.executeUpdate() &gt; 0
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun deleteToken(token: String): Boolean {
+&nbsp;        val deleteQuery =
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            DELETE FROM users_tokens
+&nbsp;            WHERE token = ?
+&nbsp;            &quot;&quot;&quot;.trimIndent()
+&nbsp;        val stm = connection.prepareStatement(deleteQuery)
+&nbsp;        stm.setString(1, token)
+&nbsp;        return stm.executeUpdate() &gt; 0
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun countUserTokens(userId: UInt): Int {
+&nbsp;        val query = &quot;SELECT COUNT(*) FROM users_tokens WHERE user_id = ?&quot;
+&nbsp;        val stm = connection.prepareStatement(query)
+&nbsp;        stm.setInt(1, userId.toInt())
+&nbsp;        val rs = stm.executeQuery()
+&nbsp;        rs.next()
+&nbsp;        return rs.getInt(1)
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun deleteOldestToken(userId: UInt) {
+&nbsp;        val deleteOldestQuery =
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            DELETE FROM users_tokens
+&nbsp;            WHERE token IN (
+&nbsp;                SELECT token
+&nbsp;                FROM users_tokens
+&nbsp;                WHERE user_id = ?
+&nbsp;                ORDER BY creation 
+&nbsp;                    FETCH 
+&nbsp;                    FIRST 1 ROWS ONLY
+&nbsp;            )
+&nbsp;            &quot;&quot;&quot;.trimIndent()
+&nbsp;        val stmDelete = connection.prepareStatement(deleteOldestQuery)
+&nbsp;        stmDelete.setInt(1, userId.toInt())
+&nbsp;        stmDelete.executeUpdate()
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun findAll(
+&nbsp;        offset: Int,
+&nbsp;        limit: Int,
+&nbsp;    ): List&lt;User&gt; {
+&nbsp;        val selectQuery =
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            SELECT id, name, password
+&nbsp;            FROM users
+&nbsp;            OFFSET ?
+&nbsp;            LIMIT ?
+&nbsp;            &quot;&quot;&quot;.trimIndent()
+&nbsp;        val stm = connection.prepareStatement(selectQuery)
+&nbsp;        stm.setInt(1, offset)
+&nbsp;        stm.setInt(2, limit)
+&nbsp;        val rs = stm.executeQuery()
+&nbsp;        val users = mutableListOf&lt;User&gt;()
+&nbsp;        while (rs.next()) {
+&nbsp;            users.add(rs.toUser())
+&nbsp;        }
+&nbsp;        return users
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun save(entity: User) {
+&nbsp;        val updateQuery =
+&nbsp;            &quot;&quot;&quot;
+&nbsp;            UPDATE users
+&nbsp;            SET name = ?, password = ?
+&nbsp;            WHERE id = ?
+&nbsp;            &quot;&quot;&quot;.trimIndent()
+&nbsp;        val stm = connection.prepareStatement(updateQuery)
+&nbsp;        var idx = 1
+&nbsp;        stm.setString(idx++, entity.username)
+&nbsp;        stm.setString(idx++, entity.password.value)
+&nbsp;        entity.uId?.let { stm.setInt(idx, it.toInt()) }
+&nbsp;        stm.executeUpdate()
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun deleteById(id: UInt) {
+&nbsp;        executeDeleteQuery(&quot;DELETE FROM users_invitations WHERE user_id = ?&quot;, id)
+&nbsp;        executeDeleteQuery(&quot;DELETE FROM users_tokens WHERE user_id = ?&quot;, id)
+&nbsp;        executeDeleteQuery(&quot;DELETE FROM messages WHERE author = ?&quot;, id)
+&nbsp;        executeDeleteQuery(&quot;DELETE FROM channel_members WHERE member = ?&quot;, id)
+&nbsp;        executeDeleteQuery(&quot;DELETE FROM users WHERE id = ?&quot;, id)
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun executeDeleteQuery(
+&nbsp;        query: String,
+&nbsp;        id: UInt,
+&nbsp;    ) {
+&nbsp;        val stm = connection.prepareStatement(query)
+&nbsp;        stm.setInt(1, id.toInt())
+&nbsp;        stm.executeUpdate()
+&nbsp;    }
+&nbsp;
+&nbsp;    @Suppress(&quot;SqlWithoutWhere&quot;)
+&nbsp;    override fun clear() {
+&nbsp;        val tables = listOf(USERS_TOKENS_TABLE, USERS_INVITATIONS_TABLE, USERS_TABLE)
+&nbsp;
+&nbsp;        for (table in tables) {
+&nbsp;            val deleteQuery = &quot;DELETE FROM $table&quot;
+&nbsp;            val stmDelete = connection.prepareStatement(deleteQuery)
+&nbsp;            stmDelete.executeUpdate()
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:16</div>
+</div>
+</body>
+</html>

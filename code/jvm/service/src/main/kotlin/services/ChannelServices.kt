@@ -152,6 +152,8 @@ class ChannelServices(
                             accessControl = AccessControl.valueOf(accessControl.uppercase()),
                         )
                     }
+                val oldInvitation = channelRepo.findInvitation(channelId)
+                if (oldInvitation != null) channelRepo.deleteInvitation(channelId)
                 channelRepo.createInvitation(invitation)
                 success(invitation.invitationCode)
             }

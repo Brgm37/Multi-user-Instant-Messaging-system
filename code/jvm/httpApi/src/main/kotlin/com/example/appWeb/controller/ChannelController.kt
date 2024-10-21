@@ -3,6 +3,7 @@ package com.example.appWeb.controller
 import com.example.appWeb.model.dto.input.channel.CreateChannelInputModel
 import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputModel
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
+import com.example.appWeb.model.dto.output.channel.ChannelInvitationOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
@@ -134,7 +135,7 @@ class ChannelController(
             )
         return when (response) {
             is Success -> {
-                ResponseEntity.ok(response.value)
+                ResponseEntity.ok(ChannelInvitationOutputModel(response.value.toString()))
             }
 
             is Failure -> {
