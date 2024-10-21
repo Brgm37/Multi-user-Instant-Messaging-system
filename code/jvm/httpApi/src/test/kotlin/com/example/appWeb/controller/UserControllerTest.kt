@@ -6,6 +6,7 @@ import com.example.appWeb.model.dto.input.user.UserLogInInputModel
 import com.example.appWeb.model.dto.input.user.UserSignUpInputModel
 import com.example.appWeb.model.dto.output.user.UserAuthenticatedOutputModel
 import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
+import com.example.appWeb.model.dto.output.user.UserInvitationOutputModel
 import com.example.appWeb.model.dto.output.user.UserSignUpOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.UserProblem
@@ -277,9 +278,8 @@ class UserControllerTest {
 
         val response = userController.createInvitation(authenticated)
         assertEquals(HttpStatus.OK, response.statusCode)
-        assertIs<UserInvitation>(response.body)
-        assertEquals(userId, (response.body as UserInvitation).inviterId)
-        assertNotNull((response.body as UserInvitation).invitationCode)
+        assertIs<UserInvitationOutputModel>(response.body)
+        assertNotNull((response.body as UserInvitationOutputModel).invitationCode)
     }
 
     @ParameterizedTest

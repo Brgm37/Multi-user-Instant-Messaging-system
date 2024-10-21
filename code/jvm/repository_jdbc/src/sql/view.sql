@@ -15,7 +15,7 @@ select m.id        as msgId,
        m.author    as msgAuthorId,
        m.content   as msgContent,
        m.timestamp as msgTimestamp,
-       c.owner     as msgChannelName,
+       c.name     as msgChannelName,
        u.name      as msgAuthorUsername
 from messages m
          join users u on m.author = u.id

@@ -361,10 +361,6 @@ abstract class AbstractUserControllerTest {
             .expectBody()
             .jsonPath("$.invitationCode")
             .isNotEmpty
-            .jsonPath("$.expirationDate")
-            .isNotEmpty
-            .jsonPath("$.inviterId")
-            .isNotEmpty
     }
 
     @Test
