@@ -1,0 +1,56 @@
+@startuml
+
+!theme plain
+left to right direction
+skinparam linetype ortho
+
+class ChannelServices
+class MessageServices
+class UserServices
+class aesEncryption
+class authenticatedUserArgumentResolver
+class authenticationInterceptor
+class channelController
+class cs
+class customOpenAPI
+class hikariDc
+class httpApiApplication
+class jdbc
+class messageController
+class noEncryption
+class pipelineConfigurer
+class publicApi
+class requestTokenProcessor
+class swaggerConfig
+class userController
+
+ChannelServices                    -[#595959,plain]->  jdbc                              : "depends on"
+MessageServices                    -[#595959,plain]->  jdbc                              : "depends on"
+UserServices                       -[#595959,plain]->  jdbc                              : "depends on"
+authenticationInterceptor          -[#595959,plain]->  requestTokenProcessor             : "depends on"
+channelController                  -[#595959,plain]->  ChannelServices                   : "depends on"
+httpApiApplication                 -[#000082,dashed]->  aesEncryption                     : "@Bean"
+httpApiApplication                 -[#000082,dashed]->  cs                                : "@Bean"
+httpApiApplication                 -[#000082,dashed]->  hikariDc                          : "@Bean"
+httpApiApplication                 -[#008200,dotted]->  httpApiApplication                
+httpApiApplication                 -[#000082,dashed]->  jdbc                              : "@Bean"
+httpApiApplication                 -[#000082,dashed]->  noEncryption                      : "@Bean"
+httpApiApplication                 -[#008200,dotted]->  pipelineConfigurer                
+messageController                  -[#595959,plain]->  MessageServices                   : "depends on"
+pipelineConfigurer                 -[#008200,dotted]->  ChannelServices                   
+pipelineConfigurer                 -[#008200,dotted]->  MessageServices                   
+pipelineConfigurer                 -[#008200,dotted]->  UserServices                      
+pipelineConfigurer                 -[#008200,dotted]->  authenticatedUserArgumentResolver 
+pipelineConfigurer                 -[#595959,plain]->  authenticatedUserArgumentResolver : "depends on"
+pipelineConfigurer                 -[#008200,dotted]->  authenticationInterceptor         
+pipelineConfigurer                 -[#595959,plain]->  authenticationInterceptor         : "depends on"
+pipelineConfigurer                 -[#008200,dotted]->  channelController                 
+pipelineConfigurer                 -[#008200,dotted]->  messageController                 
+pipelineConfigurer                 -[#008200,dotted]->  requestTokenProcessor             
+pipelineConfigurer                 -[#008200,dotted]->  swaggerConfig                     
+pipelineConfigurer                 -[#008200,dotted]->  userController                    
+requestTokenProcessor              -[#595959,plain]->  UserServices                      : "depends on"
+swaggerConfig                      -[#000082,dashed]->  customOpenAPI                     : "@Bean"
+swaggerConfig                      -[#000082,dashed]->  publicApi                         : "@Bean"
+userController                     -[#595959,plain]->  UserServices                      : "depends on"
+@enduml

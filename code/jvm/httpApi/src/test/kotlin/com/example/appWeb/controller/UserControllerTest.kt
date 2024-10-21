@@ -41,8 +41,8 @@ class UserControllerTest {
         @JvmStatic
         fun transactionManager(): Stream<TransactionManager> =
             Stream.of(
-                TransactionManagerInMem().also { cleanup(it) },
-                TransactionManagerJDBC(TestSetup.dataSource, DummyEncrypt).also { cleanup(it) },
+                TransactionManagerInMem().also(::cleanup),
+                TransactionManagerJDBC(TestSetup.dataSource, DummyEncrypt).also(::cleanup),
             )
 
         private fun cleanup(manager: TransactionManager) {

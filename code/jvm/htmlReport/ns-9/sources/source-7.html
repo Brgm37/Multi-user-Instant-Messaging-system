@@ -1,0 +1,93 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ChannelProblemKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.appWeb.model.problem</a>
+</div>
+
+<h1>Coverage Summary for Class: ChannelProblemKt (com.example.appWeb.model.problem)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ChannelProblemKt</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.appWeb.model.problem
+&nbsp;
+&nbsp;import java.net.URI
+&nbsp;
+&nbsp;private const val PROBLEM_URI_PATH =
+&nbsp;    &quot;https://github.com/isel-leic-daw/2024-daw-leic52d-im-i52d-2425-g04/tree/main/docs/problems/channel&quot;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a ChannelProblem.
+&nbsp; *
+&nbsp; * @param typeUri the URI of the problem type.
+&nbsp; */
+&nbsp;sealed class ChannelProblem(
+&nbsp;    typeUri: URI,
+&nbsp;) : Problem(typeUri) {
+&nbsp;    data object ChannelNotFound : Problem(URI(&quot;$PROBLEM_URI_PATH/channel-not-found&quot;))
+&nbsp;
+&nbsp;    data object InvalidChannelInfo : Problem(URI(&quot;$PROBLEM_URI_PATH/invalid-channel-info&quot;))
+&nbsp;
+&nbsp;    data object UnableToCreateChannel : Problem(URI(&quot;$PROBLEM_URI_PATH/unable-to-create-channel&quot;))
+&nbsp;
+&nbsp;    data object InvalidChannelVisibility : Problem(URI(&quot;$PROBLEM_URI_PATH/invalid-channel-visibility&quot;))
+&nbsp;
+&nbsp;    data object InvalidChannelAccessControl : Problem(URI(&quot;$PROBLEM_URI_PATH/invalid-channel-access-control&quot;))
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:04</div>
+</div>
+</body>
+</html>

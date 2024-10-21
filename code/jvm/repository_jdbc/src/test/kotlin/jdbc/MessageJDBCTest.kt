@@ -53,16 +53,17 @@ class MessageJDBCTest {
                                 assertNotNull(channel)
                                 val channelId = checkNotNull(channel.cId) { "Channel id is null" }
                                 val jdbc = MessageJDBC(connection)
-                                jdbc.createMessage(
-                                    Message(
-                                        msg = "Hello, World!",
-                                        user = UserInfo(uId, user.username),
-                                        channel = ChannelInfo(channelId, channel.name),
-                                    ),
-                                ).let { message ->
-                                    assertNotNull(message)
-                                    jdbc.block(user, channel, message)
-                                }
+                                jdbc
+                                    .createMessage(
+                                        Message(
+                                            msg = "Hello, World!",
+                                            user = UserInfo(uId, user.username),
+                                            channel = ChannelInfo(channelId, channel.name),
+                                        ),
+                                    ).let { message ->
+                                        assertNotNull(message)
+                                        jdbc.block(user, channel, message)
+                                    }
                             }
                     }
             }

@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ChannelOutputModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.appWeb.model.dto.output.channel</a>
+</div>
+
+<h1>Coverage Summary for Class: ChannelOutputModel (com.example.appWeb.model.dto.output.channel)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChannelOutputModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ChannelOutputModel$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.appWeb.model.dto.output.channel
+&nbsp;
+&nbsp;import com.example.appWeb.model.dto.output.message.MessageOutputModel
+&nbsp;import model.channels.Channel
+&nbsp;import model.channels.Visibility.PRIVATE
+&nbsp;import model.channels.Visibility.PUBLIC
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a ChannelOutputModel.
+&nbsp; *
+&nbsp; * @property id the channel’s identifier (unique).
+&nbsp; * @property owner the owner of the channel.
+&nbsp; * @property name the name of the channel.
+&nbsp; * @property accessControl the access control settings of the channel.
+&nbsp; * @property visibility the visibility of the channel.
+&nbsp; * @property messages the messages in the channel.
+&nbsp; */
+<b class="fc">&nbsp;data class ChannelOutputModel(</b>
+<b class="fc">&nbsp;    val id: UInt,</b>
+<b class="fc">&nbsp;    val owner: OwnerOutputModel,</b>
+<b class="fc">&nbsp;    val name: ChannelNameOutputModel,</b>
+<b class="fc">&nbsp;    val accessControl: String,</b>
+<b class="fc">&nbsp;    val visibility: String,</b>
+<b class="fc">&nbsp;    val messages: List&lt;MessageOutputModel&gt; = emptyList(),</b>
+&nbsp;) {
+&nbsp;    companion object {
+&nbsp;        fun fromDomain(channel: Channel): ChannelOutputModel =
+<b class="fc">&nbsp;            ChannelOutputModel(</b>
+<b class="pc">&nbsp;                id = requireNotNull(channel.cId) { &quot;Channel id is null&quot; },</b>
+<b class="fc">&nbsp;                owner = OwnerOutputModel.fromDomain(channel.owner),</b>
+<b class="fc">&nbsp;                name = ChannelNameOutputModel.fromDomain(channel.name),</b>
+<b class="fc">&nbsp;                accessControl = channel.accessControl.name,</b>
+<b class="pc">&nbsp;                visibility = if (channel is Channel.Public) PUBLIC.name else PRIVATE.name,</b>
+<b class="fc">&nbsp;                messages = channel.messages.map(MessageOutputModel::fromDomain),</b>
+&nbsp;            )
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:04</div>
+</div>
+</body>
+</html>

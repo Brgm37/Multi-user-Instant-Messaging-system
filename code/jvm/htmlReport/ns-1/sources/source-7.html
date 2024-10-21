@@ -1,0 +1,134 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserRepositoryInterface</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">&lt;empty package name&gt;</a>
+</div>
+
+<h1>Coverage Summary for Class: UserRepositoryInterface (&lt;empty package name&gt;)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">UserRepositoryInterface</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;import model.users.User
+&nbsp;import model.users.UserInvitation
+&nbsp;import model.users.UserToken
+&nbsp;
+&nbsp;interface UserRepositoryInterface : Repository&lt;User&gt; {
+&nbsp;    /**
+&nbsp;     * Creates a new user and retrieves its ID
+&nbsp;     * @param user The user to create
+&nbsp;     * @return The created user
+&nbsp;     */
+&nbsp;    fun createUser(user: User): User?
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieves an invitation associated to the user
+&nbsp;     * @param inviterUId The ID of the inviter
+&nbsp;     * @param invitationCode The invitation code
+&nbsp;     */
+&nbsp;    fun findInvitation(
+&nbsp;        inviterUId: UInt,
+&nbsp;        invitationCode: String,
+&nbsp;    ): UserInvitation?
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes an invitation associated to the user
+&nbsp;     * @param invitation The invitation to delete
+&nbsp;     */
+&nbsp;    fun deleteInvitation(invitation: UserInvitation)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an invitation for the user
+&nbsp;     * @param invitation The invitation to create
+&nbsp;     */
+&nbsp;    fun createInvitation(invitation: UserInvitation): Boolean
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Validates if a token exists and is not expired
+&nbsp;     *
+&nbsp;     * @param token The token to validate
+&nbsp;     */
+&nbsp;    fun validateToken(token: String): Boolean
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieves a User by its username
+&nbsp;     * @param username the username of the user
+&nbsp;     */
+&nbsp;    fun findByUsername(username: String): User?
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new authentication token for the user
+&nbsp;     * @param token The token to create
+&nbsp;     */
+&nbsp;    fun createToken(token: UserToken): Boolean
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes the token associated to the user
+&nbsp;     * @param token The token to delete
+&nbsp;     */
+&nbsp;    fun deleteToken(token: String): Boolean
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a user by its token
+&nbsp;     * @param token The ID of the user
+&nbsp;     * @return The user with the given ID
+&nbsp;     */
+&nbsp;    fun findByToken(token: String): User?
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:04</div>
+</div>
+</body>
+</html>

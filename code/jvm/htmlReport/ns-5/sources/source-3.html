@@ -1,0 +1,129 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserSignUpInputModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.appWeb.model.dto.input.user</a>
+</div>
+
+<h1>Coverage Summary for Class: UserSignUpInputModel (com.example.appWeb.model.dto.input.user)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserSignUpInputModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.appWeb.model.dto.input.user
+&nbsp;
+&nbsp;import jakarta.validation.constraints.AssertTrue
+&nbsp;import jakarta.validation.constraints.NotBlank
+&nbsp;import jakarta.validation.constraints.Pattern
+&nbsp;import model.users.Password
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents the user input model for the sign-up operation.
+&nbsp; *
+&nbsp; * @property username The username of the user signing up.
+&nbsp; * @property password The password of the user signing up.
+&nbsp; * @property invitationCode The invitation code used to sign up.
+&nbsp; * @property inviterUId The id of the user that invited the user signing up.
+&nbsp; */
+<b class="fc">&nbsp;data class UserSignUpInputModel(</b>
+<b class="fc">&nbsp;    @get:NotBlank val username: String,</b>
+<b class="fc">&nbsp;    @get:NotBlank @get:Pattern(regexp = Password.PASSWORD_PATTERN)</b>
+<b class="fc">&nbsp;    val password: String,</b>
+<b class="fc">&nbsp;    @get:NotBlank val invitationCode: String,</b>
+<b class="fc">&nbsp;    val inviterUId: UInt,</b>
+&nbsp;) {
+&nbsp;    @AssertTrue
+<b class="nc">&nbsp;    fun validatePassword() = Password.isValidPassword(password)</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:04</div>
+</div>
+</body>
+</html>

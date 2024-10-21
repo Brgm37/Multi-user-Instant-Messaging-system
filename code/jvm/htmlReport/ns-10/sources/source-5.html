@@ -1,0 +1,297 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserInMem</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">mem</a>
+</div>
+
+<h1>Coverage Summary for Class: UserInMem (mem)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserInMem</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.7%
+  </span>
+  <span class="absValue">
+    (13/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.7%
+  </span>
+  <span class="absValue">
+    (23/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.1%
+  </span>
+  <span class="absValue">
+    (32/34)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UserInMem$deleteById$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UserInMem$deleteInvitation$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UserInMem$deleteToken$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UserInMem$save$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    84.2%
+  </span>
+  <span class="absValue">
+    (16/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67.6%
+  </span>
+  <span class="absValue">
+    (23/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.1%
+  </span>
+  <span class="absValue">
+    (35/38)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package mem
+&nbsp;
+&nbsp;import UserRepositoryInterface
+&nbsp;import model.users.User
+&nbsp;import model.users.UserInvitation
+&nbsp;import model.users.UserToken
+&nbsp;import java.util.UUID
+&nbsp;
+<b class="fc">&nbsp;class UserInMem : UserRepositoryInterface {</b>
+<b class="fc">&nbsp;    private val users = mutableListOf&lt;User&gt;()</b>
+<b class="fc">&nbsp;    private val invitations = mutableListOf&lt;UserInvitation&gt;()</b>
+<b class="fc">&nbsp;    private val tokens = mutableListOf&lt;UserToken&gt;()</b>
+<b class="fc">&nbsp;    private var nextId = 1u</b>
+&nbsp;
+&nbsp;    override fun createUser(user: User): User =
+<b class="fc">&nbsp;        user</b>
+<b class="fc">&nbsp;            .copy(uId = nextId++)</b>
+<b class="fc">&nbsp;            .also { users.add(it) }</b>
+&nbsp;
+&nbsp;    override fun findInvitation(
+&nbsp;        inviterUId: UInt,
+&nbsp;        invitationCode: String,
+&nbsp;    ): UserInvitation? =
+<b class="pc">&nbsp;        invitations.find { it.inviterId == inviterUId &amp;&amp; it.invitationCode.toString() == invitationCode }</b>
+&nbsp;
+&nbsp;    override fun deleteInvitation(invitation: UserInvitation) {
+<b class="fc">&nbsp;        invitations.removeIf { it.invitationCode == invitation.invitationCode }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun createInvitation(invitation: UserInvitation): Boolean {
+<b class="fc">&nbsp;        invitations.add(invitation)</b>
+<b class="fc">&nbsp;        return true</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun validateToken(token: String): Boolean {
+<b class="pc">&nbsp;        val tokenObj = tokens.find { it.token == UUID.fromString(token) } ?: return false</b>
+<b class="fc">&nbsp;        return !tokenObj.isExpired()</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    override fun findByUsername(username: String): User? = users.find { it.username == username }</b>
+&nbsp;
+&nbsp;    override fun createToken(token: UserToken): Boolean {
+<b class="fc">&nbsp;        tokens.add(token)</b>
+<b class="fc">&nbsp;        return true</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    override fun deleteToken(token: String): Boolean = tokens.removeIf { it.token == UUID.fromString(token) }</b>
+&nbsp;
+&nbsp;    override fun findByToken(token: String): User? {
+<b class="fc">&nbsp;        val tokenObj =</b>
+<b class="fc">&nbsp;            try {</b>
+<b class="fc">&nbsp;                UUID.fromString(token)</b>
+<b class="fc">&nbsp;            } catch (e: Exception) {</b>
+<b class="fc">&nbsp;                return null</b>
+&nbsp;            }
+<b class="fc">&nbsp;        return tokens</b>
+<b class="pc">&nbsp;            .find { it.token == tokenObj }</b>
+<b class="pc">&nbsp;            ?.let { findById(it.userId) }</b>
+&nbsp;    }
+&nbsp;
+<b class="pc">&nbsp;    override fun findById(id: UInt): User? = users.find { it.uId == id }</b>
+&nbsp;
+&nbsp;    override fun findAll(
+&nbsp;        offset: Int,
+&nbsp;        limit: Int,
+<b class="nc">&nbsp;    ): List&lt;User&gt; = users.drop(offset).take(limit)</b>
+&nbsp;
+&nbsp;    override fun save(entity: User) {
+<b class="fc">&nbsp;        users.removeIf { it.uId == entity.uId }</b>
+<b class="fc">&nbsp;        users.add(entity)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun deleteById(id: UInt) {
+<b class="nc">&nbsp;        users.removeIf { it.uId == id }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun clear() {
+<b class="fc">&nbsp;        users.clear()</b>
+<b class="fc">&nbsp;        invitations.clear()</b>
+<b class="fc">&nbsp;        tokens.clear()</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:04</div>
+</div>
+</body>
+</html>

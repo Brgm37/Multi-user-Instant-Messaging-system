@@ -1,0 +1,257 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserServicesKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">services</a>
+</div>
+
+<h1>Coverage Summary for Class: UserServicesKt (services)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">UserServicesKt</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package services
+&nbsp;
+&nbsp;import TransactionManager
+&nbsp;import errors.ChannelError.ChannelNotFound
+&nbsp;import errors.Error
+&nbsp;import errors.UserError
+&nbsp;import errors.UserError.InvitationCodeHasExpired
+&nbsp;import errors.UserError.InvitationCodeIsInvalid
+&nbsp;import errors.UserError.InvitationCodeMaxUsesReached
+&nbsp;import interfaces.UserServicesInterface
+&nbsp;import jakarta.inject.Named
+&nbsp;import model.channels.Channel
+&nbsp;import model.channels.decrementUses
+&nbsp;import model.users.Password
+&nbsp;import model.users.User
+&nbsp;import model.users.UserInvitation
+&nbsp;import model.users.UserToken
+&nbsp;import utils.Either
+&nbsp;import utils.failure
+&nbsp;import utils.success
+&nbsp;import java.sql.Timestamp
+&nbsp;import java.time.LocalDateTime
+&nbsp;
+&nbsp;/**
+&nbsp; * The number of days an invitation is valid.
+&nbsp; */
+&nbsp;private const val INVITATION_EXPIRATION_DAYS = 7L
+&nbsp;
+&nbsp;/**
+&nbsp; * The number of days a token is valid.
+&nbsp; */
+&nbsp;private const val TOKEN_EXPIRATION_DAYS = 7L
+&nbsp;
+&nbsp;/**
+&nbsp; * The services available for the user entity.
+&nbsp; * @property repoManager The transaction manager.
+&nbsp; */
+&nbsp;@Named(&quot;UserServices&quot;)
+&nbsp;class UserServices(
+&nbsp;    private val repoManager: TransactionManager,
+&nbsp;) : UserServicesInterface {
+&nbsp;    override fun createUser(
+&nbsp;        username: String,
+&nbsp;        password: String,
+&nbsp;        invitationCode: String,
+&nbsp;        inviterUId: UInt,
+&nbsp;    ): Either&lt;UserError, User&gt; {
+&nbsp;        if (username.isEmpty()) return failure(UserError.UsernameIsEmpty)
+&nbsp;        if (!Password.isValidPassword(password)) return failure(UserError.PasswordIsInvalid)
+&nbsp;        val user =
+&nbsp;            User(
+&nbsp;                username = username,
+&nbsp;                password = Password(password),
+&nbsp;            )
+&nbsp;        return repoManager.run {
+&nbsp;            userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
+&nbsp;            if (userRepo.findByUsername(username) != null) return@run failure(UserError.UsernameAlreadyExists)
+&nbsp;            val invitation =
+&nbsp;                userRepo
+&nbsp;                    .findInvitation(inviterUId, invitationCode)
+&nbsp;                    ?: return@run failure(InvitationCodeIsInvalid)
+&nbsp;            if (invitation.isExpired) {
+&nbsp;                userRepo.deleteInvitation(invitation)
+&nbsp;                return@run failure(InvitationCodeHasExpired)
+&nbsp;            }
+&nbsp;            val createdUser = userRepo.createUser(user) ?: return@run failure(UserError.UnableToCreateUser)
+&nbsp;            userRepo.deleteInvitation(invitation)
+&nbsp;            success(createdUser)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun deleteUser(id: UInt): Either&lt;UserError, Unit&gt; {
+&nbsp;        return repoManager.run {
+&nbsp;            userRepo.findById(id) ?: return@run failure(UserError.UserNotFound)
+&nbsp;            userRepo.deleteById(id)
+&nbsp;            success(Unit)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun getUser(id: UInt): Either&lt;UserError, User&gt; {
+&nbsp;        return repoManager.run {
+&nbsp;            val user = userRepo.findById(id) ?: return@run failure(UserError.UserNotFound)
+&nbsp;            success(user)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun joinChannel(
+&nbsp;        userId: UInt,
+&nbsp;        channelId: UInt,
+&nbsp;        invitationCode: String?,
+&nbsp;    ): Either&lt;Error, Unit&gt; {
+&nbsp;        return repoManager.run {
+&nbsp;            val channel =
+&nbsp;                channelRepo.findById(channelId) ?: return@run failure(ChannelNotFound)
+&nbsp;            userRepo.findById(userId) ?: return@run failure(UserError.UserNotFound)
+&nbsp;            if (channelRepo.isUserInChannel(channelId, userId)) {
+&nbsp;                return@run success(Unit)
+&nbsp;            }
+&nbsp;            if (channel is Channel.Public) {
+&nbsp;                channelRepo.joinChannel(channelId, userId, channel.accessControl)
+&nbsp;                return@run success(Unit)
+&nbsp;            }
+&nbsp;            val invitation = channelRepo.findInvitation(channelId) ?: return@run failure(InvitationCodeIsInvalid)
+&nbsp;            if (invitationCode != invitation.invitationCode.toString()) {
+&nbsp;                return@run failure(InvitationCodeIsInvalid)
+&nbsp;            }
+&nbsp;            if (invitation.isExpired) {
+&nbsp;                channelRepo.deleteInvitation(channelId)
+&nbsp;                return@run failure(InvitationCodeHasExpired)
+&nbsp;            }
+&nbsp;            if (invitation.maxUses == 0u) {
+&nbsp;                channelRepo.deleteInvitation(channelId)
+&nbsp;                return@run failure(InvitationCodeMaxUsesReached)
+&nbsp;            }
+&nbsp;            channelRepo.updateInvitation(invitation.decrementUses())
+&nbsp;            channelRepo.joinChannel(channelId, userId, invitation.accessControl)
+&nbsp;            success(Unit)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun getUserByToken(token: String): Either&lt;UserError, User&gt; =
+&nbsp;        repoManager.run {
+&nbsp;            val user = userRepo.findByToken(token) ?: return@run failure(UserError.UserNotFound)
+&nbsp;            success(user)
+&nbsp;        }
+&nbsp;
+&nbsp;    override fun isValidToken(token: String): Either&lt;UserError, Boolean&gt; =
+&nbsp;        repoManager.run {
+&nbsp;            val session = userRepo.validateToken(token)
+&nbsp;            success(session)
+&nbsp;        }
+&nbsp;
+&nbsp;    override fun getInvitation(
+&nbsp;        inviterUId: UInt,
+&nbsp;        invitationCode: String,
+&nbsp;    ): Either&lt;UserError, UserInvitation&gt; {
+&nbsp;        return repoManager.run {
+&nbsp;            userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
+&nbsp;            val invitation =
+&nbsp;                userRepo
+&nbsp;                    .findInvitation(inviterUId, invitationCode) ?: return@run failure(UserError.InvitationNotFound)
+&nbsp;            success(invitation)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun login(
+&nbsp;        username: String,
+&nbsp;        password: String,
+&nbsp;    ): Either&lt;UserError, UserToken&gt; {
+&nbsp;        return repoManager.run {
+&nbsp;            val user = userRepo.findByUsername(username) ?: return@run failure(UserError.UserNotFound)
+&nbsp;            if (!user.password.matches(password)) return@run failure(UserError.PasswordIsInvalid)
+&nbsp;            val userId = checkNotNull(user.uId)
+&nbsp;            val token =
+&nbsp;                UserToken(
+&nbsp;                    userId = userId,
+&nbsp;                    expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(TOKEN_EXPIRATION_DAYS)),
+&nbsp;                )
+&nbsp;            if (userRepo.createToken(token)) success(token) else failure(UserError.UnableToCreateToken)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun logout(
+&nbsp;        token: String,
+&nbsp;        uId: UInt,
+&nbsp;    ): Either&lt;UserError, Unit&gt; =
+&nbsp;        repoManager.run {
+&nbsp;            if (!userRepo.validateToken(token)) return@run failure(UserError.TokenNotFound)
+&nbsp;            if (userRepo.findById(uId) == null) return@run failure(UserError.UserNotFound)
+&nbsp;            if (!userRepo.deleteToken(token)) return@run failure(UserError.UnableToDeleteToken)
+&nbsp;            success(Unit)
+&nbsp;        }
+&nbsp;
+&nbsp;    override fun createInvitation(inviterUId: UInt): Either&lt;UserError, UserInvitation&gt; {
+&nbsp;        return repoManager.run {
+&nbsp;            userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
+&nbsp;            val invitation =
+&nbsp;                UserInvitation(
+&nbsp;                    inviterId = inviterUId,
+&nbsp;                    expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(INVITATION_EXPIRATION_DAYS)),
+&nbsp;                )
+&nbsp;            if (userRepo.createInvitation(invitation)) {
+&nbsp;                success(invitation)
+&nbsp;            } else {
+&nbsp;                failure(UserError.UnableToCreateInvitation)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-10-21 22:04</div>
+</div>
+</body>
+</html>
