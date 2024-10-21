@@ -125,7 +125,7 @@ object UserSwaggerConfig {
                 content = [
                     Content(
                         mediaType = "application/json",
-                        schema = Schema(implementation = String::class), // Assuming the response is a String
+                        schema = Schema(implementation = String::class),
                     ),
                 ],
             ),

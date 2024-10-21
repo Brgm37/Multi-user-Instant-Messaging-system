@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 
 /**
- * Represents the Swagger configuration for the channel endpoints in the application.
+ * Represents the Swagger configuration for the message endpoints in the application.
  * @see UserSwaggerConfig
  */
 object MessageSwaggerConfig {
