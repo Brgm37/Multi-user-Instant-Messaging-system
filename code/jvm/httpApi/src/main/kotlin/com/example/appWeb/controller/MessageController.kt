@@ -11,6 +11,7 @@ import errors.MessageError.ChannelNotFound
 import errors.MessageError.InvalidMessageInfo
 import errors.MessageError.UserNotFound
 import interfaces.MessageServicesInterface
+import io.swagger.v3.oas.annotations.Parameter
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -49,7 +50,7 @@ class MessageController(
     @MessageSwaggerConfig.CreateMessage
     fun createMessage(
         @Valid @RequestBody message: CreateMessageInputModel,
-        authenticated: AuthenticatedUserInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> {
         val response =
             messageService
@@ -78,7 +79,7 @@ class MessageController(
     @MessageSwaggerConfig.GetSingleMessage
     fun getSingleMessage(
         @PathVariable msgId: UInt,
-        authenticated: AuthenticatedUserInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
         when (val response = messageService.getMessage(msgId, authenticated.uId)) {
             is Success -> {
@@ -96,7 +97,7 @@ class MessageController(
         @PathVariable channelId: UInt,
         @RequestParam offset: UInt = OFFSET,
         @RequestParam limit: UInt = LIMIT,
-        authenticated: AuthenticatedUserInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
         when (val response = messageService.latestMessages(channelId, authenticated.uId, offset, limit)) {
             is Success -> {

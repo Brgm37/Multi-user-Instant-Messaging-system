@@ -14,6 +14,7 @@ import errors.ChannelError.InvalidChannelInfo
 import errors.ChannelError.InvalidChannelVisibility
 import errors.ChannelError.UserNotFound
 import interfaces.ChannelServicesInterface
+import io.swagger.v3.oas.annotations.Parameter
 import jakarta.validation.Valid
 import org.hibernate.validator.constraints.Range
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -53,7 +54,7 @@ class ChannelController(
     @ChannelSwaggerConfig.GetChannel
     fun getChannel(
         @PathVariable @Range(min = 1) channelId: UInt,
-        authenticated: AuthenticatedUserInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
         when (val response = channelService.getChannel(channelId)) {
             is Success -> {
@@ -68,7 +69,7 @@ class ChannelController(
     @GetMapping
     @ChannelSwaggerConfig.GetChannels
     fun getChannels(
-        authenticated: AuthenticatedUserInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
         @RequestParam offset: UInt = OFFSET,
         @RequestParam limit: UInt = LIMIT,
     ): ResponseEntity<*> =
@@ -91,7 +92,7 @@ class ChannelController(
     @ChannelSwaggerConfig.CreateChannel
     fun createChannel(
         @Valid @RequestBody channel: CreateChannelInputModel,
-        authenticated: AuthenticatedUserInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> {
         val response =
             channelService.createChannel(
@@ -121,7 +122,7 @@ class ChannelController(
     @ChannelSwaggerConfig.CreateChannelInvitation
     fun createChannelInvitation(
         @Valid @RequestBody invitation: CreateChannelInvitationInputModel,
-        authenticated: AuthenticatedUserInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> {
         val response =
             channelService.createChannelInvitation(
