@@ -43,7 +43,6 @@ class UserServices(
         username: String,
         password: String,
         invitationCode: String,
-        inviterUId: UInt,
     ): Either<UserError, User> {
         if (username.isEmpty()) return failure(UserError.UsernameIsEmpty)
         if (!Password.isValidPassword(password)) return failure(UserError.PasswordIsInvalid)
@@ -53,11 +52,10 @@ class UserServices(
                 password = Password(password),
             )
         return repoManager.run {
-            userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
             if (userRepo.findByUsername(username) != null) return@run failure(UserError.UsernameAlreadyExists)
             val invitation =
                 userRepo
-                    .findInvitation(inviterUId, invitationCode)
+                    .findInvitation(invitationCode)
                     ?: return@run failure(InvitationCodeIsInvalid)
             if (invitation.isExpired) {
                 userRepo.deleteInvitation(invitation)
@@ -130,15 +128,11 @@ class UserServices(
             success(session)
         }
 
-    override fun getInvitation(
-        inviterUId: UInt,
-        invitationCode: String,
-    ): Either<UserError, UserInvitation> {
+    override fun getInvitation(invitationCode: String): Either<UserError, UserInvitation> {
         return repoManager.run {
-            userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
             val invitation =
                 userRepo
-                    .findInvitation(inviterUId, invitationCode) ?: return@run failure(UserError.InvitationNotFound)
+                    .findInvitation(invitationCode) ?: return@run failure(UserError.InvitationNotFound)
             success(invitation)
         }
     }

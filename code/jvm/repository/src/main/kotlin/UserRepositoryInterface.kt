@@ -11,14 +11,10 @@ interface UserRepositoryInterface : Repository<User> {
     fun createUser(user: User): User?
 
     /**
-     * Retrieves an invitation associated to the user
-     * @param inviterUId The ID of the inviter
+     * Retrieves an invitation by its code
      * @param invitationCode The invitation code
      */
-    fun findInvitation(
-        inviterUId: UInt,
-        invitationCode: String,
-    ): UserInvitation?
+    fun findInvitation(invitationCode: String): UserInvitation?
 
     /**
      * Deletes an invitation associated to the user

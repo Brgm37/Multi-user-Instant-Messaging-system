@@ -105,7 +105,6 @@ class UserControllerTest {
                 username = "newUser",
                 password = "Password123",
                 invitationCode = invitation.invitationCode.toString(),
-                inviterUId = invitation.inviterId,
             )
 
         val response = userController.signUp(userSignUpInput)
@@ -127,7 +126,6 @@ class UserControllerTest {
                 username = existingUser.username,
                 password = "Password123",
                 invitationCode = invitation.invitationCode.toString(),
-                inviterUId = invitation.inviterId,
             )
 
         val response = userController.signUp(userSignUpInput)
@@ -148,7 +146,6 @@ class UserControllerTest {
                 username = "newUser",
                 password = "Password123",
                 invitationCode = "invalidCode",
-                inviterUId = invitation.inviterId,
             )
 
         val response = userController.signUp(userSignUpInput)
@@ -171,7 +168,6 @@ class UserControllerTest {
                 username = "newUser",
                 password = "Password123",
                 invitationCode = expiredInvitation.invitationCode.toString(),
-                inviterUId = expiredInvitation.inviterId,
             )
 
         val response = userController.signUp(userSignUpInput)
