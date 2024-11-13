@@ -25,6 +25,10 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import utils.Failure
 import utils.Success
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 /**
  * The default limit for the message list.
@@ -46,6 +50,45 @@ private const val LIMIT = 100u
 class MessageController(
     private val messageService: MessageServicesInterface,
 ) {
+    private val listeners = mutableMapOf<UInt, MutableList<(String) -> Unit>>()
+    private val lock = ReentrantLock()
+    private var connectionCounter = 0
+
+    private val executor =
+        Executors
+            .newScheduledThreadPool(1)
+            .also {
+                it.scheduleAtFixedRate({ keepAlive() }, 2, 2, TimeUnit.SECONDS)
+            }
+
+    private fun keepAlive() =
+        lock.withLock {
+            if (listeners.isNotEmpty()) {
+//                sendEventToAll()
+            }
+        }
+
+    private fun sendEventToAll(channelId: UInt, msg: String) {
+        listeners[channelId]?.forEach {
+            try {
+                it(msg)
+            } catch (ex: Exception) {
+                //do nothing
+            }
+        }
+    }
+
+    private fun removeListener(channelId: UInt, listener: (String) -> Unit) =
+        lock.withLock {
+            listeners[channelId]?.remove(listener)
+        }
+
+    fun addListener(channelId: UInt, listener: (String) -> Unit) =
+        lock.withLock {
+            listeners[channelId]?.add(listener)
+        }
+
+
     @PostMapping
     @MessageSwaggerConfig.CreateMessage
     fun createMessage(
@@ -61,6 +104,7 @@ class MessageController(
                 )
         return when (response) {
             is Success -> {
+                sendEventToAll(message.channel, message.msg)
                 ResponseEntity.ok(MessageOutputModel.fromDomain(response.value))
             }
 
