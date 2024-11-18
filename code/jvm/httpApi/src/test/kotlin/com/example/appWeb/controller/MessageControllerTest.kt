@@ -22,6 +22,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.http.HttpStatus
 import services.MessageServices
+import services.SseServices
 import utils.Success
 import utils.encryption.DummyEncrypt
 import java.util.UUID
@@ -110,6 +111,7 @@ class MessageControllerTest {
             ) -> Unit,
         ) {
             val messageServices = MessageServices(manager)
+            val sseServices = SseServices(manager)
             val owner = makeUser(manager, username)
             val user = checkNotNull(makeUser(manager, username))
             val userId = checkNotNull(user.uId) { "User id is null" }
@@ -118,7 +120,7 @@ class MessageControllerTest {
             val authOwner = AuthenticatedUserInputModel(ownerId, makeToken(manager, ownerId).token.toString())
             val channel = makeChannel(manager, checkNotNull(owner))
             checkNotNull(channel) { "Channel is null" }
-            val messageController = MessageController(messageServices)
+            val messageController = MessageController(messageServices, sseServices)
             messageController.block(manager, authOwner, authUser, channel, messageServices)
         }
 
@@ -195,7 +197,8 @@ class MessageControllerTest {
     fun `fail to create message due to channel not found`(m: TransactionManager) {
         val owner = AuthenticatedUserInputModel(0u, "token")
         val messageServices = MessageServices(m)
-        val channelController = MessageController(messageServices)
+        val sseServices = SseServices(m)
+        val channelController = MessageController(messageServices, sseServices)
         channelController
             .createMessage(
                 CreateMessageInputModel(

@@ -123,19 +123,15 @@ class UserJDBC(
         }
     }
 
-    override fun findInvitation(
-        inviterUId: UInt,
-        invitationCode: String,
-    ): UserInvitation? {
+    override fun findInvitation(invitationCode: String): UserInvitation? {
         val selectQuery =
             """
             SELECT user_id, invitation, expiration_date
             FROM users_invitations
-            WHERE user_id = ? AND invitation = ?
+            WHERE invitation = ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
-        stm.setInt(1, inviterUId.toInt())
-        stm.setString(2, invitationCode)
+        stm.setString(1, invitationCode)
         val rs = stm.executeQuery()
         return if (rs.next()) {
             rs.toUserInvitation()

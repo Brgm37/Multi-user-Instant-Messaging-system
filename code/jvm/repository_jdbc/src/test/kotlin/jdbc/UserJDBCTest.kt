@@ -211,7 +211,7 @@ class UserJDBCTest {
             val userId = checkNotNull(user.uId)
             val userInvitation = UserInvitation(userId, Timestamp.valueOf(LocalDateTime.now().plusDays(1)))
             UserJDBC(connection).createInvitation(userInvitation)
-            val result = UserJDBC(connection).findInvitation(userId, userInvitation.invitationCode.toString())
+            val result = UserJDBC(connection).findInvitation(userInvitation.invitationCode.toString())
             val resultID = checkNotNull(result?.inviterId)
             assertEquals(userInvitation.inviterId, resultID)
         }
@@ -225,7 +225,7 @@ class UserJDBCTest {
             val userInvitation = UserInvitation(userId, Timestamp.valueOf(LocalDateTime.now().plusDays(1)))
             UserJDBC(connection).createInvitation(userInvitation)
             UserJDBC(connection).deleteInvitation(userInvitation)
-            val result = UserJDBC(connection).findInvitation(userId, userInvitation.invitationCode.toString())
+            val result = UserJDBC(connection).findInvitation(userInvitation.invitationCode.toString())
             assertEquals(null, result)
         }
     }
@@ -237,7 +237,7 @@ class UserJDBCTest {
             val userId = checkNotNull(user.uId)
             val userInvitation = UserInvitation(userId, Timestamp.valueOf(LocalDateTime.now().plusDays(1)))
             UserJDBC(connection).createInvitation(userInvitation)
-            val result = UserJDBC(connection).findInvitation(userId, userInvitation.invitationCode.toString())
+            val result = UserJDBC(connection).findInvitation(userInvitation.invitationCode.toString())
             assertEquals(userInvitation.inviterId, result?.inviterId)
         }
     }

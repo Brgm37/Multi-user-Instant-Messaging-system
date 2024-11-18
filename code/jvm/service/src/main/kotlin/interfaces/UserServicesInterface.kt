@@ -16,13 +16,11 @@ interface UserServicesInterface {
      * @param username The username of the user.
      * @param password The password of the user.
      * @param invitationCode The invitation code to join the app.
-     * @param inviterUId The inviter user id.
      */
     fun createUser(
         username: String,
         password: String,
         invitationCode: String,
-        inviterUId: UInt,
     ): Either<UserError, User>
 
     /**
@@ -51,13 +49,9 @@ interface UserServicesInterface {
 
     /**
      * Gets an invitation by inviterId and invitationCode
-     * @param inviterUId inviter userId
      * @param invitationCode invitation code associated to the invitation
      */
-    fun getInvitation(
-        inviterUId: UInt,
-        invitationCode: String,
-    ): Either<UserError, UserInvitation>
+    fun getInvitation(invitationCode: String): Either<UserError, UserInvitation>
 
     /**
      * Logs in a user.

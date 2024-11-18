@@ -51,7 +51,6 @@ class UserController(
                 username = user.username,
                 password = user.password,
                 invitationCode = user.invitationCode,
-                inviterUId = user.inviterUId,
             )
         return when (response) {
             is Success -> {

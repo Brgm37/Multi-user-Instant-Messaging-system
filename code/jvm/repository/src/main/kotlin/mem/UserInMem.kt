@@ -17,11 +17,8 @@ class UserInMem : UserRepositoryInterface {
             .copy(uId = nextId++)
             .also { users.add(it) }
 
-    override fun findInvitation(
-        inviterUId: UInt,
-        invitationCode: String,
-    ): UserInvitation? =
-        invitations.find { it.inviterId == inviterUId && it.invitationCode.toString() == invitationCode }
+    override fun findInvitation(invitationCode: String): UserInvitation? =
+        invitations.find { it.invitationCode.toString() == invitationCode }
 
     override fun deleteInvitation(invitation: UserInvitation) {
         invitations.removeIf { it.invitationCode == invitation.invitationCode }

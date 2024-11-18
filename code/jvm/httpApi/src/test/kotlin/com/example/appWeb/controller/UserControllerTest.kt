@@ -105,7 +105,6 @@ class UserControllerTest {
                 username = "newUser",
                 password = "Password123",
                 invitationCode = invitation.invitationCode.toString(),
-                inviterUId = invitation.inviterId,
             )
 
         val response = userController.signUp(userSignUpInput)
@@ -127,7 +126,6 @@ class UserControllerTest {
                 username = existingUser.username,
                 password = "Password123",
                 invitationCode = invitation.invitationCode.toString(),
-                inviterUId = invitation.inviterId,
             )
 
         val response = userController.signUp(userSignUpInput)
@@ -141,14 +139,12 @@ class UserControllerTest {
     fun `trying to sign up with invalid invitation code should return BAD_REQUEST`(manager: TransactionManager) {
         val userServices = UserServices(manager)
         val userController = UserController(userServices)
-        val invitation = makeInviterAndInvitation(manager)
 
         val userSignUpInput =
             UserSignUpInputModel(
                 username = "newUser",
                 password = "Password123",
                 invitationCode = "invalidCode",
-                inviterUId = invitation.inviterId,
             )
 
         val response = userController.signUp(userSignUpInput)
@@ -171,7 +167,6 @@ class UserControllerTest {
                 username = "newUser",
                 password = "Password123",
                 invitationCode = expiredInvitation.invitationCode.toString(),
-                inviterUId = expiredInvitation.inviterId,
             )
 
         val response = userController.signUp(userSignUpInput)

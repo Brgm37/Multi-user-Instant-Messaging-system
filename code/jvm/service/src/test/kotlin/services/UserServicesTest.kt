@@ -82,7 +82,6 @@ class UserServicesTest {
                     "userToJoinChannel",
                     validPassword,
                     invitation.invitationCode.toString(),
-                    invitation.inviterId,
                 )
                 as Success<User>
         return user.value
@@ -147,7 +146,7 @@ class UserServicesTest {
 
         val newUser =
             userServices
-                .createUser(usernameDefault2, validPassword, invitation.invitationCode.toString(), invitation.inviterId)
+                .createUser(usernameDefault2, validPassword, invitation.invitationCode.toString())
 
         assertIs<Success<User>>(newUser, "User creation failed with error" + (newUser as? Failure)?.value)
         assertNotNull(newUser.value.uId, "User id is null")
@@ -164,7 +163,7 @@ class UserServicesTest {
         val invitation = makeInviterAndInvitation(manager)
         val newUser =
             userServices
-                .createUser("", validPassword, invitation.invitationCode.toString(), invitation.inviterId)
+                .createUser("", validPassword, invitation.invitationCode.toString())
         assertIs<Failure<UserError.UsernameIsEmpty>>(newUser)
         assertEquals(newUser.value, UserError.UsernameIsEmpty)
     }
@@ -182,27 +181,9 @@ class UserServicesTest {
                     usernameDefault1,
                     invalidPassword,
                     invitation.invitationCode.toString(),
-                    invitation.inviterId,
                 )
         assertIs<Failure<UserError.PasswordIsInvalid>>(newUser)
         assertEquals(newUser.value, UserError.PasswordIsInvalid)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `trying to create a user with an Invitation with an nonexistent inviter id`(manager: TransactionManager) {
-        val userServices = UserServices(manager)
-        val invitation = makeInviterAndInvitation(manager)
-        val newUser =
-            userServices
-                .createUser(
-                    usernameDefault1,
-                    validPassword,
-                    invitation.invitationCode.toString(),
-                    0u,
-                )
-        assertIs<Failure<UserError.InviterNotFound>>(newUser)
-        assertEquals(newUser.value, UserError.InviterNotFound)
     }
 
     @ParameterizedTest
@@ -211,14 +192,12 @@ class UserServicesTest {
         manager: TransactionManager,
     ) {
         val userServices = UserServices(manager)
-        val invitation = makeInviterAndInvitation(manager)
         val newUser =
             userServices
                 .createUser(
                     "newUser",
                     validPassword,
                     "invalid",
-                    invitation.inviterId,
                 )
         assertIs<Failure<UserError.InvitationCodeIsInvalid>>(newUser)
         assertEquals(newUser.value, UserError.InvitationCodeIsInvalid)
@@ -238,7 +217,6 @@ class UserServicesTest {
                     "newUser",
                     validPassword,
                     invitation.invitationCode.toString(),
-                    invitation.inviterId,
                 )
         assertIs<Failure<UserError.InvitationCodeHasExpired>>(newUser)
         assertEquals(newUser.value, UserError.InvitationCodeHasExpired)
@@ -257,7 +235,6 @@ class UserServicesTest {
                     usernameDefault1,
                     validPassword,
                     invitation.invitationCode.toString(),
-                    invitation.inviterId,
                 )
         assertIs<Failure<UserError.UsernameAlreadyExists>>(newUser)
         assertEquals(newUser.value, UserError.UsernameAlreadyExists)
@@ -274,7 +251,6 @@ class UserServicesTest {
                     "userToDelete",
                     validPassword,
                     invitation.invitationCode.toString(),
-                    invitation.inviterId,
                 )
                 as Success<User>
         val userId = checkNotNull(user.value.uId)
@@ -303,7 +279,6 @@ class UserServicesTest {
                     "userToGet",
                     validPassword,
                     invitation.invitationCode.toString(),
-                    invitation.inviterId,
                 )
                 as Success<User>
         val userId = checkNotNull(user.value.uId)
@@ -480,41 +455,13 @@ class UserServicesTest {
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
-    fun `getting an invitation by its inviter id and invitation code should return the invitation`(
-        manager: TransactionManager,
-    ) {
+    fun `getting an invitation by valid invitation code should return the invitation`(manager: TransactionManager) {
         val userServices = UserServices(manager)
-        val invitation =
-            makeInviterAndInvitation(
-                manager,
-            )
-        val result =
-            userServices.getInvitation(
-                invitation.inviterId,
-                invitation.invitationCode.toString(),
-            )
+        val invitation = makeInviterAndInvitation(manager)
+        val result = userServices.getInvitation(invitation.invitationCode.toString())
         assertIs<Success<UserInvitation>>(result)
         assertEquals(invitation.inviterId, result.value.inviterId)
         assertEquals(invitation.invitationCode, result.value.invitationCode)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `trying to get an invitation with an invalid inviter id should return InviterNotFound`(
-        manager: TransactionManager,
-    ) {
-        val userServices = UserServices(manager)
-        val invitation =
-            makeInviterAndInvitation(
-                manager,
-            )
-        val result =
-            userServices.getInvitation(
-                0u,
-                invitation.invitationCode.toString(),
-            )
-        assertIs<Failure<UserError.InviterNotFound>>(result)
-        assertEquals(UserError.InviterNotFound, result.value)
     }
 
     @ParameterizedTest
@@ -523,15 +470,7 @@ class UserServicesTest {
         manager: TransactionManager,
     ) {
         val userServices = UserServices(manager)
-        val invitation =
-            makeInviterAndInvitation(
-                manager,
-            )
-        val result =
-            userServices.getInvitation(
-                invitation.inviterId,
-                "0f7ed58e-89c0-4331-b22d-0d075b356317",
-            )
+        val result = userServices.getInvitation("b4e4d6cd-6f11-44c0-9c93-3b1c2f2d1987")
         assertIs<Failure<UserError.InvitationNotFound>>(result)
         assertEquals(UserError.InvitationNotFound, result.value)
     }
