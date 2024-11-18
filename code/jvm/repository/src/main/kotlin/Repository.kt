@@ -1,12 +1,12 @@
 /**
  * The default offset for the repository.
  */
-private const val OFFSET = 0
+private const val OFFSET = 0u
 
 /**
  * The default limit for the repository.
  */
-private const val LIMIT = 100
+private const val LIMIT = 100u
 
 /**
  * Generic repository interface for basic CRUD operations
@@ -26,8 +26,8 @@ interface Repository<T> {
      * @return A list with all entities
      */
     fun findAll(
-        offset: Int = OFFSET,
-        limit: Int = LIMIT,
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
     ): List<T>
 
     /**
