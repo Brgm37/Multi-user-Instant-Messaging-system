@@ -19,8 +19,7 @@ data class ChannelName(
         require(ownerName.isNotBlank()) { "The owner name cannot be blank." }
     }
 
-    val fullName: String
-        get() = "@$ownerName/$name"
+    val fullName: String by lazy { "@$ownerName/$name" }
 }
 
 /**

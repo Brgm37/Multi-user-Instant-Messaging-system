@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import utils.Failure
 import utils.Success
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 /**
  * The default limit for the channel list.
@@ -51,6 +53,16 @@ private const val OFFSET = 0u
 class ChannelController(
     private val channelService: ChannelServicesInterface,
 ) {
+    /**
+     * Decodes the name of the channel.
+     *
+     * @param name The name of the channel
+     * @return The decoded name
+     */
+    private fun decodeName(name: String): String =
+        URLDecoder
+            .decode(name, StandardCharsets.UTF_8.toString())
+
     @GetMapping(CHANNEL_ID_URL)
     @ChannelSwaggerConfig.GetChannel
     fun getChannel(
@@ -80,12 +92,7 @@ class ChannelController(
             }
 
             is Success -> {
-                ResponseEntity
-                    .ok(
-                        response
-                            .value
-                            .map(ChannelListOutputModel::fromDomain),
-                    )
+                ResponseEntity.ok(response.value.map(ChannelListOutputModel::fromDomain))
             }
         }
 
@@ -147,6 +154,42 @@ class ChannelController(
         }
     }
 
+    @GetMapping(CHANNEL_NAME_URL)
+    @ChannelSwaggerConfig.GetChannelByName
+    fun getChannelByName(
+        @PathVariable name: String,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> {
+        return when (val response = channelService.getByName(decodeName(name))) {
+            is Success -> {
+                ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
+            }
+
+            is Failure -> {
+                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+            }
+        }
+    }
+
+    @GetMapping(CHANNEL_PARTIAL_NAME_URL)
+    @ChannelSwaggerConfig.GetChannelByPartialName
+    fun getChannelByPartialName(
+        @PathVariable name: String,
+        @RequestParam offset: UInt = OFFSET,
+        @RequestParam limit: UInt = LIMIT,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> {
+        return when (val response = channelService.getByName(decodeName(name), offset, limit)) {
+            is Success -> {
+                ResponseEntity.ok(response.value.map(ChannelListOutputModel::fromDomain))
+            }
+
+            is Failure -> {
+                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+            }
+        }
+    }
+
     companion object {
         /**
          * The base URL for the channel endpoints.
@@ -162,5 +205,15 @@ class ChannelController(
          * The URL for the channel invitations.
          */
         const val CHANNEL_INVITATION_URL = "/invitations"
+
+        /**
+         * The URL for the channel with the given name.
+         */
+        const val CHANNEL_NAME_URL = "/name/{name}"
+
+        /**
+         * The URL for the channel with the given partial name.
+         */
+        const val CHANNEL_PARTIAL_NAME_URL = "/search/{name}"
     }
 }

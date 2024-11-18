@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.test.web.reactive.server.WebTestClient
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -49,6 +51,10 @@ abstract class AbstractChannelControllerTest {
         }
 
     private lateinit var token: UserToken
+
+    private fun encodeName(name: String): String {
+        return URLEncoder.encode(name, StandardCharsets.UTF_8.toString())
+    }
 
     @BeforeAll
     fun setUp() {
@@ -336,6 +342,66 @@ abstract class AbstractChannelControllerTest {
         client
             .get()
             .uri("${ChannelController.CHANNEL_BASE_URL}/$channelId")
+            .header("Authorization", "Bearer ${token.token}")
+            .exchange()
+            .expectStatus()
+            .isOk
+    }
+
+    @Test
+    fun `get channel by name`() {
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
+
+        val channel =
+            manager.run {
+                val user = userRepo.findByToken(token.token.toString()) ?: throw IllegalStateException("User not found")
+                channelRepo
+                    .createChannel(
+                        Channel.createChannel(
+                            owner = UserInfo(token.userId, user.username),
+                            name = ChannelName(channelName, user.username),
+                            visibility = PUBLIC,
+                            accessControl = READ_WRITE,
+                        ),
+                    )
+                    ?: throw IllegalStateException("Channel not created")
+            }
+
+        val channelName = checkNotNull(channel.name) { "Channel not created" }
+
+        client
+            .get()
+            .uri("${ChannelController.CHANNEL_BASE_URL}/name/${encodeName(channelName.fullName)}")
+            .header("Authorization", "Bearer ${token.token}")
+            .exchange()
+            .expectStatus()
+            .isOk
+    }
+
+    @Test
+    fun `get channel list by name`() {
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
+
+        val channel =
+            manager.run {
+                val user = userRepo.findByToken(token.token.toString()) ?: throw IllegalStateException("User not found")
+                channelRepo
+                    .createChannel(
+                        Channel.createChannel(
+                            owner = UserInfo(token.userId, user.username),
+                            name = ChannelName(channelName, user.username),
+                            visibility = PUBLIC,
+                            accessControl = READ_WRITE,
+                        ),
+                    )
+                    ?: throw IllegalStateException("Channel not created")
+            }
+
+        val channelName = checkNotNull(channel.name) { "Channel not created" }
+
+        client
+            .get()
+            .uri("${ChannelController.CHANNEL_BASE_URL}/search/${encodeName(channelName.fullName)}")
             .header("Authorization", "Bearer ${token.token}")
             .exchange()
             .expectStatus()
