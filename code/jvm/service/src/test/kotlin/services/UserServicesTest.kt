@@ -464,19 +464,19 @@ class UserServicesTest {
         assertEquals(UserError.InvitationCodeMaxUsesReached, result2.value)
     }
 
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun isValidTokenTest(manager: TransactionManager) {
-        val userServices = UserServices(manager)
-        val user = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val token = userServices.login(user.username, validPassword) as Success<UserToken>
-        val result = userServices.isValidToken(token.value.token.toString())
-        val result2 = userServices.isValidToken("0f7ed58e-89c0-4331-b22d-0d075b356317")
-        assertIs<Success<Boolean>>(result)
-        assertEquals(true, result.value)
-        assertIs<Success<Boolean>>(result2)
-        assertEquals(false, result2.value)
-    }
+//    @ParameterizedTest
+//    @MethodSource("transactionManagers")
+//    fun isValidTokenTest(manager: TransactionManager) {
+//        val userServices = UserServices(manager)
+//        val user = checkNotNull(ChannelServicesTest.makeUser(manager))
+//        val token = userServices.login(user.username, validPassword) as Success<UserToken>
+//        val result = userServices.isValidToken(token.value.token.toString())
+//        val result2 = userServices.isValidToken("0f7ed58e-89c0-4331-b22d-0d075b356317")
+//        assertIs<Success<Boolean>>(result)
+//        assertEquals(true, result.value)
+//        assertIs<Success<Boolean>>(result2)
+//        assertEquals(false, result2.value)
+//    }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
@@ -598,25 +598,25 @@ class UserServicesTest {
         assertEquals(UserError.UserNotFound, result.value)
     }
 
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `getting a user by token should return the user`(manager: TransactionManager) {
-        val userServices = UserServices(manager)
-        val user = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val token = userServices.login(user.username, validPassword) as Success<UserToken>
-        val result = userServices.getUserByToken(token.value.token.toString())
-        assertIs<Success<User>>(result)
-        assertEquals(user, result.value)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `trying to get a user by token that does not exist should return UserNotFound`(manager: TransactionManager) {
-        val userServices = UserServices(manager)
-        val result = userServices.getUserByToken("nonexistent_token")
-        assertIs<Failure<UserError.UserNotFound>>(result)
-        assertEquals(UserError.UserNotFound, result.value)
-    }
+//    @ParameterizedTest
+//    @MethodSource("transactionManagers")
+//    fun `getting a user by token should return the user`(manager: TransactionManager) {
+//        val userServices = UserServices(manager)
+//        val user = checkNotNull(ChannelServicesTest.makeUser(manager))
+//        val token = userServices.login(user.username, validPassword) as Success<UserToken>
+//        val result = userServices.getUserByToken(token.value.token.toString())
+//        assertIs<Success<User>>(result)
+//        assertEquals(user, result.value)
+//    }
+//
+//    @ParameterizedTest
+//    @MethodSource("transactionManagers")
+//    fun `trying to get a user by token that does not exist should return UserNotFound`(manager: TransactionManager) {
+//        val userServices = UserServices(manager)
+//        val result = userServices.getUserByToken("nonexistent_token")
+//        assertIs<Failure<UserError.UserNotFound>>(result)
+//        assertEquals(UserError.UserNotFound, result.value)
+//    }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")

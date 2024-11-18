@@ -253,4 +253,43 @@ class ChannelServicesTest {
                 )
             assertIs<Success<UUID>>(result, "Channel invitation creation failed")
         }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `find a channel by its name`(manager: TransactionManager) =
+        testSetup(manager) { user ->
+            val uId = checkNotNull(user.uId) { "Owner id is null" }
+            val name = "name"
+            val newChannel = createChannel(uId, name, READ_WRITE.name, PUBLIC.name)
+            assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+            assertNotNull(newChannel.value.cId, "Channel id is null")
+            val result = getByName(newChannel.value.name.fullName)
+            assertIs<Success<Channel>>(result, "Channel retrieval failed")
+            assertEquals(newChannel.value, result.value, "Channel is different")
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `fail to find a channel by its name`(manager: TransactionManager) =
+        testSetup(manager) { _ ->
+            val result = getByName("name")
+            assertIs<Failure<ChannelError>>(result, "Channel retrieval should have failed")
+            assertEquals(ChannelError.ChannelNotFound, result.value, "Channel error is different")
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `get all channels with name`(manager: TransactionManager) =
+        testSetup(manager) { user ->
+            val ownerId = checkNotNull(user.uId) { "Owner id is null" }
+            val nr = 5
+            repeat(nr) {
+                val newChannel = createChannel(ownerId, "name$it", READ_WRITE.name, PUBLIC.name)
+                assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+                assertNotNull(newChannel.value.cId, "Channel id is null")
+            }
+            val result = getByName("name", 0u, nr.toUInt())
+            assertIs<Success<List<Channel>>>(result, "Channels retrieval failed")
+            assertEquals(nr, result.value.size, "Number of channels is different")
+        }
 }

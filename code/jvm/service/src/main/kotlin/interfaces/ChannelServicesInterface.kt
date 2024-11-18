@@ -78,4 +78,24 @@ interface ChannelServicesInterface {
         accessControl: String?,
         owner: UInt,
     ): Either<ChannelError, UUID>
+
+    /**
+     * Get a channel by its Name.
+     *
+     * @param name The name of the channel to get.
+     */
+    fun getByName(name: String): Either<ChannelError, Channel>
+
+    /**
+     * Get a channel list by its Name.
+     *
+     * @param name The name of the channel to get.
+     * @param offset The offset for the channels.
+     * @param limit The limit for the channels.
+     */
+    fun getByName(
+        name: String,
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
+    ): Either<ChannelError, List<Channel>>
 }

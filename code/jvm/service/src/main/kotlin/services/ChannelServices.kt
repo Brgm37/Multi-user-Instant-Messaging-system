@@ -67,9 +67,9 @@ class ChannelServices(
                     accessControl = AccessControl.valueOf(upperCaseAccessControl),
                     visibility = Visibility.valueOf(upperCaseVisibility),
                 )
+            val checkChannel = channelRepo.findByName(channel.name.fullName)
+            if (checkChannel != null) return@run failure(UnableToCreateChannel)
             val createdChannel = channelRepo.createChannel(channel) ?: return@run failure(UnableToCreateChannel)
-            val chId = checkNotNull(createdChannel.cId)
-            channelRepo.joinChannel(chId, uId, AccessControl.READ_WRITE)
             success(createdChannel)
         }
     }
@@ -112,7 +112,7 @@ class ChannelServices(
     ): Either<ChannelError, List<Channel>> =
         repoManager
             .run {
-                val channels = channelRepo.findAll(offset.toInt(), limit.toInt())
+                val channels = channelRepo.findAll(offset, limit)
                 success(channels)
             }
 
@@ -158,6 +158,29 @@ class ChannelServices(
                 success(invitation.invitationCode)
             }
     }
+
+    override fun getByName(name: String): Either<ChannelError, Channel> =
+        repoManager
+            .run {
+                val channel = channelRepo.findByName(name) ?: return@run failure(ChannelNotFound)
+                val cId = checkNotNull(channel.cId) { "Channel id is null" }
+                val messages = messageRepo.findMessagesByChannelId(cId, MSG_LIMIT, MSG_OFFSET)
+                return@run when (channel) {
+                    is Public -> success(channel.copy(messages = messages))
+                    is Private -> success(channel.copy(messages = messages))
+                }
+            }
+
+    override fun getByName(
+        name: String,
+        offset: UInt,
+        limit: UInt,
+    ): Either<ChannelError, List<Channel>> =
+        repoManager
+            .run {
+                val channels = channelRepo.findByName(name, offset, limit)
+                success(channels)
+            }
 
     private fun makeTimeStamp(expirationDate: String) =
         try {

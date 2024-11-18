@@ -118,18 +118,6 @@ class UserServices(
         }
     }
 
-    override fun getUserByToken(token: String): Either<UserError, User> =
-        repoManager.run {
-            val user = userRepo.findByToken(token) ?: return@run failure(UserError.UserNotFound)
-            success(user)
-        }
-
-    override fun isValidToken(token: String): Either<UserError, Boolean> =
-        repoManager.run {
-            val session = userRepo.validateToken(token)
-            success(session)
-        }
-
     override fun getInvitation(
         inviterUId: UInt,
         invitationCode: String,
