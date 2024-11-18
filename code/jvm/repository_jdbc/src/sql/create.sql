@@ -54,7 +54,8 @@ create table if not exists channel_members
     member        integer                                                            not null,
     access_control varchar(10) check ( access_control in ('READ_ONLY', 'READ_WRITE') ) not null,
     foreign key (channel) references channels (id),
-    foreign key (member) references users (id)
+    foreign key (member) references users (id),
+    unique (channel, member)
 );
 
 create table if not exists messages
