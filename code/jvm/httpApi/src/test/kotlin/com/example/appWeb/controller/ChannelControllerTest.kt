@@ -307,4 +307,56 @@ class ChannelControllerTest {
                 assertIs<ChannelProblem.ChannelNotFound>(resp.body, "Body is not a ChannelProblem.ChannelNotFound")
             }
         }
+
+    @ParameterizedTest
+    @MethodSource("transactionManager")
+    fun `get a channel by name`(manager: TransactionManager) =
+        testSetUp(manager) { authenticated, channelServices ->
+            val name = "channel1"
+            val newChannel =
+                channelServices
+                    .createChannel(authenticated.uId, name, READ_WRITE.name, PUBLIC.name)
+            assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+            val cId = checkNotNull(newChannel.value.cId) { "Channel id is null" }
+            getChannelByName(newChannel.value.name.fullName, authenticated).let { resp ->
+                assertEquals(HttpStatus.OK, resp.statusCode, "Status code is different")
+                assertIs<ChannelOutputModel>(resp.body, "Body is not a ChannelOutputModel")
+                val outputModel = resp.body as ChannelOutputModel
+                assertEquals(cId, outputModel.id, "Channel id is different")
+                assertEquals(authenticated.uId, outputModel.owner.id, "Owner id is different")
+                assertEquals(newChannel.value.name.fullName, outputModel.name.name, "Channel name is different")
+                assertEquals(READ_WRITE.name, outputModel.accessControl, "Access control is different")
+                assertEquals(PUBLIC.name, outputModel.visibility, "Visibility is different")
+            }
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManager")
+    fun `fail to get a channel by name`(manager: TransactionManager) =
+        testSetUp(manager) { authenticated, _ ->
+            getChannelByName("name", authenticated).let { resp ->
+                assertEquals(HttpStatus.NOT_FOUND, resp.statusCode, "Status code is different")
+                assertIs<ChannelProblem.ChannelNotFound>(resp.body, "Body is not a ChannelProblem.ChannelNotFound")
+            }
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManager")
+    @Suppress("UNCHECKED_CAST")
+    fun `get channels by name`(manager: TransactionManager) =
+        testSetUp(manager) { authenticated, channelServices ->
+            val nr = 10
+            val name = "name"
+            repeat(nr) {
+                channelServices.createChannel(authenticated.uId, "$name$it", READ_WRITE.name, PUBLIC.name)
+            }
+            getChannelByPartialName(name, 0u, 10u, authenticated).let { resp ->
+                assertEquals(HttpStatus.OK, resp.statusCode, "Status code is different")
+                assertIs<List<ChannelListOutputModel>>(resp.body, "Body is not a List<ChannelOutputModel>")
+                val outputModels = resp.body as List<ChannelListOutputModel>
+                assertEquals(nr, outputModels.size, "Number of channels is different")
+                val outputModel = outputModels.first()
+                assertEquals(authenticated.uId, outputModel.ownerOutputModel.id, "Owner id is different")
+            }
+        }
 }

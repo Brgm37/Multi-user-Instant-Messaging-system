@@ -61,9 +61,9 @@ class UserInMem : UserRepositoryInterface {
     override fun findById(id: UInt): User? = users.find { it.uId == id }
 
     override fun findAll(
-        offset: Int,
-        limit: Int,
-    ): List<User> = users.drop(offset).take(limit)
+        offset: UInt,
+        limit: UInt,
+    ): List<User> = users.drop(offset.toInt()).take(limit.toInt())
 
     override fun save(entity: User) {
         users.removeIf { it.uId == entity.uId }

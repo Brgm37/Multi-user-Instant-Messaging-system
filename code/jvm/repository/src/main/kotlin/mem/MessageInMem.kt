@@ -36,9 +36,9 @@ class MessageInMem : MessageRepositoryInterface {
     override fun findById(id: UInt): Message? = messages.find { it.msgId == id }
 
     override fun findAll(
-        offset: Int,
-        limit: Int,
-    ): List<Message> = messages.drop(offset).take(limit)
+        offset: UInt,
+        limit: UInt,
+    ): List<Message> = messages.drop(offset.toInt()).take(limit.toInt())
 
     override fun save(entity: Message) {
         messages.removeIf { it.msgId == entity.msgId }

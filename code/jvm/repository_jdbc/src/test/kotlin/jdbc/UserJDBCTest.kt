@@ -100,7 +100,7 @@ class UserJDBCTest {
                 (1..10).map {
                     createUser(connection, "user$it")
                 }
-            val foundUsers = UserJDBC(connection).findAll(5, 5)
+            val foundUsers = UserJDBC(connection).findAll(5u, 5u)
             assertEquals(users.drop(5), foundUsers)
         }
     }

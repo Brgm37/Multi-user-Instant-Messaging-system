@@ -150,7 +150,7 @@ class MessageJDBCTest {
             }
         }
         testSetup { _, _, _ ->
-            val messages = findAll(0, 11)
+            val messages = findAll(0u, 11u)
             val count = messages.size
             assertEquals(6, count)
             assertNotNull(messages, "Messages are null")

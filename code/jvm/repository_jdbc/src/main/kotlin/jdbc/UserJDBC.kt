@@ -291,8 +291,8 @@ class UserJDBC(
     }
 
     override fun findAll(
-        offset: Int,
-        limit: Int,
+        offset: UInt,
+        limit: UInt,
     ): List<User> {
         val selectQuery =
             """
@@ -302,8 +302,8 @@ class UserJDBC(
             LIMIT ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
-        stm.setInt(1, offset)
-        stm.setInt(2, limit)
+        stm.setInt(1, offset.toInt())
+        stm.setInt(2, limit.toInt())
         val rs = stm.executeQuery()
         val users = mutableListOf<User>()
         while (rs.next()) {

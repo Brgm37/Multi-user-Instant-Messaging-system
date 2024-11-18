@@ -3,6 +3,16 @@ import model.channels.Channel
 import model.channels.ChannelInvitation
 
 /**
+ * The offset for the channels
+ */
+private const val OFFSET = 0u
+
+/**
+ * The limit for the channels
+ */
+private const val LIMIT = 100u
+
+/**
  * Interface for the channel repository
  */
 interface ChannelRepositoryInterface : Repository<Channel> {
@@ -84,4 +94,24 @@ interface ChannelRepositoryInterface : Repository<Channel> {
         channelId: UInt,
         userId: UInt,
     ): AccessControl?
+
+    /**
+     * Retrieves a channel by its name
+     * @param name The name of the channel
+     * @return The channel with the given name
+     */
+    fun findByName(name: String): Channel?
+
+    /**
+     * Retrieves a channel list by its name
+     *
+     * @param name The name of the channel
+     * @param offset The offset for the channels
+     * @param limit The maximum number of channels to retrieve
+     */
+    fun findByName(
+        name: String,
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
+    ): List<Channel>
 }

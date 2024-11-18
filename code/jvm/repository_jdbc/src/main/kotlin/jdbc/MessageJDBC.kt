@@ -152,8 +152,8 @@ class MessageJDBC(
     }
 
     override fun findAll(
-        offset: Int,
-        limit: Int,
+        offset: UInt,
+        limit: UInt,
     ): List<Message> {
         val selectQuery =
             """

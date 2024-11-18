@@ -131,7 +131,7 @@ class ChannelJDBCTest {
                     ),
                 )
             }
-            val channels = findAll(0, n)
+            val channels = findAll(0u, n.toUInt())
             assertEquals(n, channels.size)
         }
 
@@ -264,5 +264,31 @@ class ChannelJDBCTest {
             val foundChannels = findByUserId(uId, 0, 10)
             val expectedSize = 1
             assertEquals(expectedSize, foundChannels.size)
+        }
+
+    @Test
+    fun `find by name`() =
+        testSetup { _, channel ->
+            val name = checkNotNull(channel.name) { "Channel name is null" }
+            val foundChannels = findByName(name.fullName)
+            assertNotNull(foundChannels) { "Channel is null" }
+        }
+
+    @Test
+    fun `find by partial name`() =
+        testSetup { user, _ ->
+            val uId = checkNotNull(user.uId) { "User id is null" }
+            val newChannel =
+                createChannel(
+                    Channel.createChannel(
+                        owner = UserInfo(uId, user.username),
+                        name = ChannelName("new_channel", user.username),
+                        accessControl = READ_WRITE,
+                        visibility = PUBLIC,
+                    ),
+                )
+            val name = checkNotNull(newChannel?.name) { "Channel name is null" }
+            val foundChannels = findByName(name.name, 0u, 10u)
+            assertEquals(newChannel, foundChannels.first())
         }
 }

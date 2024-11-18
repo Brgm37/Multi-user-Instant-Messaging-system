@@ -177,4 +177,74 @@ object ChannelSwaggerConfig {
         example = "Bearer 123e4567-e89b-12d3-a456-426614174000",
     )
     annotation class CreateChannelInvitation
+
+    @Operation(summary = "Get a channel by name")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Channel retrieved successfully",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ChannelOutputModel::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Channel not found",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ChannelProblem::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @Parameter(
+        name = "Authorization",
+        description = "Authorization token",
+        required = true,
+        schema = Schema(type = "UUID"),
+        `in` = ParameterIn.HEADER,
+        example = "Bearer 123e4567-e89b-12d3-a456-426614174000",
+    )
+    annotation class GetChannelByName
+
+    @Operation(summary = "Get a channel by partial name")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Channel retrieved successfully",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ChannelListOutputModel::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Channel not found",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = ChannelProblem::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @Parameter(
+        name = "Authorization",
+        description = "Authorization token",
+        required = true,
+        schema = Schema(type = "UUID"),
+        `in` = ParameterIn.HEADER,
+        example = "Bearer 123e4567-e89b-12d3-a456-426614174000",
+    )
+    annotation class GetChannelByPartialName
 }

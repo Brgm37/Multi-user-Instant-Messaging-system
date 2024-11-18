@@ -366,6 +366,49 @@ class ChannelJDBC(
         }
     }
 
+    override fun findByName(name: String): Channel? {
+        val selectQuery =
+            """
+            SELECT 
+            	channel_id, channel_name, channel_owner, channel_accessControl,
+            	channel_visibility, owner_name
+            FROM v_channel
+            WHERE channel_name = ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        stm.setString(1, name)
+        val rs = stm.executeQuery()
+        return if (rs.next()) {
+            rs.toChannel()
+        } else {
+            null
+        }
+    }
+
+    override fun findByName(
+        name: String,
+        offset: UInt,
+        limit: UInt,
+    ): List<Channel> {
+        val selectQuery =
+            """
+            SELECT 
+            	channel_id, channel_name, channel_owner, channel_accessControl,
+            	channel_visibility, owner_name
+            FROM v_channel
+            WHERE channel_name like ? and channel_visibility = '${PUBLIC.name}'
+            LIMIT ?
+            OFFSET ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setString(idx++, "%$name%")
+        stm.setInt(idx++, limit.toInt())
+        stm.setInt(idx, offset.toInt())
+        val rs = stm.executeQuery()
+        return rs.toChannelList()
+    }
+
     override fun findById(id: UInt): Channel? {
         val selectQuery =
             """
@@ -386,8 +429,8 @@ class ChannelJDBC(
     }
 
     override fun findAll(
-        offset: Int,
-        limit: Int,
+        offset: UInt,
+        limit: UInt,
     ): List<Channel> {
         val selectQuery =
             """
@@ -401,8 +444,8 @@ class ChannelJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
-        stm.setInt(idx++, limit)
-        stm.setInt(idx, offset)
+        stm.setInt(idx++, limit.toInt())
+        stm.setInt(idx, offset.toInt())
         val rs = stm.executeQuery()
         return rs.toChannelList()
     }
