@@ -1,7 +1,7 @@
 package pipeline
 
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
-import interfaces.UserServicesInterface
+import interfaces.AuthServiceInterface
 import org.springframework.stereotype.Component
 import utils.Failure
 import utils.Success
@@ -13,7 +13,7 @@ import utils.Success
  */
 @Component
 class RequestTokenProcessor(
-    private val service: UserServicesInterface,
+    private val service: AuthServiceInterface,
 ) {
     fun processAuthorizationHeader(authorizationValue: String?): AuthenticatedUserInputModel? {
         if (authorizationValue == null) {
