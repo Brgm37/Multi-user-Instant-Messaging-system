@@ -11,8 +11,20 @@ import errors.MessageError.ChannelNotFound
 import errors.MessageError.InvalidMessageInfo
 import errors.MessageError.UserNotFound
 import interfaces.MessageServicesInterface
+import interfaces.SseServiceInterface
 import io.swagger.v3.oas.annotations.Parameter
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.launch
+import model.messages.Message
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
@@ -23,8 +35,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import utils.Failure
 import utils.Success
+import java.util.concurrent.TimeUnit
 
 /**
  * The default limit for the message list.
@@ -45,7 +59,51 @@ private const val LIMIT = 100u
 @RequestMapping(MessageController.MESSAGE_BASE_URL)
 class MessageController(
     private val messageService: MessageServicesInterface,
+    private val sseServices: SseServiceInterface,
 ) {
+    private val globalMessages: MutableSharedFlow<Message> = MutableSharedFlow(replay = 1000)
+    private val listeners = mutableMapOf<AuthenticatedUserInputModel, MutableSharedFlow<Message>>()
+    private val scope = CoroutineScope(Dispatchers.Default)
+
+    private suspend fun sendEventToAll(message: Message) {
+        listeners
+            .forEach { (user, flow) ->
+                when (val isUserInChannel = sseServices.isUserInChannel(message.channel.cId, user.uId)) {
+                    is Success -> {
+                        if (isUserInChannel.value) {
+                            flow.emit(message)
+                        }
+                    }
+
+                    is Failure -> {
+                        // Do nothing
+                    }
+                }
+            }
+    }
+
+    private fun listenersInit(
+        user: AuthenticatedUserInputModel,
+        flow: MutableSharedFlow<Message>,
+        lastEventId: UInt,
+    ) {
+        scope
+            .launch {
+                var count = globalMessages.replayCache.size
+                globalMessages
+                    .filter {
+                        when (val result = sseServices.isUserInChannel(it.channel.cId, user.uId)) {
+                            is Success -> result.value
+                            is Failure -> false
+                        }
+                    }.filter {
+                        val msgId = checkNotNull(it.msgId) { "Message id is null" }
+                        msgId > lastEventId
+                    }.takeWhile { count-- > 0 }
+                    .collect(flow::emit)
+            }
+    }
+
     @PostMapping
     @MessageSwaggerConfig.CreateMessage
     fun createMessage(
@@ -61,6 +119,10 @@ class MessageController(
                 )
         return when (response) {
             is Success -> {
+                scope.launch {
+                    globalMessages.emit(response.value)
+                    sendEventToAll(response.value)
+                }
                 ResponseEntity.ok(MessageOutputModel.fromDomain(response.value))
             }
 
@@ -73,6 +135,59 @@ class MessageController(
                 }
             }
         }
+    }
+
+    @GetMapping(MESSAGE_SSE_URL)
+    fun getMessageEventStream(
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+        request: HttpServletRequest,
+    ): SseEmitter {
+        val emitter = SseEmitter(TimeUnit.HOURS.toMillis(1))
+        val lastId = request.getHeader("Last-Event-ID")?.toUIntOrNull()
+        val flow = MutableSharedFlow<Message>()
+        listeners[authenticated] = flow
+        if (lastId != null) listenersInit(authenticated, flow, lastId)
+        val scope =
+            scope
+                .launch {
+                    if (lastId != null) {
+                        flow
+                            .filterNotNull()
+                            .filter { it.msgId?.let { msgId -> msgId > lastId } ?: true }
+                            .onEach {
+                                emitter.send(
+                                    SseEmitter
+                                        .event()
+                                        .id(it.msgId.toString())
+                                        .data(MessageOutputModel.fromDomain(it)),
+                                )
+                            }.collect()
+                    } else {
+                        flow
+                            .filterNotNull()
+                            .onEach {
+                                emitter.send(
+                                    SseEmitter
+                                        .event()
+                                        .id(it.msgId.toString())
+                                        .data(MessageOutputModel.fromDomain(it)),
+                                )
+                            }.collect()
+                    }
+                }
+        emitter.onCompletion {
+            listeners.remove(authenticated)
+            scope.cancel()
+        }
+        emitter.onTimeout {
+            listeners.remove(authenticated)
+            scope.cancel()
+        }
+        emitter.onError {
+            listeners.remove(authenticated)
+            scope.cancel()
+        }
+        return emitter
     }
 
     @GetMapping(MESSAGE_ID_URL)
@@ -113,5 +228,6 @@ class MessageController(
         const val MESSAGE_BASE_URL = "api/messages"
         const val MESSAGE_ID_URL = "/{msgId}"
         const val CHANNEL_MESSAGES_URL = "/channel/{channelId}"
+        const val MESSAGE_SSE_URL = "/sse"
     }
 }
