@@ -31,7 +31,7 @@ class UserInMem : UserRepositoryInterface {
 
     override fun validateToken(token: String): Boolean {
         val tokenObj = tokens.find { it.token == UUID.fromString(token) } ?: return false
-        return !tokenObj.isExpired()
+        return !tokenObj.isExpired
     }
 
     override fun findByUsername(username: String): User? = users.find { it.username == username }
@@ -43,7 +43,7 @@ class UserInMem : UserRepositoryInterface {
 
     override fun deleteToken(token: String): Boolean = tokens.removeIf { it.token == UUID.fromString(token) }
 
-    override fun findByToken(token: String): User? {
+    override fun findToken(token: String): UserToken? {
         val tokenObj =
             try {
                 UUID.fromString(token)
@@ -52,7 +52,11 @@ class UserInMem : UserRepositoryInterface {
             }
         return tokens
             .find { it.token == tokenObj }
-            ?.let { findById(it.userId) }
+    }
+
+    override fun findByToken(token: String): User? {
+        val tokenObj = findToken(token) ?: return null
+        return findById(tokenObj.uId)
     }
 
     override fun findById(id: UInt): User? = users.find { it.uId == id }

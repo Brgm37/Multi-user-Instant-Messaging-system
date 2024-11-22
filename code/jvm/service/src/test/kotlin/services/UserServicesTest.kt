@@ -482,7 +482,7 @@ class UserServicesTest {
         val user = checkNotNull(ChannelServicesTest.makeUser(manager))
         val result = userServices.login(user.username, validPassword)
         assertIs<Success<UserToken>>(result)
-        assertEquals(user.uId, result.value.userId)
+        assertEquals(user.uId, result.value.uId)
         assertNotNull(result.value.token)
     }
 

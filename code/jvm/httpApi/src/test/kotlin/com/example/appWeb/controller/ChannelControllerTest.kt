@@ -62,7 +62,7 @@ class ChannelControllerTest {
             uId: UInt,
         ) = manager
             .run {
-                val token = UserToken(userId = uId, token = UUID.randomUUID())
+                val token = UserToken(uId = uId, token = UUID.randomUUID())
                 userRepo
                     .createToken(token)
                 token

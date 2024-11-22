@@ -14,6 +14,8 @@ import errors.ChannelError.ChannelNotFound
 import errors.UserError
 import interfaces.UserServicesInterface
 import io.swagger.v3.oas.annotations.Parameter
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
@@ -89,10 +91,17 @@ class UserController(
     @UserSwaggerConfig.Login
     fun login(
         @Valid @RequestBody user: UserLogInInputModel,
+        res: HttpServletResponse,
     ): ResponseEntity<*> =
         when (val response = userService.login(user.username, user.password)) {
             is Success -> {
-                ResponseEntity.ok(UserAuthenticatedOutputModel.fromDomain(response.value))
+                val auth = response.value
+                val cookie = Cookie(AUTH_COOKIE, auth.token.toString())
+                cookie.path = "/api"
+                cookie.isHttpOnly = true
+                cookie.maxAge = auth.creationDateInInt
+                res.addCookie(cookie)
+                ResponseEntity.ok(UserAuthenticatedOutputModel.fromDomain(auth))
             }
 
             is Failure -> {
@@ -185,12 +194,12 @@ class UserController(
         /**
          * The URL for the channel with the given id.
          */
-        const val CHANNEL_ID_URL = "/{channelId}"
+        private const val CHANNEL_ID_URL = "/{channelId}"
 
         /**
          * The URL for the channels.
          */
-        const val CHANNELS_URL = "/channels"
+        private const val CHANNELS_URL = "/channels"
 
         /**
          * The URL for the user with the given id, the channel with the given id and invitation code.
@@ -216,5 +225,7 @@ class UserController(
          * The URL for the logout.
          */
         const val LOGOUT_URL = "/logout"
+
+        const val AUTH_COOKIE = "auth-token"
     }
 }

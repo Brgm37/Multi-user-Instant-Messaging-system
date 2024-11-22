@@ -28,7 +28,7 @@ class UserTokenTest {
     fun `token is not expired when expiration date is in the future`() {
         val futureDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1))
         val token = UserToken(1u, UUID.randomUUID(), Timestamp(System.currentTimeMillis()), futureDate)
-        assertFalse(token.isExpired())
+        assertFalse(token.isExpired)
     }
 
     @Test

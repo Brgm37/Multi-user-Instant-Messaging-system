@@ -52,9 +52,7 @@ abstract class AbstractChannelControllerTest {
 
     private lateinit var token: UserToken
 
-    private fun encodeName(name: String): String {
-        return URLEncoder.encode(name, StandardCharsets.UTF_8.toString())
-    }
+    private fun encodeName(name: String): String = URLEncoder.encode(name, StandardCharsets.UTF_8.toString())
 
     @BeforeAll
     fun setUp() {
@@ -140,11 +138,14 @@ abstract class AbstractChannelControllerTest {
 
         val channel =
             manager.run {
-                val user = userRepo.findByToken(token.token.toString()) ?: throw IllegalStateException("User not found")
+                val user =
+                    userRepo
+                        .findByToken(token.token.toString())
+                        ?: throw IllegalStateException("User not found")
                 channelRepo
                     .createChannel(
                         Channel.createChannel(
-                            owner = UserInfo(token.userId, user.username),
+                            owner = UserInfo(token.uId, user.username),
                             name = ChannelName(channelName, user.username),
                             visibility = PUBLIC,
                             accessControl = READ_WRITE,
@@ -270,11 +271,15 @@ abstract class AbstractChannelControllerTest {
 
         val channel =
             manager.run {
-                val user = userRepo.findByToken(token.token.toString()) ?: throw IllegalStateException("User not found")
+                val user =
+                    userRepo
+                        .findToken(token.token.toString())
+                        ?.let { userRepo.findById(it.uId) }
+                        ?: throw IllegalStateException("User not found")
                 channelRepo
                     .createChannel(
                         Channel.createChannel(
-                            owner = UserInfo(token.userId, user.username),
+                            owner = UserInfo(token.uId, user.username),
                             name = ChannelName(channelName, user.username),
                             visibility = PUBLIC,
                             accessControl = READ_WRITE,
@@ -324,11 +329,15 @@ abstract class AbstractChannelControllerTest {
 
         val channel =
             manager.run {
-                val user = userRepo.findByToken(token.token.toString()) ?: throw IllegalStateException("User not found")
+                val user =
+                    userRepo
+                        .findToken(token.token.toString())
+                        ?.let { userRepo.findById(it.uId) }
+                        ?: throw IllegalStateException("User not found")
                 channelRepo
                     .createChannel(
                         Channel.createChannel(
-                            owner = UserInfo(token.userId, user.username),
+                            owner = UserInfo(token.uId, user.username),
                             name = ChannelName(channelName, user.username),
                             visibility = PUBLIC,
                             accessControl = READ_WRITE,
@@ -354,11 +363,15 @@ abstract class AbstractChannelControllerTest {
 
         val channel =
             manager.run {
-                val user = userRepo.findByToken(token.token.toString()) ?: throw IllegalStateException("User not found")
+                val user =
+                    userRepo
+                        .findToken(token.token.toString())
+                        ?.let { userRepo.findById(it.uId) }
+                        ?: throw IllegalStateException("User not found")
                 channelRepo
                     .createChannel(
                         Channel.createChannel(
-                            owner = UserInfo(token.userId, user.username),
+                            owner = UserInfo(token.uId, user.username),
                             name = ChannelName(channelName, user.username),
                             visibility = PUBLIC,
                             accessControl = READ_WRITE,
@@ -384,11 +397,15 @@ abstract class AbstractChannelControllerTest {
 
         val channel =
             manager.run {
-                val user = userRepo.findByToken(token.token.toString()) ?: throw IllegalStateException("User not found")
+                val user =
+                    userRepo
+                        .findToken(token.token.toString())
+                        ?.let { userRepo.findById(it.uId) }
+                        ?: throw IllegalStateException("User not found")
                 channelRepo
                     .createChannel(
                         Channel.createChannel(
-                            owner = UserInfo(token.userId, user.username),
+                            owner = UserInfo(token.uId, user.username),
                             name = ChannelName(channelName, user.username),
                             visibility = PUBLIC,
                             accessControl = READ_WRITE,

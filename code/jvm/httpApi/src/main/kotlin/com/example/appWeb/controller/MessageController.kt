@@ -61,6 +61,7 @@ class MessageController(
     private val messageService: MessageServicesInterface,
     private val sseServices: SseServiceInterface,
 ) {
+    // TODO("Change globalMessages to a database")
     private val globalMessages: MutableSharedFlow<Message> = MutableSharedFlow(replay = 1000)
     private val listeners = mutableMapOf<AuthenticatedUserInputModel, MutableSharedFlow<Message>>()
     private val scope = CoroutineScope(Dispatchers.Default)

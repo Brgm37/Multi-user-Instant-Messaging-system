@@ -15,7 +15,7 @@ data class UserAuthenticatedOutputModel(
     companion object {
         fun fromDomain(token: UserToken): UserAuthenticatedOutputModel =
             UserAuthenticatedOutputModel(
-                uId = token.userId,
+                uId = token.uId,
                 token = token.token.toString(),
             )
     }

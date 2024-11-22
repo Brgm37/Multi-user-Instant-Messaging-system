@@ -4,7 +4,7 @@ import TransactionManager
 import errors.UserError
 import interfaces.AuthServiceInterface
 import jakarta.inject.Named
-import model.users.User
+import model.users.UserToken
 import utils.Either
 import utils.failure
 import utils.success
@@ -13,9 +13,9 @@ import utils.success
 class AuthServices(
     private val repoManager: TransactionManager,
 ) : AuthServiceInterface {
-    override fun getUserByToken(token: String): Either<UserError, User> =
+    override fun getUserByToken(token: String): Either<UserError, UserToken> =
         repoManager.run {
-            val user = userRepo.findByToken(token) ?: return@run failure(UserError.UserNotFound)
+            val user = userRepo.findToken(token) ?: return@run failure(UserError.UserNotFound)
             success(user)
         }
 }

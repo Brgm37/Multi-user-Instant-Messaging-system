@@ -22,6 +22,7 @@ import model.users.UserToken
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.http.HttpStatus
+import org.springframework.mock.web.MockHttpServletResponse
 import services.ChannelServices
 import services.UserServices
 import utils.Success
@@ -86,7 +87,7 @@ class UserControllerTest {
             uId: UInt,
         ) = manager
             .run {
-                val token = UserToken(userId = uId, token = UUID.randomUUID())
+                val token = UserToken(uId = uId, token = UUID.randomUUID())
                 userRepo
                     .createToken(token)
                 token
@@ -223,7 +224,7 @@ class UserControllerTest {
 
         val userLogInInput = UserLogInInputModel(user.username, user.password.value)
 
-        val response = userController.login(userLogInInput)
+        val response = userController.login(userLogInInput, MockHttpServletResponse())
         assertEquals(HttpStatus.OK, response.statusCode)
         assertIs<UserAuthenticatedOutputModel>(response.body)
         assertNotNull((response.body as UserAuthenticatedOutputModel).token)
@@ -239,7 +240,7 @@ class UserControllerTest {
 
         val userLogInInput = UserLogInInputModel("invalidUsername", user.password.value)
 
-        val response = userController.login(userLogInInput)
+        val response = userController.login(userLogInInput, MockHttpServletResponse())
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
         assertIs<UserProblem.UserNotFound>(response.body)
         assertEquals(response.body, UserProblem.UserNotFound)
@@ -255,7 +256,7 @@ class UserControllerTest {
 
         val userLogInInput = UserLogInInputModel(user.username, "invalidPassword")
 
-        val response = userController.login(userLogInInput)
+        val response = userController.login(userLogInInput, MockHttpServletResponse())
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
         assertIs<UserProblem.PasswordIsInvalid>(response.body)
         assertEquals(response.body, UserProblem.PasswordIsInvalid)

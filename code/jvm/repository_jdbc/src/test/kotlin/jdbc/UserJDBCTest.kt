@@ -156,9 +156,21 @@ class UserJDBCTest {
     }
 
     @Test
+    fun `finding a userToken by token should return the correct userToken`() {
+        runWithConnection { connection ->
+            val user = createUser(connection)
+            val userId = checkNotNull(user.uId)
+            val token = UserToken(userId)
+            UserJDBC(connection).createToken(token)
+            val foundUser = UserJDBC(connection).findToken(token.token.toString())
+            assertEquals(token, foundUser)
+        }
+    }
+
+    @Test
     fun `trying to find a user by token that does not exist should return null`() {
         runWithConnection { connection ->
-            val foundUser = UserJDBC(connection).findByToken("nonExistentToken")
+            val foundUser = UserJDBC(connection).findToken("nonExistentToken")
             assertEquals(null, foundUser)
         }
     }
@@ -182,7 +194,7 @@ class UserJDBCTest {
             val tokens =
                 (1..5).map {
                     UserToken(
-                        userId = userId,
+                        uId = userId,
                         creationDate = Timestamp.valueOf(LocalDateTime.now().plusHours(it.toLong())),
                         expirationDate = Timestamp.valueOf(LocalDateTime.now().plusHours(it.toLong() + 1)),
                     )
@@ -192,7 +204,7 @@ class UserJDBCTest {
             }
             val newToken =
                 UserToken(
-                    userId = userId,
+                    uId = userId,
                     creationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1)),
                     expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2)),
                 )

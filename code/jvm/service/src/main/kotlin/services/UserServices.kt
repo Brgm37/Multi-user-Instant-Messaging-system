@@ -135,7 +135,7 @@ class UserServices(
             val userId = checkNotNull(user.uId)
             val token =
                 UserToken(
-                    userId = userId,
+                    uId = userId,
                     expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(TOKEN_EXPIRATION_DAYS)),
                 )
             if (userRepo.createToken(token)) success(token) else failure(UserError.UnableToCreateToken)

@@ -1,7 +1,7 @@
 package interfaces
 
 import errors.UserError
-import model.users.User
+import model.users.UserToken
 import utils.Either
 
 /**
@@ -12,5 +12,5 @@ interface AuthServiceInterface {
      * Validates a token.
      * @param token The token to validate.
      */
-    fun getUserByToken(token: String): Either<UserError, User>
+    fun getUserByToken(token: String): Either<UserError, UserToken>
 }

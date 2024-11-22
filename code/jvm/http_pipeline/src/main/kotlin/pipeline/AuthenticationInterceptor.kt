@@ -1,5 +1,6 @@
 package pipeline
 
+import com.example.appWeb.controller.UserController
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -30,17 +31,22 @@ class AuthenticationInterceptor(
                 .map(MethodParameter::getParameterType)
                 .any(AuthenticatedUserInputModel::class.java::equals)
         ) {
-            val user =
-                processor
-                    .processAuthorizationHeader(request.getHeader(NAME_AUTHORIZATION_HEADER))
-            return if (user == null) {
-                response.status = SC_UNAUTHORIZED
-                response.addHeader(NAME_WWW_AUTHENTICATE_HEADER, RequestTokenProcessor.SCHEME)
-                false
-            } else {
-                AuthenticatedUserArgumentResolver.addUserTo(user, request)
-                true
-            }
+            request
+                .cookies
+                ?.find { it.name == UserController.AUTH_COOKIE }
+                ?.let { processor.processToken(it) }
+                ?.let { AuthenticatedUserArgumentResolver.addUserTo(it, request) }
+                ?.let { return true }
+
+            request
+                .getHeader(NAME_AUTHORIZATION_HEADER)
+                ?.let { processor.processAuthorizationHeader(it) }
+                ?.let { AuthenticatedUserArgumentResolver.addUserTo(it, request) }
+                ?.let { return true }
+
+            response.status = SC_UNAUTHORIZED
+            response.addHeader(NAME_WWW_AUTHENTICATE_HEADER, RequestTokenProcessor.SCHEME)
+            return false
         }
         return true
     }

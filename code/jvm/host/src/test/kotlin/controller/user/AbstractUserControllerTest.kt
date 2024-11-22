@@ -66,7 +66,7 @@ abstract class AbstractUserControllerTest {
             manager
                 .run {
                     val user =
-                        userRepo.findByToken(token.token.toString()) ?: throw IllegalStateException("User not found")
+                        userRepo.findToken(token.token.toString()) ?: throw IllegalStateException("User not found")
                     val uId = checkNotNull(user.uId) { "User not found" }
                     val userInvitation =
                         UserInvitation(
@@ -85,7 +85,9 @@ abstract class AbstractUserControllerTest {
     ) = manager
         .run {
             val owner =
-                userRepo.findByToken(token.token.toString()) ?: throw IllegalStateException("User not found")
+                userRepo
+                    .findByToken(token.token.toString())
+                    ?: throw IllegalStateException("User not found")
             val ownerId = checkNotNull(owner.uId) { "User not found" }
             val channel =
                 Channel.Private(
@@ -252,7 +254,7 @@ abstract class AbstractUserControllerTest {
             manager
                 .run {
                     val user =
-                        userRepo.findByToken(token.token.toString()) ?: throw IllegalStateException("User not found")
+                        userRepo.findToken(token.token.toString()) ?: throw IllegalStateException("User not found")
                     return@run checkNotNull(user.uId) { "User not found" }
                 }
 

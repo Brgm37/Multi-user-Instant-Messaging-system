@@ -2,6 +2,7 @@ package pipeline
 
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import interfaces.AuthServiceInterface
+import jakarta.servlet.http.Cookie
 import org.springframework.stereotype.Component
 import utils.Failure
 import utils.Success
@@ -15,10 +16,7 @@ import utils.Success
 class RequestTokenProcessor(
     private val service: AuthServiceInterface,
 ) {
-    fun processAuthorizationHeader(authorizationValue: String?): AuthenticatedUserInputModel? {
-        if (authorizationValue == null) {
-            return null
-        }
+    fun processAuthorizationHeader(authorizationValue: String): AuthenticatedUserInputModel? {
         val parts = authorizationValue.trim().split(" ")
         if (parts.size != 2) {
             return null
@@ -40,6 +38,20 @@ class RequestTokenProcessor(
                 }
             }
     }
+
+    fun processToken(cookie: Cookie): AuthenticatedUserInputModel? =
+        service
+            .getUserByToken(cookie.value)
+            .let { resp ->
+                when (resp) {
+                    is Success -> {
+                        val uId = checkNotNull(resp.value.uId) { "User ID not found" }
+                        AuthenticatedUserInputModel(uId, cookie.value)
+                    }
+
+                    is Failure -> null
+                }
+            }
 
     companion object {
         const val SCHEME = "bearer"
