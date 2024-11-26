@@ -64,7 +64,7 @@ class MessageController(
     // TODO("Change globalMessages to a database")
     private val globalMessages: MutableSharedFlow<Message> = MutableSharedFlow(replay = 1000)
     private val listeners = mutableMapOf<AuthenticatedUserInputModel, MutableSharedFlow<Message>>()
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     private suspend fun sendEventToAll(message: Message) {
         listeners
@@ -75,7 +75,6 @@ class MessageController(
                             flow.emit(message)
                         }
                     }
-
                     is Failure -> {
                         // Do nothing
                     }
@@ -143,8 +142,8 @@ class MessageController(
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
         request: HttpServletRequest,
     ): SseEmitter {
-        val emitter = SseEmitter(TimeUnit.HOURS.toMillis(1))
-        val lastId = request.getHeader("Last-Event-ID")?.toUIntOrNull()
+        val emitter = SseEmitter(TimeUnit.HOURS.toMillis(1)) // TODO: Change to config file.
+        val lastId = request.getHeader(MESSAGE_SSE_LAST_EVENT_ID)?.toUIntOrNull()
         val flow = MutableSharedFlow<Message>()
         listeners[authenticated] = flow
         if (lastId != null) listenersInit(authenticated, flow, lastId)
@@ -230,5 +229,6 @@ class MessageController(
         const val MESSAGE_ID_URL = "/{msgId}"
         const val CHANNEL_MESSAGES_URL = "/channel/{channelId}"
         const val MESSAGE_SSE_URL = "/sse"
+        private const val MESSAGE_SSE_LAST_EVENT_ID = "Last-Event-ID"
     }
 }
