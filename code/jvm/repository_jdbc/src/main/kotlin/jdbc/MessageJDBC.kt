@@ -132,6 +132,14 @@ class MessageJDBC(
         return rs.toMessageList()
     }
 
+    override fun emitAllMessages(
+        uId: UInt,
+        lastEventId: UInt,
+        emitter: (Message) -> Unit,
+    ) {
+        TODO("Not yet implemented")
+    }
+
     override fun findById(id: UInt): Message? {
         val selectQuery =
             """

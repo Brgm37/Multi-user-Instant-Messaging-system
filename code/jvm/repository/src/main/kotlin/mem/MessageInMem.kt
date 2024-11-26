@@ -33,6 +33,14 @@ class MessageInMem : MessageRepositoryInterface {
             .reversed()
     }
 
+    override fun emitAllMessages(
+        uId: UInt,
+        lastEventId: UInt,
+        emitter: (Message) -> Unit,
+    ) {
+        TODO("Not yet implemented")
+    }
+
     override fun findById(id: UInt): Message? = messages.find { it.msgId == id }
 
     override fun findAll(

@@ -1,6 +1,7 @@
 package interfaces
 
 import errors.Error
+import model.messages.Message
 import utils.Either
 
 /**
@@ -19,4 +20,17 @@ interface SseServiceInterface {
         cId: UInt,
         uId: UInt,
     ): Either<Error, Boolean>
+
+    /**
+     * Emits all messages to the user.
+     *
+     * @param uId The user ID
+     * @param lastEventId The last event ID
+     * @param emitter The emitter function
+     */
+    fun emitAllMessages(
+        uId: UInt,
+        lastEventId: UInt,
+        emitter: (Message) -> Unit,
+    )
 }
