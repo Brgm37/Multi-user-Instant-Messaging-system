@@ -1,6 +1,6 @@
-import {SingInValidationResponse} from "../SingInService"
 import {usernameValidation} from "./UsernameValidation"
 import {passwordValidation} from "./PasswordValidation"
+import {SignInValidationResponse} from "../signIn/aux/SignInAction";
 
 /**
  * Validate the username, password and confirm password
@@ -13,7 +13,7 @@ export function singInValidator(
     username: string,
     password: string,
     confirmPassword: string
-): Promise<SingInValidationResponse> {
+): Promise<SignInValidationResponse> {
     return Promise.resolve(
         {
             isUsernameValid: usernameValidation(username),
