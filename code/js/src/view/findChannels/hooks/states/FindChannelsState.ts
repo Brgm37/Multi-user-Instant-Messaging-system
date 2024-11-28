@@ -11,7 +11,8 @@ export type State =
     { tag:
             "navigating" |
             "searching" |
-            "fetchingMore",
+            "fetchingMore"|
+            "joining"
         searchBar: string, channels: PublicChannel[],
     } |
     { tag: "error", error: string, channels: PublicChannel[] } |
