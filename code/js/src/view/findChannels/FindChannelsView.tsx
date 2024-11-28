@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ChangeEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { reduce } from "./hooks/FindChannelsReducer";
+import { reduce } from "./hooks/UseFindChannels";
 
 const DEBOUNCE_DELAY = 500;
 

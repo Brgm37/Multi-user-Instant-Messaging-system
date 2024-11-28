@@ -2,19 +2,16 @@ import {Action} from "./states/FindChannelsAction";
 import {State} from "./states/FindChannelsState";
 import {useEffect, useReducer} from "react";
 import {useFetch} from "../../../service/utils/useFetch";
-import {urlBuilder} from "../../../service/utils/UrlBuilder";
 import {channelsToPublicChannels} from "../model/findChannels/PublicChannel";
-
-/**
- * The URL for the find channels API.
- */
-const findChannelsApiUrl = urlBuilder("/channels/search")
+import {makeDefaultFindChannelService, FindChannelsService} from "../../../service/findChannels/FindChannelService";
 
 /**
  * The delay for debounce.
  *
  */
 const DEBOUNCE_DELAY = 500;
+
+const CHANNELS_PER_FETCH = 10;
 
 /**
  * The reducer function for the find channels form.
@@ -33,7 +30,9 @@ export function reduce(state: State, action: Action): State {
                 case "error":
                     return { tag: "error", error: action.error, channels: [] }
                 case "fetchMore":
-                    return { tag: "fetchingMore", searchBar: state.searchBar, channels: [...state.channels, ...action.channels] }
+                    return { tag: "fetchingMore", searchBar: state.searchBar, channels: state.channels }
+                case "join":
+                    return { tag: "joining", channels: state.channels , searchBar: state.searchBar }
                 default:
                     return state
             }
@@ -61,7 +60,20 @@ export function reduce(state: State, action: Action): State {
                     return { tag: "navigating", searchBar: "", channels: state.channels } 
                 default:
                     return state
-        }
+            }
+        case "joining":
+            switch (action.type) {
+                case "joined":
+                    return { tag: "redirect" }
+                case "error":
+                    return { tag: "error", error: action.error, channels: state.channels }
+                default:
+                    return state
+            }
+        case "redirect":
+            throw Error("Already in final State 'redirect' and should not reduce to any other State.")
+        default:
+            throw Error("Invalid state")
     }
 }
 
@@ -94,18 +106,19 @@ export type UseFindChannelsHandler = {
      * @returns void
      */
     onErrorClose: () => void
-
 }
 
 const initialState: State = { tag: "navigating", searchBar: "", channels: [] }
 
-export function useFindChannels() {
+export function useFindChannels(
+    {getChannelsByPartialName, joinChannel, getPublicChannels}: FindChannelsService = makeDefaultFindChannelService()
+) {
     const [state, dispatch] = useReducer(reduce, initialState)
-
     useEffect(() => {
         if (state.tag != "navigating") return
         const timeout = setTimeout(() => {
-            dispatch({ type: "search", channels: [] })
+            dispatch({ type: "search" })
+            onFetch()
         }, DEBOUNCE_DELAY)
         return () => clearTimeout(timeout)
     }, [state]
@@ -113,27 +126,45 @@ export function useFindChannels() {
 
     const onSearchChange = () => {
         if (state.tag != "navigating") return
-        useFetch(
-            findChannelsApiUrl + '/' + state.searchBar,
-            "GET",
-            response => response.json().then((channels) =>
+        dispatch({ type: "search" })
+    }
+
+    const onFetchMore = () => {
+        if (state.tag != "navigating") return
+        dispatch({ type: "fetchMore" })
+        getPublicChannels(
+            state.channels.length,
+            CHANNELS_PER_FETCH,
+            response => response.json().then( (channels) =>
                 dispatch({ type: "success", channels: channelsToPublicChannels(channels) })),
-            response => dispatch({ type: "error", error: response.message }),
-            {}
-        ).toFetch()
-        dispatch({ type: "search", channels: [] })
+            error => dispatch({ type: "error", error: error.message })
+        )
     }
 
     const onFetch = () => {
-        dispatch({ type: "fetchMore", channels: [] })
+        if (state.tag != "navigating") return
+        dispatch({ type: "search" })
+        getChannelsByPartialName(
+            state.searchBar,
+            response => response.json().then( (channels) =>
+                dispatch({ type: "success", channels: channelsToPublicChannels(channels) })),
+            error => dispatch({ type: "error", error: error.message })
+        )
     }
 
     const onErrorClose = () => {
+        if (state.tag != "error") return
         dispatch({ type: "closeError" })
     }
 
     const onJoin = (channelId: number) => {
+        if (state.tag != "navigating") return
         dispatch({ type: "join", channelId: channelId })
+        joinChannel(
+            channelId,
+            response => response.json().then(() => dispatch({ type: "joined" })),
+            error => dispatch({ type: "error", error: error.message })
+        )
     }
 
     return [ state, {onSearchChange} ]
