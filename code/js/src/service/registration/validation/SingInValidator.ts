@@ -1,6 +1,6 @@
 import {usernameValidation} from "./UsernameValidation"
 import {passwordValidation} from "./PasswordValidation"
-import {SignInValidationResponse} from "../signIn/aux/SignInAction";
+import {SignInValidationResponse} from "../signIn/states/SignInAction";
 
 /**
  * Validate the username, password and confirm password

@@ -1,8 +1,8 @@
 import {useEffect, useReducer} from "react"
 import {useFetch} from "../../utils/useFetch"
 import {urlBuilder} from "../../utils/UrlBuilder"
-import {LoginState, makeInitialState} from "./aux/LoginState"
-import {LoginAction, LoginValidationResponse} from "./aux/LoginAction";
+import {LoginState, makeInitialState} from "./states/LoginState"
+import {LoginAction, LoginValidationResponse} from "./states/LoginAction";
 
 /**
  * The timeout for the validation.

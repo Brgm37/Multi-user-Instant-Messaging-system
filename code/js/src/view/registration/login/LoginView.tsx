@@ -1,12 +1,12 @@
 import * as React from 'react'
 import {useLoginForm} from '../../../service/registration/login/LoginService'
-import {LoginValidationResponse} from "../../../service/registration/login/aux/LoginAction";
+import {LoginValidationResponse} from "../../../service/registration/login/states/LoginAction";
 import {InputLabelContext} from "../components/InputLabelContext";
 import {LoginEditingView} from "./components/LoginEditingView";
 import {Link, Navigate, useLocation} from "react-router-dom";
 import {LoginSubmittingView} from "./components/LoginSubmittingView";
 import {LoginErrorView} from "./components/LoginErrorView";
-import {LoginState} from "../../../service/registration/login/aux/LoginState";
+import {LoginState} from "../../../service/registration/login/states/LoginState";
 
 export function LoginView(
     {validator}: {

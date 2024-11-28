@@ -1,6 +1,6 @@
 import * as React from "react"
-import {SignInAction, SignInValidationResponse} from "./aux/SignInAction";
-import {SignInState, makeInitialState} from "./aux/SignInState";
+import {SignInAction, SignInValidationResponse} from "./states/SignInAction";
+import {SignInState, makeInitialState} from "./states/SignInState";
 import {useReducer} from "react";
 import {useFetch} from "../../utils/useFetch";
 import {urlBuilder} from "../../utils/UrlBuilder";

@@ -1,12 +1,12 @@
 import * as React from 'react'
 import {useSignInForm} from "../../../service/registration/signIn/SingInService";
-import {SignInValidationResponse} from "../../../service/registration/signIn/aux/SignInAction";
+import {SignInValidationResponse} from "../../../service/registration/signIn/states/SignInAction";
 import {Link, Navigate, useLocation} from "react-router-dom";
 import { InputLabelContext } from '../components/InputLabelContext';
 import {SignInEditingView} from "./components/SignInEditingView";
 import {SignInSubmittingView} from "./components/SignInSubmittingView";
 import {SignInErrorView} from "./components/SignInErrorView";
-import {SignInState} from "../../../service/registration/signIn/aux/SignInState";
+import {SignInState} from "../../../service/registration/signIn/states/SignInState";
 
 export function SignInView(
     {validator}: {
