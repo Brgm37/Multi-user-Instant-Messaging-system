@@ -1,23 +1,14 @@
 import * as React from 'react'
-import {useSignInForm} from "../../../service/registration/signIn/SingInService";
-import {SignInValidationResponse} from "../../../service/registration/signIn/states/SignInAction";
+import {useSignInForm} from "./hooks/UseSingInForm";
 import {Link, Navigate, useLocation} from "react-router-dom";
-import { InputLabelContext } from '../components/InputLabelContext';
+import {InputLabelContext} from '../components/InputLabelContext';
 import {SignInEditingView} from "./components/SignInEditingView";
 import {SignInSubmittingView} from "./components/SignInSubmittingView";
 import {SignInErrorView} from "./components/SignInErrorView";
-import {SignInState} from "../../../service/registration/signIn/states/SignInState";
+import {SignInState} from "./hooks/states/SignInState";
 
-export function SignInView(
-    {validator}: {
-        validator: (
-            username: string,
-            password: string,
-            confirmPassword: string,
-        ) => Promise<SignInValidationResponse>,
-    },
-): React.JSX.Element {
-    const [signIn, handler] = useSignInForm(validator)
+export function SignInView(): React.JSX.Element {
+    const [signIn, handler] = useSignInForm()
     const location = useLocation()
     if (signIn.tag === "redirect") {
         let source = location.state?.source

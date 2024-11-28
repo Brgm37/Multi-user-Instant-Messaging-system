@@ -1,6 +1,6 @@
 import {usernameValidation} from "./UsernameValidation"
 import {passwordValidation} from "./PasswordValidation"
-import {SignInValidationResponse} from "../signIn/states/SignInAction";
+import {SignInValidationResponse} from "../signIn/SignInValidationResponse";
 
 /**
  * Validate the username, password and confirm password
@@ -9,7 +9,7 @@ import {SignInValidationResponse} from "../signIn/states/SignInAction";
  * @param password
  * @param confirmPassword
  */
-export function singInValidator(
+export function signInValidator(
     username: string,
     password: string,
     confirmPassword: string

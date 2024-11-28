@@ -12,8 +12,10 @@ import {useEffect, useReducer} from "react";
  * @prop error The error from the response.
  */
 type State = {
-    body: { [key: string]: string }
-    method: "GET" | "POST" | "PUT" | "DELETE"
+    body: { [key: string]: string },
+    method: "GET" | "POST" | "PUT" | "DELETE",
+    onSuccess: (res: Response) => void,
+    onError: (error: Error) => void,
     isLoading: boolean,
 }
 
@@ -32,31 +34,10 @@ type State = {
 type Action =
     { type: "done" } |
     { type: "update", key: string, value: string } |
+    { type: "onSuccessChange", newFunc: (res: Response) => void } |
+    { type: "onErrorChange", newFunc: (error: Error) => void} |
     { type: "reset" } |
     { type: "submit" }
-
-/**
- * Update the body of the request.
- *
- * @param body
- * @param key
- * @param value
- *
- * @returns The new body.
- */
-function updateBody(
-    body: { [key: string]: string },
-    key: string,
-    value: string,
-): { [key: string]: string } {
-    let newBody: { [key: string]: string } = {[key]: value}
-    for (let k in body) {
-        if (k !== key) {
-            newBody[k] = body[k]
-        }
-    }
-    return newBody
-}
 
 /**
  * The reducer for the fetch.
@@ -68,14 +49,20 @@ function updateBody(
  */
 function reduce(state: State, action: Action): State {
     switch (action.type) {
-        case "update":
-            return {...state, body: updateBody(state.body, action.key, action.value)}
+        case "update": {
+            const body = {...state.body, [action.key]: action.value}
+            return {...state, body}
+        }
         case "reset":
             return {...state, body: {}, isLoading: false}
         case "submit":
             return {...state, isLoading: true}
         case "done":
             return {...state, isLoading: false}
+        case "onSuccessChange":
+            return {...state, onSuccess: action.newFunc}
+        case "onErrorChange":
+            return {...state, onError: action.newFunc}
     }
 }
 
@@ -89,6 +76,19 @@ type FetchHandler = {
      * Fetch the data.
      */
     toFetch: () => void
+
+    /**
+     * The success handler.
+     * @param response
+     */
+    onSuccessChange: (newFunc: (res: Response) => void) => void
+
+    /**
+     * The error handler.
+     * @param error
+     */
+    onErrorChange: (newFunc: (error: Error) => void) => void
+
     /**
      * Update the body.
      *
@@ -125,6 +125,8 @@ export function useFetch(
             {
                 body,
                 method,
+                onSuccess,
+                onError,
                 isLoading: false,
             }
         )
@@ -155,10 +157,10 @@ export function useFetch(
             }
         }
     }, [url, state.isLoading])
-    const toFetch = () => {
-        dispatch({type: "submit"})
-    }
+    const toFetch = () => dispatch({type: "submit"})
     const toUpdate = (key: string, value: string) => dispatch({type: "update", key, value})
     const toReset = () => dispatch({type: "reset"})
-    return {toFetch, toUpdate, toReset}
+    const onSuccessChange = (newFunc: (response: Response) => void) => dispatch({type: "onSuccessChange", newFunc})
+    const onErrorChange = (newFunc: (error: Error) => void) => dispatch({type: "onErrorChange", newFunc})
+    return {toFetch, toUpdate, toReset, onSuccessChange, onErrorChange}
 }
