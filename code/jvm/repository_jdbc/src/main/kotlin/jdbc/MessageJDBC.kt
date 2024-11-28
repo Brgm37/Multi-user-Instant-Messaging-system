@@ -120,7 +120,7 @@ class MessageJDBC(
                 msgChannelName, msgAuthorUsername
             FROM v_message
             WHERE msgChannelId = ?
-            ORDER BY msgTimestamp DESC
+            ORDER BY msgTimestamp
             LIMIT ? OFFSET ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
@@ -144,7 +144,7 @@ class MessageJDBC(
                     msgChannelName, msgAuthorUsername
                 FROM channel_members JOIN v_message ON channel = msgChannelId 
                 WHERE member = ? AND msgId > ?
-                ORDER BY msgTimestamp DESC
+                ORDER BY msgTimestamp
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
@@ -185,6 +185,7 @@ class MessageJDBC(
                 msgId, msgChannelId, msgContent, msgauthorid, msgTimestamp,
                 msgChannelName, msgAuthorUsername
             FROM v_message
+            ORDER BY msgTimestamp
             LIMIT ? OFFSET ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
