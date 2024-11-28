@@ -1,36 +1,5 @@
-import { PublicChannel } from "../../model/findChannels/PublicChannel"
-
-/**
- * @description Type for the state of the PublicChannels form.
- * 
- * @type State
- * @prop searchBar The search bar input.
- * @prop channels The list of public channels.
- */
-type State = 
-    { tag: 
-        "navigating" | 
-        "searching" | 
-        "fetchingMore", 
-        searchBar: string, channels: PublicChannel[]
-    } |
-    { tag: "error", error: string, channels: PublicChannel[] }
-
-/**
- * The Action type for the PublicChannels form.
- * 
- * @type Action
- * @prop type The type of the action.
- * @prop channels The list of public channels.
- * @prop error The error message.
- * @prop searchBar The search bar input.
-*/
-type Action = 
-    { type: "search", channels: PublicChannel[] } |
-    { type: "error", error: string} |
-    { type: "success", channels: PublicChannel[] } |
-    { type: "fetchMore", channels: PublicChannel[] } |
-    { type: "closeError" }
+import {Action} from "./states/FindChannelsAction";
+import {State} from "./states/FindChannelsState";
 
 export function reduce(state: State, action: Action): State {
     switch (state.tag) {
