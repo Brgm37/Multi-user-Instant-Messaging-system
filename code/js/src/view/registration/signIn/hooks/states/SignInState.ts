@@ -1,5 +1,5 @@
 import {useSearchParams} from "react-router-dom";
-import {extractSearchParams} from "../../../utils/extractParams";
+import {extractSearchParams} from "../../../../../service/utils/extractParams";
 
 /**
  * The visibility state of the password fields.

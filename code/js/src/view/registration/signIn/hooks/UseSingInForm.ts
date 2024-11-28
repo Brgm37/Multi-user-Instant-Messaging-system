@@ -1,35 +1,16 @@
 import * as React from "react"
-import {SignInAction, SignInValidationResponse} from "./states/SignInAction";
 import {SignInState, makeInitialState} from "./states/SignInState";
 import {useReducer} from "react";
-import {useFetch} from "../../utils/useFetch";
-import {urlBuilder} from "../../utils/UrlBuilder";
+import {makeDefaultSignInService, SignInService} from "../../../../service/registration/signIn/SignInService";
+import {SignInValidationResponse} from "../../../../service/registration/signIn/SignInValidationResponse";
+import {SignInAction} from "./states/SignInAction";
+import {SingInFormHandler} from "./handler/UseSignInFormHandler";
 
 /**
  * The timeout for the validation service.
  *
  */
 const TIMEOUT = 500
-
-/**
- * The URL for the SignIn API.
- */
-const signInApiUrl = urlBuilder("/users/signup")
-
-/**
- * The header for the username.
- */
-const invitationCodeHeader = "invitationCode"
-
-/**
- * The header for the password.
- */
-const passwordHeader = "password"
-
-/**
- * The header for the password confirmation.
- */
-const usernameHeader = "username"
 
 /**
  * The verifier function for the SignIn form.
@@ -84,7 +65,10 @@ function reduce(state: SignInState, action: SignInAction): SignInState {
                             return {...state, input}
                         }
                         default: {
-                            const input = {...state.input, [action.inputName]: action.inputValue}
+                            const input = {
+                                ...state.input,
+                                [action.inputName]: action.inputValue
+                            }
                             return {...state, input}
                         }
                     }
@@ -100,7 +84,11 @@ function reduce(state: SignInState, action: SignInAction): SignInState {
                 case "submit":
                     return {tag: "submitting", input: state.input}
                 case "validation-result": {
-                    const {isUsernameValid, isPasswordValid, isConfirmPasswordValid} = action.response
+                    const {
+                        isUsernameValid,
+                        isPasswordValid,
+                        isConfirmPasswordValid
+                    } = action.response
                     const error = {
                         usernameError: isUsernameValid === true ? "" : isUsernameValid,
                         passwordError: isPasswordValid === true ? "" : isPasswordValid,
@@ -131,7 +119,12 @@ function reduce(state: SignInState, action: SignInAction): SignInState {
             switch (action.type) {
                 case "edit": {
                     const input = {...state.input, [action.inputName]: action.inputValue}
-                    return {tag: "editing", input, visibility: {password: false, confirmPassword: false}, error: {usernameError: "", passwordError: "", confirmPasswordError: ""}}
+                    return {
+                        tag: "editing",
+                        input,
+                        visibility: {password: false, confirmPassword: false},
+                        error: {usernameError: "", passwordError: "", confirmPasswordError: ""}
+                    }
                 }
                 default:
                     throw Error("Invalid action")
@@ -142,106 +135,43 @@ function reduce(state: SignInState, action: SignInAction): SignInState {
 }
 
 /**
- * The handler for the SignIn form.
- *
- * @type SingInFormHandler
- *
- * @prop onUsernameChange The handler for the username change event.
- * @prop onPasswordChange The handler for the password change event.
- * @prop onConfirmPasswordChange The handler for the password confirmation change event.
- * @prop onInvitationCodeChange The handler for the invitation code change event.
- */
-export type SingInFormHandler = {
-    /**
-     * The handler for the username change event.
-     * @param username
-     */
-    onUsernameChange: (username: string) => void,
-    /**
-     * The handler for the password change event.
-     * @param password
-     */
-    onPasswordChange: (password: string) => void,
-    /**
-     * The handler for the password confirmation change event.
-     * @param confirmPassword
-     */
-    onConfirmPasswordChange: (confirmPassword: string) => void,
-    /**
-     * The handler for the invitation code change event.
-     * @param invitationCode
-     */
-    onInvitationCodeChange: (invitationCode: string) => void,
-
-    /**
-     * The handler for the password visibility toggle event.
-     */
-    onPasswordVisibilityToggle: () => void,
-
-    /**
-     * The handler for the confirmation password visibility toggle event.
-     */
-    onConfirmPasswordVisibilityToggle: () => void,
-
-    /**
-     * The handler for the form submission event.
-     */
-    onSubmit: () => void
-
-}
-
-/**
  * The hook for the SignIn form.
  *
- * @param stateValidator The validator function for the form.
+ * @param service The service for the SignIn form.
  *
  * @returns [State, SingInFormHandler]
  */
 export function useSignInForm(
-    stateValidator:
-        (
-            username: string,
-            password: string,
-            confirmPassword: string,
-        ) => Promise<SignInValidationResponse>,
+    {signIn, stateValidator}: SignInService = makeDefaultSignInService(),
 ): [SignInState, SingInFormHandler] {
     const [state, dispatch] = useReducer(reduce, makeInitialState())
-    const fetchHandler = useFetch(
-        signInApiUrl,
-        "POST",
-        response => response.json().then(() => dispatch({type: "success", response})),
-        response => dispatch({type: "error", message: response.message}),
-        state.tag !== "editing"
-            ? {"username": "", "password": "", "invitationCode": ""}
-            : {
-                "username": state.input.username,
-                "password": state.input.password.password,
-                "invitationCode": state.input.invitationCode
-            }
-    )
     const handler: SingInFormHandler = {
         onUsernameChange: (username: string) => {
             dispatch({type: "edit", inputName: "username", inputValue: username})
-            fetchHandler.toUpdate(usernameHeader, username)
         },
         onPasswordChange: (password: string) => {
             dispatch({type: "edit", inputName: "password", inputValue: password})
-            fetchHandler.toUpdate(passwordHeader, password)
         },
         onConfirmPasswordChange: (confirmPassword: string) => {
             dispatch({type: "edit", inputName: "confirmPassword", inputValue: confirmPassword})
         },
         onInvitationCodeChange: (invitationCode: string) => {
             dispatch({type: "edit", inputName: "invitationCode", inputValue: invitationCode})
-            fetchHandler.toUpdate(invitationCodeHeader, invitationCode)
         },
         onPasswordVisibilityToggle: () =>
             dispatch({type: "toggleVisibility", inputName: "password"}),
         onConfirmPasswordVisibilityToggle: () =>
             dispatch({type: "toggleVisibility", inputName: "confirmPassword"}),
         onSubmit: () => {
+            if (state.tag !== "editing") return
             dispatch({type: "submit"})
-            fetchHandler.toFetch
+            signIn(
+                state.input.username,
+                state.input.password.password,
+                state.input.invitationCode,
+                response => response.json().then(() => dispatch({type: "success", response})),
+                error => dispatch({type: "error", message: error.message})
+            )
         }
     }
     React.useEffect(() => {

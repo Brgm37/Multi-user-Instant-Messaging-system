@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {SingInFormHandler} from "../../../../service/registration/signIn/SingInService";
 import {InputLabelContext} from "../../components/InputLabelContext";
 import {InputLabel} from "../../components/InputLabel";
+import {SingInFormHandler} from "../hooks/handler/UseSignInFormHandler";
 
 /**
  * The view for the editing state of the signIn form.

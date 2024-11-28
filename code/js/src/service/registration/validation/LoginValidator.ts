@@ -1,6 +1,6 @@
 import {usernameValidation} from "./UsernameValidation";
 import {passwordValidation} from "./PasswordValidation";
-import {LoginValidationResponse} from "../login/states/LoginAction";
+import {LoginValidationResponse} from "../login/LoginValidationResponse";
 
 /**
  * Validate the username and password

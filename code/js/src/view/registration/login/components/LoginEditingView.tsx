@@ -1,7 +1,7 @@
 import * as React from "react";
-import {UseLoginFormHandler} from "../../../../service/registration/login/LoginService";
 import {InputLabel} from "../../components/InputLabel";
 import {InputLabelContext} from "../../components/InputLabelContext";
+import {UseLoginFormHandler} from "../hooks/handler/UseLoginFormHandler";
 
 
 /**
