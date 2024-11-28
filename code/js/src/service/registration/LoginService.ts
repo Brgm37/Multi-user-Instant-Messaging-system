@@ -13,7 +13,7 @@ import {useSearchParams} from "react-router-dom";
  * @prop passwordError The error message for the password field.
  */
 type State = {
-    username: string
+    username: string,
     password: string,
     isValid: boolean,
     isPasswordVisible: boolean,
