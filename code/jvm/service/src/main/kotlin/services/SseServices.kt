@@ -6,6 +6,7 @@ import errors.ChannelError.UserNotFound
 import errors.Error
 import interfaces.SseServiceInterface
 import jakarta.inject.Named
+import model.messages.Message
 import utils.Either
 import utils.failure
 import utils.success
@@ -23,4 +24,12 @@ class SseServices(
             channelRepo.findById(cId) ?: return@run failure(ChannelNotFound)
             success(channelRepo.isUserInChannel(cId, uId))
         }
+
+    override fun emitAllMessages(
+        uId: UInt,
+        lastEventId: UInt,
+        emitter: (Message) -> Unit,
+    ) {
+        repoManager.run { messageRepo.emitAllMessages(uId, lastEventId, emitter) }
+    }
 }

@@ -148,7 +148,7 @@ class MessageJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
-        stm.setInt(idx, uId.toInt())
+        stm.setInt(idx++, uId.toInt())
         stm.setInt(idx, lastEventId.toInt())
         val rs = stm.executeQuery()
         while (rs.next()) {
