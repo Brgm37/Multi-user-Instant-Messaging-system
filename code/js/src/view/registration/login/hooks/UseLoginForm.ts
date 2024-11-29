@@ -98,8 +98,8 @@ export function useLoginForm(): [LoginState, UseLoginFormHandler] {
             state.input.username,
             state.input.password,
         ).then(response => {
-            if (response === true) dispatch({type: "success"})
-            else dispatch({type: "error", message: response})
+            if (response.tag === "success") dispatch({type: "success"})
+            else dispatch({type: "error", message: response.value})
         })
         dispatch({type: "submit"})
     }

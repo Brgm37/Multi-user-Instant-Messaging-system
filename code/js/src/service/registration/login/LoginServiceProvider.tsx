@@ -3,6 +3,7 @@ import {LoginServiceContext} from "./LoginServiceContext";
 import useSignal from "../../utils/useSignal";
 import {urlBuilder} from "../../utils/UrlBuilder";
 import {loginValidator} from "../validation/LoginValidator";
+import {Either, success, failure} from "../../../model/Either";
 
 /**
  * The URL for the login API.
@@ -22,7 +23,7 @@ const passwordHeader = "password"
 export function LoginServiceProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
     const signal = useSignal()
     const service : LoginServiceContext = {
-        async login(username: string, password: string): Promise<true | string> {
+        async login(username: string, password: string): Promise<Either<true, string>> {
             const init: RequestInit = {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -32,9 +33,9 @@ export function LoginServiceProvider({ children }: { children: React.ReactNode }
             }
             const response = await fetch(loginApiUrl, init);
             if (response.ok) {
-                return true
+                return failure(true) as Either<true, string>
             } else {
-                return response.text()
+                return success(response.text()) as Either<true, string>
             }
         },
         stateValidator: loginValidator

@@ -1,5 +1,6 @@
 import {LoginValidationResponse} from "./LoginValidationResponse";
 import {Context, createContext} from "react";
+import {Either} from "../../../model/Either";
 
 /**
  * The login service context.
@@ -17,7 +18,7 @@ export interface LoginServiceContext {
     login(
         username: string,
         password: string,
-    ): Promise<true | string>
+    ): Promise<Either<true, string>>
 
     /**
      * The state validator method.
@@ -30,7 +31,7 @@ export interface LoginServiceContext {
 
 const defaultLoginServiceContext: LoginServiceContext = {
     login: (username, password) => {
-        return new Promise<true | string>((resolve, reject) => {
+        return new Promise<Either<true, string>>((resolve, reject) => {
             reject(new Error("Not implemented"))
         })
     },
