@@ -6,9 +6,12 @@ import {SignInEditingView} from "./components/SignInEditingView";
 import {SignInSubmittingView} from "./components/SignInSubmittingView";
 import {SignInErrorView} from "./components/SignInErrorView";
 import {SignInState} from "./hooks/states/SignInState";
+import {makeDefaultSignInService, SignInService} from "../../../service/registration/signIn/SignInService";
 
-export function SignInView(): React.JSX.Element {
-    const [signIn, handler] = useSignInForm()
+export function SignInView(
+    service: SignInService = makeDefaultSignInService(),
+): React.JSX.Element {
+    const [signIn, handler] = useSignInForm(service)
     const location = useLocation()
     if (signIn.tag === "redirect") {
         let source = location.state?.source

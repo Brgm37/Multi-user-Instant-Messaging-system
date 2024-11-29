@@ -67,14 +67,12 @@ const invitationCodeHeader = "invitationCode"
  * @returns SignInService
  */
 export function makeDefaultSignInService() : SignInService {
-    const fetchHandler = useFetch(signInApiUrl, "POST")
     return {
         signIn: (username, password, invitationCode, onSuccess, onError) => {
+            const fetchHandler = useFetch(signInApiUrl, "POST", onSuccess, onError)
             fetchHandler.toUpdate(usernameHeader, username)
             fetchHandler.toUpdate(passwordHeader, password)
             fetchHandler.toUpdate(invitationCodeHeader, invitationCode)
-            fetchHandler.onSuccessChange(onSuccess)
-            fetchHandler.onErrorChange(onError)
             fetchHandler.toFetch()
         },
         stateValidator: signInValidator

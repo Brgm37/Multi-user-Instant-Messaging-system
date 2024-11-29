@@ -12,10 +12,9 @@ import {useEffect, useReducer} from "react";
  * @prop error The error from the response.
  */
 type State = {
+    url: string,
     body: { [key: string]: string },
     method: "GET" | "POST" | "PUT" | "DELETE",
-    onSuccess: (res: Response) => void,
-    onError: (error: Error) => void,
     isLoading: boolean,
 }
 
@@ -34,9 +33,6 @@ type State = {
 type Action =
     { type: "done" } |
     { type: "update", key: string, value: string } |
-    { type: "onSuccessChange", newFunc: (res: Response) => void } |
-    { type: "onErrorChange", newFunc: (error: Error) => void} |
-    { type: "reset" } |
     { type: "submit" }
 
 /**
@@ -53,16 +49,12 @@ function reduce(state: State, action: Action): State {
             const body = {...state.body, [action.key]: action.value}
             return {...state, body}
         }
-        case "reset":
-            return {...state, body: {}, isLoading: false}
         case "submit":
             return {...state, isLoading: true}
         case "done":
             return {...state, isLoading: false}
-        case "onSuccessChange":
-            return {...state, onSuccess: action.newFunc}
-        case "onErrorChange":
-            return {...state, onError: action.newFunc}
+        default:
+            throw new Error("Invalid action")
     }
 }
 
@@ -76,19 +68,6 @@ type FetchHandler = {
      * Fetch the data.
      */
     toFetch: () => void
-
-    /**
-     * The success handler.
-     * @param response
-     */
-    onSuccessChange: (newFunc: (res: Response) => void) => void
-
-    /**
-     * The error handler.
-     * @param error
-     */
-    onErrorChange: (newFunc: (error: Error) => void) => void
-
     /**
      * Update the body.
      *
@@ -96,10 +75,6 @@ type FetchHandler = {
      * @param value The value of the body.
      */
     toUpdate: (key: string, value: string) => void
-    /**
-     * Reset the body.
-     */
-    toReset: () => void
 }
 
 /**
@@ -123,10 +98,9 @@ export function useFetch(
         useReducer(
             reduce,
             {
+                url,
                 body,
                 method,
-                onSuccess,
-                onError,
                 isLoading: false,
             }
         )
@@ -159,8 +133,5 @@ export function useFetch(
     }, [url, state.isLoading])
     const toFetch = () => dispatch({type: "submit"})
     const toUpdate = (key: string, value: string) => dispatch({type: "update", key, value})
-    const toReset = () => dispatch({type: "reset"})
-    const onSuccessChange = (newFunc: (response: Response) => void) => dispatch({type: "onSuccessChange", newFunc})
-    const onErrorChange = (newFunc: (error: Error) => void) => dispatch({type: "onErrorChange", newFunc})
-    return {toFetch, toUpdate, toReset, onSuccessChange, onErrorChange}
+    return {toFetch, toUpdate, }
 }
