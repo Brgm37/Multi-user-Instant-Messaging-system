@@ -3,17 +3,16 @@ import {PublicChannel} from "../../model/PublicChannel";
 /**
  * @description Type for the state of the PublicChannels form.
  *
- * @type State
+ * @type FindChannelState
  * @prop searchBar The search bar input.
  * @prop channels The list of public channels.
  */
-export type State =
+export type FindChannelState =
     { tag:
             "navigating" |
-            "searching" |
-            "fetchingMore"|
-            "joining"
+            "searching" | "fetchingMore"
         searchBar: string, channels: PublicChannel[],
     } |
     { tag: "error", error: string, channels: PublicChannel[] } |
-    { tag: "redirect" }
+    { tag: "joining", channels: PublicChannel[], searchBar: string, channelId: number } |
+    { tag: "redirect", channelId: number }
