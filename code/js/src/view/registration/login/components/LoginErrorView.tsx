@@ -1,7 +1,7 @@
 import * as React from "react";
-import {UseLoginFormHandler} from "../../../../service/registration/login/LoginService";
 import {InputLabelContext} from "../../components/InputLabelContext";
 import {InputLabel} from "../../components/InputLabel";
+import {UseLoginFormHandler} from "../hooks/handler/UseLoginFormHandler";
 
 
 export function LoginErrorView(

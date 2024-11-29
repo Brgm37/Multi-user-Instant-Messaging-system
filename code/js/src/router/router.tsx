@@ -1,7 +1,7 @@
 import * as React from "react"
 import {createRoot} from "react-dom/client"
 import {loginValidator} from "../service/registration/validation/LoginValidator";
-import {singInValidator} from "../service/registration/validation/SingInValidator";
+import {signInValidator} from "../service/registration/validation/SignInValidator";
 
 import {
     createBrowserRouter,
@@ -21,11 +21,11 @@ const router = createBrowserRouter(
         },
         {
             "path": "/login",
-            "element": <LoginView validator={loginValidator}/>,
+            "element": <LoginView/>,
         },
         {
             "path": "/signIn",
-            "element": <SignInView validator={singInValidator}/>,
+            "element": <SignInView/>,
         },
         {
             "path": "/home",
