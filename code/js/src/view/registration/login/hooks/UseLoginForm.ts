@@ -1,8 +1,8 @@
-import {useEffect, useReducer} from "react";
 import {LoginState, makeInitialState} from "./states/LoginState";
 import {LoginService, makeDefaultLoginService} from "../../../../service/registration/login/LoginService";
 import {LoginAction} from "./states/LoginAction";
 import {UseLoginFormHandler} from "./handler/UseLoginFormHandler";
+import {useEffect, useReducer} from "react";
 
 /**
  * The timeout for the validation.

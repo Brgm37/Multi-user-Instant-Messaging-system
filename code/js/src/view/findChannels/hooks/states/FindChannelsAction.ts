@@ -1,4 +1,4 @@
-import {PublicChannel} from "../../model/findChannels/PublicChannel";
+import {PublicChannel} from "../../model/PublicChannel";
 
 /**
  * The Action type for the PublicChannels form.

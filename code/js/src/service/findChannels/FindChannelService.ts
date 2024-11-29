@@ -1,4 +1,4 @@
-import {PublicChannel} from "../../view/findChannels/model/findChannels/PublicChannel";
+import {PublicChannel} from "../../view/findChannels/model/PublicChannel";
 import {urlBuilder} from "../utils/UrlBuilder";
 import {useFetch} from "../utils/useFetch";
 

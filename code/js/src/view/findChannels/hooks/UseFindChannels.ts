@@ -2,7 +2,7 @@ import {Action} from "./states/FindChannelsAction";
 import {State} from "./states/FindChannelsState";
 import {useEffect, useReducer} from "react";
 import {useFetch} from "../../../service/utils/useFetch";
-import {channelsToPublicChannels} from "../model/findChannels/PublicChannel";
+import {channelsToPublicChannels} from "../model/PublicChannel";
 import {makeDefaultFindChannelService, FindChannelsService} from "../../../service/findChannels/FindChannelService";
 
 /**
