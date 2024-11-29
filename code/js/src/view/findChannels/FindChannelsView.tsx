@@ -1,38 +1,52 @@
 import * as React from 'react';
-import {reduce, useFindChannels} from "./hooks/UseFindChannels";
+import {reduce, useFindChannels, UseFindChannelsHandler} from "./hooks/UseFindChannels";
 import {FindChannelsService, makeDefaultFindChannelService} from "../../service/findChannels/FindChannelService";
-import {useLocation} from "react-router-dom";
-import {State} from "./hooks/states/FindChannelsState";
+import {Navigate, useLocation} from "react-router-dom";
+import {FindChannelState} from "./hooks/states/FindChannelsState";
 import {SearchBar} from "./components/shared/SearchBar";
+import {FindChannelsFetchingMoreView} from "./components/FindChannelsFetchingMoreView";
+import * as url from "node:url";
+import {urlBuilder} from "../../service/utils/UrlBuilder";
 
 const DEBOUNCE_DELAY = 500;
 
-export function FindChannels(
+export function FindChannelsView(
     service: FindChannelsService = makeDefaultFindChannelService()
 ): React.JSX.Element {
     const location = useLocation();
-    const [state, handler] = useFindChannels()
+    const [state, handler]: [FindChannelState, UseFindChannelsHandler] = useFindChannels();
 
-    const view = ((state: State) => {
+    if(state.tag === "redirect") {
+        const channelId = state.channelId
+        return <Navigate to={urlBuilder("/channels/" + channelId)} replace={true}></Navigate>
+    }
+
+    if (state.tag === "error") {
+        return
+    }
+
+    const view  = ((state: FindChannelState) => {
         switch (state.tag) {
             case "navigating":
-                return <FindChannelsView handler={handler}/>
+                return <FindChannelsFetchingMoreView/>
             case "searching":
-                return <FindChannelsSearchingView handler={handler}/>
+                return <FindChannelsFetchingMoreView/>
             case "fetchingMore":
-                return <FindChannelsFetchingMoreView handler={handler}/>
+                return <FindChannelsFetchingMoreView/>
             case "error":
-                return <FindChannelsErrorView handler={handler}/>
+                return <FindChannelsFetchingMoreView/>
             case "joining":
-                return <FindChannelsJoiningView handler={handler}/>
+                return <FindChannelsFetchingMoreView/>
+            default:
+                return <FindChannelsFetchingMoreView/>
         }
     })
 
     return (
         <div>
             <h1>Find Channels</h1>
-            <SearchBar value={} onChange={}
-            {view(state)}
+            <SearchBar value={state.searchBar} onChange={handler.onSearchChange}/>
+            { view(state) }
         </div>
     )
 
