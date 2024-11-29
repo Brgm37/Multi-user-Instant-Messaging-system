@@ -12,6 +12,8 @@ import {
 } from "react-router-dom"
 import {LoginView} from "../view/registration/login/LoginView";
 import {SignInView} from "../view/registration/signIn/SignInView";
+import {FindChannelsView} from "../view/findChannels/FindChannelsView";
+import {makeDefaultFindChannelService} from "../service/findChannels/FindChannelService";
 
 const router = createBrowserRouter(
     [
@@ -30,6 +32,11 @@ const router = createBrowserRouter(
         {
             "path": "/home",
             "element": <h1>Home</h1>,
+        },
+        {
+            "path": "/findChannels",
+            "element":
+                <FindChannelsView/>
         }
     ]
 )
