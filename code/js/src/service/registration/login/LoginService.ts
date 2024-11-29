@@ -48,13 +48,11 @@ const passwordHeader = "password"
  * @returns LoginService
  */
 export function makeDefaultLoginService() : LoginService {
-    const fetchHandler = useFetch(loginApiUrl, "POST")
     return {
         login: (username, password, onSuccess, onError) => {
+            const fetchHandler = useFetch(loginApiUrl, "POST", onSuccess, onError)
             fetchHandler.toUpdate(usernameHeader, username)
             fetchHandler.toUpdate(passwordHeader, password)
-            fetchHandler.onSuccessChange(onSuccess)
-            fetchHandler.onErrorChange(onError)
             fetchHandler.toFetch()
         },
         stateValidator: loginValidator
