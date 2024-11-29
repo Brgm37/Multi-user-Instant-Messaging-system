@@ -120,7 +120,7 @@ class MessageJDBC(
                 msgChannelName, msgAuthorUsername
             FROM v_message
             WHERE msgChannelId = ?
-            ORDER BY msgTimestamp DESC
+            ORDER BY msgTimestamp
             LIMIT ? OFFSET ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
@@ -130,6 +130,30 @@ class MessageJDBC(
         stm.setInt(idx, offset.toInt())
         val rs = stm.executeQuery()
         return rs.toMessageList()
+    }
+
+    override fun emitAllMessages(
+        uId: UInt,
+        lastEventId: UInt,
+        emitter: (Message) -> Unit,
+    ) {
+        val selectQuery =
+            """
+            SELECT
+                msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
+                msgChannelName, msgAuthorUsername
+            FROM channel_members JOIN v_message ON channel = msgChannelId 
+            WHERE member = ? AND msgId > ?
+            ORDER BY msgTimestamp
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, uId.toInt())
+        stm.setInt(idx, lastEventId.toInt())
+        val rs = stm.executeQuery()
+        while (rs.next()) {
+            emitter(rs.toMessage())
+        }
     }
 
     override fun findById(id: UInt): Message? {
@@ -161,8 +185,13 @@ class MessageJDBC(
                 msgId, msgChannelId, msgContent, msgauthorid, msgTimestamp,
                 msgChannelName, msgAuthorUsername
             FROM v_message
+            ORDER BY msgTimestamp
+            LIMIT ? OFFSET ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, limit.toInt())
+        stm.setInt(idx, offset.toInt())
         val rs = stm.executeQuery()
         val messages = mutableListOf<Message>()
         while (rs.next()) {

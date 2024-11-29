@@ -19,12 +19,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import model.messages.Message
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
@@ -38,7 +36,6 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import utils.Failure
 import utils.Success
-import java.util.concurrent.TimeUnit
 
 /**
  * The default limit for the message list.
@@ -61,12 +58,12 @@ class MessageController(
     private val messageService: MessageServicesInterface,
     private val sseServices: SseServiceInterface,
 ) {
-    // TODO("Change globalMessages to a database")
-    private val globalMessages: MutableSharedFlow<Message> = MutableSharedFlow(replay = 1000)
+    @Value("\${sse.connection.timeout}")
+    private val timeout: Long = 0
     private val listeners = mutableMapOf<AuthenticatedUserInputModel, MutableSharedFlow<Message>>()
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope(Dispatchers.IO)
 
-    private suspend fun sendEventToAll(message: Message) {
+    private suspend fun sendEventToAll(message: Message) =
         listeners
             .forEach { (user, flow) ->
                 when (val isUserInChannel = sseServices.isUserInChannel(message.channel.cId, user.uId)) {
@@ -81,29 +78,15 @@ class MessageController(
                     }
                 }
             }
-    }
 
-    private fun listenersInit(
-        user: AuthenticatedUserInputModel,
+    fun lastEventIdUpdate(
+        authenticated: AuthenticatedUserInputModel,
         flow: MutableSharedFlow<Message>,
-        lastEventId: UInt,
-    ) {
-        scope
-            .launch {
-                var count = globalMessages.replayCache.size
-                globalMessages
-                    .filter {
-                        when (val result = sseServices.isUserInChannel(it.channel.cId, user.uId)) {
-                            is Success -> result.value
-                            is Failure -> false
-                        }
-                    }.filter {
-                        val msgId = checkNotNull(it.msgId) { "Message id is null" }
-                        msgId > lastEventId
-                    }.takeWhile { count-- > 0 }
-                    .collect(flow::emit)
-            }
-    }
+        lastId: UInt,
+    ) = sseServices
+        .emitAllMessages(authenticated.uId, lastId) { message ->
+            scope.launch { flow.emit(message) }
+        }
 
     @PostMapping
     @MessageSwaggerConfig.CreateMessage
@@ -121,7 +104,6 @@ class MessageController(
         return when (response) {
             is Success -> {
                 scope.launch {
-                    globalMessages.emit(response.value)
                     sendEventToAll(response.value)
                 }
                 ResponseEntity.ok(MessageOutputModel.fromDomain(response.value))
@@ -143,39 +125,24 @@ class MessageController(
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
         request: HttpServletRequest,
     ): SseEmitter {
-        val emitter = SseEmitter(TimeUnit.HOURS.toMillis(1))
-        val lastId = request.getHeader("Last-Event-ID")?.toUIntOrNull()
+        val emitter = SseEmitter(timeout)
+        val lastId = request.getHeader(MESSAGE_SSE_LAST_EVENT_ID)?.toUIntOrNull()
         val flow = MutableSharedFlow<Message>()
         listeners[authenticated] = flow
-        if (lastId != null) listenersInit(authenticated, flow, lastId)
         val scope =
             scope
                 .launch {
-                    if (lastId != null) {
-                        flow
-                            .filterNotNull()
-                            .filter { it.msgId?.let { msgId -> msgId > lastId } ?: true }
-                            .onEach {
-                                emitter.send(
-                                    SseEmitter
-                                        .event()
-                                        .id(it.msgId.toString())
-                                        .data(MessageOutputModel.fromDomain(it)),
-                                )
-                            }.collect()
-                    } else {
-                        flow
-                            .filterNotNull()
-                            .onEach {
-                                emitter.send(
-                                    SseEmitter
-                                        .event()
-                                        .id(it.msgId.toString())
-                                        .data(MessageOutputModel.fromDomain(it)),
-                                )
-                            }.collect()
-                    }
+                    flow
+                        .onEach {
+                            emitter.send(
+                                SseEmitter
+                                    .event()
+                                    .id(it.msgId.toString())
+                                    .data(MessageOutputModel.fromDomain(it)),
+                            )
+                        }.collect()
                 }
+        if (lastId != null) lastEventIdUpdate(authenticated, flow, lastId)
         emitter.onCompletion {
             listeners.remove(authenticated)
             scope.cancel()
@@ -230,5 +197,6 @@ class MessageController(
         const val MESSAGE_ID_URL = "/{msgId}"
         const val CHANNEL_MESSAGES_URL = "/channel/{channelId}"
         const val MESSAGE_SSE_URL = "/sse"
+        private const val MESSAGE_SSE_LAST_EVENT_ID = "Last-Event-ID"
     }
 }

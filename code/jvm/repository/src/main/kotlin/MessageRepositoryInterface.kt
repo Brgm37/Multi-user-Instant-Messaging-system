@@ -24,4 +24,16 @@ interface MessageRepositoryInterface : Repository<Message> {
         limit: UInt,
         offset: UInt,
     ): List<Message>
+
+    /**
+     * Emits all messages to the user
+     * @param uId The user ID
+     * @param lastEventId The last event ID
+     * @param emitter The emitter function
+     */
+    fun emitAllMessages(
+        uId: UInt,
+        lastEventId: UInt,
+        emitter: (Message) -> Unit,
+    )
 }

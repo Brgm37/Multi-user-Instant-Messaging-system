@@ -10,8 +10,8 @@ import {
     RouterProvider,
     useParams,
 } from "react-router-dom"
-import {LoginView} from "../view/registration/LoginView";
-import {SingInView} from "../view/registration/SingInView";
+import {LoginView} from "../view/registration/login/LoginView";
+import {SignInView} from "../view/registration/signIn/SignInView";
 
 const router = createBrowserRouter(
     [
@@ -25,7 +25,11 @@ const router = createBrowserRouter(
         },
         {
             "path": "/signIn",
-            "element": <SingInView validator={singInValidator}/>,
+            "element": <SignInView validator={singInValidator}/>,
+        },
+        {
+            "path": "/home",
+            "element": <h1>Home</h1>,
         }
     ]
 )

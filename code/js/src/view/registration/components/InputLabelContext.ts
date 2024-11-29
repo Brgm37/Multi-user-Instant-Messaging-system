@@ -9,20 +9,31 @@ import {Context} from "react";
  * @prop error The error message for the input field.
  */
 interface InputLabelContext {
-    value: string
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
-    error: string
+    input: {
+        username: string,
+        password: string,
+        confirmPassword?: string,
+        invitationCode?: string,
+        isValid: boolean
+    },
+    visibility: {
+        password: boolean,
+        confirmPassword?: boolean
+    },
+    error?: {
+        usernameError: string,
+        passwordError: string,
+        confirmPasswordError?: string,
+        invitationCodeError?: string
+    }
 }
 
 /**
  * The default context for the InputLabel component.
  */
 const defaultInputLabelContext: InputLabelContext = {
-    value: '',
-    onChange: () => {
-        throw Error('onChange not implemented')
-    },
-    error: undefined
+    input: {username: '', password: '', isValid: false},
+    visibility: {password: false},
 }
 
 /**
