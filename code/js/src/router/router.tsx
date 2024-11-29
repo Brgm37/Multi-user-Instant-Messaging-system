@@ -1,7 +1,5 @@
 import * as React from "react"
 import {createRoot} from "react-dom/client"
-import {loginValidator} from "../service/registration/validation/LoginValidator";
-import {signInValidator} from "../service/registration/validation/SignInValidator";
 
 import {
     createBrowserRouter,
@@ -12,6 +10,8 @@ import {
 } from "react-router-dom"
 import {LoginView} from "../view/registration/login/LoginView";
 import {SignInView} from "../view/registration/signIn/SignInView";
+import {LoginServiceProvider} from "../service/registration/login/LoginServiceProvider";
+import {SignInServiceProvider} from "../service/registration/signIn/SignInServiceProvider";
 
 const router = createBrowserRouter(
     [
@@ -21,11 +21,17 @@ const router = createBrowserRouter(
         },
         {
             "path": "/login",
-            "element": <LoginView/>,
+            "element":
+                <LoginServiceProvider>
+                    <LoginView/>
+                </LoginServiceProvider>,
         },
         {
             "path": "/signIn",
-            "element": <SignInView/>,
+            "element":
+                <SignInServiceProvider>
+                    <SignInView/>
+                </SignInServiceProvider>,
         },
         {
             "path": "/home",

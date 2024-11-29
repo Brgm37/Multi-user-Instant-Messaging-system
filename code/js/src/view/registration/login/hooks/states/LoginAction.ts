@@ -10,6 +10,6 @@ export type LoginAction =
     { type: "edit", inputName: "username" | "password", inputValue: string } |
     { type: "toggleVisibility" } |
     { type: "submit" } |
-    { type: "success", response: Response } |
+    { type: "success" } |
     { type: "error", message: string } |
     { type: "validation-result", response: LoginValidationResponse }

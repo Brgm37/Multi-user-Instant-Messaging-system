@@ -6,13 +6,10 @@ import {Link, Navigate, useLocation} from "react-router-dom";
 import {LoginSubmittingView} from "./components/LoginSubmittingView";
 import {LoginErrorView} from "./components/LoginErrorView";
 import {LoginState} from "./hooks/states/LoginState";
-import {LoginService, makeDefaultLoginService} from "../../../service/registration/login/LoginService";
 
-export function LoginView(
-    service: LoginService = makeDefaultLoginService(),
-): React.JSX.Element {
+export function LoginView(): React.JSX.Element {
     const location = useLocation()
-    const [loginState, handler] = useLoginForm(service)
+    const [loginState, handler] = useLoginForm()
     if (loginState.tag === "redirect") {
         let source = location.state?.source
         if (!source) source = "/home"
@@ -46,8 +43,8 @@ export function LoginView(
                 {view(loginState)}
                 <Link to={
                     {
-                        pathname:"/signIn",
-                        search:`?username=${loginState.input.username}&password=${loginState.input.password}`
+                        pathname: "/signIn",
+                        search: `?username=${loginState.input.username}&password=${loginState.input.password}`
                     }
                 }>Register</Link>
             </div>
