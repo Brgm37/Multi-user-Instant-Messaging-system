@@ -115,14 +115,17 @@ export function useFindChannels(
 ): [FindChannelState, UseFindChannelsHandler] {
     const [state, dispatch] = useReducer(reduce, initialState)
     useEffect(() => {
-            if (state.tag != "navigating") return
-            const timeout = setTimeout(() => {
-                dispatch({type: "search"})
-                onFetch()
-            }, DEBOUNCE_DELAY)
-            return () => clearTimeout(timeout)
-        }, [state]
-    )
+        if (state.tag !== "searching") return;
+        const timeout = setTimeout(() => {
+            getChannelsByPartialName(
+                state.searchBar,
+                response => response.json().then((channels) =>
+                    dispatch({ type: "success", channels: channelsToPublicChannels(channels) })),
+                error => dispatch({ type: "error", error: error.message })
+            );
+        }, DEBOUNCE_DELAY);
+        return () => clearTimeout(timeout);
+    }, [state]);
 
     const onSearchChange = () => {
         if (state.tag != "navigating") return
