@@ -14,15 +14,16 @@ type SearchBarProps = {
  * @param onChange The function to call when the search bar changes.
  * @returns JSX.Element
  */
-export function SearchBar(
-    {value, onChange}: SearchBarProps
-): React.JSX.Element {
+export function SearchBar({value, onChange}: SearchBarProps): React.JSX.Element {
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        onChange(event.target.value);
+    }
     return (
         <div>
             <input
                 type="text"
                 value={value}
-                onChange={(event) => onChange(event.target.value)}
+                onChange={handleChange}
                 placeholder="Search for channels"
             />
         </div>
