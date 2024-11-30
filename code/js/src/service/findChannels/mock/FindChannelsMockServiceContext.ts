@@ -1,5 +1,5 @@
-import {Either} from "../../model/Either";
-import {Channel} from "../../view/findChannels/model/PublicChannel";
+import {Either} from "../../../model/Either";
+import {Channel} from "../../../view/findChannels/model/PublicChannel";
 import {createContext} from "react";
 
 export interface FindChannelsMockServiceContext {
