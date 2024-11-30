@@ -67,9 +67,8 @@ export function FindChannelsServiceProvider({ children }: { children: React.Reac
         }
     }
     return (
-        <div>
-            <h1>Find Channels</h1>
-        {children}
-        </div>
+        <FindChannelsServiceContext.Provider value={service}>
+            {children}
+        </FindChannelsServiceContext.Provider>
     )
 }
