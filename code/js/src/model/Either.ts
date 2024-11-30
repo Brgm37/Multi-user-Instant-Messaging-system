@@ -23,3 +23,21 @@ export function success<L, R>(value: L): Either<L, R> {
 export function failure<L, R>(value: R): Either<L, R> {
     return { tag: "failure", value }
 }
+
+/**
+ * Check if the Either is a success
+ *
+ * @param either
+ */
+export function isSuccess<L, R>(either: Either<L, R>): either is { tag: "success", value: L } {
+    return either.tag === "success"
+}
+
+/**
+ * Check if the Either is a failure
+ *
+ * @param either
+ */
+export function isFailure<L, R>(either: Either<L, R>): either is { tag: "failure", value: R } {
+    return either.tag === "failure"
+}
