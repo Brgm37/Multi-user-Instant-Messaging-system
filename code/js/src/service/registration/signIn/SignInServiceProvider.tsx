@@ -42,9 +42,9 @@ export function SignInServiceProvider({ children }: { children: React.ReactNode 
             }
             const response = await fetch(signInApiUrl, init);
             if (response.ok) {
-                return failure(true) as Either<true, string>
+                return success(true) as Either<true, string>
             } else {
-                return success(response.text()) as Either<true, string>
+                return failure(response.text()) as Either<true, string>
             }
         },
 
