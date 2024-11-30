@@ -14,6 +14,7 @@ import {LoginView} from "../view/registration/login/LoginView";
 import {SignInView} from "../view/registration/signIn/SignInView";
 import {FindChannelsView} from "../view/findChannels/FindChannelsView";
 import {makeDefaultFindChannelService} from "../service/findChannels/FindChannelService";
+import {makeDefaultFindChannelsMockService} from "../service/findChannels/FindChannelsMockService";
 
 const router = createBrowserRouter(
     [
@@ -23,11 +24,11 @@ const router = createBrowserRouter(
         },
         {
             "path": "/login",
-            "element": <LoginView/>,
+            "element": <LoginView service={undefined}/>,
         },
         {
             "path": "/signIn",
-            "element": <SignInView/>,
+            "element": <SignInView service={undefined}/>,
         },
         {
             "path": "/home",
@@ -36,7 +37,7 @@ const router = createBrowserRouter(
         {
             "path": "/findChannels",
             "element":
-                <FindChannelsView/>
+                <FindChannelsView service={makeDefaultFindChannelsMockService()}/>
         }
     ]
 )
