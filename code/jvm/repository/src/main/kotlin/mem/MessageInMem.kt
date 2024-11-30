@@ -2,6 +2,7 @@ package mem
 
 import MessageRepositoryInterface
 import model.messages.Message
+import java.sql.Timestamp
 
 /**
  * In-memory implementation of the message repository
@@ -38,6 +39,14 @@ class MessageInMem : MessageRepositoryInterface {
         lastEventId: UInt,
         emitter: (Message) -> Unit,
     ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun findMessagesByTimeStamp(
+        channelId: UInt,
+        timestamp: Timestamp,
+        limit: UInt,
+    ): List<Message> {
         TODO("Not yet implemented")
     }
 

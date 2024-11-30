@@ -12,6 +12,7 @@ import model.users.UserInfo
 import utils.Either
 import utils.failure
 import utils.success
+import java.sql.Timestamp
 
 @Named("MessageServices")
 class MessageServices(
@@ -93,6 +94,19 @@ class MessageServices(
             val chId = checkNotNull(channel.cId) { "Channel id is null" }
             if (!channelRepo.isUserInChannel(chId, uId)) return@run failure(MessageError.UserNotInChannel)
             val messages = messageRepo.findMessagesByChannelId(chId, limit, offset)
+            success(messages)
+        }
+    }
+
+    override fun messagesByTimeStamp(
+        channelId: UInt,
+        timestamp: Timestamp,
+        limit: UInt,
+    ): Either<MessageError, List<Message>> {
+        return repoManager.run {
+            val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
+            val chId = checkNotNull(channel.cId) { "Channel id is null" }
+            val messages = messageRepo.findMessagesByTimeStamp(chId, timestamp, limit)
             success(messages)
         }
     }
