@@ -12,6 +12,9 @@ import {LoginView} from "../view/registration/login/LoginView";
 import {SignInView} from "../view/registration/signIn/SignInView";
 import {LoginServiceProvider} from "../service/registration/login/LoginServiceProvider";
 import {SignInServiceProvider} from "../service/registration/signIn/SignInServiceProvider";
+import ChannelView from "../view/channel/ChannelView";
+import {ChannelServiceProvider} from "../service/channel/ChannelServiceProvider";
+import {AuthValidator} from "../view/session/authValidator";
 
 const router = createBrowserRouter(
     [
@@ -35,7 +38,19 @@ const router = createBrowserRouter(
         },
         {
             "path": "/home",
-            "element": <h1>Home</h1>,
+            "element":
+                <AuthValidator>
+                    <h1>Home</h1>
+                </AuthValidator>,
+            children: [
+                {
+                    "path": "channel/:id",
+                    "element":
+                        <ChannelServiceProvider>
+                            <ChannelView/>
+                        </ChannelServiceProvider>
+                }
+            ]
         }
     ]
 )

@@ -1,27 +1,26 @@
 import * as React from "react"
-import {useNavigate} from "react-router-dom"
-import {useCookies} from "react-cookie"
-
-function isNotValid(token: string): boolean {
-    // TODO: Implement isNotValid function
-    return token === "undefined" || token === "null" || token === ""
-}
+import configJson from "../../../envConfig.json"
+import {Navigate, useLocation} from "react-router-dom";
 
 /**
- * 
+ * The authentication token.
  */
-const TOKEN = "token"
+const TOKEN = configJson.session
+
+function getCookies(): {[key: string]: string}[] {
+    return document.cookie.split(";").map((cookie) => {
+        const [key, value] = cookie.split("=")
+        return {[key]: value}
+    })
+}
 
 export function AuthValidator({children}: {children: React.ReactNode}): React.ReactElement {
-    const navigate = useNavigate()
-    const [cookies] = useCookies([TOKEN])
-    const token = cookies.token
-
-    React.useEffect(() => {
-        if (!token || isNotValid(token)) {
-            navigate("/login")
-        }
-    },[token, navigate])
-
-    return <>{children}</>
+    const cookies = getCookies()
+    const location = useLocation()
+    if (cookies.some((cookie) => cookie[TOKEN])) {
+        return <>{children}</>
+    }
+    else {
+        return <Navigate to={"/login"} state={{source: location.pathname}}></Navigate>
+    }
 }
