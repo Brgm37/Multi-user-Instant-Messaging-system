@@ -53,22 +53,31 @@ const getPublicChannelsApiUrl = urlBuilder("/channels")
 export function makeDefaultFindChannelService() : FindChannelsService {
     return {
         getChannelsByPartialName: (partialName, onSuccess, onError) => {
-            const fetchHandler = useFetch(getChannelsByPartialNameApiUrl + '/' + partialName, "GET")
-            fetchHandler.onSuccessChange(onSuccess)
-            fetchHandler.onErrorChange(onError)
+            const fetchHandler =
+                useFetch(
+                    getChannelsByPartialNameApiUrl + '/' + partialName, "GET",
+                    onSuccess,
+                    onError,
+                )
             fetchHandler.toFetch()
         },
         joinChannel: (channelId, onSuccess, onError) => {
-            const fetchHandler = useFetch(joinChannelApiUrl + '/' + channelId, "PUT")
-            fetchHandler.onSuccessChange(onSuccess)
-            fetchHandler.onErrorChange(onError)
+            const fetchHandler =
+                useFetch(
+                    joinChannelApiUrl + '/' + channelId, "PUT",
+                    onSuccess,
+                    onError,
+                )
             fetchHandler.toFetch()
         },
 
         getPublicChannels: (offset, limit, onSuccess, onError) => {
-            const fetchHandler = useFetch(getPublicChannelsApiUrl + '?offset=' + offset + '&limit=' + limit, "GET")
-            fetchHandler.onSuccessChange(onSuccess)
-            fetchHandler.onErrorChange(onError)
+            const fetchHandler =
+                useFetch(
+                    getPublicChannelsApiUrl + '?offset=' + offset + '&limit=' + limit, "GET",
+                    onSuccess,
+                    onError,
+                )
             fetchHandler.toFetch()
         }
     }
