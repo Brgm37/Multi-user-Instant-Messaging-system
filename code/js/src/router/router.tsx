@@ -13,8 +13,7 @@ import {SignInView} from "../view/registration/signIn/SignInView";
 import {LoginServiceProvider} from "../service/registration/login/LoginServiceProvider";
 import {SignInServiceProvider} from "../service/registration/signIn/SignInServiceProvider";
 import {FindChannelsView} from "../view/findChannels/FindChannelsView";
-import {makeDefaultFindChannelService} from "../service/findChannels/FindChannelService";
-import {makeDefaultFindChannelsMockService} from "../service/findChannels/FindChannelsMockService";
+import {FindChannelsMockServiceProvider} from "../service/findChannels/mock/FindChannelsMockServiceProvider";
 
 const router = createBrowserRouter(
     [
@@ -43,7 +42,9 @@ const router = createBrowserRouter(
         {
             "path": "/findChannels",
             "element":
-                <FindChannelsView/>
+                <FindChannelsMockServiceProvider>
+                    <FindChannelsView/>
+                </FindChannelsMockServiceProvider>,
         }
     ]
 )
