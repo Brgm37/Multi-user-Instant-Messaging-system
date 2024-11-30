@@ -18,7 +18,7 @@ export type PublicChannel = {
  * @prop id The id of the channel.
  * @prop owner The owner of the channel.
  */
-type Channel = {
+export type Channel = {
     name: ChannelName,
     id: number,
     owner: Owner,
