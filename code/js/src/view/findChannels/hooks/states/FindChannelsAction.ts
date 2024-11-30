@@ -10,10 +10,11 @@ import {PublicChannel} from "../../model/PublicChannel";
  * @prop searchBar The search bar input.
  */
 export type Action =
-    { type: "search" } |
+    { type: "search", searchBar: string} |
     { type: "error", error: string} |
     { type: "success", channels: PublicChannel[] } |
     { type: "fetchMore" } |
     { type: "closeError" } |
     { type: "join", channelId: number } |
-    { type: "joined" }
+    { type: "joined" } |
+    { type: "edit", inputName: "searchBar", inputValue: string }
