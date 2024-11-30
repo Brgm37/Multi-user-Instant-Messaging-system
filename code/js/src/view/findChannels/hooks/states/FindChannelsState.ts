@@ -8,11 +8,10 @@ import {PublicChannel} from "../../model/PublicChannel";
  * @prop channels The list of public channels.
  */
 export type FindChannelState =
-    { tag:
-            "navigating" |
-            "searching" | "fetchingMore"
-        searchBar: string, channels: PublicChannel[],
-    } |
-    { tag: "error", error: string, channels: PublicChannel[] } |
-    { tag: "joining", channels: PublicChannel[], searchBar: string, channelId: number } |
-    { tag: "redirect", channelId: number }
+    | { tag: "navigating"; searchBar: string; channels: PublicChannel[] }
+    | { tag: "searching"; searchBar: string; channels: PublicChannel[] }
+    | { tag: "fetchingMore"; searchBar: string; channels: PublicChannel[] }
+    | { tag: "error"; error: string; channels: PublicChannel[], searchBar: string }
+    | { tag: "joining"; searchBar: string; channels: PublicChannel[]; channelId: number }
+    | { tag: "redirect"; channelId: number, searchBar: string }
+    | { tag: "editing"; searchBar: string; channels: PublicChannel[] };
