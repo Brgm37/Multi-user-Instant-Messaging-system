@@ -9,7 +9,7 @@ import {SignInState} from "./hooks/states/SignInState";
 import {makeDefaultSignInService, SignInService} from "../../../service/registration/signIn/SignInService";
 
 export function SignInView(
-    service: SignInService = makeDefaultSignInService(),
+    {service}: {service: SignInService} = {service: makeDefaultSignInService()},
 ): React.JSX.Element {
     const [signIn, handler] = useSignInForm(service)
     const location = useLocation()

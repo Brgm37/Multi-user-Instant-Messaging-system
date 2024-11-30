@@ -9,7 +9,7 @@ import {LoginState} from "./hooks/states/LoginState";
 import {LoginService, makeDefaultLoginService} from "../../../service/registration/login/LoginService";
 
 export function LoginView(
-    service: LoginService = makeDefaultLoginService(),
+    {service}: {service: LoginService} = {service: makeDefaultLoginService()}
 ): React.JSX.Element {
     const location = useLocation()
     const [loginState, handler] = useLoginForm(service)

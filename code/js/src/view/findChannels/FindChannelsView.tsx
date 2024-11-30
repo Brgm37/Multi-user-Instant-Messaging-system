@@ -7,14 +7,17 @@ import {SearchBar} from "./components/shared/SearchBar";
 import {FindChannelsFetchingMoreView} from "./components/FindChannelsFetchingMoreView";
 import * as url from "node:url";
 import {urlBuilder} from "../../service/utils/UrlBuilder";
+import {FindChannelsErrorView} from "./components/FindChannelsErrorView";
+import {FindChannelsNavigatingView} from "./components/FindChannelsNavigatingView";
+import {FindChannelsLoadingView} from "./components/FindChannelsLoadingView";
 
 const DEBOUNCE_DELAY = 500;
 
 export function FindChannelsView(
-    service: FindChannelsService = makeDefaultFindChannelService()
+    {service}: {service: FindChannelsService} = {service: makeDefaultFindChannelService()}
 ): React.JSX.Element {
     const location = useLocation();
-    const [state, handler]: [FindChannelState, UseFindChannelsHandler] = useFindChannels();
+    const [state, handler]: [FindChannelState, UseFindChannelsHandler] = useFindChannels(service);
 
     if(state.tag === "redirect") {
         const channelId = state.channelId
@@ -28,17 +31,17 @@ export function FindChannelsView(
     const view  = ((state: FindChannelState) => {
         switch (state.tag) {
             case "navigating":
-                return <FindChannelsFetchingMoreView/>
+                return <FindChannelsNavigatingView/>
             case "searching":
-                return <FindChannelsFetchingMoreView/>
+                return <FindChannelsLoadingView/>
             case "fetchingMore":
                 return <FindChannelsFetchingMoreView/>
             case "error":
-                return <FindChannelsFetchingMoreView/>
+                return <FindChannelsErrorView error={state.error}/>
             case "joining":
-                return <FindChannelsFetchingMoreView/>
+                return <FindChannelsLoadingView/>
             default:
-                return <FindChannelsFetchingMoreView/>
+                return <FindChannelsNavigatingView/>
         }
     })
 
