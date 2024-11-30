@@ -10,12 +10,8 @@ import {FindChannelsNavigatingView} from "./components/FindChannelsNavigatingVie
 import {FindChannelsLoadingView} from "./components/FindChannelsLoadingView";
 import {UseFindChannelsHandler} from "./hooks/handler/UseFindChannelsHandler";
 
-const DEBOUNCE_DELAY = 500;
-
 export function FindChannelsView(): React.JSX.Element {
     const [state, handler]: [FindChannelState, UseFindChannelsHandler] = useFindChannels();
-
-    console.log(state.tag)
 
     if(state.tag === "redirect") {
         const channelId = state.channelId
