@@ -1,10 +1,10 @@
 import * as React from "react"
 import {SignInState, makeInitialState} from "./states/SignInState";
-import {useReducer} from "react";
-import {makeDefaultSignInService, SignInService} from "../../../../service/registration/signIn/SignInService";
+import {useContext, useReducer} from "react";
 import {SignInValidationResponse} from "../../../../service/registration/signIn/SignInValidationResponse";
 import {SignInAction} from "./states/SignInAction";
 import {SingInFormHandler} from "./handler/UseSignInFormHandler";
+import {SignInServiceContext} from "../../../../service/registration/signIn/SignInServiceContext";
 
 /**
  * The timeout for the validation service.
@@ -24,7 +24,7 @@ const TIMEOUT = 500
  */
 function isValidForm(
     state: SignInState,
-    action: {type: "validation-result", response: SignInValidationResponse}
+    action: { type: "validation-result", response: SignInValidationResponse }
 ): boolean {
     if (state.tag !== "editing") return false
     return action.response.isUsernameValid === true &&
@@ -137,14 +137,19 @@ function reduce(state: SignInState, action: SignInAction): SignInState {
 /**
  * The hook for the SignIn form.
  *
- * @param service The service for the SignIn form.
- *
  * @returns [State, SingInFormHandler]
  */
-export function useSignInForm(
-    {signIn, stateValidator}: SignInService = makeDefaultSignInService(),
-): [SignInState, SingInFormHandler] {
+export function useSignInForm(): [SignInState, SingInFormHandler] {
+    const {signIn, stateValidator} = useContext(SignInServiceContext)
     const [state, dispatch] = useReducer(reduce, makeInitialState())
+    React.useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (state.tag !== "editing") return
+            stateValidator(state.input.username, state.input.password.password, state.input.password.confirmPassword)
+                .then(response => dispatch({type: "validation-result", response}))
+        }, TIMEOUT)
+        return () => clearTimeout(timeout)
+    }, [state, stateValidator])
     const handler: SingInFormHandler = {
         onUsernameChange: (username: string) => {
             dispatch({type: "edit", inputName: "username", inputValue: username})
@@ -164,23 +169,16 @@ export function useSignInForm(
             dispatch({type: "toggleVisibility", inputName: "confirmPassword"}),
         onSubmit: () => {
             if (state.tag !== "editing") return
-            dispatch({type: "submit"})
             signIn(
                 state.input.username,
                 state.input.password.password,
                 state.input.invitationCode,
-                response => response.json().then(() => dispatch({type: "success", response})),
-                error => dispatch({type: "error", message: error.message})
-            )
+            ).then(response => {
+                if (response.tag === "success") dispatch({type: "success"})
+                else dispatch({type: "error", message: response.value})
+            })
+            dispatch({type: "submit"})
         }
     }
-    React.useEffect(() => {
-        const timeout = setTimeout(() => {
-            if (state.tag !== "editing") return
-            stateValidator(state.input.username, state.input.password.password, state.input.password.confirmPassword)
-                .then(response => dispatch({type: "validation-result", response}))
-        }, TIMEOUT)
-        return () => clearTimeout(timeout)
-    }, [state, stateValidator])
     return [state, handler]
 }

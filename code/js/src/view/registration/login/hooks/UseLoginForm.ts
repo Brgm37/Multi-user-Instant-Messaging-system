@@ -1,8 +1,8 @@
+import {useContext, useEffect, useReducer} from "react";
 import {LoginState, makeInitialState} from "./states/LoginState";
-import {LoginService, makeDefaultLoginService} from "../../../../service/registration/login/LoginService";
+import {LoginServiceContext} from "../../../../service/registration/login/LoginServiceContext";
 import {LoginAction} from "./states/LoginAction";
 import {UseLoginFormHandler} from "./handler/UseLoginFormHandler";
-import {useEffect, useReducer} from "react";
 
 /**
  * The timeout for the validation.
@@ -72,13 +72,10 @@ function reduce(state: LoginState, action: LoginAction): LoginState {
 /**
  * The hook for the login form.
  *
- * @param service The login service.
- *
  * @returns [State, UseLoginFormHandler]
  */
-export function useLoginForm(
-    {login, stateValidator}: LoginService = makeDefaultLoginService(),
-): [LoginState, UseLoginFormHandler] {
+export function useLoginForm(): [LoginState, UseLoginFormHandler] {
+    const {login, stateValidator} = useContext(LoginServiceContext)
     const [state, dispatch] = useReducer(reduce, makeInitialState())
     useEffect(
         () => {
@@ -100,9 +97,10 @@ export function useLoginForm(
         login(
             state.input.username,
             state.input.password,
-            response => response.json().then(() => dispatch({type: "success", response})),
-            error => dispatch({type: "error", message: error.message})
-            )
+        ).then(response => {
+            if (response.tag === "success") dispatch({type: "success"})
+            else dispatch({type: "error", message: response.value})
+        })
         dispatch({type: "submit"})
     }
     return [state, {onUsernameChange, onPasswordChange, togglePasswordVisibility, onSubmit}]

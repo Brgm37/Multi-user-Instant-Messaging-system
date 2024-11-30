@@ -11,6 +11,6 @@ export type SignInAction =
     { type: "edit", inputName: "username" | "password" | "confirmPassword" | "invitationCode", inputValue: string } |
     { type: "toggleVisibility", inputName: "password" | "confirmPassword" } |
     { type: "submit" } |
-    { type: "success", response: Response } |
+    { type: "success" } |
     { type: "error", message: string } |
     { type: "validation-result", response: SignInValidationResponse }

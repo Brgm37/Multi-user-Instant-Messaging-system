@@ -1,17 +1,14 @@
 import * as React from 'react'
-import {useSignInForm} from "./hooks/UseSingInForm";
 import {Link, Navigate, useLocation} from "react-router-dom";
 import {InputLabelContext} from '../components/InputLabelContext';
 import {SignInEditingView} from "./components/SignInEditingView";
 import {SignInSubmittingView} from "./components/SignInSubmittingView";
 import {SignInErrorView} from "./components/SignInErrorView";
 import {SignInState} from "./hooks/states/SignInState";
-import {makeDefaultSignInService, SignInService} from "../../../service/registration/signIn/SignInService";
+import {useSignInForm} from "./hooks/UseSingInForm";
 
-export function SignInView(
-    {service}: {service: SignInService} = {service: makeDefaultSignInService()},
-): React.JSX.Element {
-    const [signIn, handler] = useSignInForm(service)
+export function SignInView(): React.JSX.Element {
+    const [signIn, handler] = useSignInForm()
     const location = useLocation()
     if (signIn.tag === "redirect") {
         let source = location.state?.source
@@ -57,8 +54,8 @@ export function SignInView(
                 {view(signIn)}
                 <Link to={
                     {
-                        pathname:"/login",
-                        search:`?username=${signIn.input.username}&password=${signIn.input.password.password}`
+                        pathname: "/login",
+                        search: `?username=${signIn.input.username}&password=${signIn.input.password.password}`
                     }
                 }>Login</Link>
             </div>
