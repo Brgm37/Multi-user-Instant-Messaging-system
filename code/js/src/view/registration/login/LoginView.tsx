@@ -1,20 +1,15 @@
 import * as React from 'react'
-import {useLoginForm} from '../../../service/registration/login/LoginService'
-import {LoginValidationResponse} from "../../../service/registration/login/states/LoginAction";
+import {useLoginForm} from './hooks/UseLoginForm'
 import {InputLabelContext} from "../components/InputLabelContext";
 import {LoginEditingView} from "./components/LoginEditingView";
 import {Link, Navigate, useLocation} from "react-router-dom";
 import {LoginSubmittingView} from "./components/LoginSubmittingView";
 import {LoginErrorView} from "./components/LoginErrorView";
-import {LoginState} from "../../../service/registration/login/states/LoginState";
+import {LoginState} from "./hooks/states/LoginState";
 
-export function LoginView(
-    {validator}: {
-        validator: (username: string, password: string) => Promise<LoginValidationResponse>,
-    }
-): React.JSX.Element {
+export function LoginView(): React.JSX.Element {
     const location = useLocation()
-    const [loginState, handler] = useLoginForm(validator)
+    const [loginState, handler] = useLoginForm()
     if (loginState.tag === "redirect") {
         let source = location.state?.source
         if (!source) source = "/home"
@@ -48,8 +43,8 @@ export function LoginView(
                 {view(loginState)}
                 <Link to={
                     {
-                        pathname:"/signIn",
-                        search:`?username=${loginState.input.username}&password=${loginState.input.password}`
+                        pathname: "/signIn",
+                        search: `?username=${loginState.input.username}&password=${loginState.input.password}`
                     }
                 }>Register</Link>
             </div>

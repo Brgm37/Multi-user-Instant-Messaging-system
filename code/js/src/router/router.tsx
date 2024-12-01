@@ -1,7 +1,5 @@
 import * as React from "react"
 import {createRoot} from "react-dom/client"
-import {loginValidator} from "../service/registration/validation/LoginValidator";
-import {singInValidator} from "../service/registration/validation/SingInValidator";
 
 import {
     createBrowserRouter,
@@ -13,6 +11,10 @@ import {
 import {LoginView} from "../view/registration/login/LoginView";
 import {SignInView} from "../view/registration/signIn/SignInView";
 import { DevView } from "../view/about/components/DevView";
+import {LoginServiceProvider} from "../service/registration/login/LoginServiceProvider";
+import {SignInServiceProvider} from "../service/registration/signIn/SignInServiceProvider";
+import {FindChannelsView} from "../view/findChannels/FindChannelsView";
+import {FindChannelsMockServiceProvider} from "../service/findChannels/mock/FindChannelsMockServiceProvider";
 
 const router = createBrowserRouter(
     [
@@ -22,11 +24,17 @@ const router = createBrowserRouter(
         },
         {
             "path": "/login",
-            "element": <LoginView validator={loginValidator}/>,
+            "element":
+                <LoginServiceProvider>
+                    <LoginView/>
+                </LoginServiceProvider>,
         },
         {
             "path": "/signIn",
-            "element": <SignInView validator={singInValidator}/>,
+            "element":
+                <SignInServiceProvider>
+                    <SignInView/>
+                </SignInServiceProvider>,
         },
         {
             "path": "/home",
@@ -36,6 +44,13 @@ const router = createBrowserRouter(
             "path": "/about",
             "element": <DevView />,
         },
+        {
+            "path": "/findChannels",
+            "element":
+                <FindChannelsMockServiceProvider>
+                    <FindChannelsView/>
+                </FindChannelsMockServiceProvider>,
+        }
     ]
 )
 

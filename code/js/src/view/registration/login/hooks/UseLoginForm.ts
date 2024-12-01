@@ -1,29 +1,14 @@
-import {useEffect, useReducer} from "react"
-import {useFetch} from "../../utils/useFetch"
-import {urlBuilder} from "../../utils/UrlBuilder"
-import {LoginState, makeInitialState} from "./states/LoginState"
-import {LoginAction, LoginValidationResponse} from "./states/LoginAction";
+import {useContext, useEffect, useReducer} from "react";
+import {LoginState, makeInitialState} from "./states/LoginState";
+import {LoginServiceContext} from "../../../../service/registration/login/LoginServiceContext";
+import {LoginAction} from "./states/LoginAction";
+import {UseLoginFormHandler} from "./handler/UseLoginFormHandler";
 
 /**
  * The timeout for the validation.
  *
  */
 const TIMEOUT = 500
-
-/**
- * The URL for the login API.
- */
-const loginApiUrl = urlBuilder("/users/login")
-
-/**
- * The header for the username.
- */
-const usernameHeader = "username"
-
-/**
- * The header for the password.
- */
-const passwordHeader = "password"
 
 /**
  * The reducer function for the login form.
@@ -85,58 +70,13 @@ function reduce(state: LoginState, action: LoginAction): LoginState {
 }
 
 /**
- * The Handler for the login form.
- */
-export type UseLoginFormHandler = {
-    /**
-     * The function to call when the username changes.
-     * @param username The new username.
-     * @returns void
-     */
-    onUsernameChange: (username: string) => void,
-    /**
-     * The function to call when the password changes.
-     * @param password The new password.
-     * @returns void
-     */
-    onPasswordChange: (password: string) => void,
-
-    /**
-     * The function to call when the user clicks on the password visibility button.
-     *
-     * @returns void
-     */
-    togglePasswordVisibility: () => void,
-
-    /**
-     * The function to call when the user clicks on the submit button.
-     *
-     * @returns void
-     */
-    onSubmit: () => void,
-}
-
-/**
  * The hook for the login form.
- *
- * @param stateValidator The validation service.
  *
  * @returns [State, UseLoginFormHandler]
  */
-export function useLoginForm(
-    stateValidator: (username: string, password: string) => Promise<LoginValidationResponse>,
-): [LoginState, UseLoginFormHandler] {
+export function useLoginForm(): [LoginState, UseLoginFormHandler] {
+    const {login, stateValidator} = useContext(LoginServiceContext)
     const [state, dispatch] = useReducer(reduce, makeInitialState())
-    const fetchHandler =
-        useFetch(
-            loginApiUrl,
-            "POST",
-            response => response.json().then(() => dispatch({type: "success", response})),
-            response => dispatch({type: "error", message: response.message}),
-            state.tag != "editing"
-                ? {"username": "", "password": ""}
-                : {"username": state.input.username, "password": state.input.password}
-        )
     useEffect(
         () => {
             if (state.tag !== "editing") return
@@ -149,18 +89,19 @@ export function useLoginForm(
         },
         [state, stateValidator]
     )
-    const onUsernameChange = (username: string) => {
-        fetchHandler.toUpdate(usernameHeader, username)
-        dispatch({type: "edit", inputName: "username", inputValue: username})
-    }
-    const onPasswordChange = (password: string) => {
-        fetchHandler.toUpdate(passwordHeader, password)
-        dispatch({type: "edit", inputName: "password", inputValue: password})
-    }
+    const onUsernameChange = (username: string) => dispatch({type: "edit", inputName: "username", inputValue: username})
+    const onPasswordChange = (password: string) => dispatch({type: "edit", inputName: "password", inputValue: password})
     const togglePasswordVisibility = () => dispatch({type: "toggleVisibility"})
     const onSubmit = () => {
+        if (state.tag !== "editing") return
+        login(
+            state.input.username,
+            state.input.password,
+        ).then(response => {
+            if (response.tag === "success") dispatch({type: "success"})
+            else dispatch({type: "error", message: response.value})
+        })
         dispatch({type: "submit"})
-        fetchHandler.toFetch()
     }
     return [state, {onUsernameChange, onPasswordChange, togglePasswordVisibility, onSubmit}]
 }
