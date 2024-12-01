@@ -12,6 +12,7 @@ import {
 } from "react-router-dom"
 import {LoginView} from "../view/registration/login/LoginView";
 import {SignInView} from "../view/registration/signIn/SignInView";
+import { DevView } from "../view/about/components/DevView";
 
 const router = createBrowserRouter(
     [
@@ -30,7 +31,11 @@ const router = createBrowserRouter(
         {
             "path": "/home",
             "element": <h1>Home</h1>,
-        }
+        },
+        {
+            "path": "/about",
+            "element": <DevView />,
+        },
     ]
 )
 
