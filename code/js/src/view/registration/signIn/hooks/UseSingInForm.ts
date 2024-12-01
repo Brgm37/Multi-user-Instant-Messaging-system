@@ -5,12 +5,31 @@ import {SignInValidationResponse} from "../../../../service/registration/signIn/
 import {SignInAction} from "./states/SignInAction";
 import {SingInFormHandler} from "./handler/UseSignInFormHandler";
 import {SignInServiceContext} from "../../../../service/registration/signIn/SignInServiceContext";
+import saltGenerator from "../../../../service/session/SaltGenerator";
+import {generateHash} from "../../../../service/session/HashGenerator";
+import {setCookie} from "../../../../service/session/SetCookie";
+import configJson from "../../../../../envConfig.json";
 
 /**
- * The timeout for the validation service.
+ * The timeout for the validation.
  *
  */
 const TIMEOUT = 500
+
+/**
+ * The salt for the hash.
+ */
+const SALT = configJson.saltRounds
+
+/**
+ * The authentication cookie.
+ */
+const auth_cookie = configJson.session
+
+/**
+ * The validity of the token.
+ */
+const validity: number = configJson.expiration_date
 
 /**
  * The verifier function for the SignIn form.
@@ -174,7 +193,13 @@ export function useSignInForm(): [SignInState, SingInFormHandler] {
                 state.input.password.password,
                 state.input.invitationCode,
             ).then(response => {
-                if (response.tag === "success") dispatch({type: "success"})
+                if (response.tag === "success") {
+                    const id = saltGenerator(SALT)
+                    generateHash(id).then(token => {
+                        setCookie(auth_cookie, token, validity)
+                        dispatch({type: "success"})
+                    })
+                }
                 else dispatch({type: "error", message: response.value})
             })
             dispatch({type: "submit"})

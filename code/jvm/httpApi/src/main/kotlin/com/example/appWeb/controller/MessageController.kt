@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import utils.Failure
 import utils.Success
+import java.sql.Timestamp
 
 /**
  * The default limit for the message list.
@@ -192,10 +193,27 @@ class MessageController(
             }
         }
 
+    @GetMapping(MESSAGE_TIMESTAMP_URL)
+    fun getMessagesByTimeStamp(
+        @PathVariable channelId: UInt,
+        @PathVariable timeStamp: Timestamp,
+        @RequestParam limit: UInt = LIMIT,
+    ): ResponseEntity<*> =
+        when (val response = messageService.messagesByTimeStamp(channelId, timeStamp, limit)) {
+            is Success -> {
+                ResponseEntity.ok(response.value.map(MessageOutputModel::fromDomain))
+            }
+
+            is Failure -> {
+                MessageProblem.MessageNotFound.response(NOT_FOUND)
+            }
+        }
+
     companion object {
         const val MESSAGE_BASE_URL = "api/messages"
         const val MESSAGE_ID_URL = "/{msgId}"
         const val CHANNEL_MESSAGES_URL = "/channel/{channelId}"
+        const val MESSAGE_TIMESTAMP_URL = "/channel/{channelId}/timestamp/{timeStamp}"
         const val MESSAGE_SSE_URL = "/sse"
         private const val MESSAGE_SSE_LAST_EVENT_ID = "Last-Event-ID"
     }

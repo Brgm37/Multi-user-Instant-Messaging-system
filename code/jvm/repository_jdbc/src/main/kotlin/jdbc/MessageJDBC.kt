@@ -9,6 +9,7 @@ import utils.encryption.DummyEncrypt
 import utils.encryption.Encrypt
 import java.sql.Connection
 import java.sql.ResultSet
+import java.sql.Timestamp
 
 /**
  * @property AUTHOR_ID the author id column of the v_message table
@@ -154,6 +155,30 @@ class MessageJDBC(
         while (rs.next()) {
             emitter(rs.toMessage())
         }
+    }
+
+    override fun findMessagesByTimeStamp(
+        channelId: UInt,
+        timestamp: Timestamp,
+        limit: UInt,
+    ): List<Message> {
+        val selectQuery =
+            """
+            SELECT 
+                msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
+                msgChannelName, msgAuthorUsername
+            FROM v_message
+            WHERE msgChannelId = ? AND msgTimestamp > ?
+            ORDER BY msgTimestamp
+            LIMIT ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, channelId.toInt())
+        stm.setTimestamp(idx++, timestamp)
+        stm.setInt(idx, limit.toInt())
+        val rs = stm.executeQuery()
+        return rs.toMessageList()
     }
 
     override fun findById(id: UInt): Message? {

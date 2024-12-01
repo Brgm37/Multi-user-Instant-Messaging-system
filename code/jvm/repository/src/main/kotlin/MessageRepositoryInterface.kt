@@ -1,4 +1,5 @@
 import model.messages.Message
+import java.sql.Timestamp
 
 /**
  * Interface for the channel repository
@@ -36,4 +37,17 @@ interface MessageRepositoryInterface : Repository<Message> {
         lastEventId: UInt,
         emitter: (Message) -> Unit,
     )
+
+    /**
+     * Finds messages by timestamp
+     * @param channelId The ID of the channel
+     * @param timestamp The timestamp to search for
+     * @param limit The maximum number of messages to retrieve
+     * @return A [List] with all [Message] in the channel
+     */
+    fun findMessagesByTimeStamp(
+        channelId: UInt,
+        timestamp: Timestamp,
+        limit: UInt,
+    ): List<Message>
 }
