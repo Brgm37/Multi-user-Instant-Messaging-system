@@ -10,7 +10,6 @@ import {
 } from "react-router-dom"
 import {LoginView} from "../view/registration/login/LoginView";
 import {SignInView} from "../view/registration/signIn/SignInView";
-import { DevView } from "../view/about/components/DevView";
 import {LoginServiceProvider} from "../service/registration/login/LoginServiceProvider";
 import {SignInServiceProvider} from "../service/registration/signIn/SignInServiceProvider";
 import ChannelView from "../view/channel/ChannelView";
@@ -18,6 +17,7 @@ import {ChannelServiceProvider} from "../service/channel/ChannelServiceProvider"
 import {AuthValidator} from "../view/session/authValidator";
 import {FindChannelsView} from "../view/findChannels/FindChannelsView";
 import {FindChannelsMockServiceProvider} from "../service/findChannels/mock/FindChannelsMockServiceProvider";
+import {AboutView} from "../view/about/AboutView";
 
 const router = createBrowserRouter(
     [
@@ -57,7 +57,7 @@ const router = createBrowserRouter(
         },
         {
             "path": "/about",
-            "element": <DevView />,
+            "element": <AboutView />,
         },
         {
             "path": "/findChannels",
