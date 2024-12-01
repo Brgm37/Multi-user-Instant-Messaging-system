@@ -5,12 +5,14 @@ import * as React from 'react';
  */
 type SearchBarProps = {
     value: string;
+    isSearching: boolean;
     onChange: (value: string) => void;
 };
 
 /**
  * A search bar component.
  * @param value The value of the search bar.
+ * @param isSearching Whether the search bar is currently searching.
  * @param onChange The function to call when the search bar changes.
  * @returns JSX.Element
  */
