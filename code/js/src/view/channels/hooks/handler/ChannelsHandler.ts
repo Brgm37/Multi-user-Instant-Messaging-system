@@ -8,10 +8,11 @@
  * @method clear - Clear the search results
  * @method goBack - Go back to the previous state
  */
-export type ChannelHandler = {
+export type ChannelsHandler = {
     loadChannels: () => void
-    loadMore: () => void
+    loadMore: (offset:number, at: "head" | "tail") => void
     search: (query: string) => void
+    searchMore: (query: string, offset: number, at: "head" | "tail") => void
     clear: () => void
     goBack: () => void
 }

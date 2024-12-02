@@ -1,7 +1,7 @@
 import {ChannelsState} from "./state/ChannelsState";
 import {ChannelsAction} from "./state/ChannelsAction";
 import {useContext, useEffect, useReducer} from "react";
-import {ChannelHandler} from "./handler/ChannelHandler";
+import {ChannelsHandler} from "./handler/ChannelsHandler";
 import {ChannelsServiceContext} from "../../../service/channels/ChannelsServiceContext";
 import useScroll, {HasMore, UseScrollHandler, UseScrollState} from "../../../service/utils/hooks/useScroll/UseScroll";
 import {Channel} from "../../../model/Channel";
@@ -102,7 +102,7 @@ function addItems(
     listHandler.addItems(channels, at, hasMore)
 }
 
-export default function (): [ChannelsState, ChannelHandler] {
+export default function (): [ChannelsState, ChannelsHandler] {
     const [list, listHandler] = useScroll<Channel>(LIST_LIMIT)
     const initialState: ChannelsState = {tag: "idle", channels: list}
     const [state, dispatch] = useReducer(reduce, initialState)
@@ -119,7 +119,7 @@ export default function (): [ChannelsState, ChannelHandler] {
             }
         }
     }, [list]);
-    const handler: ChannelHandler = {
+    const handler: ChannelsHandler = {
         clear(): void {
             service.findChannels(0, HAS_MORE)
                 .then(result => {
