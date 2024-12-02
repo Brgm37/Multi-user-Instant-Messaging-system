@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useFindChannels} from "./hooks/UseFindChannels";
 import {Navigate} from "react-router-dom";
 import {FindChannelState} from "./hooks/states/FindChannelsState";
-import {SearchBar} from "./components/shared/SearchBar";
+import {SearchBar} from "../components/SearchBar";
 import {FindChannelsFetchingMoreView} from "./components/FindChannelsFetchingMoreView";
 import {urlBuilder} from "../../service/utils/UrlBuilder";
 import {FindChannelsErrorView} from "./components/FindChannelsErrorView";
@@ -43,7 +43,7 @@ export function FindChannelsView(): React.JSX.Element {
     return (
         <div>
             <h1>Find Channels</h1>
-            <SearchBar value={state.searchBar} onChange={handler.onSearchChange}/>
+            <SearchBar value={state.searchBar} onChange={handler.onSearchChange} isSearching={false}/>
             { view(state) }
         </div>
     )
