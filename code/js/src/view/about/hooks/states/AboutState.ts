@@ -6,7 +6,7 @@ export type Dev = {
     email: string,
     github: URL,
     linkdIn: URL,
-    dev?: Dev
+    imageURL: string,
 }
 
 export type AboutState =
