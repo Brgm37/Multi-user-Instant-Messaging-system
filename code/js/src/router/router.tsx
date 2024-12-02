@@ -1,12 +1,12 @@
 import * as React from "react"
 import {createRoot} from "react-dom/client"
+import '../../public/index.css'
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import {
     createBrowserRouter,
-    Link, Navigate,
-    Outlet,
+    Navigate,
     RouterProvider,
-    useParams,
 } from "react-router-dom"
 import {LoginView} from "../view/registration/login/LoginView";
 import {SignInView} from "../view/registration/signIn/SignInView";

@@ -6,29 +6,29 @@ import {Channel} from "../../../view/findChannels/model/PublicChannel";
 
 const mockChannels = [
     {
-        name: {name: "test", displayName: "test1"},
+        name: {name: "test", displayName: "TEST CHANNEL 1"},
         id: 1,
-        owner: {id: 1, username: "test1"},
+        owner: {id: 1, name: "test1"},
     },
     {
-        name: {name: "test", displayName: "test2"},
+        name: {name: "test", displayName: "TEST CHANNEL 2"},
         id: 2,
-        owner: {id: 2, username: "test2"},
+        owner: {id: 2, name: "test2"},
     },
     {
-        name: {name: "test", displayName: "test3"},
+        name: {name: "test", displayName: "TEST CHANNEL 3"},
         id: 3,
-        owner: {id: 3, username: "test3"},
+        owner: {id: 3, name: "test3"},
     },
     {
-        name: {name: "isel", displayName: "isel"},
+        name: {name: "isel", displayName: "ISEL CHANNEL"},
         id: 4,
-        owner: {id: 4, username: "isel"},
+        owner: {id: 4, name: "isel"},
     },
     {
-        name: {name: "chelas", displayName: "chelas"},
+        name: {name: "chelas", displayName: "CHELAS CHANNEL"},
         id: 5,
-        owner: {id: 5, username: "chelas"},
+        owner: {id: 5, name: "chelas"},
     }
 ]
 
@@ -37,25 +37,31 @@ export function FindChannelsMockServiceProvider(props: { children: ReactNode }):
     const signal = useSignal()
     const service : FindChannelsMockServiceContext = {
         async getChannelsByPartialName(partialName: string): Promise<Either<Channel[], string>> {
-            if (partialName === "error") {
-                return failure("error") as Either<Channel[], string>;
-            }
-            if (partialName) {
-                const filteredChannels = mockChannels.filter(channel =>
-                    channel.name.displayName.includes(partialName)
-                );
-                return success(filteredChannels) as Either<Channel[], string>
-            }
-            else {
-                return failure("error") as Either<Channel[], string>;
-            }
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    if (partialName === "error") {
+                        resolve(failure("error") as Either<Channel[], string>);
+                    } else if (partialName) {
+                        const filteredChannels = mockChannels.filter(channel =>
+                            channel.name.displayName.toLowerCase().includes(partialName.toLowerCase())
+                        );
+                        resolve(success(filteredChannels) as Either<Channel[], string>);
+                    } else {
+                        resolve(success([]) as Either<Channel[], string>);
+                    }
+                }, 1000);
+            });
         },
         async joinChannel(channelId: number): Promise<Either<void, string>> {
-            if (channelId === 1) {
-                return success(undefined) as Either<void, string>
-            } else {
-                return failure("Something went Wrong") as Either<void, string>
-            }
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    if (channelId === 1) {
+                        resolve(success(undefined) as Either<void, string>)
+                    } else {
+                        resolve(failure("error") as Either<void, string>)
+                    }
+                }, 1000);
+            });
         },
         async getPublicChannels(offset: number, limit: number): Promise<Either<Channel[], string>> {
             return success([...mockChannels]) as Either<Channel[], string>
