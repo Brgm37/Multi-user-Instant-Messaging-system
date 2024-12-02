@@ -1,6 +1,6 @@
 import * as React from "react";
 import {ChannelServiceContext} from "./ChannelServiceContext";
-import useSignal from "../utils/useSignal";
+import useSignal from "../utils/hooks/useSignal/useSignal";
 import {urlBuilder} from "../utils/UrlBuilder";
 import {Either, success, failure} from "../../model/Either";
 import {Channel, jsonToChannel} from "../../model/Channel";

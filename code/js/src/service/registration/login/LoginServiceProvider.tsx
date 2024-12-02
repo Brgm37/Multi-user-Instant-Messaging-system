@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {LoginServiceContext} from "./LoginServiceContext";
-import useSignal from "../../utils/useSignal";
+import useSignal from "../../utils/hooks/useSignal/useSignal";
 import {urlBuilder} from "../../utils/UrlBuilder";
 import {loginValidator} from "../validation/LoginValidator";
 import {Either, success, failure} from "../../../model/Either";
