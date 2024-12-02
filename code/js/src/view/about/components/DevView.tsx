@@ -7,7 +7,13 @@ export function DevView({ dev }: { dev: Dev }): React.JSX.Element  {
     const handleToggleDevInfo = () => setShowDevInfo(!showDevInfo)
     return (
         <div>
-            <button onClick={handleToggleDevInfo}>{dev.name}</button>
+            <button onClick={handleToggleDevInfo}>
+                <img
+                    src={dev.imageURL} // Placeholder if no image
+                    alt={`${dev.name}'s Profile Picture`}
+                    style={{width: "30px", height: "30px", borderRadius: "50%"}}
+                />
+                {dev.name}</button>
             {showDevInfo ? (
                 <>
                     <p>{dev.num}</p>
