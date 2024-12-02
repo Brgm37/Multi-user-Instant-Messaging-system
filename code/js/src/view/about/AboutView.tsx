@@ -21,7 +21,8 @@ const Developers: Dev[] =
             bio: "I am a developer",
             email: "A50543@alunos.isel.pt",
             github: new URL("https://github.com/Thuzys"),
-            linkdIn: new URL("https://www.linkedin.com/in/arthur-cesar-oliveira-681643184/")
+            linkdIn: new URL("https://www.linkedin.com/in/arthur-cesar-oliveira-681643184/"),
+            imageURL: "https://avatars.githubusercontent.com/u/114019837?v=4"
         },
         {
             name: "Brian Melhorado",
@@ -29,7 +30,8 @@ const Developers: Dev[] =
             bio: null,
             email: "A50471@alunos.isel.pt",
             github: new URL("https://github.com/Brgm37"),
-            linkdIn: new URL("https://www.linkedin.com/in/brian-melhorado-449794307/")
+            linkdIn: new URL("https://www.linkedin.com/in/brian-melhorado-449794307/"),
+            imageURL: "https://avatars.githubusercontent.com/u/114441596?v=4"
         },
         {
             name: "Mariana Moraes",
@@ -37,6 +39,7 @@ const Developers: Dev[] =
             bio: null,
             email: "A50560@alunos.isel.pt",
             github: new URL("https://github.com/mariana-moraess"),
-            linkdIn: new URL("https://www.linkedin.com/in/mariana-moraes-92975b330/")
+            linkdIn: new URL("https://www.linkedin.com/in/mariana-moraes-92975b330/"),
+            imageURL: "https://avatars.githubusercontent.com/u/146859944?s=400&v=4"
         }
     ]
