@@ -12,7 +12,7 @@ import {UserInfo} from "./UserInfo";
  * @property {number} timestamp - The timestamp of the message.
  * @property {number} timestamp - The timestamp of the message.
  */
-export type Message = {
+export type Message = Identifiable & {
     id: string,
     text: string,
     channel: string,

@@ -11,7 +11,7 @@ import {UserInfo} from "./UserInfo";
  * @property {string} name - The name of the channel.
  * @property {Message[]} messages - The messages of the channel.
  */
-export type Channel = {
+export type Channel = Identifiable & {
     id: string,
     name: string,
     messages: Message[],
