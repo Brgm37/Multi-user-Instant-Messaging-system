@@ -1,17 +1,15 @@
 import React from "react";
 import {PublicChannel} from "../model/PublicChannel";
+import {PublicChannelsList} from "./shared/PublicChannelsList";
 
 export function FindChannelsNavigatingView(
-    {channels}: {channels: PublicChannel[]}
+    {channels, onClick}: {channels: PublicChannel[], onClick: (channelId: number) => void}
 ): React.JSX.Element {
     return (
         <div>
-            <h1>FindChannelsNavigatingView</h1>
-            <ul>
-                {channels.map((channel) => (
-                    <li key={channel.id}>{channel.name}</li>
-                ))}
-            </ul>
+            <section className={"p-8"}>
+                <PublicChannelsList channels={channels} onClick={onClick}/>
+            </section>
         </div>
     )
 }
