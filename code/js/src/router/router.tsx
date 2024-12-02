@@ -3,10 +3,8 @@ import {createRoot} from "react-dom/client"
 
 import {
     createBrowserRouter,
-    Link, Navigate,
-    Outlet,
+    Navigate,
     RouterProvider,
-    useParams,
 } from "react-router-dom"
 import {LoginView} from "../view/registration/login/LoginView";
 import {SignInView} from "../view/registration/signIn/SignInView";
@@ -24,7 +22,7 @@ const router = createBrowserRouter(
     [
         {
             "path": "/",
-            "element": <Navigate to="/login" replace />,
+            "element": <Navigate to="/login" replace/>,
         },
         {
             "path": "/login",
@@ -47,16 +45,16 @@ const router = createBrowserRouter(
                     <ChannelsServiceProviderMock>
                         <ChannelsView/>
                     </ChannelsServiceProviderMock>
-                </AuthValidator>
-            // "children": [
-            //     {
-            //         "path": ":id",
-            //         "element":
-            //             <ChannelServiceProvider>
-            //                 <ChannelView/>
-            //             </ChannelServiceProvider>
-            //     }
-            // ]
+                </AuthValidator>,
+            "children": [
+                {
+                    "path": ":id",
+                    "element":
+                        <ChannelServiceProvider>
+                            <ChannelView/>
+                        </ChannelServiceProvider>
+                }
+            ]
         },
         {
             "path": "/findChannels",
