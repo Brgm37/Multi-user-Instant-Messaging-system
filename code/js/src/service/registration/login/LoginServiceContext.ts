@@ -18,7 +18,7 @@ export interface LoginServiceContext {
     login(
         username: string,
         password: string,
-    ): Promise<Either<true, string>>
+    ): Promise<Either<AuthInfo, string>>
 
     /**
      * The state validator method.
@@ -31,7 +31,7 @@ export interface LoginServiceContext {
 
 const defaultLoginServiceContext: LoginServiceContext = {
     login: (username, password) => {
-        return new Promise<Either<true, string>>((resolve, reject) => {
+        return new Promise<Either<AuthInfo, string>>((resolve, reject) => {
             reject(new Error("Not implemented"))
         })
     },

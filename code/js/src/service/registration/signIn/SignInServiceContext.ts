@@ -20,7 +20,7 @@ export interface SignInServiceContext {
         username: string,
         password: string,
         invitationCode: string,
-    ): Promise<Either<true, string>>
+    ): Promise<Either<AuthInfo, string>>
 
     /**
      * The state validator method.
@@ -37,13 +37,13 @@ export interface SignInServiceContext {
 }
 
 const defaultSignInServiceContext: SignInServiceContext = {
-    signIn: (username, password, invitationCode) => {
-        return new Promise<Either<true, string>>((resolve, reject) => {
+    signIn: () => {
+        return new Promise<Either<AuthInfo, string>>((_, reject) => {
             reject(new Error("Not implemented"))
         })
     },
-    stateValidator: (username, password, invitationCode) => {
-        return new Promise<SignInValidationResponse>((resolve, reject) => {
+    stateValidator: () => {
+        return new Promise<SignInValidationResponse>((_, reject) => {
             reject(new Error("Not implemented"))
         })
     }

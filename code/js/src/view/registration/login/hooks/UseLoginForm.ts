@@ -3,10 +3,9 @@ import {LoginState, makeInitialState} from "./states/LoginState";
 import {LoginServiceContext} from "../../../../service/registration/login/LoginServiceContext";
 import {LoginAction} from "./states/LoginAction";
 import {UseLoginFormHandler} from "./handler/UseLoginFormHandler";
-import saltGenerator from "../../../../service/session/SaltGenerator";
 import {setCookie} from "../../../../service/session/SetCookie";
 import configJson from "../../../../../envConfig.json";
-import {generateHash} from "../../../../service/session/HashGenerator";
+import {getExpiresIn} from "../../../../service/session/ExpiresTime";
 
 /**
  * The timeout for the validation.
@@ -15,19 +14,9 @@ import {generateHash} from "../../../../service/session/HashGenerator";
 const TIMEOUT = 500
 
 /**
- * The salt for the hash.
- */
-const SALT = configJson.saltRounds
-
-/**
  * The authentication cookie.
  */
 const auth_cookie = configJson.session
-
-/**
- * The validity of the token.
- */
-const validity: number = configJson.expiration_date
 
 /**
  * The reducer function for the login form.
@@ -118,11 +107,10 @@ export function useLoginForm(): [LoginState, UseLoginFormHandler] {
             state.input.password,
         ).then(response => {
             if (response.tag === "success") {
-                const id = saltGenerator(SALT)
-                generateHash(id).then(token => {
-                    setCookie(auth_cookie, token, validity)
-                    dispatch({type: "success"})
-                })
+                const auth = response.value
+                const validity = getExpiresIn(response.value.expirationDate)
+                setCookie(auth_cookie, auth.uId, validity)
+                dispatch({type: "success"})
             }
             else dispatch({type: "error", message: response.value})
         })

@@ -1,10 +1,10 @@
 import {Cookies} from "react-cookie";
 import {CookieOptions} from "react-router-dom";
 
-export function setCookie(name: string, value: string, days: number) {
+export function setCookie(name: string, value: string, seconds: number) {
     const cookie = new Cookies()
     const expires = new Date()
-    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000)
+    expires.setSeconds(expires.getSeconds() + seconds)
     const options: CookieOptions = {
         expires,
         path: "/",
