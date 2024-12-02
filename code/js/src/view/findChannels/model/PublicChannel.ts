@@ -6,8 +6,9 @@
  * @prop name The name of the public channel.
  */
 export type PublicChannel = {
-    id: string,
+    id: number,
     name: string,
+    owner: string,
 }
 
 /**
@@ -31,7 +32,7 @@ export type Channel = {
  * @prop name The name of the channel.
  * @prop displayName The display name of the channel.
  */
-type ChannelName = {
+export type ChannelName = {
     name: string,
     displayName: string,
 }
@@ -43,7 +44,7 @@ type ChannelName = {
  * @prop id The id of the owner.
  * @prop name The name of the owner.
  */
-type Owner = {
+export type Owner = {
     id: number,
     name: string,
 }
@@ -56,8 +57,9 @@ type Owner = {
  */
 export function channelToPublicChannel(channel: Channel): PublicChannel {
     return {
-        id: channel.id.toString(),
-        name: channel.name.displayName
+        id: channel.id,
+        name: channel.name.displayName,
+        owner: channel.owner.name,
     }
 }
 
