@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+.card:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s;
+}

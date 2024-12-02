@@ -3,13 +3,13 @@ const path = require('path');
 module.exports = {
   entry: './src/index.ts',
   mode: 'development',
-  devServer : {
+  devServer: {
     port: 8000,
     historyApiFallback: true,
     compress: false,
     proxy: [
       {
-        context : ['/api'],
+        context: ['/api'],
         target: 'http://localhost:8080',
       },
     ],
@@ -20,6 +20,10 @@ module.exports = {
         test: /\.tsx?$/,
         use: 'ts-loader',
         exclude: /node_modules/,
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
     ],
   },
