@@ -17,6 +17,8 @@ import {ChannelServiceProvider} from "../service/channel/ChannelServiceProvider"
 import {AuthValidator} from "../view/session/authValidator";
 import {FindChannelsView} from "../view/findChannels/FindChannelsView";
 import {FindChannelsMockServiceProvider} from "../service/findChannels/mock/FindChannelsMockServiceProvider";
+import {ChannelsView} from "../view/channels/ChannelsView";
+import {ChannelsServiceProviderMock} from "../service/channels/ChannelsServiceProviderMock";
 
 const router = createBrowserRouter(
     [
@@ -39,20 +41,22 @@ const router = createBrowserRouter(
                 </SignInServiceProvider>,
         },
         {
-            "path": "/home",
+            "path": "/channels",
             "element":
                 <AuthValidator>
-                    <h1>Home</h1>
-                </AuthValidator>,
-            children: [
-                {
-                    "path": "channel/:id",
-                    "element":
-                        <ChannelServiceProvider>
-                            <ChannelView/>
-                        </ChannelServiceProvider>
-                }
-            ]
+                    <ChannelsServiceProviderMock>
+                        <ChannelsView/>
+                    </ChannelsServiceProviderMock>
+                </AuthValidator>
+            // "children": [
+            //     {
+            //         "path": ":id",
+            //         "element":
+            //             <ChannelServiceProvider>
+            //                 <ChannelView/>
+            //             </ChannelServiceProvider>
+            //     }
+            // ]
         },
         {
             "path": "/findChannels",
