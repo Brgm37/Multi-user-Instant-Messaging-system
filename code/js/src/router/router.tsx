@@ -17,6 +17,13 @@ import {ChannelServiceProvider} from "../service/channel/ChannelServiceProvider"
 import {AuthValidator} from "../view/session/authValidator";
 import {FindChannelsView} from "../view/findChannels/FindChannelsView";
 import {FindChannelsMockServiceProvider} from "../service/findChannels/mock/FindChannelsMockServiceProvider";
+import {
+    CreateChannelInvitationMockServiceContext
+} from "../service/createChannelInvitation/mock/CreateChannelInvitationMockServiceContext";
+import {
+    CreateChannelInvitationMockServiceProvider
+} from "../service/createChannelInvitation/mock/CreateChannelInvitationMockServiceProvider";
+import {CreateChannelInvitationView} from "../view/sendChannelInvitation/CreateChannelInvitation";
 
 const router = createBrowserRouter(
     [
@@ -60,6 +67,13 @@ const router = createBrowserRouter(
                 <FindChannelsMockServiceProvider>
                     <FindChannelsView/>
                 </FindChannelsMockServiceProvider>,
+        },
+        {
+            "path": "/dummy",
+            "element":
+            <CreateChannelInvitationMockServiceProvider>
+                <CreateChannelInvitationView/>
+            </CreateChannelInvitationMockServiceProvider>,
         }
     ]
 )
