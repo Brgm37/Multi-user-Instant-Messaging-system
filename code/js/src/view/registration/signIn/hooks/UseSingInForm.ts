@@ -81,21 +81,13 @@ function reduce(state: SignInState, action: SignInAction): SignInState {
                         }
                     }
                 }
-                case "toggleVisibility": {
-                    const visibility =
-                        {
-                            ...state.visibility,
-                            [action.inputName]: !state.visibility[action.inputName]
-                        }
-                    return {...state, visibility}
-                }
                 case "submit":
                     return {tag: "submitting", input: state.input}
                 case "validation-result": {
                     const {
                         isUsernameValid,
                         isPasswordValid,
-                        isConfirmPasswordValid
+                        isConfirmPasswordValid,
                     } = action.response
                     const error = {
                         usernameError: isUsernameValid === true ? "" : isUsernameValid,
@@ -105,7 +97,7 @@ function reduce(state: SignInState, action: SignInAction): SignInState {
                                 ? ""
                                 : state.input.password.confirmPassword.length > 0
                                     ? isConfirmPasswordValid
-                                    : ""
+                                    : "",
                     }
                     const isValid = isValidForm(state, action)
                     const input = {...state.input, isValid}
@@ -130,7 +122,6 @@ function reduce(state: SignInState, action: SignInAction): SignInState {
                     return {
                         tag: "editing",
                         input,
-                        visibility: {password: false, confirmPassword: false},
                         error: {usernameError: "", passwordError: "", confirmPasswordError: ""}
                     }
                 }
@@ -171,10 +162,6 @@ export function useSignInForm(): [SignInState, SingInFormHandler] {
         onInvitationCodeChange: (invitationCode: string) => {
             dispatch({type: "edit", inputName: "invitationCode", inputValue: invitationCode})
         },
-        onPasswordVisibilityToggle: () =>
-            dispatch({type: "toggleVisibility", inputName: "password"}),
-        onConfirmPasswordVisibilityToggle: () =>
-            dispatch({type: "toggleVisibility", inputName: "confirmPassword"}),
         onSubmit: () => {
             if (state.tag !== "editing") return
             signIn(

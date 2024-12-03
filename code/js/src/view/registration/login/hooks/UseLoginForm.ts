@@ -34,9 +34,6 @@ function reduce(state: LoginState, action: LoginAction): LoginState {
                     const input = {...state.input, [action.inputName]: action.inputValue}
                     return {...state, input}
                 }
-                case "toggleVisibility": {
-                    return {...state, visibility: !state.visibility}
-                }
                 case "submit": {
                     return {tag: "submitting", input: state.input}
                 }
@@ -66,7 +63,7 @@ function reduce(state: LoginState, action: LoginAction): LoginState {
             switch (action.type) {
                 case "edit":
                     const input = {...state.input, [action.inputName]: action.inputValue}
-                    return {tag: "editing", input, visibility: false, error: {usernameError: "", passwordError: ""}}
+                    return {tag: "editing", input, error: {usernameError: "", passwordError: ""}}
                 default:
                     throw Error("Invalid action")
             }
@@ -99,7 +96,6 @@ export function useLoginForm(): [LoginState, UseLoginFormHandler] {
     )
     const onUsernameChange = (username: string) => dispatch({type: "edit", inputName: "username", inputValue: username})
     const onPasswordChange = (password: string) => dispatch({type: "edit", inputName: "password", inputValue: password})
-    const togglePasswordVisibility = () => dispatch({type: "toggleVisibility"})
     const onSubmit = () => {
         if (state.tag !== "editing") return
         login(
@@ -116,5 +112,5 @@ export function useLoginForm(): [LoginState, UseLoginFormHandler] {
         })
         dispatch({type: "submit"})
     }
-    return [state, {onUsernameChange, onPasswordChange, togglePasswordVisibility, onSubmit}]
+    return [state, {onUsernameChange, onPasswordChange, onSubmit}]
 }

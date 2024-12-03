@@ -16,13 +16,6 @@ export type UseLoginFormHandler = {
     onPasswordChange: (password: string) => void,
 
     /**
-     * The function to call when the user clicks on the password visibility button.
-     *
-     * @returns void
-     */
-    togglePasswordVisibility: () => void,
-
-    /**
      * The function to call when the user clicks on the submit button.
      *
      * @returns void

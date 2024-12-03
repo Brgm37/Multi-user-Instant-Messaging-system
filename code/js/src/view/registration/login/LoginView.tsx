@@ -18,7 +18,6 @@ export function LoginView(): React.JSX.Element {
     let visibility = {password: false}
     let error = {usernameError: "", passwordError: ""}
     if (loginState.tag == "editing") {
-        visibility = {password: loginState.visibility}
         error = {usernameError: loginState.error.usernameError, passwordError: loginState.error.passwordError}
     }
     const form = {
@@ -39,14 +38,7 @@ export function LoginView(): React.JSX.Element {
     return (
         <InputLabelContext.Provider value={form}>
             <div>
-                <h1>Login</h1>
                 {view(loginState)}
-                <Link to={
-                    {
-                        pathname: "/signIn",
-                        search: `?username=${loginState.input.username}&password=${loginState.input.password}`
-                    }
-                }>Register</Link>
             </div>
         </InputLabelContext.Provider>
     )

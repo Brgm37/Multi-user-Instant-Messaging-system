@@ -31,16 +31,6 @@ export type SingInFormHandler = {
     onInvitationCodeChange: (invitationCode: string) => void,
 
     /**
-     * The handler for the password visibility toggle event.
-     */
-    onPasswordVisibilityToggle: () => void,
-
-    /**
-     * The handler for the confirmation password visibility toggle event.
-     */
-    onConfirmPasswordVisibilityToggle: () => void,
-
-    /**
      * The handler for the form submission event.
      */
     onSubmit: () => void

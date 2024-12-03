@@ -2,18 +2,6 @@ import {useSearchParams} from "react-router-dom";
 import {extractSearchParams} from "../../../../../service/utils/extractParams";
 
 /**
- * The visibility state of the password fields.
- *
- * @type Visibility
- * @prop password The visibility state of the password field.
- * @prop confirmPassword The visibility state of the password confirmation field.
- */
-type Visibility = {
-    password: boolean,
-    confirmPassword: boolean,
-}
-
-/**
  * The password object.
  *
  * @type Password
@@ -64,7 +52,7 @@ type UserInput = {
  * @prop error The error for the form.
  */
 export type SignInState =
-    { tag: "editing", input: UserInput, visibility: Visibility, error?: InputError } |
+    { tag: "editing", input: UserInput, error?: InputError } |
     { tag: "error", message: string, input: UserInput } |
     { tag: "submitting", input: UserInput } |
     { tag: "redirect" }
@@ -93,7 +81,6 @@ export function makeInitialState(): SignInState {
             invitationCode: "",
             isValid: false,
         },
-        error: { usernameError: "", passwordError: "", confirmPasswordError: "" },
-        visibility: { password: false, confirmPassword: false },
+        error: { usernameError: "", passwordError: "", confirmPasswordError: ""},
     }
 }
