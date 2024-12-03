@@ -27,6 +27,7 @@ import {
     CreateChannelInvitationMockServiceProvider
 } from "../service/createChannelInvitation/mock/CreateChannelInvitationMockServiceProvider";
 import {CreateChannelInvitationView} from "../view/createChannelInvitation/CreateChannelInvitation";
+import {SseCommunicationServiceProvider} from "../service/sse/SseCommunicationServiceProvider";
 
 const router = createBrowserRouter(
     [
@@ -60,9 +61,11 @@ const router = createBrowserRouter(
                 {
                     "path": "/channels/:id",
                     "element":
+                    <SseCommunicationServiceProvider>
                         <ChannelServiceProvider>
                             <ChannelView/>
                         </ChannelServiceProvider>
+                    </SseCommunicationServiceProvider>,
                 }
             ]
         },
