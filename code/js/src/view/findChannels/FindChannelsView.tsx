@@ -4,7 +4,6 @@ import {Navigate} from "react-router-dom";
 import {FindChannelState} from "./hooks/states/FindChannelsState";
 import {SearchBar} from "./components/shared/SearchBar";
 import {FindChannelsFetchingMoreView} from "./components/FindChannelsFetchingMoreView";
-import {urlBuilder} from "../../service/utils/UrlBuilder";
 import {FindChannelsErrorView} from "./components/FindChannelsErrorView";
 import {FindChannelsNavigatingView} from "./components/FindChannelsNavigatingView";
 import {FindChannelsLoadingView} from "./components/FindChannelsLoadingView";
@@ -15,23 +14,17 @@ export function FindChannelsView(): React.JSX.Element {
 
     if(state.tag === "redirect") {
         const channelId = state.channelId
-        window.history.replaceState(null, "", urlBuilder("/channels/" + channelId));
+        return <Navigate to={"channel/" + channelId} replace={true}/>
     }
 
     if (state.tag === "navigating" && state.channels.length === 0 && state.searchBar === "") {
         handler.onFetchMore()
     }
 
-    if (state.tag === "searching") {
-        handler.onFetch()
-    }
-
     const view  = ((state: FindChannelState) => {
         switch (state.tag) {
             case "navigating":
                 return <FindChannelsNavigatingView channels={state.channels} onClick={handler.onJoin}/>
-            case "searching":
-                return <FindChannelsLoadingView/>
             case "fetchingMore":
                 return <FindChannelsFetchingMoreView/>
             case "error":
