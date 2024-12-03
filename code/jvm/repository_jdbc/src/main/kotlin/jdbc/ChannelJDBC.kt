@@ -238,8 +238,8 @@ class ChannelJDBC(
             SELECT 
             	channel_id, channel_name, channel_owner, channel_accessControl,
             	channel_visibility, owner_name
-            FROM v_channel
-            WHERE channel_owner = ?
+            FROM v_channel JOIN channel_members c on c.id = v_channel.channel_id
+            WHERE member = ?
             LIMIT ?
             OFFSET ?
             """.trimIndent()
@@ -403,6 +403,32 @@ class ChannelJDBC(
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
         stm.setString(idx++, "%$name%")
+        stm.setInt(idx++, limit.toInt())
+        stm.setInt(idx, offset.toInt())
+        val rs = stm.executeQuery()
+        return rs.toChannelList()
+    }
+
+    override fun findByName(
+        userId: UInt,
+        name: String,
+        offset: UInt,
+        limit: UInt,
+    ): List<Channel> {
+        val selectQuery =
+            """
+            SELECT 
+            	channel_id, channel_name, channel_owner, channel_accessControl,
+            	channel_visibility, owner_name
+            FROM v_channel JOIN channel_members c on c.id = v_channel.channel_id
+            WHERE member = ? AND compare_partial_name(channel_name, ?)
+            LIMIT ?
+            OFFSET ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, userId.toInt())
+        stm.setString(idx++, name)
         stm.setInt(idx++, limit.toInt())
         stm.setInt(idx, offset.toInt())
         val rs = stm.executeQuery()

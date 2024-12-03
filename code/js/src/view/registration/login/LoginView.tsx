@@ -12,7 +12,7 @@ export function LoginView(): React.JSX.Element {
     const [loginState, handler] = useLoginForm()
     if (loginState.tag === "redirect") {
         let source = location.state?.source
-        if (!source) source = "/home"
+        if (!source) source = "/channels"
         return <Navigate to={source} replace={true}></Navigate>
     }
     let visibility = {password: false}

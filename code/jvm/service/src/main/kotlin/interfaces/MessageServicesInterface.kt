@@ -64,10 +64,12 @@ interface MessageServicesInterface {
      * @param channelId The id of the channel.
      * @param timestamp The timestamp to get the messages from.
      * @param limit The quantity of messages to get.
+     * @param isBefore If the messages should be before the timestamp.
      */
     fun messagesByTimeStamp(
         channelId: UInt,
-        timestamp: Timestamp,
+        timestamp: Timestamp?,
         limit: UInt = MSG_LIMIT,
+        isBefore: Boolean = false,
     ): Either<MessageError, List<Message>>
 }

@@ -26,11 +26,13 @@ export interface ChannelServiceContext {
      * @param cId
      * @param timestamp
      * @param limit
+     * @param at
      */
     loadMore(
         cId: string,
         timestamp: string,
         limit: number,
+        at: "before" | "after",
     ): Promise<Either<Message[], string>>
 
     /**
@@ -42,20 +44,20 @@ export interface ChannelServiceContext {
     sendMsg(
         cId: string,
         msg: string,
-    ): Promise<Either<void, string>>
+    ): Promise<Either<Message, string>>
 }
 
 /**
  * The default channel service.
  */
 const defaultChannelService: ChannelServiceContext = {
-    async loadChannel(cId: string): Promise<Either<Channel, string>> {
+    async loadChannel(): Promise<Either<Channel, string>> {
         throw Error("Not implemented")
     },
-    async loadMore(cId: string, timestamp: string, limit: number): Promise<Either<Message[], string>> {
+    async loadMore(): Promise<Either<Message[], string>> {
         throw Error("Not implemented")
     },
-    async sendMsg(cId: string, msg: string): Promise<Either<void, string>> {
+    async sendMsg(): Promise<Either<Message, string>> {
         throw Error("Not implemented")
     },
 }

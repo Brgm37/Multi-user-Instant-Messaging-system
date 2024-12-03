@@ -44,8 +44,9 @@ class MessageInMem : MessageRepositoryInterface {
 
     override fun findMessagesByTimeStamp(
         channelId: UInt,
-        timestamp: Timestamp,
+        timestamp: Timestamp?,
         limit: UInt,
+        isBefore: Boolean,
     ): List<Message> {
         TODO("Not yet implemented")
     }

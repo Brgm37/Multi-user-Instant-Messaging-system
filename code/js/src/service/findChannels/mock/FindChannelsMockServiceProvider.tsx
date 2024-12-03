@@ -1,5 +1,5 @@
 import React, {ReactNode} from "react";
-import useSignal from "../../utils/useSignal";
+import useSignal from "../../utils/hooks/useSignal/useSignal";
 import {FindChannelsMockServiceContext} from "./FindChannelsMockServiceContext";
 import {Either, failure, success} from "../../../model/Either";
 import {Channel} from "../../../view/findChannels/model/PublicChannel";

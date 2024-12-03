@@ -12,6 +12,7 @@ type SearchBarProps = {
 /**
  * A search bar component.
  * @param value The value of the search bar.
+ * @param isSearching Whether the search bar is currently searching.
  * @param onChange The function to call when the search bar changes.
  * @param className The class name for the search bar.
  * @returns JSX.Element

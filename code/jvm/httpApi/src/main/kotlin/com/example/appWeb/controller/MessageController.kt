@@ -36,6 +36,8 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import utils.Failure
 import utils.Success
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 import java.sql.Timestamp
 
 /**
@@ -63,6 +65,16 @@ class MessageController(
     private val timeout: Long = 0
     private val listeners = mutableMapOf<AuthenticatedUserInputModel, MutableSharedFlow<Message>>()
     private val scope = CoroutineScope(Dispatchers.IO)
+
+    /**
+     * Decodes the name of the channel.
+     *
+     * @param name The name of the channel
+     * @return The decoded name
+     */
+    private fun decodeName(name: String): String =
+        URLDecoder
+            .decode(name, StandardCharsets.UTF_8.toString())
 
     private suspend fun sendEventToAll(message: Message) =
         listeners
@@ -196,10 +208,12 @@ class MessageController(
     @GetMapping(MESSAGE_TIMESTAMP_URL)
     fun getMessagesByTimeStamp(
         @PathVariable channelId: UInt,
-        @PathVariable timeStamp: Timestamp,
+        @RequestParam timestamp: String? = null,
         @RequestParam limit: UInt = LIMIT,
-    ): ResponseEntity<*> =
-        when (val response = messageService.messagesByTimeStamp(channelId, timeStamp, limit)) {
+        @RequestParam isBefore: Boolean = true,
+    ): ResponseEntity<*> {
+        val correctTimeStamp = timestamp?.let { Timestamp.valueOf(decodeName(it)) }
+        return when (val response = messageService.messagesByTimeStamp(channelId, correctTimeStamp, limit, isBefore)) {
             is Success -> {
                 ResponseEntity.ok(response.value.map(MessageOutputModel::fromDomain))
             }
@@ -208,12 +222,13 @@ class MessageController(
                 MessageProblem.MessageNotFound.response(NOT_FOUND)
             }
         }
+    }
 
     companion object {
         const val MESSAGE_BASE_URL = "api/messages"
         const val MESSAGE_ID_URL = "/{msgId}"
         const val CHANNEL_MESSAGES_URL = "/channel/{channelId}"
-        const val MESSAGE_TIMESTAMP_URL = "/channel/{channelId}/timestamp/{timeStamp}"
+        const val MESSAGE_TIMESTAMP_URL = "/channel/{channelId}/timestamp"
         const val MESSAGE_SSE_URL = "/sse"
         private const val MESSAGE_SSE_LAST_EVENT_ID = "Last-Event-ID"
     }

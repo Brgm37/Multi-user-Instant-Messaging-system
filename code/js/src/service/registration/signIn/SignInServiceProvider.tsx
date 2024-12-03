@@ -1,6 +1,6 @@
 import * as React from "react";
 import {SignInServiceContext} from "./SignInServiceContext";
-import useSignal from "../../utils/useSignal";
+import useSignal from "../../utils/hooks/useSignal/useSignal";
 import {urlBuilder} from "../../utils/UrlBuilder";
 import {signInValidator} from "../validation/SignInValidator";
 import {Either, success, failure} from "../../../model/Either";
@@ -28,7 +28,7 @@ const invitationCodeHeader = "invitationCode"
 export function SignInServiceProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
     const signal = useSignal()
     const service : SignInServiceContext = {
-        async signIn(username: string, password: string, invitationCode: string): Promise<Either<true, string>> {
+        async signIn(username: string, password: string, invitationCode: string): Promise<Either<AuthInfo, string>> {
             const init: RequestInit = {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -42,9 +42,15 @@ export function SignInServiceProvider({ children }: { children: React.ReactNode 
             }
             const response = await fetch(signInApiUrl, init);
             if (response.ok) {
-                return success(true) as Either<true, string>
+                const data = await response.json()
+                const authInfo: AuthInfo = {
+                    uId: data.uId.toString(),
+                    expirationDate: data.expirationDate.toString(),
+                }
+                return success(authInfo) as Either<AuthInfo, string>
             } else {
-                return failure(response.text()) as Either<true, string>
+                const error = await response.text()
+                return failure(error) as Either<AuthInfo, string>
             }
         },
 

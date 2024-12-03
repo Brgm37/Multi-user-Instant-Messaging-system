@@ -1,5 +1,5 @@
 import React from 'react';
-import {PublicChannel} from "../../model/PublicChannel";
+import {PublicChannel} from "../findChannels/model/PublicChannel";
 
 type PublicChannelsListProps = {
     channels: PublicChannel[];

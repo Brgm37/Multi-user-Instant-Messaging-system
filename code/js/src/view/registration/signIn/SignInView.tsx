@@ -12,7 +12,7 @@ export function SignInView(): React.JSX.Element {
     const location = useLocation()
     if (signIn.tag === "redirect") {
         let source = location.state?.source
-        if (!source) source = "/home"
+        if (!source) source = "/channels"
         return <Navigate to={source} replace={true}></Navigate>
     }
     let visibility

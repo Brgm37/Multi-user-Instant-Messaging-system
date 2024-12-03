@@ -11,12 +11,14 @@ import model.users.UserToken
 data class UserAuthenticatedOutputModel(
     val uId: UInt,
     val token: String,
+    val expirationDate: String,
 ) {
     companion object {
         fun fromDomain(token: UserToken): UserAuthenticatedOutputModel =
             UserAuthenticatedOutputModel(
                 uId = token.uId,
                 token = token.token.toString(),
+                expirationDate = token.expirationDate.toString(),
             )
     }
 }

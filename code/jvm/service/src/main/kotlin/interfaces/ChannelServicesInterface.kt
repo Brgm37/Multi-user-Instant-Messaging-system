@@ -46,11 +46,11 @@ interface ChannelServicesInterface {
     fun getChannel(id: UInt): Either<ChannelError, Channel>
 
     /**
-     * Gets all channels that owner owns.
-     * @param owner The owner of the channels.
+     * Gets all channels that the user is part of.
+     * @param user the user id.
      */
     fun getChannels(
-        owner: UInt,
+        user: UInt,
         offset: UInt = OFFSET,
         limit: UInt = LIMIT,
     ): Either<ChannelError, List<Channel>>
@@ -94,6 +94,21 @@ interface ChannelServicesInterface {
      * @param limit The limit for the channels.
      */
     fun getByName(
+        name: String,
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
+    ): Either<ChannelError, List<Channel>>
+
+    /**
+     * Get a channel list witch the user is part of by its name.
+     *
+     * @param userId The user id.
+     * @param name The name of the channel to get.
+     * @param offset The offset for the channels.
+     * @param limit The limit for the channels.
+     */
+    fun getByName(
+        userId: UInt,
         name: String,
         offset: UInt = OFFSET,
         limit: UInt = LIMIT,
