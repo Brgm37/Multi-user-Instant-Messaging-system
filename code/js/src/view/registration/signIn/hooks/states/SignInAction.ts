@@ -9,7 +9,6 @@ import {SignInValidationResponse} from "../../../../../service/registration/sign
  */
 export type SignInAction =
     { type: "edit", inputName: "username" | "password" | "confirmPassword" | "invitationCode", inputValue: string } |
-    { type: "toggleVisibility", inputName: "password" | "confirmPassword" } |
     { type: "submit" } |
     { type: "success" } |
     { type: "error", message: string } |

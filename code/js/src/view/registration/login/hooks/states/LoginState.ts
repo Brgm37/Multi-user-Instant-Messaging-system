@@ -39,7 +39,7 @@ type InputError = {
  * @prop error The error for the form.
  */
 export type LoginState =
-    { tag: "editing", input: UserInput, visibility: boolean, error?: InputError } |
+    { tag: "editing", input: UserInput, error?: InputError } |
     { tag: "error", message: string, input: UserInput } |
     { tag: "submitting", input: UserInput } |
     { tag: "redirect" }
@@ -73,6 +73,5 @@ export function makeInitialState(): LoginState {
             usernameError: "",
             passwordError: ""
         },
-        visibility: false,
     }
 }

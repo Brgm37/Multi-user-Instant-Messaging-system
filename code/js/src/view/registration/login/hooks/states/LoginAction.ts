@@ -8,7 +8,6 @@ import {LoginValidationResponse} from "../../../../../service/registration/login
  */
 export type LoginAction =
     { type: "edit", inputName: "username" | "password", inputValue: string } |
-    { type: "toggleVisibility" } |
     { type: "submit" } |
     { type: "success" } |
     { type: "error", message: string } |

@@ -2,6 +2,7 @@ import * as React from "react";
 import {InputLabelContext} from "../../components/InputLabelContext";
 import {InputLabel} from "../../components/InputLabel";
 import {UseLoginFormHandler} from "../hooks/handler/UseLoginFormHandler";
+import {LoginBaseView} from "./LoginBaseView";
 
 
 export function LoginErrorView(
@@ -22,11 +23,12 @@ export function LoginErrorView(
         error: loginState.error.passwordError
     }
     return (
-        <div>
-            <InputLabel label="Username" type="text" disabled={false} input={login}/>
-            <InputLabel label="Password" type={"password"} disabled={false} input={password}/>
-            <button disabled={true}>Submit</button>
-            <h2>{message}</h2>
-        </div>
+        <LoginBaseView
+            login={login}
+            password={password}
+            loginState={loginState}
+            inputsDisabled={false}
+            error={message}
+        />
     )
 }

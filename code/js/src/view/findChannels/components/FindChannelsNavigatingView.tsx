@@ -1,5 +1,5 @@
 import React from "react";
-import {PublicChannel} from "../model/PublicChannel";
+import {PublicChannel} from "../../../model/PublicChannel";
 import {PublicChannelsList} from "../../components/PublicChannelsList"
 
 export function FindChannelsNavigatingView(

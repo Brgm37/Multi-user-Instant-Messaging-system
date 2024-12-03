@@ -8,33 +8,30 @@ import {SignInState} from "./hooks/states/SignInState";
 import {useSignInForm} from "./hooks/UseSingInForm";
 
 export function SignInView(): React.JSX.Element {
-    const [signIn, handler] = useSignInForm()
+    const [signInState, handler] = useSignInForm()
     const location = useLocation()
-    if (signIn.tag === "redirect") {
+    if (signInState.tag === "redirect") {
         let source = location.state?.source
         if (!source) source = "/channels"
         return <Navigate to={source} replace={true}></Navigate>
     }
-    let visibility
     let error
-    if (signIn.tag == "editing") {
-        visibility = {password: signIn.visibility.password, confirmPassword: signIn.visibility.confirmPassword}
+    if (signInState.tag == "editing") {
         error = {
-            usernameError: signIn.error.usernameError,
-            passwordError: signIn.error.passwordError,
-            confirmPasswordError: signIn.error.confirmPasswordError,
+            usernameError: signInState.error.usernameError,
+            passwordError: signInState.error.passwordError,
+            confirmPasswordError: signInState.error.confirmPasswordError,
         }
     }
     const input = {
-        username: signIn.input.username,
-        password: signIn.input.password.password,
-        isValid: signIn.input.isValid,
-        confirmPassword: signIn.input.password.confirmPassword,
-        invitationCode: signIn.input.invitationCode,
+        username: signInState.input.username,
+        password: signInState.input.password.password,
+        isValid: signInState.input.isValid,
+        confirmPassword: signInState.input.password.confirmPassword,
+        invitationCode: signInState.input.invitationCode,
     }
     const form = {
         input,
-        visibility,
         error,
     }
     const view = ((s: SignInState) => {
@@ -50,14 +47,7 @@ export function SignInView(): React.JSX.Element {
     return (
         <InputLabelContext.Provider value={form}>
             <div>
-                <h1>Sign In</h1>
-                {view(signIn)}
-                <Link to={
-                    {
-                        pathname: "/login",
-                        search: `?username=${signIn.input.username}&password=${signIn.input.password.password}`
-                    }
-                }>Login</Link>
+                {view(signInState)}
             </div>
         </InputLabelContext.Provider>
     )

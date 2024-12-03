@@ -1,5 +1,5 @@
 import React from 'react';
-import {PublicChannel} from "../findChannels/model/PublicChannel";
+import {PublicChannel} from "../../model/PublicChannel";
 
 type PublicChannelsListProps = {
     channels: PublicChannel[];
@@ -13,10 +13,10 @@ export function PublicChannelsList(
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {channels.map((channel, index) => (
                 <div key={index} className="bg-gray-800 rounded-lg overflow-hidden card">
-                    <img  alt={`Server ${channel.name}`} className="w-full h-40 object-cover" src={'https://cinema10.com.br/upload/noticias/2021-2/10091efaa1.jpg'} />
+                    <img  alt={`Server ${channel.name}`} className="w-full h-40 object-cover" src={channel.icon} />
                     <div className="p-4">
                         <div className="flex items-center space-x-2 mb-2">
-                            <img src={'https://cinema10.com.br/upload/noticias/2021-2/10091efaa1.jpg'} className="h-8 w-8 rounded-full" alt={channel.name}/>
+                            <img src={channel.icon} className="h-8 w-8 rounded-full" alt={channel.name}/>
                             <h3 className="text-lg font-bold text-white">{channel.name}</h3>
                         </div>
                         <p className="text-gray-400 mb-4">Im simply a channel´s description. My only purpose is to show how the description of a channel would look like.</p>
