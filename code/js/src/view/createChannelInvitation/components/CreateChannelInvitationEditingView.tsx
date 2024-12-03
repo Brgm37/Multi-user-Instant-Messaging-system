@@ -1,5 +1,5 @@
 import React from "react";
-import {AccessControl} from "../model/SendChannelInvitation";
+import {AccessControl} from "../model/createChannelInvitation";
 
 /**
  * list of options for the expiration date of the invitation code

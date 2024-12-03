@@ -23,7 +23,7 @@ import {
 import {
     CreateChannelInvitationMockServiceProvider
 } from "../service/createChannelInvitation/mock/CreateChannelInvitationMockServiceProvider";
-import {CreateChannelInvitationView} from "../view/sendChannelInvitation/CreateChannelInvitation";
+import {CreateChannelInvitationView} from "../view/createChannelInvitation/CreateChannelInvitation";
 
 const router = createBrowserRouter(
     [

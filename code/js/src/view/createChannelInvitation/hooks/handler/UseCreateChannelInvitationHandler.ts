@@ -1,4 +1,4 @@
-import {AccessControl} from "../../model/SendChannelInvitation";
+import {AccessControl} from "../../model/createChannelInvitation";
 
 
 export type UseCreateChannelInvitationHandler = {
