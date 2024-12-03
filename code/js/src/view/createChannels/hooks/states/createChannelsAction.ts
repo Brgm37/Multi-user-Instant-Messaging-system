@@ -4,4 +4,4 @@ export type CreateChannelsAction =
     { type: "error", error: string} |
     { type: "success" } |
     { type: "submit" } |
-    { type: "validation-result", response: string | boolean }
+    { type: "validation-result", response: string | true }
