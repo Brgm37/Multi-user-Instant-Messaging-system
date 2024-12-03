@@ -2,33 +2,38 @@ import React, {ReactNode} from "react";
 import useSignal from "../../utils/hooks/useSignal/useSignal";
 import {FindChannelsMockServiceContext} from "./FindChannelsMockServiceContext";
 import {Either, failure, success} from "../../../model/Either";
-import {Channel} from "../../../view/findChannels/model/PublicChannel";
+import {Channel} from "../../../model/Channel";
 
 const mockChannels = [
     {
         name: {name: "test", displayName: "TEST CHANNEL 1"},
         id: 1,
         owner: {id: 1, name: "test1"},
+        icon: '/defaultIcons/icon11.png'
     },
     {
         name: {name: "test", displayName: "TEST CHANNEL 2"},
         id: 2,
         owner: {id: 2, name: "test2"},
+        icon: '/defaultIcons/icon1.jpg'
     },
     {
         name: {name: "test", displayName: "TEST CHANNEL 3"},
         id: 3,
         owner: {id: 3, name: "test3"},
+        icon: '/defaultIcons/icon4.png'
     },
     {
         name: {name: "isel", displayName: "ISEL CHANNEL"},
         id: 4,
         owner: {id: 4, name: "isel"},
+        icon: '/defaultIcons/icon10.png'
     },
     {
         name: {name: "chelas", displayName: "CHELAS CHANNEL"},
         id: 5,
         owner: {id: 5, name: "chelas"},
+        icon: '/defaultIcons/icon8.png'
     }
 ]
 
