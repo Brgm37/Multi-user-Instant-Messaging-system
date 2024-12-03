@@ -26,8 +26,6 @@ export function reduce(state: FindChannelState, action: Action): FindChannelStat
     switch (state.tag) {
         case "navigating":
             switch (action.type) {
-                case "search":
-                    return { tag: "searching", searchBar: state.searchBar, channels: state.channels }
                 case "error":
                     return { tag: "error", error: action.error, channels: [], searchBar: state.searchBar }
                 case "fetchMore":
@@ -35,16 +33,7 @@ export function reduce(state: FindChannelState, action: Action): FindChannelStat
                 case "join":
                     return { tag: "joining", channels: state.channels , searchBar: state.searchBar, channelId: action.channelId }
                 case "edit":
-                    return { tag: "editing", searchBar: action.inputValue, channels: state.channels }
-                default:
-                    return state
-            }
-        case "searching":
-            switch (action.type) {
-                case "success":
-                    return { tag: "navigating", searchBar: state.searchBar, channels: action.channels }
-                case "error":
-                    return { tag: "error", error: action.error, channels: state.channels, searchBar: state.searchBar }
+                    return { tag: "editing", searchBar: action.inputValue, channels: [] }
                 default:
                     return state
             }
@@ -75,8 +64,6 @@ export function reduce(state: FindChannelState, action: Action): FindChannelStat
             }
         case "editing":
             switch (action.type) {
-                case "search":
-                    return { tag: "searching", searchBar: state.searchBar, channels: state.channels };
                 case "error":
                     return { tag: "error", error: action.error, channels: [], searchBar: state.searchBar };
                 case "fetchMore":
@@ -84,7 +71,7 @@ export function reduce(state: FindChannelState, action: Action): FindChannelStat
                 case "join":
                     return { tag: "joining", channels: state.channels, searchBar: state.searchBar, channelId: action.channelId };
                 case "edit":
-                    return { tag: "editing", searchBar: action.inputValue, channels: state.channels };
+                    return { tag: "editing", searchBar: action.inputValue, channels: [] };
                 case "success":
                     return { tag: "navigating", searchBar: state.searchBar, channels: action.channels };
                 default:
@@ -103,26 +90,18 @@ export function useFindChannels(): [FindChannelState, UseFindChannelsHandler] {
     const { getChannelsByPartialName, getPublicChannels, joinChannel } = useContext(FindChannelsMockServiceContext)
     const [state, dispatch] = useReducer(reduce, initialState)
 
-    if (state.tag === "redirect") {
-        window.location.href = `/channel/${state.channelId}`
-    }
-
     useEffect(() => {
         if (state.tag !== "editing") return;
-            const timeout = setTimeout(() => {
-                getChannelsByPartialName(state.searchBar)
-                    .then((response) => {
-                        if (isFailure(response)) {
-                            throw new Error(response.value);
-                        }
-                        dispatch({ type: "success", channels: channelsToPublicChannels(response.value as Channel[]) });
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                        dispatch({ type: "error", error: error.message });
-                    });
-            }, DEBOUNCE_DELAY);
-            return () => clearTimeout(timeout);
+        const timeout = setTimeout(() => {
+            const fetchChannels = state.searchBar === "" ? getPublicChannels(0, CHANNELS_PER_FETCH) : getChannelsByPartialName(state.searchBar);
+            fetchChannels
+                .then((response) => {
+                    if (isFailure(response)) throw new Error(response.value);
+                    dispatch({ type: "success", channels: channelsToPublicChannels(response.value as Channel[]) });
+                })
+                .catch((error) => dispatch({ type: "error", error: error.message }));
+        }, DEBOUNCE_DELAY);
+        return () => clearTimeout(timeout);
     }, [state.searchBar, state.tag]);
 
     const onSearchChange = (searchBar: string) => {
@@ -140,15 +119,6 @@ export function useFindChannels(): [FindChannelState, UseFindChannelsHandler] {
         )
     }
 
-    const onFetch = () => {
-        if (state.tag != "searching") return
-        getChannelsByPartialName(state.searchBar)
-            .then((response) =>
-                dispatch({type: "success", channels: channelsToPublicChannels(response.value as Channel[])}))
-            .catch((error) => dispatch({type: "error", error: error})
-        )
-    }
-
     const onErrorClose = () => {
         if (state.tag != "error") return
         dispatch({type: "closeError"})
@@ -158,12 +128,15 @@ export function useFindChannels(): [FindChannelState, UseFindChannelsHandler] {
         if (state.tag != "navigating") return
         dispatch({type: "join", channelId: channelId})
         joinChannel(channelId)
-            .then(() => dispatch({type: "joined"}))
+            .then((response) => {
+                if (isFailure(response)) throw new Error("Error joining channel")
+                dispatch({type: "joined"})
+            })
             .catch((error) => dispatch({type: "error", error: error})
         )
     }
 
-    return [state, {onSearchChange, onErrorClose, onFetch, onJoin, onFetchMore}]
+    return [state, {onSearchChange, onErrorClose, onJoin, onFetchMore}]
 }
 
 

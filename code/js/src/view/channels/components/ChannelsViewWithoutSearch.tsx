@@ -11,7 +11,7 @@ export default function (): React.JSX.Element {
 
     return (
         <div>
-            <PartialNameSearchBar/>
+            <PartialNameSearchBar className={"bg-gray-700 text-white p-2 rounded"}/>
             <MenuBar/>
             <Outlet/>
         </div>

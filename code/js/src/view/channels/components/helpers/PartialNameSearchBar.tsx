@@ -23,7 +23,9 @@ const MINIMUM_SEARCH_LENGTH = 3;
  * A search bar component.
  * @returns JSX.Element
  */
-export function PartialNameSearchBar(): React.JSX.Element {
+export function PartialNameSearchBar(
+    {className}: {className?: string}
+): React.JSX.Element {
     const {onSearch, onCancelSearch, isSearching} = useContext(ChannelsMenuContext)
     const {findChannelsByName} = useContext(ChannelsServiceContext)
     const [list, setList] = React.useState<Channel[]>([]);
@@ -51,6 +53,7 @@ export function PartialNameSearchBar(): React.JSX.Element {
     return (
         <div>
             <input
+                className={className}
                 type="text"
                 value={value}
                 onChange={handleChange}

@@ -1,5 +1,7 @@
 import * as React from "react"
 import {createRoot} from "react-dom/client"
+import '../../public/index.css'
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import {
     createBrowserRouter,
@@ -18,12 +20,19 @@ import {FindChannelsMockServiceProvider} from "../service/findChannels/mock/Find
 import {ChannelsView} from "../view/channels/ChannelsView";
 //import {ChannelsServiceProviderMock} from "../service/channels/ChannelsServiceProviderMock";
 import {ChannelsServicesProvider} from "../service/channels/ChannelsServicesProvider";
+import {
+    CreateChannelInvitationMockServiceContext
+} from "../service/createChannelInvitation/mock/CreateChannelInvitationMockServiceContext";
+import {
+    CreateChannelInvitationMockServiceProvider
+} from "../service/createChannelInvitation/mock/CreateChannelInvitationMockServiceProvider";
+import {CreateChannelInvitationView} from "../view/createChannelInvitation/CreateChannelInvitation";
 
 const router = createBrowserRouter(
     [
         {
             "path": "/",
-            "element": <Navigate to="/login" replace/>,
+            "element": <Navigate to="/channels" replace/>,
         },
         {
             "path": "/login",
@@ -63,6 +72,13 @@ const router = createBrowserRouter(
                 <FindChannelsMockServiceProvider>
                     <FindChannelsView/>
                 </FindChannelsMockServiceProvider>,
+        },
+        {
+            "path": "/dummy",
+            "element":
+            <CreateChannelInvitationMockServiceProvider>
+                <CreateChannelInvitationView/>
+            </CreateChannelInvitationMockServiceProvider>,
         }
     ]
 )
