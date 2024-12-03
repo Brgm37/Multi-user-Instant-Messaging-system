@@ -8,7 +8,7 @@ import {Context} from "react";
  * @prop onChange The function to handle the change event.
  * @prop error The error message for the input field.
  */
-interface InputLabelContext {
+export interface InputLabelContext {
     input: {
         username: string,
         password: string,
@@ -16,13 +16,9 @@ interface InputLabelContext {
         invitationCode?: string,
         isValid: boolean
     },
-    visibility: {
-        password: boolean,
-        confirmPassword?: boolean
-    },
     error?: {
-        usernameError: string,
-        passwordError: string,
+        usernameError?: string,
+        passwordError?: string,
         confirmPasswordError?: string,
         invitationCodeError?: string
     }
@@ -33,7 +29,6 @@ interface InputLabelContext {
  */
 const defaultInputLabelContext: InputLabelContext = {
     input: {username: '', password: '', isValid: false},
-    visibility: {password: false},
 }
 
 /**
