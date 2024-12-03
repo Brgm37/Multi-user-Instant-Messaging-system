@@ -1,6 +1,7 @@
 import {Channel} from "../../../model/Channel";
 import {Context, createContext} from "react";
 import {HasMore} from "../../../service/utils/hooks/useScroll/UseScroll";
+import {Either} from "../../../model/Either";
 
 /**
  * Context for the channels menu

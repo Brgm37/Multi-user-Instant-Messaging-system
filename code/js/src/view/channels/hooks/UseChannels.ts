@@ -6,8 +6,9 @@ import {ChannelsServiceContext} from "../../../service/channels/ChannelsServiceC
 import useScroll, {HasMore, UseScrollHandler, UseScrollState} from "../../../service/utils/hooks/useScroll/UseScroll";
 import {Channel} from "../../../model/Channel";
 import envConfig from "../../../../envConfig.json"
+import {Either} from "../../../model/Either";
 
-const LIST_LIMIT = envConfig.list_limit
+const LIST_SIZE = envConfig.channels_limit
 const DEFAULT_LIMIT = envConfig.default_limit
 let limit = DEFAULT_LIMIT
 const HAS_MORE = DEFAULT_LIMIT + 1
@@ -76,10 +77,8 @@ function resetList(
     result: Channel[],
 ): void {
     const channels = result.slice(0, limit)
-    listHandler.reset(
-        channels,
-        result.length === HAS_MORE ? {head: false, tail: true} : {head: false, tail: false}
-    )
+    const hasMore = {head: false, tail: result.length === HAS_MORE}
+    listHandler.reset(channels, hasMore)
 }
 
 function addItems(
@@ -94,16 +93,16 @@ function addItems(
     else limit = DEFAULT_LIMIT
     const tail =
         result.length === HAS_MORE && at === "tail" ||
-        at === "head" && list.list.length === LIST_LIMIT
+        at === "head" && list.list.length === LIST_SIZE
     const hasMore: HasMore = {
-        head: offset > 0 && list.list.length === LIST_LIMIT,
+        head: offset > 0 && list.list.length === LIST_SIZE,
         tail
     }
     listHandler.addItems(channels, at, hasMore)
 }
 
 export default function (): [ChannelsState, ChannelsHandler] {
-    const [list, listHandler] = useScroll<Channel>(LIST_LIMIT)
+    const [list, listHandler] = useScroll<Channel>(LIST_SIZE)
     const initialState: ChannelsState = {tag: "idle", channels: list}
     const [state, dispatch] = useReducer(reduce, initialState)
     const service = useContext(ChannelsServiceContext)
@@ -121,6 +120,7 @@ export default function (): [ChannelsState, ChannelsHandler] {
     }, [list]);
     const handler: ChannelsHandler = {
         clear(): void {
+            if (state.tag === "channels") return
             service.findChannels(0, HAS_MORE)
                 .then(result => {
                     if (result.tag === "success") resetList(listHandler, result.value)
@@ -164,7 +164,7 @@ export default function (): [ChannelsState, ChannelsHandler] {
                     else dispatch({tag: "searchError", message: result.value, previous: state})
                 })
             dispatch({tag: "loadMore", at})
-        }
+        },
     }
     return [state, handler]
 }
