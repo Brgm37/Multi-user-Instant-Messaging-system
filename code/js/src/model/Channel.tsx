@@ -1,4 +1,7 @@
 import {jsonToMessage, Message} from "./Message";
+import {AccessControl} from "./AccessControl";
+import {ChannelVisibility} from "./ChannelVisibility";
+import {PublicChannel} from "./PublicChannel";
 
 /**
  * @type Channel
@@ -15,18 +18,51 @@ export type Channel = Identifiable & {
     name: string,
     messages: Message[],
     hasMore: boolean,
+    accessControl: AccessControl,
+    visibility: ChannelVisibility,
+    owner: Owner,
+    icon: string,
+}
+
+/**
+ * @description Owner type.
+ *
+ * @type Owner
+ * @prop id The id of the owner.
+ * @prop name The name of the owner.
+ */
+type Owner = {
+    id: number,
+    name: string,
 }
 
 export function jsonToChannel(json: any): Channel {
     let messages = json.messages
-    let hasMore = json.hasMore
-    if (hasMore === undefined) hasMore = false
-    if (messages === undefined) messages = []
-    else messages.map((msg: any) => jsonToMessage(msg))
+    if (messages !== undefined) messages.map((msg: any) => jsonToMessage(msg))
+
     return {
         id: json.id,
         name: json.name.displayName as string,
         messages: messages,
-        hasMore: hasMore,
+        hasMore: json.hasMore,
+        accessControl: json.access,
+        visibility: json.visibility,
+        owner: json.owner,
+        icon: json.icon
+    }
+}
+
+/**
+ * @description Converts a channel to a public channel.
+ *
+ * @param json The object to convert.
+ * @returns PublicChannel
+ */
+export function jsonToPublicChannel(json: any): PublicChannel {
+    return {
+        id: json.id,
+        name: json.name.displayName,
+        owner: json.owner.name,
+        icon: json.icon
     }
 }
