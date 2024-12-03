@@ -1,10 +1,14 @@
-import {SendChannelInvitationState} from "./states/SendChannelInvitationState";
-import {SendChannelInvitationAction} from "./states/SendChannelInvitationAction";
-import {UseSendChannelInvitationHandler} from "./handler/UseSendChannelInvitationHandler";
+import {CreateChannelInvitationState} from "./states/CreateChannelInvitationState";
+import {CreateChannelInvitationAction} from "./states/CreateChannelInvitationAction";
+import {UseCreateChannelInvitationHandler} from "./handler/UseCreateChannelInvitationHandler";
 import {useContext, useReducer} from "react";
+import {
+    CreateChannelInvitationMockServiceContext
+} from "../../../service/createChannelInvitation/mock/CreateChannelInvitationMockServiceContext";
+import {isFailure} from "../../../model/Either";
 
 
-export function reduce(state: SendChannelInvitationState, action: SendChannelInvitationAction): SendChannelInvitationState {
+export function reduce(state: CreateChannelInvitationState, action: CreateChannelInvitationAction): CreateChannelInvitationState {
     switch (state.tag) {
         case "editingInvitationToken":
             switch (action.type) {
@@ -47,15 +51,21 @@ export function reduce(state: SendChannelInvitationState, action: SendChannelInv
     }
 }
 
-const initialState: SendChannelInvitationState = { tag: "editingInvitationToken", inputs: { maxUses: 1, accessControl: "READ_WRITE"} }
+const initialState: CreateChannelInvitationState = { tag: "editingInvitationToken", inputs: { maxUses: 1, accessControl: "READ_WRITE"} }
 
-export function useSendChannelInvitation(): [SendChannelInvitationState, UseSendChannelInvitationHandler] {
-    // const context = useContext(SendChannelInvitationContext)
+export function useCreateChannelInvitation(): [CreateChannelInvitationState, UseCreateChannelInvitationHandler] {
+    const { createChannelInvitation } = useContext(CreateChannelInvitationMockServiceContext)
     const [state, dispatch] = useReducer(reduce, initialState)
 
-    const onCreate = (expirationDate: string, maxUses: number, accessControl: "READ_ONLY" | "READ_WRITE") => {
+    const onCreate = (expirationDate: string, maxUses: string, accessControl: "READ_ONLY" | "READ_WRITE") => {
         if (state.tag !== "editingInvitationToken") return
-        dispatch({ type: "create", expirationDate, maxUses, accessControl })
+        let maxUsesInt = parseInt(maxUses)
+        dispatch({ type: "create", expirationDate, maxUses: maxUsesInt, accessControl })
+        createChannelInvitation(expirationDate, maxUsesInt, accessControl).then(r => {
+                if (isFailure(r)) dispatch({type: "error", error: r.value})
+                else dispatch({ type: "success", invitationToken: r.value.invitationCode })
+            }
+        )
     }
 
     const onClose = () => {
