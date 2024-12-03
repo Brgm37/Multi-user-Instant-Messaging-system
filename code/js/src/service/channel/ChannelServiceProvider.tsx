@@ -46,8 +46,17 @@ export function ChannelServiceProvider({children}: { children: React.ReactNode }
                 return failure(error) as Either<Channel, string>
             }
         },
-        async loadMore(cId: string, timestamp: string, limit: number): Promise<Either<Message[], string>> {
-            const url = `${messageApiUrl}/${cId}/${timestamp}?limit=${limit}`
+        async loadMore(
+            cId: string,
+            timestamp: string,
+            limit: number,
+            at: "before" | "after"
+        ): Promise<Either<Message[], string>> {
+            let url = `${messageApiUrl}/channel/${cId}/timestamp`
+            if (timestamp === "0") url = `${url}?limit=${limit}`
+            else url = `${url}?timestamp=${encodeURIComponent(timestamp)}&limit=${limit}`
+            url = `${url}&isBefore=${at === "before"}`
+            console.log("loading more", url)
             const init: RequestInit = {
                 method: "GET",
                 headers: {"Content-Type": "application/json"},
@@ -57,14 +66,17 @@ export function ChannelServiceProvider({children}: { children: React.ReactNode }
             const response = await fetch(url, init);
             if (response.ok) {
                 const messages = await response.json()
-                messages.map((msg: any) => jsonToMessage(msg))
-                return success(messages) as Either<Message[], string>
+                return success(
+                    messages.map((msg: any) => {
+                        return jsonToMessage(msg)
+                    })
+                ) as Either<Message[], string>
             } else {
                 const error = await response.text()
                 return failure(error) as Either<Message[], string>
             }
         },
-        async sendMsg(cId: string, msg: string): Promise<Either<void, string>> {
+        async sendMsg(cId: string, msg: string): Promise<Either<Message, string>> {
             const init: RequestInit = {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -74,10 +86,11 @@ export function ChannelServiceProvider({children}: { children: React.ReactNode }
             }
             const response = await fetch(messageApiUrl, init);
             if (response.ok) {
-                return success(undefined) as Either<void, string>
+                const data = await response.json()
+                return success(jsonToMessage(data)) as Either<Message, string>
             } else {
                 const error = await response.text()
-                return failure(error) as Either<void, string>
+                return failure(error) as Either<Message, string>
             }
         }
     }
