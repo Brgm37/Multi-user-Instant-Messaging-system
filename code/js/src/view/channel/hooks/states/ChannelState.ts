@@ -1,4 +1,5 @@
 import {Message} from "../../../../model/Message";
+import {UseScrollState} from "../../../../service/utils/hooks/useScroll/UseScroll";
 
 /**
  * @type ChannelState
@@ -7,17 +8,7 @@ import {Message} from "../../../../model/Message";
  * This type is used to represent the state of the channel component.
  */
 export type ChannelState =
-    { tag: "idle" } |
-    { tag: "init" } |
-    { tag: "loaded", messages: Message[], hasMore: boolean } |
-    { tag: "error", error: string, previous: ChannelState } |
-    { tag: "loading", messages: Message[], hasMore: boolean, intent: ("loadMore" | "sendMessage")[] }
-
-/**
- * The function that returns the initial state.
- *
- * @return [ChannelState]
- */
-export function makeChannelInitialState(): ChannelState {
-    return {tag: "idle"}
-}
+    { tag: "idle", messages: UseScrollState<Message> } |
+    { tag: "messages", messages: UseScrollState<Message> } |
+    { tag: "loading", messages: UseScrollState<Message>, at: "head" | "tail" | "sending" } |
+    { tag: "error", message: string, previous: ChannelState }

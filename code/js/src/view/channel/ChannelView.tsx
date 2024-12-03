@@ -2,10 +2,12 @@ import * as React from "react";
 import {useChannel} from "./hooks/UseChannel";
 import {ChannelState} from "./hooks/states/ChannelState";
 import {InitLoadingView} from "./components/InitLoadingView";
-//import {MessageList} from "./components/MessageList";
 import {ChannelErrorView} from "./components/ChannelErrorView";
-import {MessageViewContext} from "./components/MessageViewContext";
 import {AuthValidator} from "../session/authValidator";
+import {InfiniteScrollContext} from "../components/infiniteScroll/InfiniteScrollContext";
+import {Message} from "../../model/Message";
+import InfiniteScroll from "../components/infiniteScroll/InfiniteScroll";
+import {InputText} from "./components/InputText";
 
 function ChannelView(): React.JSX.Element {
     const [state, handler] = useChannel()
@@ -15,24 +17,29 @@ function ChannelView(): React.JSX.Element {
                 handler.initChannel()
                 return <InitLoadingView/>
             }
-            case "init":
-                return <InitLoadingView/>
             case "error":
                 return <ChannelErrorView/>
             default: {
-                const provider: MessageViewContext = {
-                    hasMore: state.hasMore,
-                    isLoadingMore: state.tag === "loading" && state.intent.includes("loadMore"),
-                    isSending: state.tag === "loading" && state.intent.includes("sendMessage"),
-                    messages: state.messages,
-                    loadMore: handler.loadMore,
-                    sendMsg: handler.sendMsg
+                const value: InfiniteScrollContext<Message> = {
+                    list: state.messages.list,
+                    hasMore: state.messages.hasMore,
+                    isLoading: state.tag === "loading" && state.at !== "sending" ? state.at : false,
+                    listMaxSize: state.messages.max,
+                    loadMore(_ ,at: "head" | "tail"): void {handler.loadMore(at)},
+                    renderItems(item: Message): React.ReactNode {
+                        return (
+                            <div>
+                                <div>{item.owner.username}</div>
+                                <div>{item.text}</div>
+                            </div>
+                        )
+                    },
                 }
                 return (
-                    <MessageViewContext.Provider value={provider}>
-                        {/*<MessageList/>*/}
-                        <div>Hello</div>
-                    </MessageViewContext.Provider>
+                    <InfiniteScrollContext.Provider value={value}>
+                        <InfiniteScroll/>
+                        <InputText onSubmit={handler.sendMsg}/>
+                    </InfiniteScrollContext.Provider>
                 )
             }
         }
