@@ -1,6 +1,6 @@
 import {Either} from "../../../model/Either";
-import {Channel} from "../../../view/findChannels/model/PublicChannel";
 import {createContext} from "react";
+import {Channel} from "../../../model/Channel";
 
 export interface FindChannelsMockServiceContext {
     getChannelsByPartialName(partialName: string): Promise<Either<Channel[], string>>

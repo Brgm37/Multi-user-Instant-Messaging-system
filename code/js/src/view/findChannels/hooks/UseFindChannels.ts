@@ -1,18 +1,26 @@
 import {Action} from "./states/FindChannelsAction";
 import {FindChannelState} from "./states/FindChannelsState";
 import {useContext, useEffect, useReducer} from "react";
-import {Channel, channelsToPublicChannels} from "../model/PublicChannel";
 import {UseFindChannelsHandler} from "./handler/UseFindChannelsHandler";
 import {FindChannelsMockServiceContext} from "../../../service/findChannels/mock/FindChannelsMockServiceContext";
 import {isFailure} from "../../../model/Either";
+import envConfig from "../../../../envConfig.json"
+import {channelsToPublicChannels} from "../../../model/PublicChannel";
 
 /**
  * The delay for debounce.
- *
  */
 const DEBOUNCE_DELAY = 500;
 
-const CHANNELS_PER_FETCH = 10;
+/**
+ * The number of channels to fetch per request.
+ */
+const CHANNELS_PER_FETCH = envConfig.public_channels_limit
+
+/**
+ * The default offset.
+ */
+const DEFAULT_OFFSET = envConfig.default_offset
 
 /**
  * The reducer function for the find channels form.
@@ -93,13 +101,15 @@ export function useFindChannels(): [FindChannelState, UseFindChannelsHandler] {
     useEffect(() => {
         if (state.tag !== "editing") return;
         const timeout = setTimeout(() => {
-            const fetchChannels = state.searchBar === "" ? getPublicChannels(0, CHANNELS_PER_FETCH) : getChannelsByPartialName(state.searchBar);
+            const fetchChannels =
+                state.searchBar === ""
+                    ? getPublicChannels(DEFAULT_OFFSET, CHANNELS_PER_FETCH)
+                    : getChannelsByPartialName(state.searchBar);
             fetchChannels
                 .then((response) => {
-                    if (isFailure(response)) throw new Error(response.value);
-                    dispatch({ type: "success", channels: channelsToPublicChannels(response.value as Channel[]) });
+                    if (isFailure(response)) dispatch({ type: "error", error: response.value })
+                    else dispatch({ type: "success", channels: channelsToPublicChannels(response.value) })
                 })
-                .catch((error) => dispatch({ type: "error", error: error.message }));
         }, DEBOUNCE_DELAY);
         return () => clearTimeout(timeout);
     }, [state.searchBar, state.tag]);
@@ -113,10 +123,13 @@ export function useFindChannels(): [FindChannelState, UseFindChannelsHandler] {
         if (state.tag != "navigating") return
         dispatch({type: "fetchMore"})
         getPublicChannels(state.channels.length, CHANNELS_PER_FETCH)
-            .then((response) =>
-                dispatch({type: "success", channels: channelsToPublicChannels(response.value as Channel[])}))
-            .catch((error) => dispatch({type: "error", error: error})
-        )
+            .then((response) => {
+                if (isFailure(response)) {
+                    dispatch({type: "error", error: response.value})
+                } else {
+                    dispatch({type: "success", channels: channelsToPublicChannels(response.value)})
+                }
+            })
     }
 
     const onErrorClose = () => {
@@ -129,11 +142,9 @@ export function useFindChannels(): [FindChannelState, UseFindChannelsHandler] {
         dispatch({type: "join", channelId: channelId})
         joinChannel(channelId)
             .then((response) => {
-                if (isFailure(response)) throw new Error("Error joining channel")
-                dispatch({type: "joined"})
+                if (isFailure(response)) dispatch({ type: "error", error: response.value })
+                else dispatch({type: "joined"})
             })
-            .catch((error) => dispatch({type: "error", error: error})
-        )
     }
 
     return [state, {onSearchChange, onErrorClose, onJoin, onFetchMore}]

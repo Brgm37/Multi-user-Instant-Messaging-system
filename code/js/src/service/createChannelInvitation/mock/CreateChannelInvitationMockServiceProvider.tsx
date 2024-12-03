@@ -3,7 +3,7 @@ import React, {ReactNode} from "react";
 import useSignal from "../../utils/hooks/useSignal/useSignal";
 import {Either, failure, success} from "../../../model/Either";
 import { CreateChannelInvitationMockServiceContext } from './CreateChannelInvitationMockServiceContext';
-import {AccessControl} from "../../../view/createChannelInvitation/model/createChannelInvitation";
+import {AccessControl} from "../../../model/AccessControl";
 
 export function CreateChannelInvitationMockServiceProvider(props: { children: ReactNode }): React.JSX.Element {
     const signal = useSignal()

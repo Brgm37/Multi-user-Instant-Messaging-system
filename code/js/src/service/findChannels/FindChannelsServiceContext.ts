@@ -1,6 +1,6 @@
 import {Either} from "../../model/Either";
-import {Channel} from "../../view/findChannels/model/PublicChannel";
 import {Context, createContext} from "react";
+import {Channel} from "../../model/Channel";
 
 
 /**

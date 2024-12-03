@@ -20,11 +20,7 @@ import {FindChannelsMockServiceProvider} from "../service/findChannels/mock/Find
 import {AboutView} from "../view/about/AboutView";
 import {CreateChannelsView} from "../view/createChannels/createChannelsView";
 import {ChannelsView} from "../view/channels/ChannelsView";
-//import {ChannelsServiceProviderMock} from "../service/channels/ChannelsServiceProviderMock";
 import {ChannelsServicesProvider} from "../service/channels/ChannelsServicesProvider";
-import {
-    CreateChannelInvitationMockServiceContext
-} from "../service/createChannelInvitation/mock/CreateChannelInvitationMockServiceContext";
 import {
     CreateChannelInvitationMockServiceProvider
 } from "../service/createChannelInvitation/mock/CreateChannelInvitationMockServiceProvider";
