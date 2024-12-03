@@ -3,15 +3,17 @@ import {ChannelAction} from "./states/ChannelAction";
 import {useContext, useEffect, useReducer} from "react";
 import {useParams} from "react-router-dom";
 import {ChannelServiceContext} from "../../../service/channel/ChannelServiceContext";
-import useScroll, {UseScrollHandler, UseScrollState} from "../../../service/utils/hooks/useScroll/UseScroll";
-import {compareTimestamps, Message} from "../../../model/Message";
+import useScroll from "../../../service/utils/hooks/useScroll/UseScroll";
+import {Message} from "../../../model/Message";
 import envConfig from "../../../../envConfig.json"
+import {SseCommunicationServiceContext} from "../../../service/sse/SseCommunicationService";
+import {UseChannelHandler} from "./handler/UseChannelHandler";
+import {addItems, addMessage, initList} from "./handler/helper/MessagesLoader";
 
 const LIST_SIZE = envConfig.messages_limit
 const DEFAULT_LIMIT = envConfig.default_limit
 let limit = DEFAULT_LIMIT
 const HAS_MORE = DEFAULT_LIMIT + 1
-
 
 /**
  * The reducer function for the channel component.
@@ -27,6 +29,8 @@ function reduce(state: ChannelState, action: ChannelAction): ChannelState {
             switch (action.tag) {
                 case "init":
                     return {tag: "loading", messages: state.messages, at: "tail"}
+                case "reset":
+                    return {tag: "idle", messages: action.messages}
                 default:
                     throw new Error(`Invalid action ${action.tag} for state ${state.tag}`)
             }
@@ -38,8 +42,12 @@ function reduce(state: ChannelState, action: ChannelAction): ChannelState {
                     return action.previous
                 case "sendSuccess":
                     return {tag: "messages", messages: state.messages}
+                case "receiving-sse":
+                    return state
                 case "sendError":
                     return {tag: "error", message: action.error, previous: state}
+                case "reset":
+                    return {tag: "idle", messages: action.messages}
                 default:
                     throw new Error(`Invalid action ${action.tag} for state ${state.tag}`)
             }
@@ -47,6 +55,8 @@ function reduce(state: ChannelState, action: ChannelAction): ChannelState {
             switch (action.tag) {
                 case "go-back":
                     return state.previous
+                case "reset":
+                    return {tag: "idle", messages: action.messages}
                 default:
                     throw new Error(`Invalid action ${action.tag} for state ${state.tag}`)
             }
@@ -56,41 +66,14 @@ function reduce(state: ChannelState, action: ChannelAction): ChannelState {
                     return {tag: "loading", messages: state.messages, at: action.at}
                 case "sendMessage":
                     return {tag: "loading", messages: state.messages, at: "sending"}
+                case "receiving-sse":
+                    return {tag: "loading", messages: state.messages, at: "head"}
+                case "reset":
+                    return {tag: "idle", messages: action.messages}
                 default:
                     throw new Error(`Invalid action ${action.tag} for state ${state.tag}`)
             }
     }
-}
-
-export type UseChannelHandler = {
-    initChannel(): void
-    loadMore(at: "head" | "tail"): void
-    sendMsg(msg: string): void
-}
-
-function initList(handler: UseScrollHandler<Message>, messages: Message[]): void {
-    const list = messages.slice(0, limit)
-    const hasMore = {head: false, tail: messages.length === HAS_MORE}
-    handler.reset(list, hasMore)
-}
-
-function addItems(
-    at: "head" | "tail",
-    listHandler: UseScrollHandler<Message>,
-    list: UseScrollState<Message>,
-    result: Message[]
-): void {
-    const messages = result.slice(0, limit)
-    if (messages.length < limit) limit = messages.length
-    else limit = DEFAULT_LIMIT
-    const tail =
-        result.length === HAS_MORE && at === "tail" ||
-        at === "head" && list.list.length === LIST_SIZE
-    const hasMore = {
-        head: compareTimestamps(messages[messages.length -1], list.list[0]) < 0 && list.list.length === LIST_SIZE,
-        tail
-    }
-    listHandler.addItems(messages, at, hasMore)
 }
 
 /**
@@ -98,10 +81,30 @@ function addItems(
  */
 export function useChannel(): [ChannelState, UseChannelHandler] {
     const {id} = useParams()
+    const {messages, consumeMessage} = useContext(SseCommunicationServiceContext)
     const [list, listHandler] = useScroll<Message>(LIST_SIZE)
     const initialState: ChannelState = {tag: "idle", messages: list}
     const service = useContext(ChannelServiceContext)
     const [state, dispatcher] = useReducer(reduce, initialState)
+
+    useEffect(() => {
+        if (state.tag !== "messages") return
+        const toRemove: Message[] = []
+        for (const message of messages) {
+            if (message.channel == id) {
+                if (!list.list.some(m => m.id === message.id)) {
+                    dispatcher({tag: "receiving-sse"})
+                    addMessage(listHandler, list, message)
+                }
+                toRemove.push(message)
+            }
+        }
+        if (toRemove.length > 0) consumeMessage(toRemove)
+    }, [messages, state]);
+
+    useEffect(() => {
+        dispatcher({tag: "reset", messages: list})
+    }, [id]);
 
     useEffect(() => {
         if (state.tag === "error") return
@@ -109,9 +112,6 @@ export function useChannel(): [ChannelState, UseChannelHandler] {
             if (state.messages !== list) {
                 dispatcher({tag: "loadSuccess", messages: list})
             }
-            console.log("list size", list.list.length)
-            console.log("list max", list.max)
-            console.log("list ", JSON.stringify(list.list))
         }
     }, [list]);
 
@@ -120,31 +120,31 @@ export function useChannel(): [ChannelState, UseChannelHandler] {
             service
                 .loadMore(id, "0", HAS_MORE, "before")
                 .then(response => {
-                    if (response.tag === "success") initList(listHandler, response.value)
+                    if (response.tag === "success") initList(listHandler, response.value, limit, HAS_MORE)
                     else dispatcher({tag: "loadError", error: response.value, previous: state})
                 })
             dispatcher({tag: "init"})
         },
         loadMore(at): void {
-            const timestamp = at === "head" ? list.list[0].timestamp : list.list[list.list.length - 1].timestamp
-            const beforeOrAfter = at === "head" ? "before" : "after"
-            console.log("loading more", beforeOrAfter, timestamp)
+            const timestamp = at === "head" ?
+                list.list[0].timestamp :
+                list.list[list.list.length - 1].timestamp
+            const beforeOrAfter = at === "head" ? "after" : "before"
             service
-                .loadMore(id, timestamp, limit, beforeOrAfter)
+                .loadMore(id, timestamp, HAS_MORE, beforeOrAfter)
                 .then(response => {
-                    if (response.tag === "success") addItems(at, listHandler, list, response.value)
+                    if (response.tag === "success")
+                        addItems(at, listHandler, list, response.value, limit, DEFAULT_LIMIT, HAS_MORE, LIST_SIZE)
                     else dispatcher({tag: "loadError", error: response.value, previous: state})
                 })
-            dispatcher({tag:"loadMore", at})
+            dispatcher({tag: "loadMore", at})
         },
         sendMsg(msg: string): void {
             service
                 .sendMsg(id, msg)
                 .then(response => {
-                    if (response.tag === "success") {
-                        addItems("tail", listHandler, list, [response.value])
-                        dispatcher({tag: "sendSuccess"})
-                    } else dispatcher({tag: "sendError", error: response.value, previous: state})
+                    if (response.tag === "success") addMessage(listHandler, list, response.value)
+                    else dispatcher({tag: "sendError", error: response.value, previous: state})
                 })
             dispatcher({tag: "sendMessage"})
         }

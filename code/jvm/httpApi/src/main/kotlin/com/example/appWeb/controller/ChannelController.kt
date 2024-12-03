@@ -255,6 +255,6 @@ class ChannelController(
         /**
          * The URL for the user's channels with the given name.
          */
-        const val MY_CHANNELS_WITH_NAME = "/my/{name}"
+        const val MY_CHANNELS_WITH_NAME = "${MY_CHANNELS}/{name}"
     }
 }

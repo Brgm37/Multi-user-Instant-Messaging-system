@@ -172,7 +172,7 @@ class MessageJDBC(
             FROM v_message
             WHERE msgChannelId = ?
             AND msgTimestamp $beforeOrAfter ?
-            ORDER BY msgTimestamp
+            ORDER BY msgTimestamp DESC
             LIMIT ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)

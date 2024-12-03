@@ -7,8 +7,16 @@ export function InputText(
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => setText(event.target.value)
     return (
         <div>
-            <input type="text" value={text} onChange={handleChange}/>
-            <button onClick={() => onSubmit(text)}>Submit</button>
+            <input
+                type="text"
+                value={text}
+                onChange={handleChange}
+                className={"bg-gray-700 text-white p-2 rounded"}
+            />
+            <button onClick={() => {
+                onSubmit(text)
+                setText('')
+            }}>Submit</button>
         </div>
     )
 }
