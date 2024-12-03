@@ -12,9 +12,4 @@ export type Dev = {
 export type AboutState =
     { tag: "iddle" } |
     { tag: "devView", dev: Dev } |
-    { tag: "expandedBio", dev: Dev } |
     { tag: "redirect" }
-
-export function makeInitialState(): AboutState {
-    return {tag: "iddle"}
-}
