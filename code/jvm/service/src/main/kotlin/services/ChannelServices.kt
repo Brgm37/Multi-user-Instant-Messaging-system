@@ -94,14 +94,14 @@ class ChannelServices(
             }
 
     override fun getChannels(
-        owner: UInt,
+        user: UInt,
         offset: UInt,
         limit: UInt,
     ): Either<ChannelError, List<Channel>> =
         repoManager
             .run {
-                val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
-                val id = checkNotNull(user.uId) { "User id is null" }
+                val u = userRepo.findById(user) ?: return@run failure(UserNotFound)
+                val id = checkNotNull(u.uId) { "User id is null" }
                 val channels = channelRepo.findByUserId(id, offset.toInt(), limit.toInt())
                 success(channels)
             }
@@ -181,6 +181,19 @@ class ChannelServices(
                 val channels = channelRepo.findByName(name, offset, limit)
                 success(channels)
             }
+
+    override fun getByName(
+        userId: UInt,
+        name: String,
+        offset: UInt,
+        limit: UInt,
+    ): Either<ChannelError, List<Channel>> =
+        repoManager.run {
+            val user = userRepo.findById(userId) ?: return@run failure(UserNotFound)
+            val uId = checkNotNull(user.uId) { "User id is null" }
+            val channels = channelRepo.findByName(uId, name, offset, limit)
+            success(channels)
+        }
 
     private fun makeTimeStamp(expirationDate: String) =
         try {
