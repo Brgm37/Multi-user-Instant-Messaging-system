@@ -29,7 +29,7 @@ data class UserToken(
     val isExpired: Boolean
         get() = expirationDate < Timestamp(System.currentTimeMillis())
 
-    val creationDateInInt: Int
+    val expirationDateInInt: Int
         get() {
             val currTime = System.currentTimeMillis()
             val expirationTime = expirationDate.time

@@ -100,13 +100,14 @@ class MessageServices(
 
     override fun messagesByTimeStamp(
         channelId: UInt,
-        timestamp: Timestamp,
+        timestamp: Timestamp?,
         limit: UInt,
+        isBefore: Boolean,
     ): Either<MessageError, List<Message>> {
         return repoManager.run {
             val channel = channelRepo.findById(channelId) ?: return@run failure(MessageError.ChannelNotFound)
             val chId = checkNotNull(channel.cId) { "Channel id is null" }
-            val messages = messageRepo.findMessagesByTimeStamp(chId, timestamp, limit)
+            val messages = messageRepo.findMessagesByTimeStamp(chId, timestamp, limit, isBefore)
             success(messages)
         }
     }

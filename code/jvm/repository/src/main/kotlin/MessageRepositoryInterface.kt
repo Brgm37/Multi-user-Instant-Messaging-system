@@ -43,11 +43,13 @@ interface MessageRepositoryInterface : Repository<Message> {
      * @param channelId The ID of the channel
      * @param timestamp The timestamp to search for
      * @param limit The maximum number of messages to retrieve
+     * @param isBefore Whether to search for messages before or after the timestamp
      * @return A [List] with all [Message] in the channel
      */
     fun findMessagesByTimeStamp(
         channelId: UInt,
-        timestamp: Timestamp,
+        timestamp: Timestamp?,
         limit: UInt,
+        isBefore: Boolean,
     ): List<Message>
 }

@@ -26,8 +26,6 @@ export function reduce(state: FindChannelState, action: Action): FindChannelStat
     switch (state.tag) {
         case "navigating":
             switch (action.type) {
-                case "search":
-                    return { tag: "searching", searchBar: state.searchBar, channels: state.channels }
                 case "error":
                     return { tag: "error", error: action.error, channels: [], searchBar: state.searchBar }
                 case "fetchMore":
@@ -36,15 +34,6 @@ export function reduce(state: FindChannelState, action: Action): FindChannelStat
                     return { tag: "joining", channels: state.channels , searchBar: state.searchBar, channelId: action.channelId }
                 case "edit":
                     return { tag: "editing", searchBar: action.inputValue, channels: [] }
-                default:
-                    return state
-            }
-        case "searching":
-            switch (action.type) {
-                case "success":
-                    return { tag: "navigating", searchBar: state.searchBar, channels: action.channels }
-                case "error":
-                    return { tag: "error", error: action.error, channels: state.channels, searchBar: state.searchBar }
                 default:
                     return state
             }
@@ -75,8 +64,6 @@ export function reduce(state: FindChannelState, action: Action): FindChannelStat
             }
         case "editing":
             switch (action.type) {
-                case "search":
-                    return { tag: "searching", searchBar: state.searchBar, channels: state.channels };
                 case "error":
                     return { tag: "error", error: action.error, channels: [], searchBar: state.searchBar };
                 case "fetchMore":
@@ -132,15 +119,6 @@ export function useFindChannels(): [FindChannelState, UseFindChannelsHandler] {
         )
     }
 
-    const onFetch = () => {
-        if (state.tag != "searching") return
-        getChannelsByPartialName(state.searchBar)
-            .then((response) =>
-                dispatch({type: "success", channels: channelsToPublicChannels(response.value as Channel[])}))
-            .catch((error) => dispatch({type: "error", error: error})
-        )
-    }
-
     const onErrorClose = () => {
         if (state.tag != "error") return
         dispatch({type: "closeError"})
@@ -158,7 +136,7 @@ export function useFindChannels(): [FindChannelState, UseFindChannelsHandler] {
         )
     }
 
-    return [state, {onSearchChange, onErrorClose, onFetch, onJoin, onFetchMore}]
+    return [state, {onSearchChange, onErrorClose, onJoin, onFetchMore}]
 }
 
 

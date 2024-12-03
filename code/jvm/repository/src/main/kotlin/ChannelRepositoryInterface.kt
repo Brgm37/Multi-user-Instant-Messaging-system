@@ -114,4 +114,19 @@ interface ChannelRepositoryInterface : Repository<Channel> {
         offset: UInt = OFFSET,
         limit: UInt = LIMIT,
     ): List<Channel>
+
+    /**
+     * Retrieves all channels with a name that partially matches the given name and the user is part of.
+     *
+     * @param userId The ID of the user
+     * @param name The name of the channel
+     * @param offset The offset for the channels
+     * @param limit The maximum number of channels to retrieve
+     */
+    fun findByName(
+        userId: UInt,
+        name: String,
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
+    ): List<Channel>
 }

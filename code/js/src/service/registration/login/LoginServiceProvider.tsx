@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {LoginServiceContext} from "./LoginServiceContext";
-import useSignal from "../../utils/useSignal";
+import useSignal from "../../utils/hooks/useSignal/useSignal";
 import {urlBuilder} from "../../utils/UrlBuilder";
 import {loginValidator} from "../validation/LoginValidator";
 import {Either, success, failure} from "../../../model/Either";
@@ -23,7 +23,7 @@ const passwordHeader = "password"
 export function LoginServiceProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
     const signal = useSignal()
     const service : LoginServiceContext = {
-        async login(username: string, password: string): Promise<Either<true, string>> {
+        async login(username: string, password: string): Promise<Either<AuthInfo, string>> {
             const init: RequestInit = {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -33,9 +33,15 @@ export function LoginServiceProvider({ children }: { children: React.ReactNode }
             }
             const response = await fetch(loginApiUrl, init);
             if (response.ok) {
-                return success(true) as Either<true, string>
+                const data = await response.json()
+                const authInfo: AuthInfo = {
+                    uId: data.uId.toString(),
+                    expirationDate: data.expirationDate.toString(),
+                }
+                return success(authInfo) as Either<AuthInfo, string>
             } else {
-                return failure(response.text()) as Either<true, string>
+                const error = await response.text()
+                return failure(error) as Either<AuthInfo, string>
             }
         },
         stateValidator: loginValidator

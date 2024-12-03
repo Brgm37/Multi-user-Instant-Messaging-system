@@ -7,13 +7,6 @@ export type UseFindChannelsHandler = {
     onSearchChange: (searchBar: string) => void
 
     /**
-     * The function to call when the user wants to fetch channels
-     *
-     * @returns void
-     */
-    onFetch: () => void
-
-    /**
      * The function to call when the user wants to join a channel.
      *
      * @param channelId The id of the channel to join.

@@ -1,6 +1,6 @@
 import React from "react";
 import {PublicChannel} from "../model/PublicChannel";
-import {PublicChannelsList} from "./shared/PublicChannelsList";
+import {PublicChannelsList} from "../../components/PublicChannelsList"
 
 export function FindChannelsNavigatingView(
     {channels, onClick}: {channels: PublicChannel[], onClick: (channelId: number) => void}

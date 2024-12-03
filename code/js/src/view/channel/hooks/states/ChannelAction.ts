@@ -1,6 +1,7 @@
 import {Message} from "../../../../model/Message";
 import {Channel} from "../../../../model/Channel";
 import {ChannelState} from "./ChannelState";
+import {UseScrollState} from "../../../../service/utils/hooks/useScroll/UseScroll";
 
 /**
  *
@@ -13,11 +14,11 @@ import {ChannelState} from "./ChannelState";
  * @see ChannelState
  */
 export type ChannelAction =
-    { type: "startUp" } |
-    { type: "loaded-channel", channel: Channel } |
-    { type: "error", error: string, previous: ChannelState } |
-    { type: "go-back" } |
-    { type: "load-more" } |
-    { type: "loaded-more", messages: Message[], hasMore: boolean } |
-    { type: "send-msg", message: Message } |
-    { type: "mag-sent" }
+    { tag: "init" } |
+    { tag: "loadMore", at: "head" | "tail" } |
+    { tag: "loadSuccess", messages: UseScrollState<Message> } |
+    { tag: "loadError", error: string, previous: ChannelState } |
+    { tag: "sendMessage" } |
+    { tag: "sendSuccess" } |
+    { tag: "sendError", error: string, previous: ChannelState } |
+    { tag: "go-back" }

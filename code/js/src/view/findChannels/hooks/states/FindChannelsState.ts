@@ -9,7 +9,6 @@ import {PublicChannel} from "../../model/PublicChannel";
  */
 export type FindChannelState =
     | { tag: "navigating"; searchBar: string; channels: PublicChannel[] }
-    | { tag: "searching"; searchBar: string; channels: PublicChannel[] }
     | { tag: "fetchingMore"; searchBar: string; channels: PublicChannel[] }
     | { tag: "error"; error: string; channels: PublicChannel[], searchBar: string }
     | { tag: "joining"; searchBar: string; channels: PublicChannel[]; channelId: number }

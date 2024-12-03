@@ -159,23 +159,26 @@ class MessageJDBC(
 
     override fun findMessagesByTimeStamp(
         channelId: UInt,
-        timestamp: Timestamp,
+        timestamp: Timestamp?,
         limit: UInt,
+        isBefore: Boolean,
     ): List<Message> {
+        val beforeOrAfter = if (isBefore) "<" else ">"
         val selectQuery =
             """
             SELECT 
                 msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
                 msgChannelName, msgAuthorUsername
             FROM v_message
-            WHERE msgChannelId = ? AND msgTimestamp > ?
+            WHERE msgChannelId = ?
+            AND msgTimestamp $beforeOrAfter ?
             ORDER BY msgTimestamp
             LIMIT ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
         stm.setInt(idx++, channelId.toInt())
-        stm.setTimestamp(idx++, timestamp)
+        timestamp?.let { stm.setTimestamp(idx++, it) } ?: stm.setTimestamp(idx++, Timestamp(System.currentTimeMillis()))
         stm.setInt(idx, limit.toInt())
         val rs = stm.executeQuery()
         return rs.toMessageList()
