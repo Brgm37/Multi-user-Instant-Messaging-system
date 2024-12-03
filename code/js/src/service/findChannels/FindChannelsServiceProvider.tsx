@@ -2,8 +2,8 @@ import {urlBuilder} from "../utils/UrlBuilder";
 import useSignal from "../utils/hooks/useSignal/useSignal";
 import React from "react";
 import {Either, failure, success} from "../../model/Either";
-import {Channel} from "../../view/findChannels/model/PublicChannel";
 import {FindChannelsServiceContext} from "./FindChannelsServiceContext";
+import {Channel} from "../../model/Channel";
 
 /**
  * The URL for the find channels API.

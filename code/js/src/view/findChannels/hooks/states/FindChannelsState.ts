@@ -1,4 +1,4 @@
-import {PublicChannel} from "../../model/PublicChannel";
+import {PublicChannel} from "../../../../model/PublicChannel";
 
 /**
  * @description Type for the state of the PublicChannels form.
