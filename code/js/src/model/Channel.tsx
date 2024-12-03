@@ -1,5 +1,4 @@
 import {jsonToMessage, Message} from "./Message";
-import {UserInfo} from "./UserInfo";
 
 /**
  * @type Channel
@@ -19,12 +18,15 @@ export type Channel = Identifiable & {
 }
 
 export function jsonToChannel(json: any): Channel {
-    const messages = json.messages
-    messages.map((msg: any) => jsonToMessage(msg))
+    let messages = json.messages
+    let hasMore = json.hasMore
+    if (hasMore === undefined) hasMore = false
+    if (messages === undefined) messages = []
+    else messages.map((msg: any) => jsonToMessage(msg))
     return {
         id: json.id,
-        name: json.name,
+        name: json.name.displayName as string,
         messages: messages,
-        hasMore: json.hasMore
+        hasMore: hasMore,
     }
 }
