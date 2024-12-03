@@ -1,6 +1,7 @@
+import {AccessControl} from "../../model/SendChannelInvitation";
 
 
-export type UseSendChannelInvitationHandler = {
+export type UseCreateChannelInvitationHandler = {
 
     /**
      * Create a channel invitation token.
@@ -8,7 +9,7 @@ export type UseSendChannelInvitationHandler = {
      * @param maxUses
      * @param accessControl
      */
-    onCreate: (expirationDate: string, maxUses: number, accessControl: "READ_ONLY" | "READ_WRITE") => void
+    onCreate: (expirationDate: string, maxUses: string, accessControl: AccessControl) => void
 
     /**
      * Close the send channel invitation component
