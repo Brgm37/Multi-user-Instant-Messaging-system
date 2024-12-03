@@ -77,7 +77,7 @@ export function CreateChannelInvitationEditingView(
                 <select title="maxUses" className="bg-gray-700 text-white p-2 rounded w-full">
                     {maxUsesOptions.map((option) => (
                         <option key={option} value={option}>{option}</option>
-                    ))}
+                    ))} 
                 </select>
             </div>
             <div className="mb-4">
