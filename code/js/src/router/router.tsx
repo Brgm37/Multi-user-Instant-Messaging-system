@@ -18,6 +18,7 @@ import {AuthValidator} from "../view/session/authValidator";
 import {FindChannelsView} from "../view/findChannels/FindChannelsView";
 import {FindChannelsMockServiceProvider} from "../service/findChannels/mock/FindChannelsMockServiceProvider";
 import {AboutView} from "../view/about/AboutView";
+import {CreateChannelsView} from "../view/createChannels/createChannelsView";
 
 const router = createBrowserRouter(
     [
@@ -65,6 +66,11 @@ const router = createBrowserRouter(
                 <FindChannelsMockServiceProvider>
                     <FindChannelsView/>
                 </FindChannelsMockServiceProvider>,
+        },
+        {
+            "path": "/createChannel",
+            "element": <CreateChannelsView/>
+
         }
     ]
 )
