@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {InputLabelContext} from "../../components/InputLabelContext";
 import {InputLabel} from "../../components/InputLabel";
+import {LoginBaseView} from "./LoginBaseView";
 
 /**
  * The view for the submitting state of the login form.
@@ -18,11 +19,11 @@ export function LoginSubmittingView(): React.JSX.Element {
         error: loginState.error.passwordError
     }
     return (
-        <div>
-            <InputLabel label="Username" type="text" disabled={false} input={login}/>
-            <InputLabel label="Password" type={"password"} disabled={false} input={password}/>
-            <button disabled={true}>Submit</button>
-            <h2>Submitting...</h2>
-        </div>
+        <LoginBaseView
+            login={login}
+            password={password}
+            loginState={loginState}
+            inputsDisabled={true}
+        />
     )
 }
