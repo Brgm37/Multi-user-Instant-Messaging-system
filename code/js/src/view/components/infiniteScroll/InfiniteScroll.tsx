@@ -1,7 +1,6 @@
 import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import {InfiniteScrollContext} from "./InfiniteScrollContext";
 import {useHeadTail} from "./hooks/useHeadTail";
-import "../../../styles/InfiniteScrollMock.css"; //TODO: Check the use of static css file
 
 /**
  * InfiniteScroll component
@@ -13,9 +12,11 @@ import "../../../styles/InfiniteScrollMock.css"; //TODO: Check the use of static
  * @see InfiniteScrollContext
  *
  * @param className
+ * @param scrollStyle
+ * @param isToAutoScroll
  */
 export default function (
-    {className}: { className?: string }
+    {className, scrollStyle, isToAutoScroll}: { className?: string, scrollStyle?: string, isToAutoScroll?: boolean }
 ): React.JSX.Element {
     const {
         list,
@@ -70,7 +71,7 @@ export default function (
     }, [head, tail, at]);
 
     useEffect(() => {
-        if (recordedElementRef.current) {
+        if (recordedElementRef.current && isToAutoScroll) {
             if (at === "head") recordedElementRef.current.scrollIntoView({behavior: "smooth", block: "end"})
             else recordedElementRef.current.scrollIntoView({behavior: "smooth", block: "start"})
         }
@@ -78,7 +79,7 @@ export default function (
 
     return (
         <div className={className}>
-            <ul className={'scrollable-list'}>
+            <ul className={scrollStyle}>
                 <div>{isLoading === 'head' && 'Loading...'}</div>
                 {
                     list.map((item, index) => {

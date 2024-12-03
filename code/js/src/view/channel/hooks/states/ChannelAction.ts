@@ -21,4 +21,6 @@ export type ChannelAction =
     { tag: "sendMessage" } |
     { tag: "sendSuccess" } |
     { tag: "sendError", error: string, previous: ChannelState } |
-    { tag: "go-back" }
+    { tag: "go-back" } |
+    { tag: "receiving-sse" } |
+    { tag: "reset" , messages: UseScrollState<Message> }

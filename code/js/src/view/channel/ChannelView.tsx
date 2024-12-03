@@ -7,6 +7,7 @@ import {AuthValidator} from "../session/authValidator";
 import {InfiniteScrollContext} from "../components/infiniteScroll/InfiniteScrollContext";
 import {Message} from "../../model/Message";
 import InfiniteScroll from "../components/infiniteScroll/InfiniteScroll";
+import "../../styles/InfiniteScrollChannel.css";
 import {InputText} from "./components/InputText";
 
 function ChannelView(): React.JSX.Element {
@@ -30,6 +31,7 @@ function ChannelView(): React.JSX.Element {
                         return (
                             <div>
                                 <div>{item.owner.username}</div>
+                                <p>timeStamp:{item.timestamp} and Id:{item.id}</p>
                                 <div>{item.text}</div>
                             </div>
                         )
@@ -37,7 +39,9 @@ function ChannelView(): React.JSX.Element {
                 }
                 return (
                     <InfiniteScrollContext.Provider value={value}>
-                        <InfiniteScroll/>
+                        <InfiniteScroll
+                            scrollStyle={"scrollable-list"}
+                        />
                         <InputText onSubmit={handler.sendMsg}/>
                     </InfiniteScrollContext.Provider>
                 )

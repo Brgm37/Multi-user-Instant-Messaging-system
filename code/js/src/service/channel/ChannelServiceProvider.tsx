@@ -56,7 +56,6 @@ export function ChannelServiceProvider({children}: { children: React.ReactNode }
             if (timestamp === "0") url = `${url}?limit=${limit}`
             else url = `${url}?timestamp=${encodeURIComponent(timestamp)}&limit=${limit}`
             url = `${url}&isBefore=${at === "before"}`
-            console.log("loading more", url)
             const init: RequestInit = {
                 method: "GET",
                 headers: {"Content-Type": "application/json"},
@@ -80,7 +79,7 @@ export function ChannelServiceProvider({children}: { children: React.ReactNode }
             const init: RequestInit = {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({[msgHeaders]: msg, [channelHeaders]: cId}),
+                body: JSON.stringify({[msgHeaders]: msg, [channelHeaders]: Number(cId)}),
                 signal,
                 credentials: "include"
             }

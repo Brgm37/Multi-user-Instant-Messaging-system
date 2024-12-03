@@ -150,6 +150,7 @@ class MessageController(
                             emitter.send(
                                 SseEmitter
                                     .event()
+                                    .name("message")
                                     .id(it.msgId.toString())
                                     .data(MessageOutputModel.fromDomain(it)),
                             )
