@@ -1,5 +1,3 @@
-import {useSearchParams} from "react-router-dom";
-import {extractSearchParams} from "../../../../service/utils/extractParams";
 
 type Visibility = "public" | "private"
 
@@ -20,7 +18,6 @@ export type CreateChannelsState =
 
 
 export function makeInitialState(): CreateChannelsState {
-    const [searchParams] = useSearchParams()
     return {
         tag: "editing",
         input: {
