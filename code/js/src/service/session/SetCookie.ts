@@ -11,5 +11,5 @@ export function setCookie(name: string, value: string, seconds: number) {
         httpOnly: false,
         secure: false,
     }
-    cookie.set(name, value, {expires})
+    cookie.set(name, value, options)
 }
