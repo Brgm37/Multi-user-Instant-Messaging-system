@@ -1,11 +1,11 @@
 import {RegisterState} from "./states/RegisterState";
 import {useContext, useReducer} from "react";
 import {RegisterHandler} from "./handler/RegisterHandler";
-import {RegisterServiceContext} from "../../../../service/registration/register/RegisterServiceContext";
 import {setCookie} from "../../../../service/session/SetCookie";
 import configJson from "../../../../../envConfig.json";
 import {getExpiresIn} from "../../../../service/session/ExpiresTime";
 import reduce from "./reducer/RegisterReducer";
+import {RegisterServiceContext} from "../../../../service/registration/register/RegisterServiceContext";
 
 /**
  * The authentication cookie.
@@ -18,7 +18,7 @@ const auth_cookie = configJson.session
  * @return The state and handler of the registration.
  */
 export default function(): [RegisterState, RegisterHandler] {
-    const {signIn} = useContext(SignInServiceContext)
+    const {signIn} = useContext(RegisterServiceContext)
     const [state, dispatch] =
         useReducer(
             reduce,

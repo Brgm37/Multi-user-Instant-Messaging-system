@@ -86,7 +86,7 @@ export function reduce(state: FindChannelState, action: Action): FindChannelStat
                     return state;
             }
         case "redirect":
-            throw Error("Already in final State 'redirect' and should not reduce to any other State.")
+            throw Error("Already in final State 'redirect' and should not reducer to any other State.")
         default:
             throw Error("Invalid state")
     }

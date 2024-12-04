@@ -93,7 +93,7 @@ export function RegisterView(): React.JSX.Element {
             <div>
                 <SignInBaseView
                     inputsDisabled={state.tag === "submitting"}
-                    isValid={state.tag === "editing" ? state.isValid : false}
+                    isValid={state.tag === "editing" && state.isValid}
                     error={state.tag === "error" ? state.message : undefined}
                     onSubmit={() => handler.onSubmit(username.value, password.value, invitationCode.value)}
                 />
