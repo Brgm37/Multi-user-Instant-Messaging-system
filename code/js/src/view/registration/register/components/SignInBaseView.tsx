@@ -1,55 +1,38 @@
-import {InputLabel} from "../../components/InputLabel";
 import {Link} from "react-router-dom";
+import Input from "../../components/input/Input";
 import * as React from "react";
+import {useContext} from "react";
+import {InputFormContext} from "../../components/InputFormContext";
+import {InputLabelContext} from "../../components/input/InputContext";
+import LoadingIcon from "../../../components/LoadingIcon";
 
 type SignInBaseViewProps = {
-    signIn: InputLabelProps,
-    password: InputLabelProps,
-    confirmPassword: InputLabelProps,
-    invitationCode: InputLabelProps,
     inputsDisabled: boolean,
     isValid: boolean,
     error?: string,
     onSubmit?: () => void
 }
 
-type InputLabelProps = {
-    value: string,
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
-    error: string
-}
-
 export function SignInBaseView(
-    {signIn, password, confirmPassword, invitationCode, inputsDisabled, error, isValid, onSubmit}: SignInBaseViewProps
+    {inputsDisabled, error, isValid, onSubmit}: SignInBaseViewProps
 ) {
+    const context = useContext(InputFormContext)
     return (
         <div className=" text-white flex flex-col items-center justify-center min-h-screen">
             <div className="bg-black border border-gray-700 p-8 rounded-md w-80">
                 <img src={'/logo/CHImp_Logo.png'} alt={"CHImp"}/>
-                <InputLabel
-                    label="Username"
-                    type="text"
-                    disabled={inputsDisabled}
-                    input={signIn}>
-                </InputLabel>
-                <InputLabel
-                    label="Password"
-                    type="password"
-                    disabled={inputsDisabled}
-                    input={password}>
-                </InputLabel>
-                <InputLabel
-                    label="Confirm Password"
-                    type={"password"}
-                    disabled={inputsDisabled}
-                    input={confirmPassword}>
-                </InputLabel>
-                <InputLabel
-                    label="Invitation Code"
-                    type="text"
-                    disabled={inputsDisabled}
-                    input={invitationCode}>
-                </InputLabel>
+                <InputLabelContext.Provider value={context.username}>
+                    <Input isDisabled={inputsDisabled} labelName={"Username"} type={"text"}/>
+                </InputLabelContext.Provider>
+                <InputLabelContext.Provider value={context.password}>
+                    <Input isDisabled={inputsDisabled} labelName={"Password"} type={"password"}/>
+                </InputLabelContext.Provider>
+                <InputLabelContext.Provider value={context.confirmPassword}>
+                    <Input isDisabled={inputsDisabled} labelName={"Confirm Password"} type={"password"}/>
+                </InputLabelContext.Provider>
+                <InputLabelContext.Provider value={context.invitationCode}>
+                    <Input isDisabled={inputsDisabled} labelName={"Invitation Code"} type={"text"}/>
+                </InputLabelContext.Provider>
                 <button
                     onClick={onSubmit} disabled={!isValid}
                     className="w-full bg-blue-600 text-white py-2 rounded font-medium mb-4">Register
@@ -59,13 +42,17 @@ export function SignInBaseView(
                     <span className="px-2 text-gray-500">o</span>
                     <hr className="border-gray-700 w-full"/>
                 </div>
+                {inputsDisabled && (
+                    <div className="flex items-center justify-center">
+                        <LoadingIcon/>
+                    </div>
+                )}
                 <div className="mt-4 text-center">
                     <p className="text-gray-500 text-sm mb-4">Already have an account?
                         <Link
                             to={
                                 {
                                     pathname: "/login",
-                                    search: `?username=${signIn.value}&password=${password.value}`
                                 }
                             }
                             className={"text-blue-600 hover:underline"}> Login
