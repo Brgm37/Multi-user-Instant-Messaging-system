@@ -12,7 +12,6 @@ export interface CreateChannelsServiceContext {
 
     findChannelByName(
         name: string,
-        id: number,
     ): Promise<Either<Channel, string>>
 }
 
