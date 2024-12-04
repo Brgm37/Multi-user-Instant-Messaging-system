@@ -52,7 +52,7 @@ export function SignInBaseView(
                         <Link
                             to={
                                 {
-                                    pathname: "/login",
+                                    pathname: "/register/login",
                                 }
                             }
                             className={"text-blue-600 hover:underline"}> Login

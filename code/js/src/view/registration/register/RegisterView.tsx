@@ -7,8 +7,10 @@ import {useInput} from "../components/input/useInput";
 import {usernameValidation} from "../../../service/registration/validation/UsernameValidation";
 import {passwordValidation} from "../../../service/registration/validation/PasswordValidation";
 import {useEffect} from "react";
+import {RegisterCommunicationContext} from "../../../service/registration/communication/RegisterCommunicationProvider";
 
 export function RegisterView(): React.JSX.Element {
+    const context = React.useContext(RegisterCommunicationContext)
     const [state, handler] = useRegister()
     const location = useLocation()
     if (state.tag === "redirect") {
@@ -17,8 +19,8 @@ export function RegisterView(): React.JSX.Element {
         else location.state.source = undefined
         return <Navigate to={source} replace={true}></Navigate>
     }
-    const [username, usernameHandler] = useInput()
-    const [password, passwordHandler] = useInput()
+    const [username, usernameHandler] = useInput(context.username)
+    const [password, passwordHandler] = useInput(context.password)
     const [confirmPassword, confirmPasswordHandler] = useInput()
     const [invitationCode, invitationCodeHandler] = useInput()
 
@@ -41,6 +43,7 @@ export function RegisterView(): React.JSX.Element {
             value: username.value,
             onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
                 if (state.tag === "error") handler.goBack()
+                context.setUsername(event.target.value)
                 usernameHandler.setValue(event.target.value)
             },
             error: username.error,
@@ -53,6 +56,7 @@ export function RegisterView(): React.JSX.Element {
             value: password.value,
             onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
                 if (state.tag === "error") handler.goBack()
+                context.setPassword(event.target.value)
                 passwordHandler.setValue(event.target.value)
             },
             error: password.error,
