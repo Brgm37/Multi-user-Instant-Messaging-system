@@ -1,6 +1,7 @@
 import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import {InfiniteScrollContext} from "./InfiniteScrollContext";
 import {useHeadTail} from "./hooks/useHeadTail";
+import LoadingIcon from "../LoadingIcon";
 
 /**
  * InfiniteScroll component
@@ -19,55 +20,54 @@ export default function (
     {className, scrollStyle, isToAutoScroll}: { className?: string, scrollStyle?: string, isToAutoScroll?: boolean }
 ): React.JSX.Element {
     const {
-        list,
-        hasMore,
+        items,
         isLoading,
-        listMaxSize,
         loadMore,
         renderItems
     } = useContext(InfiniteScrollContext)
+
     const [{head, tail}, {setOffset}] = useHeadTail()
     const [at, setAt] = useState<"head" | "tail">("tail")
     const lastObserver = useRef<IntersectionObserver>()
     const firstObserver = useRef<IntersectionObserver>()
     const recordedElementRef = useRef<HTMLElement>()
 
-    const lastChannelElementRef = useCallback((node: HTMLElement) => {
+    const lastItemRef = useCallback((node: HTMLElement) => {
         if (isLoading) return;
         if (lastObserver.current) lastObserver.current.disconnect();
         lastObserver.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && hasMore.tail) {
-                if (list.length == listMaxSize) {
+            if (entries[0].isIntersecting && items.hasMore.tail) {
+                if (items.list.length == items.max) {
                     setOffset("head", 1);
                 }
                 setOffset("tail", 1);
                 setAt("tail");
                 recordedElementRef.current = node;
             }
-        });
+        })
         if (node) lastObserver.current.observe(node);
-    }, [isLoading, hasMore.tail, list.length, listMaxSize]);
+    }, [isLoading, items.hasMore.tail, items.list.length, items.max])
 
-    const firstChannelElementRef = useCallback((node: HTMLElement) => {
+    const firstItemRef = useCallback((node: HTMLElement) => {
         if (isLoading) return;
         if (firstObserver.current) firstObserver.current.disconnect();
         firstObserver.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && hasMore.head) {
-                if (list.length == listMaxSize) {
+            if (entries[0].isIntersecting && items.hasMore.head) {
+                if (items.list.length == items.max) {
                     setOffset("tail", -1);
                 }
                 setOffset("head", -1);
                 setAt("head");
                 recordedElementRef.current = node;
             }
-        });
+        })
         if (node) firstObserver.current.observe(node);
-    }, [isLoading, hasMore.head, list.length, listMaxSize]);
+    }, [isLoading, items.hasMore.head, items.list.length, items.max])
 
     useEffect(() => {
-        if (isLoading || (!hasMore.head && !hasMore.tail)) return;
-        if (at === "head" && hasMore.head) loadMore(head, at);
-        if (at === "tail" && hasMore.tail) loadMore(tail, at);
+        if (isLoading || (!items.hasMore.head && !items.hasMore.tail)) return;
+        if (at === "head" && items.hasMore.head) loadMore(head, at);
+        if (at === "tail" && items.hasMore.tail) loadMore(tail, at);
     }, [head, tail, at]);
 
     useEffect(() => {
@@ -75,23 +75,22 @@ export default function (
             if (at === "head") recordedElementRef.current.scrollIntoView({behavior: "smooth", block: "end"})
             else recordedElementRef.current.scrollIntoView({behavior: "smooth", block: "start"})
         }
-    }, [list]);
-
+    }, [items.list]);
     return (
         <div className={className}>
             <ul className={scrollStyle}>
-                <div>{isLoading === 'head' && 'Loading...'}</div>
+                <div>{isLoading === 'head' && (<LoadingIcon/>)}</div>
                 {
-                    list.map((item, index) => {
+                    items.list.map((item, index) => {
                         if (index === 0) {
                             return (
-                                <li key={item.id} ref={firstChannelElementRef}>
+                                <li key={item.id} ref={firstItemRef}>
                                     {renderItems(item)}
                                 </li>
                             )
-                        } else if (list.length === index + 1) {
+                        } else if (items.list.length === index + 1) {
                             return (
-                                <li key={item.id} ref={lastChannelElementRef}>
+                                <li key={item.id} ref={lastItemRef}>
                                     {renderItems(item)}
                                 </li>
                             )
@@ -104,7 +103,7 @@ export default function (
                         }
                     })
                 }
-                <div>{isLoading === 'tail' && 'Loading...'}</div>
+                <div>{isLoading === 'tail' && (<LoadingIcon/>)}</div>
             </ul>
         </div>
     )
