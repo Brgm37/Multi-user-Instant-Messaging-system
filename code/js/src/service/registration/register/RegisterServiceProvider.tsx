@@ -1,9 +1,9 @@
 import * as React from "react";
-import {SignInServiceContext} from "./SignInServiceContext";
+import {RegisterServiceContext} from "./RegisterServiceContext";
 import useSignal from "../../utils/hooks/useSignal/useSignal";
 import {urlBuilder} from "../../utils/UrlBuilder";
-import {signInValidator} from "../validation/SignInValidator";
-import {Either, success, failure} from "../../../model/Either";
+import {Either} from "../../../model/Either";
+import responseHandler from "../responseHandler/ResponseHandler";
 
 /**
  * The URL for the sign in API.
@@ -25,9 +25,14 @@ const passwordHeader = "password"
  */
 const invitationCodeHeader = "invitationCode"
 
-export function SignInServiceProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
+/**
+ * The provider for the register service.
+ *
+ * @param children
+ */
+export function RegisterServiceProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
     const signal = useSignal()
-    const service : SignInServiceContext = {
+    const service : RegisterServiceContext = {
         async signIn(username: string, password: string, invitationCode: string): Promise<Either<AuthInfo, string>> {
             const init: RequestInit = {
                 method: "POST",
@@ -41,24 +46,12 @@ export function SignInServiceProvider({ children }: { children: React.ReactNode 
                 credentials: "include"
             }
             const response = await fetch(signInApiUrl, init);
-            if (response.ok) {
-                const data = await response.json()
-                const authInfo: AuthInfo = {
-                    uId: data.uId.toString(),
-                    expirationDate: data.expirationDate.toString(),
-                }
-                return success(authInfo) as Either<AuthInfo, string>
-            } else {
-                const error = await response.text()
-                return failure(error) as Either<AuthInfo, string>
-            }
+            return responseHandler(response)
         },
-
-        stateValidator: signInValidator
     }
     return (
-        <SignInServiceContext.Provider value={service}>
+        <RegisterServiceContext.Provider value={service}>
             {children}
-        </SignInServiceContext.Provider>
+        </RegisterServiceContext.Provider>
     )
 }

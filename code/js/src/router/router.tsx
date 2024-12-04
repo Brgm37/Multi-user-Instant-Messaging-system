@@ -9,9 +9,9 @@ import {
     RouterProvider,
 } from "react-router-dom"
 import {LoginView} from "../view/registration/login/LoginView";
-import {SignInView} from "../view/registration/signIn/SignInView";
+import {RegisterView} from "../view/registration/register/RegisterView";
 import {LoginServiceProvider} from "../service/registration/login/LoginServiceProvider";
-import {SignInServiceProvider} from "../service/registration/signIn/SignInServiceProvider";
+import {RegisterServiceProvider} from "../service/registration/register/RegisterServiceProvider";
 import ChannelView from "../view/channel/ChannelView";
 import {ChannelServiceProvider} from "../service/channel/ChannelServiceProvider";
 import {AuthValidator} from "../view/session/authValidator";
@@ -41,11 +41,11 @@ const router = createBrowserRouter(
                 </LoginServiceProvider>,
         },
         {
-            "path": "/signIn",
+            "path": "/register",
             "element":
-                <SignInServiceProvider>
-                    <SignInView/>
-                </SignInServiceProvider>,
+                <RegisterServiceProvider>
+                    <RegisterView/>
+                </RegisterServiceProvider>,
         },
         {
             "path": "/channels",

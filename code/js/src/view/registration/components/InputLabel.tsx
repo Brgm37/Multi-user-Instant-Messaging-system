@@ -11,10 +11,21 @@ export function InputLabel(
 ) {
     return (
         <div>
-            <label>{label}</label>
-            <br/>
-            <input type={type} value={input.value} onChange={input.onChange} disabled={disabled}/>
-            {input.error && <span>{input.error}</span>}
+            <input
+                placeholder={label}
+                type={type}
+                value={input.value}
+                onChange={input.onChange}
+                disabled={disabled}
+                className={"w-full p-2 mb-4 bg-gray-900 border border-gray-700 rounded text-sm"}
+            />
+            {input.error &&
+                <div className="flex items-center justify-center bg-black mb-4">
+                    <div className="text-center text-red-600 text-sm">
+                        <p>{input.error}</p>
+                    </div>
+                </div>
+            }
         </div>
     )
 }

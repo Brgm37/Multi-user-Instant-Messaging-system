@@ -1,5 +1,5 @@
 /**
- * The action that can be performed on the login form.
+ * The action that can be performed on the registration form.
  *
  * The action can be one of the following:
  * - "submit": The user has submitted the form.
@@ -8,7 +8,7 @@
  * - "go-back": When an error occurs the user can go back to editing state.
  * - "error": An error occurred while submitting the form.
  */
-export type LoginAction =
+export type RegisterAction =
     { type: "submit" } |
     { type: "success" } |
     { type: "edit", isValid: boolean } |

@@ -2,8 +2,8 @@ import * as React from 'react'
 import {LoginServiceContext} from "./LoginServiceContext";
 import useSignal from "../../utils/hooks/useSignal/useSignal";
 import {urlBuilder} from "../../utils/UrlBuilder";
-import {loginValidator} from "../validation/LoginValidator";
-import {Either, success, failure} from "../../../model/Either";
+import {Either} from "../../../model/Either";
+import responseHandler from "../responseHandler/ResponseHandler";
 
 /**
  * The URL for the login API.
@@ -32,19 +32,8 @@ export function LoginServiceProvider({ children }: { children: React.ReactNode }
                 credentials: "include"
             }
             const response = await fetch(loginApiUrl, init);
-            if (response.ok) {
-                const data = await response.json()
-                const authInfo: AuthInfo = {
-                    uId: data.uId.toString(),
-                    expirationDate: data.expirationDate.toString(),
-                }
-                return success(authInfo) as Either<AuthInfo, string>
-            } else {
-                const error = await response.text()
-                return failure(error) as Either<AuthInfo, string>
-            }
+            return responseHandler(response)
         },
-        stateValidator: loginValidator
     }
     return (
         <LoginServiceContext.Provider value={service}>
