@@ -12,7 +12,6 @@ import {LoginView} from "../view/registration/login/LoginView";
 import {RegisterView} from "../view/registration/register/RegisterView";
 import {LoginServiceProvider} from "../service/registration/login/LoginServiceProvider";
 import {RegisterServiceProvider} from "../service/registration/register/RegisterServiceProvider";
-import ChannelView from "../view/channel/ChannelView";
 import {ChannelServiceProvider} from "../service/channel/ChannelServiceProvider";
 import {AuthValidator} from "../view/session/authValidator";
 import {FindChannelsView} from "../view/findChannels/FindChannelsView";
@@ -27,6 +26,7 @@ import {SseCommunicationServiceProvider} from "../service/sse/SseCommunicationSe
 import {
     RegisterCommunicationServiceProvider
 } from "../service/registration/communication/RegisterCommunicationProvider";
+import {ChannelView} from "../view/channel/ChannelView";
 
 const router = createBrowserRouter(
     [

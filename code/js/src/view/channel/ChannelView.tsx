@@ -1,65 +1,42 @@
 import * as React from "react";
 import {useChannel} from "./hooks/UseChannel";
-import {ChannelState} from "./hooks/states/ChannelState";
 import {InitLoadingView} from "./components/InitLoadingView";
-import {ChannelErrorView} from "./components/ChannelErrorView";
-import {AuthValidator} from "../session/authValidator";
+import "../../styles/InfiniteScrollChannel.css";
 import {InfiniteScrollContext} from "../components/infiniteScroll/InfiniteScrollContext";
 import {Message} from "../../model/Message";
-import InfiniteScroll from "../components/infiniteScroll/InfiniteScroll";
-import "../../styles/InfiniteScrollChannel.css";
-import {InputText} from "./components/InputText";
+import BasicChannelView from "./components/BasicChannelView";
 
-function ChannelView(): React.JSX.Element {
-    const [state, handler] = useChannel()
-    const switchCase = (state: ChannelState) => {
-        switch (state.tag) {
-            case "idle": {
-                handler.initChannel()
-                return <InitLoadingView/>
-            }
-            case "error":
-                return <ChannelErrorView/>
-            default: {
-                const value: InfiniteScrollContext<Message> = {
-                    list: state.messages.list,
-                    hasMore: state.messages.hasMore,
-                    isLoading: state.tag === "loading" && state.at !== "sending" ? state.at : false,
-                    listMaxSize: state.messages.max,
-                    loadMore(_ ,at: "head" | "tail"): void {handler.loadMore(at)},
-                    renderItems(item: Message): React.ReactNode {
-                        return (
-                            <div>
-                                <div>{item.owner.username}</div>
-                                <p>timeStamp:{item.timestamp} and Id:{item.id}</p>
-                                <div>{item.text}</div>
-                            </div>
-                        )
-                    },
-                }
-                return (
-                    <InfiniteScrollContext.Provider value={value}>
-                        <InfiniteScroll
-                            scrollStyle={"scrollable-list"}
-                        />
-                        <InputText onSubmit={handler.sendMsg}/>
-                    </InfiniteScrollContext.Provider>
-                )
-            }
-        }
+export function ChannelView(): React.JSX.Element {
+    const [state, messages, handler] = useChannel()
+
+    if (state.tag === "idle") {
+        handler.initChannel()
+        return <InitLoadingView/>
     }
-    return (
-        <div>
-            <h1>Channel</h1>
-            {switchCase(state)}
-        </div>
-    )
-}
 
-export default function (): React.JSX.Element {
+    const provider: InfiniteScrollContext<Message> = {
+        isLoading: state.tag === "loading" && state.at !== "sending" ? state.at : false,
+        items: messages,
+        renderItems(item: Message): React.ReactNode {
+            return (
+                <div key={item.id} className={"message"}>
+                    <div className={"message-content"}>
+                        <div className={"message-author"}>{item.owner.username}</div>
+                        <div className={"message-text"}>{item.text}</div>
+                    </div>
+                </div>
+            )
+        },
+        loadMore(_: number, at: "head" | "tail"): void {handler.loadMore(at)}
+    }
+
     return (
-        <AuthValidator>
-            <ChannelView/>
-        </AuthValidator>
+        <InfiniteScrollContext.Provider value={provider}>
+            <BasicChannelView
+                error={state.tag === "error" ? state.message : undefined}
+                errorDismiss={handler.goBack}
+                onSend={handler.sendMsg}
+            />
+        </InfiniteScrollContext.Provider>
     )
 }

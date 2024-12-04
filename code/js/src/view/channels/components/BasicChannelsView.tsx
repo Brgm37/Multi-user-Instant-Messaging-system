@@ -8,7 +8,7 @@ export default function BasicChannelsView(
     return (
         <div className="flex h-screen">
             <Sidebar />
-            <div className="flex-1 bg-gray-800 p-4">
+            <div className="flex-1 bg-gray-800 p-4 flex flex-col">
                 {error && (
                     <div className="bg-red-500 text-white p-2 rounded">
                         {error}
@@ -18,9 +18,9 @@ export default function BasicChannelsView(
                         >X</button>
                     </div>
                 )}
-                <h1 className="text-center text-4xl font-bold text-gray-200">
+                <header className="text-center text-4xl font-bold text-gray-200">
                     Welcome to ChIMP
-                </h1>
+                </header>
                 <Outlet />
             </div>
         </div>
