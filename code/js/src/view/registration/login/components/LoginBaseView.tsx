@@ -1,46 +1,33 @@
 import React from "react";
-import {InputLabel} from "../../components/InputLabel";
 import {Link} from "react-router-dom";
-import {InputLabelContext} from "../../components/InputLabelContext";
-
-type InputLabelProps = {
-    value: string,
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
-    error: string
-}
+import {InputFormContext} from "../../components/InputFormContext";
+import {InputLabelContext} from "../../components/input/InputContext";
+import Input from "../../components/input/Input";
+import LoadingIcon from "../../../components/LoadingIcon";
 
 type LoginBaseViewProps = {
-    login: InputLabelProps,
-    password: InputLabelProps,
-    loginState: InputLabelContext,
-    onSubmit?: onSubmit,
     inputsDisabled: boolean,
+    isValid: boolean,
     error?: string
+    onSubmit?: () => void,
 }
 
-type onSubmit = () => void
-
 export function LoginBaseView(
-    {login, password, loginState, onSubmit, inputsDisabled, error}: LoginBaseViewProps
+    {onSubmit, inputsDisabled, error, isValid}: LoginBaseViewProps
 ): React.JSX.Element {
+    const context = React.useContext(InputFormContext)
     return (
         <div className=" text-white flex flex-col items-center justify-center min-h-screen">
             <div className="bg-black border border-gray-700 p-8 rounded-md w-80">
                 <img src={'/logo/CHImp_Logo.png'} alt={"CHImp"}/>
-                <InputLabel
-                    label="Username"
-                    type="text"
-                    disabled={inputsDisabled}
-                    input={login}>
-                </InputLabel>
-                <InputLabel
-                    label="Password"
-                    type="password"
-                    disabled={inputsDisabled}
-                    input={password}>
-                </InputLabel>
+                <InputLabelContext.Provider value={context.username}>
+                    <Input isDisabled={inputsDisabled} labelName={"Username"} type={"text"}/>
+                </InputLabelContext.Provider>
+                <InputLabelContext.Provider value={context.password}>
+                    <Input isDisabled={inputsDisabled} labelName={"Password"} type={"password"}/>
+                </InputLabelContext.Provider>
                 <button
-                    onClick={onSubmit} disabled={!loginState.input.isValid}
+                    onClick={onSubmit} disabled={!isValid}
                     className="w-full bg-blue-600 text-white py-2 rounded font-medium mb-4">Log In
                 </button>
                 <div className="flex items-center justify-center mb-4">
@@ -48,13 +35,17 @@ export function LoginBaseView(
                     <span className="px-2 text-gray-500">o</span>
                     <hr className="border-gray-700 w-full"/>
                 </div>
+                {inputsDisabled && (
+                    <div className="flex items-center justify-center">
+                        <LoadingIcon/>
+                    </div>
+                )}
                 <div className="mt-4 text-center">
                     <p className="text-gray-500 text-sm mb-4">Don´t have an account?
                         <Link
                             to={
                                 {
-                                    pathname: "/signIn",
-                                    search: `?username=${loginState.input.username}&password=${loginState.input.password}`
+                                    pathname: "/register",
                                 }
                             }
                             className={"text-blue-600 hover:underline"}> Register

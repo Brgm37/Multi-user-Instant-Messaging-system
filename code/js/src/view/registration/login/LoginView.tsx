@@ -1,45 +1,68 @@
-import * as React from 'react'
-import {useLoginForm} from './hooks/UseLoginForm'
-import {InputLabelContext} from "../components/InputLabelContext";
-import {LoginEditingView} from "./components/LoginEditingView";
-import {Link, Navigate, useLocation} from "react-router-dom";
-import {LoginSubmittingView} from "./components/LoginSubmittingView";
-import {LoginErrorView} from "./components/LoginErrorView";
-import {LoginState} from "./hooks/states/LoginState";
+import * as React from 'react';
+import {Navigate, useLocation} from "react-router-dom";
+import useLogin from "./hooks/UseLogin";
+import {useInput} from "../components/input/useInput";
+import {useEffect} from "react";
+import {InputFormContext} from "../components/InputFormContext";
+import {usernameValidation} from "../../../service/registration/validation/UsernameValidation";
+import {LoginBaseView} from "./components/LoginBaseView";
 
 export function LoginView(): React.JSX.Element {
-    const location = useLocation()
-    const [loginState, handler] = useLoginForm()
-    if (loginState.tag === "redirect") {
-        let source = location.state?.source
-        if (!source) source = "/channels"
-        return <Navigate to={source} replace={true}></Navigate>
-    }
-    let visibility = {password: false}
-    let error = {usernameError: "", passwordError: ""}
-    if (loginState.tag == "editing") {
-        error = {usernameError: loginState.error.usernameError, passwordError: loginState.error.passwordError}
-    }
-    const form = {
-        input: loginState.input,
-        visibility,
-        error,
-    }
-    const view = ((state: LoginState) => {
-        switch (state.tag) {
-            case "editing":
-                return <LoginEditingView handler={handler}/>
-            case "submitting":
-                return <LoginSubmittingView/>
-            case "error":
-                return <LoginErrorView message={state.message} handler={handler}/>
+    const location = useLocation();
+    const [state, handler] = useLogin();
+    const [username, usernameHandler] = useInput();
+    const [password, passwordHandler] = useInput();
+
+    useEffect(() => {
+        if (username.error === "" && password.error === "") {
+            handler.onIsValidChange(true);
+        } else if (state.tag === "editing" && state.isValid) {
+            handler.onIsValidChange(false);
         }
-    })
+    }, [username, password]);
+
+    if (state.tag === "redirect") {
+        let source = location.state?.source;
+        if (!source) source = "/channels";
+        else location.state.source = undefined;
+        return <Navigate to={source} replace={true} />;
+    }
+
+    const form: InputFormContext = {
+        username: {
+            value: username.value,
+            onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                if (state.tag === "error") handler.goBack();
+                usernameHandler.setValue(event.target.value);
+            },
+            error: username.error,
+            validate: (value: string) => {
+                const error = usernameValidation(value);
+                usernameHandler.setError(error === true ? "" : error);
+            }
+        },
+        password: {
+            value: password.value,
+            onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                if (state.tag === "error") handler.goBack();
+                passwordHandler.setValue(event.target.value);
+            },
+            error: password.error,
+            validate: (value: string) => {
+                const error = usernameValidation(value);
+                passwordHandler.setError(error === true ? "" : error);
+            }
+        },
+    };
+
     return (
-        <InputLabelContext.Provider value={form}>
-            <div>
-                {view(loginState)}
-            </div>
-        </InputLabelContext.Provider>
-    )
+        <InputFormContext.Provider value={form}>
+            <LoginBaseView
+                inputsDisabled={state.tag === "submitting"}
+                isValid={state.tag === "editing" && state.isValid}
+                onSubmit={() => handler.onSubmit(username.value, password.value)}
+                error={state.tag === "error" ? state.message : undefined}
+            />
+        </InputFormContext.Provider>
+    );
 }
