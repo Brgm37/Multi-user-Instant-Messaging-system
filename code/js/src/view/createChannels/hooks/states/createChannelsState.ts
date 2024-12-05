@@ -1,20 +1,20 @@
 
-type Visibility = "public" | "private"
+export type Visibility = "public" | "private"
 
-type PublicAccess = "READ_ONLY" | "READ_WRITE"
+export type Access = "READ_ONLY" | "READ_WRITE"
 
-type ChannelInput = {
+export type ChannelInput = {
     name: string,
     visibility: Visibility,
-    access: PublicAccess,
-    isValid: boolean,
+    access: Access,
+    isValid: boolean
 }
 
 export type CreateChannelsState =
-    { tag: "editing", input: ChannelInput, error?: string } |
-    { tag: "error", message: string, input: ChannelInput } |
+    { tag: "editing", input: ChannelInput} |
+    { tag: "error", message: string, input: ChannelInput} |
     { tag: "submitting", input: ChannelInput } |
-    { tag: "redirecting" }
+    { tag: "redirecting", input: ChannelInput }
 
 
 export function makeInitialState(): CreateChannelsState {
@@ -24,7 +24,8 @@ export function makeInitialState(): CreateChannelsState {
             name: "",
             visibility: "public",
             access: "READ_ONLY",
-            isValid: false
-        }
+            isValid: false,
+        },
+
     }
 }
