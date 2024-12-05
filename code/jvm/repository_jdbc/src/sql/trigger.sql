@@ -27,6 +27,8 @@ begin
            u.id            as owner_id,
            u.name          as owner_name,
            c.access_control as channel_accessControl
+            c.description  as channel_description,
+            c.icon         as channel_icon
     from channels c
              join users u on c.owner = u.id;
     return new;

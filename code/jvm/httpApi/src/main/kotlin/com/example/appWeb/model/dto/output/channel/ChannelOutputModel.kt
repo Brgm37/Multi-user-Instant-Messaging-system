@@ -22,6 +22,8 @@ data class ChannelOutputModel(
     val accessControl: String,
     val visibility: String,
     val messages: List<MessageOutputModel> = emptyList(),
+    val description: String? = null,
+    val icon: String? = null,
 ) {
     companion object {
         fun fromDomain(channel: Channel): ChannelOutputModel =
@@ -32,6 +34,8 @@ data class ChannelOutputModel(
                 accessControl = channel.accessControl.name,
                 visibility = if (channel is Channel.Public) PUBLIC.name else PRIVATE.name,
                 messages = channel.messages.map(MessageOutputModel::fromDomain),
+                description = channel.description,
+                icon = channel.icon,
             )
     }
 }

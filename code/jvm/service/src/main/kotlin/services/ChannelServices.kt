@@ -205,35 +205,39 @@ class ChannelServices(
         description: String?,
         icon: String?,
     ): Either<ChannelError, Channel> {
-        val args: Array<String?> = arrayOf(name, visibility, accessControl)
-        if (args.any { it != null && it.isBlank() }) return failure(InvalidChannelInfo)
-        accessControl?.let { if (!AccessControl.validate(it)) return failure(InvalidChannelAccessControl) }
-        visibility?.let { if (!Visibility.validate(it.uppercase())) return failure(InvalidChannelVisibility) }
-        val upperCaseAccessControl = accessControl?.uppercase() ?: return failure(InvalidChannelAccessControl)
-        return repoManager
-            .run {
-                val channel = channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
-                val updatedChannel =
-                    when (channel) {
-                        is Public ->
-                            channel.copy(
-                                name = ChannelName(name ?: channel.name.fullName, channel.owner.username),
-                                accessControl = AccessControl.valueOf(upperCaseAccessControl),
-                                description = description ?: channel.description,
-                                icon = icon ?: channel.icon,
-                            )
+        val args = arrayOf(name, accessControl, visibility, icon)
+        args.all { it.isNullOrBlank() }
+        accessControl?.let { if (AccessControl.validate(it)) return failure(InvalidChannelAccessControl) }
+        visibility?.let { if (Visibility.validate(it)) return failure(InvalidChannelVisibility) }
+        val newDescription = description?.ifBlank { null }
+        val upperCaseAccessControl = accessControl?.uppercase()
+        return repoManager.run {
+            val channel = channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
+            val updatedChannel = when (channel) {
+                is Public -> {
+                    channel.copy(
+                        name = name?.let { ChannelName(it, channel.owner.username) } ?: channel.name,
+                        accessControl = upperCaseAccessControl?.let { AccessControl.valueOf(it) }
+                            ?: channel.accessControl,
+                        description = newDescription ?: channel.description,
+                        icon = icon ?: channel.icon,
+                    )
 
-                        is Private ->
-                            channel.copy(
-                                name = ChannelName(name ?: channel.name.fullName, channel.owner.username),
-                                accessControl = AccessControl.valueOf(upperCaseAccessControl),
-                                description = description ?: channel.description,
-                                icon = icon ?: channel.icon,
-                            )
-                    }
-                channelRepo.save(updatedChannel)
-                success(updatedChannel)
+                }
+
+                is Private -> {
+                    channel.copy(
+                        name = name?.let { ChannelName(it, channel.owner.username) } ?: channel.name,
+                        accessControl = upperCaseAccessControl?.let { AccessControl.valueOf(it) }
+                            ?: channel.accessControl,
+                        description = newDescription ?: channel.description,
+                        icon = icon ?: channel.icon,
+                    )
+                }
             }
+            channelRepo.save(updatedChannel)
+            success(updatedChannel)
+        }
     }
 
     private fun makeTimeStamp(expirationDate: String) =

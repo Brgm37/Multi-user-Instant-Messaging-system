@@ -119,18 +119,18 @@ interface ChannelServicesInterface {
     /**
      * Updates a channel.
      * @param id The id of the channel to update.
-     * @param name The name of the channel.
-     * @param accessControl The access control of the channel.
-     * @param visibility The visibility of the channel.
-     * @param description The description of the channel.
-     * @param icon The icon of the channel.
+     * @param name The new name of the channel.
+     * @param accessControl The new access control of the channel.
+     * @param visibility The new visibility of the channel.
+     * @param description The new description of the channel.
+     * @param icon The new icon of the channel.
      */
     fun updateChannel(
         id: UInt,
-        name: String? = null,
-        accessControl: String? = null,
-        visibility: String? = null,
-        description: String? = null,
-        icon: String? = null,
+        name: String?,
+        accessControl: String?,
+        visibility: String?,
+        description: String?,
+        icon: String?,
     ): Either<ChannelError, Channel>
 }

@@ -8,11 +8,15 @@ import model.channels.Channel
  * @property name The channel name output model
  * @property id The channel id
  * @property ownerOutputModel The owner output model
+ * @property description The description of the channel
+ * @property icon The icon of the channel
  */
 data class ChannelListOutputModel(
     val name: ChannelNameOutputModel,
     val id: UInt,
     val ownerOutputModel: OwnerOutputModel,
+    val description: String? = null,
+    val icon: String? = null,
 ) {
     companion object {
         fun fromDomain(channel: Channel): ChannelListOutputModel {
@@ -21,6 +25,8 @@ data class ChannelListOutputModel(
                 name = ChannelNameOutputModel.fromDomain(channel.name),
                 id = id,
                 ownerOutputModel = OwnerOutputModel.fromDomain(channel.owner),
+                description = channel.description,
+                icon = channel.icon,
             )
         }
     }
