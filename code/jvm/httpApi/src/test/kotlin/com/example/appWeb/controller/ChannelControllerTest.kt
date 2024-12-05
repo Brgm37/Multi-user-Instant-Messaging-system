@@ -142,6 +142,8 @@ class ChannelControllerTest {
                     name = "name",
                     accessControl = READ_WRITE.name,
                     visibility = PUBLIC.name,
+                    description = null,
+                    icon = null,
                 ),
                 authenticated,
             ).let { resp ->
@@ -164,16 +166,22 @@ class ChannelControllerTest {
                     name = "name",
                     accessControl = " ",
                     visibility = PUBLIC.name,
+                    description = null,
+                    icon = null,
                 ),
                 CreateChannelInputModel(
                     name = "name",
                     accessControl = READ_WRITE.name,
                     visibility = " ",
+                    description = null,
+                    icon = null,
                 ),
                 CreateChannelInputModel(
                     name = " ",
                     accessControl = READ_WRITE.name,
                     visibility = PUBLIC.name,
+                    description = null,
+                    icon = null,
                 ),
             ).forEach {
                 createChannel(it, authenticated)
@@ -196,6 +204,8 @@ class ChannelControllerTest {
                     name = "name",
                     accessControl = READ_WRITE.name,
                     visibility = "invalid",
+                    description = null,
+                    icon = null,
                 ),
                 authenticated,
             ).let { resp ->
@@ -216,6 +226,8 @@ class ChannelControllerTest {
                     name = "name",
                     accessControl = "invalid",
                     visibility = PUBLIC.name,
+                    description = null,
+                    icon = null,
                 ),
                 authenticated,
             ).let { resp ->
@@ -236,6 +248,8 @@ class ChannelControllerTest {
                     name = "name",
                     accessControl = READ_WRITE.name,
                     visibility = PUBLIC.name,
+                    description = null,
+                    icon = null,
                 ),
                 AuthenticatedUserInputModel(0u, "token"),
             ).let { resp ->

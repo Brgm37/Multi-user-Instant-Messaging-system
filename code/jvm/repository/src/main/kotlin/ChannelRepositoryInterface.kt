@@ -38,32 +38,32 @@ interface ChannelRepositoryInterface : Repository<Channel> {
 
     /**
      * Joins a user to a channel
-     * @param channelId The ID of the channel
-     * @param userId The ID of the user
+     * @param cId The ID of the channel
+     * @param uId The ID of the user
      * @param accessControl The access control settings for the user
      */
     fun joinChannel(
-        channelId: UInt,
-        userId: UInt,
+        cId: UInt,
+        uId: UInt,
         accessControl: AccessControl,
     )
 
     /**
      * Checks if a user is in a channel
-     * @param channelId The ID of the channel
-     * @param userId The ID of the user
+     * @param cId The ID of the channel
+     * @param uId The ID of the user
      * @return True if the user is in the channel, false otherwise
      */
     fun isUserInChannel(
-        channelId: UInt,
-        userId: UInt,
+        cId: UInt,
+        uId: UInt,
     ): Boolean
 
     /**
      * Retrieves a channel invitation associated with a channel
-     * @param channelId The ID of the channel
+     * @param cId The ID of the channel
      */
-    fun findInvitation(channelId: UInt): ChannelInvitation?
+    fun findInvitation(cId: UInt): ChannelInvitation?
 
     /**
      * Updates a channel invitation
@@ -73,9 +73,9 @@ interface ChannelRepositoryInterface : Repository<Channel> {
 
     /**
      * Deletes a channel invitation
-     * @param channelId The ID of the channel
+     * @param cId The ID of the channel
      */
-    fun deleteInvitation(channelId: UInt)
+    fun deleteInvitation(cId: UInt)
 
     /**
      * Creates a channel invitation
@@ -86,12 +86,12 @@ interface ChannelRepositoryInterface : Repository<Channel> {
 
     /**
      * Retrieves the access control settings for a user in a channel
-     * @param channelId The ID of the channel
+     * @param cId The ID of the channel
      * @param userId The ID of the user
      * @return The access control settings for the user in the channel
      */
     fun findUserAccessControl(
-        channelId: UInt,
+        cId: UInt,
         userId: UInt,
     ): AccessControl?
 
@@ -118,15 +118,28 @@ interface ChannelRepositoryInterface : Repository<Channel> {
     /**
      * Retrieves all channels with a name that partially matches the given name and the user is part of.
      *
-     * @param userId The ID of the user
+     * @param uId The ID of the user
      * @param name The name of the channel
      * @param offset The offset for the channels
      * @param limit The maximum number of channels to retrieve
      */
     fun findByName(
-        userId: UInt,
+        uId: UInt,
         name: String,
         offset: UInt = OFFSET,
         limit: UInt = LIMIT,
     ): List<Channel>
+
+    /**
+     *  Retrieves the user access control over a given channel
+     *
+     *  @param uid the user id.
+     *  @param cId the channel id.
+     *
+     *  @return [AccessControl] the access control or null if the user is not in the channel.
+     */
+    fun findAccessControl(
+        uid: UInt,
+        cId: UInt,
+    ): AccessControl?
 }

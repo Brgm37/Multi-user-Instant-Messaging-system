@@ -4,7 +4,6 @@ import jakarta.validation.constraints.AssertTrue
 import jakarta.validation.constraints.NotBlank
 import model.channels.AccessControl
 import model.channels.Visibility
-import org.springframework.lang.Nullable
 
 /**
  * Data class representing the input model for creating a channel.

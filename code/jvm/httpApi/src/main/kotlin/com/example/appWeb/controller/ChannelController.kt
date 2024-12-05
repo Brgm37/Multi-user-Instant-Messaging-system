@@ -4,6 +4,7 @@ import com.example.appWeb.model.dto.input.channel.CreateChannelInputModel
 import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputModel
 import com.example.appWeb.model.dto.input.channel.UpdateChannelInputModel
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
+import com.example.appWeb.model.dto.output.channel.AccessControlOutPutModel
 import com.example.appWeb.model.dto.output.channel.ChannelInvitationOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
@@ -18,7 +19,6 @@ import errors.ChannelError.UserNotFound
 import interfaces.ChannelServicesInterface
 import io.swagger.v3.oas.annotations.Parameter
 import jakarta.validation.Valid
-import model.channels.Channel
 import org.hibernate.validator.constraints.Range
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -232,25 +232,36 @@ class ChannelController(
         @Valid @RequestBody channel: UpdateChannelInputModel,
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> {
-        channelService.updateChannel(
-            id = channelId,
-            name = channel.name,
-            accessControl = channel.accessControl,
-            visibility = channel.visibility,
-            description = channel.description,
-            icon = channel.icon,
-        ).let { response ->
-            return when (response) {
-                is Success -> {
-                    ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
-                }
+        channelService
+            .updateChannel(
+                id = channelId,
+                name = channel.name,
+                accessControl = channel.accessControl,
+                visibility = channel.visibility,
+                description = channel.description,
+                icon = channel.icon,
+            ).let { response ->
+                return when (response) {
+                    is Success -> {
+                        ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
+                    }
 
-                is Failure -> {
-                    ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+                    is Failure -> {
+                        ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+                    }
                 }
             }
-        }
     }
+
+    @GetMapping(ACCESS_CONTROL)
+    fun getAccessControl(
+        @PathVariable cId: UInt,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> =
+        when (val response = channelService.getAccessControl(authenticated.uId, cId)) {
+            is Success -> ResponseEntity.ok(AccessControlOutPutModel.fromAccessControl(response.value))
+            is Failure -> ChannelProblem.AccessControlNotFound.response(NOT_FOUND)
+        }
 
     companion object {
         /**
@@ -287,5 +298,7 @@ class ChannelController(
          * The URL for the user's channels with the given name.
          */
         const val MY_CHANNELS_WITH_NAME = "${MY_CHANNELS}/{name}"
+
+        const val ACCESS_CONTROL = "/accessControl/{cId}"
     }
 }

@@ -26,7 +26,7 @@ begin
            c.visibility    as channel_visibility,
            u.id            as owner_id,
            u.name          as owner_name,
-           c.access_control as channel_accessControl
+           c.access_control as channel_accessControl,
             c.description  as channel_description,
             c.icon         as channel_icon
     from channels c

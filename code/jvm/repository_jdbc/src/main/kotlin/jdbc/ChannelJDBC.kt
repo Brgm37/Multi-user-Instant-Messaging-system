@@ -136,6 +136,16 @@ private const val CHANNELS_INVITATIONS_ACCESS_CONTROL = "access_control"
 private const val CHANNELS_INVITATIONS_MAX_USES = "max_uses"
 
 /**
+ * The name of the table in the database.
+ */
+private const val CHANNEL_MEMBERS = "channel_member"
+
+/**
+ * The name of the column in the table [CHANNEL_MEMBERS].
+ */
+private const val CHANNEL_MEMBERS_ACCESS_CONTROL = "access_control"
+
+/**
  * A JDBC implementation of the [ChannelRepositoryInterface].
  * @property connection The connection to the database.
  * @property encrypt The encryption algorithm.
@@ -190,6 +200,16 @@ class ChannelJDBC(
     }
 
     /**
+     * Convert the [ResultSet] into an [AccessControl] or null if nothing is found.
+     */
+    private fun ResultSet.toAccessControl(): AccessControl? =
+        if (next()) {
+            AccessControl.valueOf(getString(CHANNEL_MEMBERS_ACCESS_CONTROL))
+        } else {
+            null
+        }
+
+    /**
      * Converts the [ResultSet] to a list of [Channel].
      */
     private fun ResultSet.toChannelList(): List<Channel> {
@@ -222,11 +242,9 @@ class ChannelJDBC(
             }
         }
         val id = channel.cId
-        if (id != null) {
-            setInt(idx++, id.toInt())
-        }
         setString(idx++, channel.description)
-        setString(idx, channel.icon)
+        setString(idx++, channel.icon)
+        if (id != null) setInt(idx, id.toInt())
     }
 
     override fun createChannel(channel: Channel): Channel? {
@@ -273,8 +291,8 @@ class ChannelJDBC(
     }
 
     override fun joinChannel(
-        channelId: UInt,
-        userId: UInt,
+        cId: UInt,
+        uId: UInt,
         accessControl: AccessControl,
     ) {
         val insertQuery =
@@ -284,15 +302,15 @@ class ChannelJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         var idx = 1
-        stm.setInt(idx++, channelId.toInt())
-        stm.setInt(idx++, userId.toInt())
+        stm.setInt(idx++, cId.toInt())
+        stm.setInt(idx++, uId.toInt())
         stm.setString(idx, accessControl.toString())
         stm.executeUpdate()
     }
 
     override fun isUserInChannel(
-        channelId: UInt,
-        userId: UInt,
+        cId: UInt,
+        uId: UInt,
     ): Boolean {
         val selectQuery =
             """
@@ -301,13 +319,13 @@ class ChannelJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
-        stm.setInt(idx++, channelId.toInt())
-        stm.setInt(idx, userId.toInt())
+        stm.setInt(idx++, cId.toInt())
+        stm.setInt(idx, uId.toInt())
         val rs = stm.executeQuery()
         return rs.next()
     }
 
-    override fun findInvitation(channelId: UInt): ChannelInvitation? {
+    override fun findInvitation(cId: UInt): ChannelInvitation? {
         val selectQuery =
             """
             SELECT channel_id, expiration_date, invitation, access_control, max_uses
@@ -315,7 +333,7 @@ class ChannelJDBC(
             WHERE channel_id = ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
-        stm.setInt(1, channelId.toInt())
+        stm.setInt(1, cId.toInt())
         val rs = stm.executeQuery()
         return if (rs.next()) {
             rs.toChannelInvitation()
@@ -338,14 +356,14 @@ class ChannelJDBC(
         stm.executeUpdate()
     }
 
-    override fun deleteInvitation(channelId: UInt) {
+    override fun deleteInvitation(cId: UInt) {
         val deleteQuery =
             """
             DELETE FROM channels_invitations
             WHERE channel_id = ?
             """.trimIndent()
         val stm = connection.prepareStatement(deleteQuery)
-        stm.setInt(1, channelId.toInt())
+        stm.setInt(1, cId.toInt())
         stm.executeUpdate()
     }
 
@@ -366,7 +384,7 @@ class ChannelJDBC(
     }
 
     override fun findUserAccessControl(
-        channelId: UInt,
+        cId: UInt,
         userId: UInt,
     ): AccessControl? {
         val selectQuery =
@@ -376,7 +394,7 @@ class ChannelJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
-        stm.setInt(idx++, channelId.toInt())
+        stm.setInt(idx++, cId.toInt())
         stm.setInt(idx, userId.toInt())
         val rs = stm.executeQuery()
         return if (rs.next()) {
@@ -430,7 +448,7 @@ class ChannelJDBC(
     }
 
     override fun findByName(
-        userId: UInt,
+        uId: UInt,
         name: String,
         offset: UInt,
         limit: UInt,
@@ -447,12 +465,30 @@ class ChannelJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
-        stm.setInt(idx++, userId.toInt())
+        stm.setInt(idx++, uId.toInt())
         stm.setString(idx++, name)
         stm.setInt(idx++, limit.toInt())
         stm.setInt(idx, offset.toInt())
         val rs = stm.executeQuery()
         return rs.toChannelList()
+    }
+
+    override fun findAccessControl(
+        uid: UInt,
+        cId: UInt,
+    ): AccessControl? {
+        val selectQuery =
+            """
+            SELECT access_control
+            FROM channel_members
+            WHERE member = ? AND channel = ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, uid.toInt())
+        stm.setInt(idx, cId.toInt())
+        val rs = stm.executeQuery()
+        return rs.toAccessControl()
     }
 
     override fun findById(id: UInt): Channel? {

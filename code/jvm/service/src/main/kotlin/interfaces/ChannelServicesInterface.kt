@@ -1,6 +1,7 @@
 package interfaces
 
 import errors.ChannelError
+import model.channels.AccessControl
 import model.channels.Channel
 import utils.Either
 import java.util.UUID
@@ -133,4 +134,19 @@ interface ChannelServicesInterface {
         description: String?,
         icon: String?,
     ): Either<ChannelError, Channel>
+
+    /**
+     * Get the access control of a user into a given channel.
+     *
+     * @param uId the id of the user.
+     * @param cId the id of the channel.
+     *
+     * @return [Either] either a [ChannelError] if an error occurs,
+     * or [AccessControl] the access control of the user in the channel.
+     * Null is returned if the user is not in the channel.
+     */
+    fun getAccessControl(
+        uId: UInt,
+        cId: UInt,
+    ): Either<ChannelError, AccessControl?>
 }
