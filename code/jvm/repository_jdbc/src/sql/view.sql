@@ -4,7 +4,9 @@ select c.id            as channel_id,
        c.owner         as channel_owner,
        c.visibility    as channel_visibility,
        u.name          as owner_name,
-       c.access_control as channel_accessControl
+       c.access_control as channel_accessControl,
+       c.description  as channel_description,
+       c.icon         as channel_icon
 from channels c
          join users u on c.owner = u.id;
 
