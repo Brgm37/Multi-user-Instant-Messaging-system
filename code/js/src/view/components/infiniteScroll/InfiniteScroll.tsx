@@ -17,7 +17,7 @@ import LoadingIcon from "../LoadingIcon";
  * @param isToAutoScroll
  */
 export default function (
-    {className, scrollStyle, isToAutoScroll}: { className?: string, scrollStyle?: string, isToAutoScroll?: boolean }
+    {className, scrollStyle}: { className?: string, scrollStyle?: string }
 ): React.JSX.Element {
     const {
         items,
@@ -68,14 +68,20 @@ export default function (
         if (isLoading || (!items.hasMore.head && !items.hasMore.tail)) return;
         if (at === "head" && items.hasMore.head) loadMore(head, at);
         if (at === "tail" && items.hasMore.tail) loadMore(tail, at);
-    }, [head, tail, at]);
+    }, [head, tail]);
 
     useEffect(() => {
-        if (recordedElementRef.current && isToAutoScroll) {
+        if (isLoading === false) return
+        setAt(isLoading)
+    }, [isLoading]);
+
+    useEffect(() => {
+        if (recordedElementRef.current) {
             if (at === "head") recordedElementRef.current.scrollIntoView({behavior: "smooth", block: "end"})
             else recordedElementRef.current.scrollIntoView({behavior: "smooth", block: "start"})
         }
     }, [items.list]);
+
     return (
         <div className={className}>
             <ul className={scrollStyle}>

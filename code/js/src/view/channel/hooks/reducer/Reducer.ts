@@ -45,7 +45,7 @@ export default function (state: ChannelState, action: ChannelAction): ChannelSta
                 case "loadMore":
                     return {tag: "loading", at: action.at}
                 case "sendMessage":
-                    return {tag: "loading", at: "sending"}
+                    return {tag: "loading", at: "head"}
                 case "reset":
                     return {tag: "idle"}
                 default:

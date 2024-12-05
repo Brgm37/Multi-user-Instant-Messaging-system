@@ -24,7 +24,6 @@ export default function BasicChannelView(
             <InfiniteScroll
                 className={"flex-1 bg-gray-800 p-4 overflow-y-auto flex-col-reverse"}
                 scrollStyle={"flex-1 bg-gray-800 p-4 overflow-y-auto flex flex-col-reverse"}
-                isToAutoScroll={false}
             />
             {error && (
                 <div className="bg-red-500 text-white p-2 rounded">

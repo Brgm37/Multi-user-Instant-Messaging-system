@@ -11,5 +11,5 @@
 export type ChannelState =
     { tag: "idle" } |
     { tag: "messages" } |
-    { tag: "loading", at: "head" | "tail" | "sending" } |
+    { tag: "loading", at: "head" | "tail" } |
     { tag: "error", message: string, previous: ChannelState }

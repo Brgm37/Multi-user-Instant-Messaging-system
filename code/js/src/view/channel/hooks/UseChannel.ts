@@ -86,16 +86,21 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
     const [list, listHandler] = useScroll<Message>(LIST_SIZE)
     const initialState: ChannelState = {tag: "idle"}
     const service = useContext(ChannelServiceContext)
-    const [state, dispatcher] = useReducer(reduce, initialState)
+    const [state, dispatch] = useReducer(reduce, initialState)
     const isInitialMount = useRef(true);
 
     useEffect(() => {
         if (isInitialMount.current) isInitialMount.current = false;
         else {
             if (state.tag === "idle") return
-            dispatcher({tag: "reset"})
+            limit = DEFAULT_LIMIT
+            dispatch({tag: "reset"})
         }
     }, [id]);
+
+    useEffect(() => {
+        console.log("list size", list.list.length, "max size", list.max)
+    }, [list]);
 
     useEffect(() => {
         if (messages.length === 0) return
@@ -104,7 +109,7 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
         messages.forEach(msg => {
             if (msg.channel == id) {
                 consumed.push(msg)
-                addMessage(listHandler, list, msg)
+                if (!list.list.some(it => it.id === msg.id)) addMessage(listHandler, list, msg)
             }
         })
         consumeMessage(consumed)
@@ -118,10 +123,10 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
                 .then(response => {
                     if (response.tag === "success") {
                         initList(listHandler, response.value)
-                        dispatcher({tag: "loadSuccess"})
-                    } else dispatcher({tag: "loadError", error: response.value, previous: state})
+                        dispatch({tag: "loadSuccess"})
+                    } else dispatch({tag: "loadError", error: response.value, previous: state})
                 })
-            dispatcher({tag: "init"})
+            dispatch({tag: "init"})
         },
         loadMore(at: "head" | "tail"): void {
             if (state.tag !== "messages") return
@@ -132,10 +137,10 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
                 .then(response => {
                     if (response.tag === "success") {
                         addItems(at, listHandler, list, response.value)
-                        dispatcher({tag: "loadSuccess"})
-                    } else dispatcher({tag: "loadError", error: response.value, previous: state})
+                        dispatch({tag: "loadSuccess"})
+                    } else dispatch({tag: "loadError", error: response.value, previous: state})
                 })
-            dispatcher({tag: "loadMore", at})
+            dispatch({tag: "loadMore", at})
         },
         sendMsg(msg: string): void {
             if (state.tag === "idle" || state.tag === "error") return
@@ -144,14 +149,14 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
                 .then(response => {
                     if (response.tag === "success") {
                         addMessage(listHandler, list, response.value)
-                        dispatcher({tag: "sendSuccess"})
-                    } else dispatcher({tag: "sendError", error: response.value, previous: state})
+                        dispatch({tag: "sendSuccess"})
+                    } else dispatch({tag: "sendError", error: response.value, previous: state})
                 })
-            dispatcher({tag: "sendMessage"})
+            dispatch({tag: "sendMessage"})
         },
         goBack() {
             if (state.tag !== "error") return
-            dispatcher({tag: "go-back"})
+            dispatch({tag: "go-back"})
         }
     }
 

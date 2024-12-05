@@ -15,7 +15,7 @@ export function ChannelView(): React.JSX.Element {
     }
 
     const provider: InfiniteScrollContext<Message> = {
-        isLoading: state.tag === "loading" && state.at !== "sending" ? state.at : false,
+        isLoading: state.tag === "loading" ? state.at : false,
         items: messages,
         renderItems(item: Message): React.ReactNode {
             return (
