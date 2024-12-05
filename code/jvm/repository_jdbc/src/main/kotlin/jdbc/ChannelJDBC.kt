@@ -75,6 +75,20 @@ private const val CHANNELS_VIEW_VISIBILITY = "channel_visibility"
 /**
  * The name of the column in the view [CHANNELS_VIEW].
  *
+ * @property CHANNELS_VIEW_DESCRIPTION The name of the column in the view [CHANNELS_VIEW].
+ */
+private const val CHANNELS_VIEW_DESCRIPTION = "channel_description"
+
+/**
+ * The name of the column in the view [CHANNELS_VIEW].
+ *
+ * @property CHANNELS_VIEW_ICON The name of the column in the view [CHANNELS_VIEW].
+ */
+private const val CHANNELS_VIEW_ICON = "channel_icon"
+
+/**
+ * The name of the column in the view [CHANNELS_VIEW].
+ *
  * @property CHANNELS_VIEW_OWNER_NAME The name of the column in the view [CHANNELS_VIEW].
  */
 private const val CHANNELS_VIEW_OWNER_NAME = "owner_name"
@@ -144,12 +158,16 @@ class ChannelJDBC(
         val name = getString(CHANNELS_VIEW_NAME).toChannelName()
         val accessControl = AccessControl.valueOf(getString(CHANNELS_VIEW_ACCESS_CONTROL).uppercase())
         val visibility = getString(CHANNELS_VIEW_VISIBILITY)
+        val description = getString(CHANNELS_VIEW_DESCRIPTION)
+        val icon = getString(CHANNELS_VIEW_ICON)
         return createChannel(
             id = id,
             owner = owner,
             name = name,
             accessControl = accessControl,
             visibility = Visibility.valueOf(visibility.uppercase()),
+            description = description,
+            icon = icon,
         )
     }
 
@@ -205,15 +223,17 @@ class ChannelJDBC(
         }
         val id = channel.cId
         if (id != null) {
-            setInt(idx, id.toInt())
+            setInt(idx++, id.toInt())
         }
+        setString(idx++, channel.description)
+        setString(idx, channel.icon)
     }
 
     override fun createChannel(channel: Channel): Channel? {
         val insertQuery =
             """
-            INSERT INTO channels (owner, name, access_control, visibility)
-            VALUES (?, ?, ?, ?) RETURNING id
+            INSERT INTO channels (owner, name, access_control, visibility, description, icon)
+            VALUES (?, ?, ?, ?, ?, ?) RETURNING id
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         stm.setInfo(channel)
@@ -237,7 +257,7 @@ class ChannelJDBC(
             """
             SELECT 
             	channel_id, channel_name, channel_owner, channel_accessControl,
-            	channel_visibility, owner_name
+            	channel_visibility, owner_name, channel_description, channel_icon
             FROM v_channel JOIN channel_members c on c.id = v_channel.channel_id
             WHERE member = ?
             LIMIT ?
@@ -371,7 +391,7 @@ class ChannelJDBC(
             """
             SELECT 
             	channel_id, channel_name, channel_owner, channel_accessControl,
-            	channel_visibility, owner_name
+            	channel_visibility, owner_name, channel_description, channel_icon
             FROM v_channel
             WHERE channel_name = ?
             """.trimIndent()
@@ -394,7 +414,7 @@ class ChannelJDBC(
             """
             SELECT 
             	channel_id, channel_name, channel_owner, channel_accessControl,
-            	channel_visibility, owner_name
+            	channel_visibility, owner_name, channel_description, channel_icon
             FROM v_channel
             WHERE channel_name like ? and channel_visibility = '${PUBLIC.name}'
             LIMIT ?
@@ -419,7 +439,7 @@ class ChannelJDBC(
             """
             SELECT 
             	channel_id, channel_name, channel_owner, channel_accessControl,
-            	channel_visibility, owner_name
+            	channel_visibility, owner_name, channel_description, channel_icon
             FROM v_channel JOIN channel_members c on c.id = v_channel.channel_id
             WHERE member = ? AND compare_partial_name(channel_name, ?)
             LIMIT ?
@@ -440,7 +460,7 @@ class ChannelJDBC(
             """
             SELECT 
             	channel_id, channel_name, channel_owner, channel_accessControl,
-            	channel_visibility, owner_name
+            	channel_visibility, owner_name, channel_description, channel_icon
             FROM v_channel
             WHERE channel_id = ?
             """.trimIndent()
@@ -462,7 +482,7 @@ class ChannelJDBC(
             """
             SELECT 
             	channel_id, channel_name, channel_owner, channel_accessControl,
-            	channel_visibility, owner_name
+            	channel_visibility, owner_name, channel_description, channel_icon
             FROM v_channel
             WHERE channel_visibility = '${PUBLIC.name}'
             LIMIT ?
@@ -480,7 +500,7 @@ class ChannelJDBC(
         val updateQuery =
             """
             UPDATE channels
-            SET owner = ?, name = ?, access_control = ?, visibility = ?
+            SET owner = ?, name = ?, access_control = ?, visibility = ?, description = ?, icon = ?
             WHERE id = ?
             """.trimIndent()
         val stm = connection.prepareStatement(updateQuery)
