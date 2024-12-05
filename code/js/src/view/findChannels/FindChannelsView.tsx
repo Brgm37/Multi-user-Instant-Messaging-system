@@ -40,6 +40,7 @@ export function FindChannelsView(): React.JSX.Element {
                 <SearchBar
                     value={state.searchBar}
                     onChange={handler.onSearchChange}
+                    placeholder={"Search for channels"}
                     className={"bg-gray-700 text-white p-2 rounded ml-auto"}
                 />
             </header>

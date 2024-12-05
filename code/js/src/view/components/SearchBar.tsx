@@ -7,6 +7,7 @@ type SearchBarProps = {
     value: string;
     onChange: (value: string) => void;
     className?: string;
+    placeholder?: string;
 };
 
 /**
@@ -17,7 +18,7 @@ type SearchBarProps = {
  * @param className The class name for the search bar.
  * @returns JSX.Element
  */
-export function SearchBar({value, onChange, className}: SearchBarProps): React.JSX.Element {
+export function SearchBar({value, onChange, className, placeholder}: SearchBarProps): React.JSX.Element {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         onChange(event.target.value);
     }
@@ -26,7 +27,7 @@ export function SearchBar({value, onChange, className}: SearchBarProps): React.J
             type="text"
             value={value}
             onChange={handleChange}
-            placeholder="Search for channels"
+            placeholder={placeholder}
         />
     )
 }
