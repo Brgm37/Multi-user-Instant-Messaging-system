@@ -1,4 +1,6 @@
-export type UseCreateChannelFormHandler = {
+import {ChannelInput} from "../states/createChannelsState";
+
+export type UseCreateChannelHandler = {
     /**
      * The function to call when the name changes.
      * @param name The new name.
@@ -22,5 +24,5 @@ export type UseCreateChannelFormHandler = {
      *
      * @returns void
      */
-    onSubmit: () => void,
+    onSubmit: (channel: ChannelInput) => void,
 }
