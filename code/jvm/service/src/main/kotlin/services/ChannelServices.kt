@@ -50,6 +50,8 @@ class ChannelServices(
         name: String,
         accessControl: String,
         visibility: String,
+        description: String?,
+        icon: String?,
     ): Either<ChannelError, Channel> {
         val args: Array<String> = arrayOf(name, visibility, accessControl)
         if (args.any(String::isBlank)) return failure(InvalidChannelInfo)
@@ -194,6 +196,45 @@ class ChannelServices(
             val channels = channelRepo.findByName(uId, name, offset, limit)
             success(channels)
         }
+
+    override fun updateChannel(
+        id: UInt,
+        name: String?,
+        accessControl: String?,
+        visibility: String?,
+        description: String?,
+        icon: String?,
+    ): Either<ChannelError, Channel> {
+        val args: Array<String?> = arrayOf(name, visibility, accessControl)
+        if (args.any { it != null && it.isBlank() }) return failure(InvalidChannelInfo)
+        accessControl?.let { if (!AccessControl.validate(it)) return failure(InvalidChannelAccessControl) }
+        visibility?.let { if (!Visibility.validate(it.uppercase())) return failure(InvalidChannelVisibility) }
+        val upperCaseAccessControl = accessControl?.uppercase() ?: return failure(InvalidChannelAccessControl)
+        return repoManager
+            .run {
+                val channel = channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
+                val updatedChannel =
+                    when (channel) {
+                        is Public ->
+                            channel.copy(
+                                name = ChannelName(name ?: channel.name.fullName, channel.owner.username),
+                                accessControl = AccessControl.valueOf(upperCaseAccessControl),
+                                description = description ?: channel.description,
+                                icon = icon ?: channel.icon,
+                            )
+
+                        is Private ->
+                            channel.copy(
+                                name = ChannelName(name ?: channel.name.fullName, channel.owner.username),
+                                accessControl = AccessControl.valueOf(upperCaseAccessControl),
+                                description = description ?: channel.description,
+                                icon = icon ?: channel.icon,
+                            )
+                    }
+                channelRepo.save(updatedChannel)
+                success(updatedChannel)
+            }
+    }
 
     private fun makeTimeStamp(expirationDate: String) =
         try {

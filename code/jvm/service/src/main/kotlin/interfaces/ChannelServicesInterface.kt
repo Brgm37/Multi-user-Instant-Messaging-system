@@ -31,6 +31,8 @@ interface ChannelServicesInterface {
         name: String,
         accessControl: String,
         visibility: String,
+        description: String? = null,
+        icon: String? = null,
     ): Either<ChannelError, Channel>
 
     /**
@@ -113,4 +115,22 @@ interface ChannelServicesInterface {
         offset: UInt = OFFSET,
         limit: UInt = LIMIT,
     ): Either<ChannelError, List<Channel>>
+
+    /**
+     * Updates a channel.
+     * @param id The id of the channel to update.
+     * @param name The name of the channel.
+     * @param accessControl The access control of the channel.
+     * @param visibility The visibility of the channel.
+     * @param description The description of the channel.
+     * @param icon The icon of the channel.
+     */
+    fun updateChannel(
+        id: UInt,
+        name: String? = null,
+        accessControl: String? = null,
+        visibility: String? = null,
+        description: String? = null,
+        icon: String? = null,
+    ): Either<ChannelError, Channel>
 }
