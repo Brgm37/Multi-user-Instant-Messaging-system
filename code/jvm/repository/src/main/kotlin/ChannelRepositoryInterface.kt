@@ -162,4 +162,16 @@ interface ChannelRepositoryInterface : Repository<Channel> {
         offset: UInt = OFFSET,
         limit: UInt = LIMIT,
     ): List<Channel>
+
+    /**
+     * Leaves a channel
+     *
+     * @param cId The ID of the channel
+     * @param uId The ID of the user
+     * @return The channel with the given ID
+     */
+    fun leaveChannel(
+        cId: UInt,
+        uId: UInt,
+    )
 }

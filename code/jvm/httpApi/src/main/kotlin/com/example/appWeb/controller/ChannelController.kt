@@ -24,6 +24,7 @@ import org.hibernate.validator.constraints.Range
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -294,6 +295,16 @@ class ChannelController(
             is Failure -> {
                 ChannelProblem.ChannelNotFound.response(NOT_FOUND)
             }
+        }
+
+    @DeleteMapping(CHANNEL_ID_URL)
+    fun deleteChannel(
+        @PathVariable @Range(min = 1) channelId: UInt,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> =
+        when (channelService.deleteOrLeaveChannel(authenticated.uId, channelId)) {
+            is Success -> ResponseEntity.ok(Unit)
+            is Failure -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
         }
 
     companion object {

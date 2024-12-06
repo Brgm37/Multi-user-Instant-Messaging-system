@@ -539,6 +539,22 @@ class ChannelJDBC(
         return rs.toChannelList()
     }
 
+    override fun leaveChannel(
+        cId: UInt,
+        uId: UInt,
+    ) {
+        val deleteQuery =
+            """
+            DELETE FROM channel_members
+            WHERE channel = ? AND member = ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(deleteQuery)
+        var idx = 1
+        stm.setInt(idx++, cId.toInt())
+        stm.setInt(idx, uId.toInt())
+        stm.executeUpdate()
+    }
+
     override fun findById(id: UInt): Channel? {
         val selectQuery =
             """

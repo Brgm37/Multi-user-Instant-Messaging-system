@@ -113,6 +113,13 @@ class ChannelInMem : ChannelRepositoryInterface {
             it is Channel.Public && usersInChannels[it.cId]?.any { ac -> ac.first == uId } == false
         }
 
+    override fun leaveChannel(
+        cId: UInt,
+        uId: UInt,
+    ) {
+        usersInChannels[cId]?.removeIf { it.first == uId }
+    }
+
     override fun findById(id: UInt): Channel? = channels.find { it.cId == id }
 
     override fun findAll(

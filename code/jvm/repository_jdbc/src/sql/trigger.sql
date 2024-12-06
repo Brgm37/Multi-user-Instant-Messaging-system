@@ -118,3 +118,17 @@ create or replace trigger tr_message_update
     on messages
     for each statement
 execute function remake_message_view();
+
+create or replace function delete_channel_members() returns trigger as
+$$
+begin
+    delete from channel_members where channel = old.id;
+    return old;
+end;
+$$ language plpgsql;
+
+create or replace trigger tr_channel_members_delete
+    before delete
+    on channels
+    for each row
+execute function delete_channel_members();

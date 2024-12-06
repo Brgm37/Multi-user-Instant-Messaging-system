@@ -174,4 +174,14 @@ interface ChannelServicesInterface {
         offset: UInt = OFFSET,
         limit: UInt = LIMIT,
     ): Either<ChannelError, List<Channel>>
+
+    /**
+     * Deletes a user from a channel. If the user is the owner of the channel, the channel is deleted.
+     *
+     * @param uId The ID of the user.
+     */
+    fun deleteOrLeaveChannel(
+        uId: UInt,
+        cId: UInt,
+    ): Either<ChannelError, Unit>
 }

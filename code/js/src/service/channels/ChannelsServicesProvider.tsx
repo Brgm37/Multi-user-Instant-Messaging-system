@@ -23,8 +23,7 @@ export function ChannelsServicesProvider(
             } else {
                 return failure(await response.text())
             }
-        }
-        ,
+        },
         findChannelsByName: async (name: string, offset: number, limit: number): Promise<Either<Channel[], string>> => {
             const url = urlBase + `/my/${name}?offset=${offset}&limit=${limit}`
             const response = await fetch(url)

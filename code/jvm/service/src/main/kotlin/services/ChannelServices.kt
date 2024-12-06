@@ -296,6 +296,22 @@ class ChannelServices(
             success(channels)
         }
 
+    override fun deleteOrLeaveChannel(
+        uId: UInt,
+        cId: UInt,
+    ): Either<ChannelError, Unit> {
+        return repoManager.run {
+            userRepo.findById(uId) ?: return@run failure(UserNotFound)
+            val channel = channelRepo.findById(cId) ?: return@run failure(ChannelNotFound)
+            if (channel.owner.uId == uId) {
+                channelRepo.deleteById(cId)
+            } else {
+                channelRepo.leaveChannel(cId, uId)
+            }
+            success(Unit)
+        }
+    }
+
     private fun makeTimeStamp(expirationDate: String) =
         try {
             Timestamp.valueOf(
