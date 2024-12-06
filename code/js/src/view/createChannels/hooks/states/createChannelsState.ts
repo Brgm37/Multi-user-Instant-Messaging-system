@@ -1,17 +1,16 @@
+import {AccessControl} from "../../../../model/AccessControl";
 
 export type Visibility = "public" | "private"
-
-export type Access = "READ_ONLY" | "READ_WRITE"
 
 export type ChannelInput = {
     name: string,
     visibility: Visibility,
-    access: Access,
+    access: AccessControl,
     isValid: boolean
 }
 
 export type CreateChannelsState =
-    { tag: "editing", input: ChannelInput} |
+    { tag: "editing", input: ChannelInput, message?: string} |
     { tag: "error", message: string, input: ChannelInput} |
     { tag: "submitting", input: ChannelInput } |
     { tag: "redirecting", input: ChannelInput }
