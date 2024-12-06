@@ -9,6 +9,9 @@
 
 body {
     font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    margin: 0;
 }
 .card:hover {
     transform: scale(1.05);
@@ -25,4 +28,15 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: #4a5568;
     border-radius: 4px;
+}
+
+@layer utilities {
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hidden {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
 }
