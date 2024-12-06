@@ -1,6 +1,7 @@
 import {Either} from "../../model/Either";
 import {Context, createContext} from "react";
 import {Channel} from "../../model/Channel";
+import {PublicChannel} from "../../model/PublicChannel";
 
 
 /**
@@ -15,16 +16,19 @@ export interface FindChannelsServiceContext {
     /**
      * Get channels by partial name method.
      * @param partialName
+     * @param offset
+     * @param limit
      */
     getChannelsByPartialName(
         partialName: string,
-    ): Promise<Either<Channel[], string>>
+        offset: number,
+        limit: number,
+    ): Promise<Either<PublicChannel[], string>>
 
     /**
      * Join channel method.
      * @param channelId
-     * @returns void
-        */
+     */
     joinChannel(
         channelId: number,
     ): Promise<Either<void, string>>
@@ -37,12 +41,12 @@ export interface FindChannelsServiceContext {
     getPublicChannels(
         offset: number,
         limit: number,
-    ): Promise<Either<Channel[], string>>
+    ): Promise<Either<PublicChannel[], string>>
 }
 
 const defaultFindChannelsServiceContext: FindChannelsServiceContext = {
-    getChannelsByPartialName: (partialName) => {
-        return new Promise<Either<Channel[], string>>((resolve, reject) => {
+    getChannelsByPartialName: (partialName, offset, limit) => {
+        return new Promise<Either<PublicChannel[], string>>((resolve, reject) => {
             reject(new Error("Not implemented"))
         })
     },
@@ -52,7 +56,7 @@ const defaultFindChannelsServiceContext: FindChannelsServiceContext = {
         })
     },
     getPublicChannels: (offset, limit) => {
-        return new Promise<Either<Channel[], string>>((resolve, reject) => {
+        return new Promise<Either<PublicChannel[], string>>((resolve, reject) => {
             reject(new Error("Not implemented"))
         })
     }

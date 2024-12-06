@@ -2,10 +2,9 @@ import {Action} from "./states/FindChannelsAction";
 import {FindChannelState} from "./states/FindChannelsState";
 import {useContext, useEffect, useReducer} from "react";
 import {UseFindChannelsHandler} from "./handler/UseFindChannelsHandler";
-import {FindChannelsMockServiceContext} from "../../../service/findChannels/mock/FindChannelsMockServiceContext";
 import {isFailure} from "../../../model/Either";
 import envConfig from "../../../../envConfig.json"
-import {channelsToPublicChannels} from "../../../model/PublicChannel";
+import {FindChannelsServiceContext} from "../../../service/findChannels/FindChannelsServiceContext";
 
 /**
  * The delay for debounce.
@@ -95,7 +94,7 @@ export function reduce(state: FindChannelState, action: Action): FindChannelStat
 const initialState: FindChannelState = { tag: "navigating", searchBar: "", channels: [] }
 
 export function useFindChannels(): [FindChannelState, UseFindChannelsHandler] {
-    const { getChannelsByPartialName, getPublicChannels, joinChannel } = useContext(FindChannelsMockServiceContext)
+    const { getChannelsByPartialName, getPublicChannels, joinChannel } = useContext(FindChannelsServiceContext)
     const [state, dispatch] = useReducer(reduce, initialState)
 
     useEffect(() => {
@@ -104,11 +103,11 @@ export function useFindChannels(): [FindChannelState, UseFindChannelsHandler] {
             const fetchChannels =
                 state.searchBar === ""
                     ? getPublicChannels(DEFAULT_OFFSET, CHANNELS_PER_FETCH)
-                    : getChannelsByPartialName(state.searchBar);
+                    : getChannelsByPartialName(state.searchBar, DEFAULT_OFFSET, CHANNELS_PER_FETCH);
             fetchChannels
                 .then((response) => {
                     if (isFailure(response)) dispatch({ type: "error", error: response.value })
-                    else dispatch({ type: "success", channels: channelsToPublicChannels(response.value) })
+                    else dispatch({ type: "success", channels: response.value })
                 })
         }, DEBOUNCE_DELAY);
         return () => clearTimeout(timeout);
@@ -126,9 +125,7 @@ export function useFindChannels(): [FindChannelState, UseFindChannelsHandler] {
             .then((response) => {
                 if (isFailure(response)) {
                     dispatch({type: "error", error: response.value})
-                } else {
-                    dispatch({type: "success", channels: channelsToPublicChannels(response.value)})
-                }
+                } else dispatch({type: "success", channels: response.value})
             })
     }
 
