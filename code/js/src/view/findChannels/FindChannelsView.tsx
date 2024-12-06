@@ -7,7 +7,7 @@ import {FindChannelsErrorView} from "./components/FindChannelsErrorView";
 import {FindChannelsNavigatingView} from "./components/FindChannelsNavigatingView";
 import {FindChannelsLoadingView} from "./components/FindChannelsLoadingView";
 import {UseFindChannelsHandler} from "./hooks/handler/UseFindChannelsHandler";
-import {SearchBar} from "../components/SearchBar";
+import {InputBar} from "../components/InputBar";
 
 export function FindChannelsView(): React.JSX.Element {
     const [state, handler]: [FindChannelState, UseFindChannelsHandler] = useFindChannels();
@@ -37,7 +37,7 @@ export function FindChannelsView(): React.JSX.Element {
         <div>
             <header className="bg-gray-800 p-4 flex items-center">
                 <h1 className="text-xl font-bold">Find Channels</h1>
-                <SearchBar
+                <InputBar
                     value={state.searchBar}
                     onChange={handler.onSearchChange}
                     placeholder={"Search for channels"}
