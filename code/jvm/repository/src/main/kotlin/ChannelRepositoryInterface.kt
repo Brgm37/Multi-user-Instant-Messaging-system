@@ -142,4 +142,12 @@ interface ChannelRepositoryInterface : Repository<Channel> {
         uid: UInt,
         cId: UInt,
     ): AccessControl?
+
+    /**
+     * Retrieves a channel by its invitation code
+     *
+     * @param invitationCode The invitation code of the channel
+     * @return The channel with the given invitation code
+     */
+    fun findByInvitationCode(invitationCode: String): Channel?
 }

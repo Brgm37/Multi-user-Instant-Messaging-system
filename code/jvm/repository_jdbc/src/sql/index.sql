@@ -13,3 +13,7 @@ create index if not exists idx_channel_members_member on channel_members (member
 create index if not exists idx_messages_channel on messages (channel);
 
 create index if not exists idx_messages_author on messages (channel, author);
+
+create index if not exists idx_channel_invitation_token on daw.public.channels_invitations (invitation);
+
+create index if not exists idx_users_invitation_token on daw.public.users_invitations (invitation);

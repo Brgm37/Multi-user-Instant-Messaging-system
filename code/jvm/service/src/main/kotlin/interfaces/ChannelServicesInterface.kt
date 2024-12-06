@@ -3,8 +3,8 @@ package interfaces
 import errors.ChannelError
 import model.channels.AccessControl
 import model.channels.Channel
+import model.channels.ChannelInvitation
 import utils.Either
-import java.util.UUID
 
 /**
  * The offset for the channels.
@@ -80,7 +80,7 @@ interface ChannelServicesInterface {
         expirationDate: String?,
         accessControl: String?,
         owner: UInt,
-    ): Either<ChannelError, UUID>
+    ): Either<ChannelError, ChannelInvitation>
 
     /**
      * Get a channel by its Name.
@@ -149,4 +149,16 @@ interface ChannelServicesInterface {
         uId: UInt,
         cId: UInt,
     ): Either<ChannelError, AccessControl?>
+
+    /**
+     * Associates a user to a channel.
+     * @param uId The id of the user to join the channel.
+     * @param cId The id of the channel to join.
+     * @param invitationCode The invitation code to join the channel.
+     */
+    fun joinChannel(
+        uId: UInt,
+        cId: UInt?,
+        invitationCode: String?,
+    ): Either<ChannelError, Channel>
 }

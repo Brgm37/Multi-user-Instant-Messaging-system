@@ -424,4 +424,30 @@ abstract class AbstractChannelControllerTest {
             .expectStatus()
             .isOk
     }
+
+    @Test
+    fun `trying to join a channel with an invalid token should return ANAUTHORIZED`() {
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
+
+        client
+            .post()
+            .uri("${ChannelController.CHANNEL_BASE_URL}/invitations")
+            .header("Authorization", "Bearer invalid")
+            .exchange()
+            .expectStatus()
+            .isUnauthorized
+    }
+
+    @Test
+    fun `trying to join a channel with an invalid invitation code should return BAD_REQUEST`() {
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
+
+        client
+            .post()
+            .uri("${ChannelController.CHANNEL_BASE_URL}/invitations")
+            .header("Authorization", "Bearer ${token.token}")
+            .exchange()
+            .expectStatus()
+            .isBadRequest
+    }
 }

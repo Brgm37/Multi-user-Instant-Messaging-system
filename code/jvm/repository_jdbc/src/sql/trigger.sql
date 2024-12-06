@@ -20,15 +20,15 @@ $$
 begin
     drop view if exists v_channel;
     create or replace view v_channel as
-    select c.id            as channel_id,
-           c.name          as channel_name,
-           c.owner         as channel_owner,
-           c.visibility    as channel_visibility,
-           u.id            as owner_id,
-           u.name          as owner_name,
+    select c.id             as channel_id,
+           c.name           as channel_name,
+           c.owner          as channel_owner,
+           c.visibility     as channel_visibility,
+           u.id             as owner_id,
+           u.name           as owner_name,
            c.access_control as channel_accessControl,
-            c.description  as channel_description,
-            c.icon         as channel_icon
+           c.description    as channel_description,
+           c.icon           as channel_icon
     from channels c
              join users u on c.owner = u.id;
     return new;
@@ -92,7 +92,7 @@ begin
            m.author    as msgAuthorId,
            m.content   as msgContent,
            m.timestamp as msgTimestamp,
-           c.name     as msgChannelName,
+           c.name      as msgChannelName,
            u.name      as msgAuthorUsername
     from messages m
              join users u on m.author = u.id

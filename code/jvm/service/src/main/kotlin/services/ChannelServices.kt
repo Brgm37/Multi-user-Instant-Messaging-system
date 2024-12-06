@@ -6,6 +6,8 @@ import errors.ChannelError.ChannelNotFound
 import errors.ChannelError.InvalidChannelAccessControl
 import errors.ChannelError.InvalidChannelInfo
 import errors.ChannelError.InvalidChannelVisibility
+import errors.ChannelError.InvitationCodeHasExpired
+import errors.ChannelError.InvitationCodeIsInvalid
 import errors.ChannelError.UnableToCreateChannel
 import errors.ChannelError.UserNotFound
 import interfaces.ChannelServicesInterface
@@ -18,6 +20,7 @@ import model.channels.Channel.Public
 import model.channels.ChannelInvitation
 import model.channels.ChannelName
 import model.channels.Visibility
+import model.channels.decrementUses
 import model.users.UserInfo
 import utils.Either
 import utils.failure
@@ -25,7 +28,6 @@ import utils.success
 import java.sql.Timestamp
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 /**
  * The offset for the channels message.
@@ -124,7 +126,7 @@ class ChannelServices(
         expirationDate: String?,
         accessControl: String?,
         owner: UInt,
-    ): Either<ChannelError, UUID> {
+    ): Either<ChannelError, ChannelInvitation> {
         val timestamp =
             if (expirationDate != null) {
                 makeTimeStamp(expirationDate) ?: return failure(InvalidChannelInfo)
@@ -157,7 +159,7 @@ class ChannelServices(
                 val oldInvitation = channelRepo.findInvitation(channelId)
                 if (oldInvitation != null) channelRepo.deleteInvitation(channelId)
                 channelRepo.createInvitation(invitation)
-                success(invitation.invitationCode)
+                success(invitation)
             }
     }
 
@@ -250,6 +252,37 @@ class ChannelServices(
             userRepo.findById(uId) ?: return@run failure(UserNotFound)
             channelRepo.findById(cId) ?: return@run failure(ChannelNotFound)
             success(channelRepo.findAccessControl(uId, cId))
+        }
+
+    override fun joinChannel(
+        uId: UInt,
+        cId: UInt?,
+        invitationCode: String?,
+    ): Either<ChannelError, Channel> =
+        repoManager.run {
+            val args = arrayOf(cId, invitationCode)
+            if (args.all { it == null }) return@run failure(InvalidChannelInfo)
+            val channel =
+                cId?.let { channelRepo.findById(it) } ?: invitationCode?.let { channelRepo.findByInvitationCode(it) }
+                    ?: return@run failure(ChannelNotFound)
+            userRepo.findById(uId) ?: return@run failure(UserNotFound)
+            val validCId = checkNotNull(channel.cId) { "Channel id is null" }
+            if (channelRepo.isUserInChannel(validCId, uId)) return@run success(channel)
+            if (channel is Public) {
+                channelRepo.joinChannel(validCId, uId, channel.accessControl)
+                return@run success(channel)
+            }
+            val invitation = channelRepo.findInvitation(validCId) ?: return@run failure(InvitationCodeIsInvalid)
+            if (invitationCode != invitation.invitationCode.toString()) return@run failure(InvitationCodeIsInvalid)
+            if (invitation.isExpired || invitation.maxUses == 0u) {
+                channelRepo.deleteInvitation(validCId)
+                return@run failure(InvitationCodeHasExpired)
+            }
+            val decreasedInvitation = invitation.decrementUses()
+            channelRepo.updateInvitation(decreasedInvitation)
+            channelRepo.joinChannel(validCId, uId, invitation.accessControl)
+            if (decreasedInvitation.maxUses == 0u) channelRepo.deleteInvitation(validCId)
+            success(channel)
         }
 
     private fun makeTimeStamp(expirationDate: String) =

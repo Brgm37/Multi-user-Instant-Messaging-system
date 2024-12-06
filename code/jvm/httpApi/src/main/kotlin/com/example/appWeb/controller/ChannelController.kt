@@ -2,6 +2,7 @@ package com.example.appWeb.controller
 
 import com.example.appWeb.model.dto.input.channel.CreateChannelInputModel
 import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputModel
+import com.example.appWeb.model.dto.input.channel.JoinChannelInputModel
 import com.example.appWeb.model.dto.input.channel.UpdateChannelInputModel
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.output.channel.AccessControlOutPutModel
@@ -262,6 +263,22 @@ class ChannelController(
             is Success -> ResponseEntity.ok(AccessControlOutPutModel.fromAccessControl(response.value))
             is Failure -> ChannelProblem.AccessControlNotFound.response(NOT_FOUND)
         }
+
+    @PutMapping(CHANNEL_INVITATION_URL)
+    fun joinChannel(
+        @RequestBody invitation: JoinChannelInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> {
+        val args = arrayOf(invitation.cId, invitation.invitationCode)
+        if (args.all { it == null }) return ChannelProblem.UnableToJoinChannel.response(BAD_REQUEST)
+        return when (
+            val response =
+                channelService.joinChannel(authenticated.uId, invitation.cId, invitation.invitationCode)
+        ) {
+            is Success -> ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
+            is Failure -> ChannelProblem.UnableToJoinChannel.response(BAD_REQUEST)
+        }
+    }
 
     companion object {
         /**
