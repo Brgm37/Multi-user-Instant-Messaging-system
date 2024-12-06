@@ -6,23 +6,16 @@ export type UseCreateChannelHandler = {
      * @param name The new name.
      * @returns void
      */
-    onNameChange: (name: string) => void,
+    onNameChange: (name: string) => void
     /**
-     * The function to call when the visibility changes.
-     * @param visibility The new visibility.
+     * The function to call to go back to the editing state.
      * @returns void
      */
-    onVisibilityChange: (visibility: string) => void,
-    /**
-     * The function to call when the access changes.
-     * @param access The new access.
-     * @returns void
-     */
-    onAccessChange: (access: string) => void,
+    goBack(): void
     /**
      * The function to call when the user clicks on the submit button.
      *
      * @returns void
      */
-    onSubmit: (channel: ChannelInput) => void,
+    onSubmit: (channel: ChannelInput) => void
 }
