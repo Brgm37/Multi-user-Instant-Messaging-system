@@ -3,15 +3,31 @@ import {Either, success, failure} from "../../model/Either";
 import {Channel, jsonToChannel} from "../../model/Channel";
 import {ChannelsServiceContext} from "./ChannelsServiceContext";
 import {urlBuilder} from "../utils/UrlBuilder";
+import useSignal from "../utils/hooks/useSignal/useSignal";
+import {useNavigate} from "react-router-dom";
 
-const urlBase = urlBuilder("/channels")
+const channelUrlBase = urlBuilder("/channels")
+const userUrlBase = urlBuilder("/users")
 
 export function ChannelsServicesProvider(
     {children}: { children: React.ReactNode }
 ): React.ReactElement {
+    const signal = useSignal()
+    const navigate = useNavigate()
     const service: ChannelsServiceContext = {
+        async logout(): Promise<void> {
+            const url = userUrlBase + "/logout"
+            const init: RequestInit = {
+                method: "DELETE",
+                credentials: "include",
+                signal
+            }
+            const response = await fetch(url, init)
+            if (!response.ok) throw new Error(await response.text())
+            else navigate("/register")
+        },
         findChannels: async (offset: number, limit: number): Promise<Either<Channel[], string>> => {
-            const url = urlBase + `/my?offset=${offset}&limit=${limit}`
+            const url = channelUrlBase + `/my?offset=${offset}&limit=${limit}`
             const response = await fetch(url)
             if (response.ok) {
                 const channels = await response.json()
@@ -25,7 +41,7 @@ export function ChannelsServicesProvider(
             }
         },
         findChannelsByName: async (name: string, offset: number, limit: number): Promise<Either<Channel[], string>> => {
-            const url = urlBase + `/my/${name}?offset=${offset}&limit=${limit}`
+            const url = channelUrlBase + `/my/${name}?offset=${offset}&limit=${limit}`
             const response = await fetch(url)
             if (response.ok) {
                 const channels = await response.json()

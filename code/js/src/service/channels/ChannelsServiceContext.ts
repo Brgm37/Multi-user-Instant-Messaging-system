@@ -6,6 +6,8 @@ export interface ChannelsServiceContext {
     findChannels(offset: number, limit: number): Promise<Either<Channel[], string>>
 
     findChannelsByName(name: string, offset: number, limit: number): Promise<Either<Channel[], string>>
+
+    logout(): void
 }
 
 const defaultChannelsServiceContext: ChannelsServiceContext = {
@@ -13,6 +15,9 @@ const defaultChannelsServiceContext: ChannelsServiceContext = {
         throw Error("Not implemented")
     },
     findChannelsByName: () => {
+        throw Error("Not implemented")
+    },
+    logout: () => {
         throw Error("Not implemented")
     }
 }
