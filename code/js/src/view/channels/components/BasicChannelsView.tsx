@@ -18,9 +18,6 @@ export default function BasicChannelsView(
                         >X</button>
                     </div>
                 )}
-                <header className="text-center text-4xl font-bold text-gray-200">
-                    Welcome to ChIMP
-                </header>
                 <Outlet />
             </div>
         </div>
