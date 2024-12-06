@@ -16,11 +16,10 @@ export function PublicChannelsList(
                     <img alt={`Server ${channel.name}`} className="w-full h-40 object-cover" src={channel.icon}/>
                         <div className="p-4">
                             <div className="flex items-center space-x-2 mb-2">
-                                <img src={channel.icon} className="h-8 w-8 rounded-full" alt={channel.name}/>
+                                <img src={channel.icon} className="h-10 w-10 rounded-full object-cover object-center" alt={channel.name}/>
                                 <h3 className="text-lg font-bold text-white">{channel.name}</h3>
                             </div>
-                            <p className="text-gray-400 mb-4">Im simply a channel´s description. My only purpose is to
-                                show how the description of a channel would look like.</p>
+                            <p className="text-gray-400 mb-4">{channel.description}</p>
                             <div className="flex justify-between text-sm text-gray-400">
                                 <span className={"font-bold text-white"}>{channel.owner}</span>
                             </div>

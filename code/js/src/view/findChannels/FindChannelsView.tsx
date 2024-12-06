@@ -14,7 +14,7 @@ export function     FindChannelsView(): React.JSX.Element {
 
     if(state.tag === "redirect") {
         const channelId = state.channelId
-        return <Navigate to={"channel/" + channelId} replace={true}/>
+        return <Navigate to={"/channels/" + channelId} replace={true}/>
     }
 
     if (state.tag === "navigating" && state.channels.length === 0 && state.searchBar === "") {
@@ -35,7 +35,7 @@ export function     FindChannelsView(): React.JSX.Element {
     })
     return (
         <div>
-            <header className="bg-gray-800 p-4 flex items-center">
+            <header className="bg-gray-900 p-4 flex items-center w-full">
                 <h1 className="text-xl font-bold">Find Channels</h1>
                 <SearchBar
                     value={state.searchBar}
@@ -47,7 +47,7 @@ export function     FindChannelsView(): React.JSX.Element {
                 <main className={"p-8"}>
                     {state.tag === "navigating" && state.searchBar === "" && (
                         <section className="text-center mb-8">
-                            <h1 className="text-4xl font-bold">FIND YOUR CHANNEL</h1>
+                            <h1 className="text-4xl font-bold">FIND A CHANNEL</h1>
                             <p className="text-gray-400">From gaming, to music, to learning, there's a place for you.</p>
                         </section>
                     )}
