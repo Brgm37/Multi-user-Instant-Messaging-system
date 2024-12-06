@@ -97,10 +97,6 @@ export default function (
         setPop(false)
     };
 
-    useEffect(() => {
-        if (beginOfListRef.current) beginOfListRef.current.scrollIntoView({behavior: "smooth"});
-    });
-
     return (
         <div className={className}>
             <ul className={scrollStyle}>

@@ -1,11 +1,25 @@
 import * as React from "react";
-// import InfiniteScroll from "../../components/infiniteScroll/InfiniteScroll";
 import MessageInfiniteScroll from "./messageInfiniteScroll/ChannelMessageInfiniteScroll";
+import {useNavigate, useParams} from "react-router-dom";
+import {Channel} from "../../../model/Channel";
+import {useContext, useEffect} from "react";
+import {ChannelServiceContext} from "../../../service/channel/ChannelServiceContext";
 
 export default function BasicChannelView(
-    {error, errorDismiss, onSend}: { error?: string, errorDismiss?: () => void, onSend(msg: string): void }
+    {error, errorDismiss, onSend}: { error?: string, errorDismiss?: () => void, onSend(msg: string): void}
 ): React.JSX.Element {
     const [message, setMessage] = React.useState<string>("");
+    const {id} = useParams()
+    const [channel, setChannel] = React.useState<Channel>()
+    const {loadChannel} = useContext(ChannelServiceContext)
+    const navigation = useNavigate()
+
+    useEffect(() => {
+        loadChannel(id).then(response => {
+            if (response.tag === "success") setChannel(response.value)
+            else navigation("/channels")
+        })
+    }, [id])
 
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => setMessage(event.target.value)
 

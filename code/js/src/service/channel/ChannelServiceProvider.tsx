@@ -40,6 +40,9 @@ export function ChannelServiceProvider({children}: { children: React.ReactNode }
             const response = await fetch(url, init);
             if (response.ok) {
                 const data = await response.json()
+                const accessRequest = await fetch(`${channelApiUrl}/accessControl/${cId}`, init)
+                const access = await accessRequest.json()
+                data.access = access.accessControl
                 return success(jsonToChannel(data)) as Either<Channel, string>
             } else {
                 const error = await response.text()
