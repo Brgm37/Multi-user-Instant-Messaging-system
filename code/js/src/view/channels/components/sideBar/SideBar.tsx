@@ -13,6 +13,7 @@ export function Sidebar(): React.JSX.Element {
     const {findChannelsByName} = useContext(ChannelsServiceContext)
     const onSearchChange = (value: React.ChangeEvent<HTMLInputElement>) => setSearch(value.target.value)
     const navigate = useNavigate()
+
     useEffect(() => {
         const timeout = setTimeout(() => {
             findChannelsByName(search, 0, 15)
@@ -20,6 +21,7 @@ export function Sidebar(): React.JSX.Element {
         }, TIMEOUT);
         return () => clearTimeout(timeout);
     }, [search]);
+
     useEffect(() => {
         const timeout = setTimeout(() => {
             const c = channels.find(channel => channel.name === search)
@@ -27,6 +29,7 @@ export function Sidebar(): React.JSX.Element {
         }, TIMEOUT);
         return () => clearTimeout(timeout);
     }, [search]);
+
     return (
         <div className="w-64 bg-gray-900 text-white flex flex-col">
             <div className={"bg-gray-700 text-white p-2 rounded ml-auto w-full"}>

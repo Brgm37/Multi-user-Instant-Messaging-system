@@ -66,7 +66,7 @@ export function CreateChannelInvitationEditingView(
         <div>
             <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">EXPIRE AFTER</label>
-                <select title={"expirationDate"} className= "bg-gray-700 text-white p-2 rounded w-full" >
+                <select title={"expirationDate"} className= "bg-gray-700 text-white p-2 rounded w-full">
                     {expirationDateOptions.map((option) => (
                         <option key={option} value={option}>{option}</option>
                     ))}

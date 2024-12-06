@@ -38,6 +38,7 @@ const router = createBrowserRouter(
             "path": "/register",
             "element":
                 <RegisterCommunicationServiceProvider>
+                    <Navigate to={"/register/login"} replace/>
                     <Outlet/>
                 </RegisterCommunicationServiceProvider>,
             "children": [

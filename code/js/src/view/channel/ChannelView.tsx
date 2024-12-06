@@ -5,6 +5,7 @@ import "../../styles/InfiniteScrollChannel.css";
 import {InfiniteScrollContext} from "../components/infiniteScroll/InfiniteScrollContext";
 import {Message} from "../../model/Message";
 import BasicChannelView from "./components/BasicChannelView";
+import {InfiniteMessageScrollContext} from "./components/messageInfiniteScroll/InfiniteMessageScrollContext";
 
 export function ChannelView(): React.JSX.Element {
     const [state, messages, handler] = useChannel()
@@ -30,13 +31,21 @@ export function ChannelView(): React.JSX.Element {
         loadMore(_: number, at: "head" | "tail"): void {handler.loadMore(at)}
     }
 
+    const onMessage: InfiniteMessageScrollContext = {
+        onNewMessage() {
+            handler.reset()
+        }
+    }
+
     return (
         <InfiniteScrollContext.Provider value={provider}>
-            <BasicChannelView
-                error={state.tag === "error" ? state.message : undefined}
-                errorDismiss={handler.goBack}
-                onSend={handler.sendMsg}
-            />
+            <InfiniteMessageScrollContext.Provider value={onMessage}>
+                <BasicChannelView
+                    error={state.tag === "error" ? state.message : undefined}
+                    errorDismiss={handler.goBack}
+                    onSend={handler.sendMsg}
+                />
+            </InfiniteMessageScrollContext.Provider>
         </InfiniteScrollContext.Provider>
     )
 }
