@@ -1,5 +1,5 @@
 // import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
-// import {InfiniteScrollContext} from "./InfiniteScrollContext";
+// import {InfiniteMessageScrollContext} from "./InfiniteMessageScrollContext";
 // import {useHeadTail} from "./hooks/useHeadTail";
 // import "../../../styles/InfiniteScrollMock.css"; //TODO: Check the use of static css file
 //
@@ -8,9 +8,9 @@
 //  *
 //  * The InfiniteScroll component is a React component that provides infinite scrolling functionality.
 //  *
-//  * @internal This function is not meant to be used inside an InfiniteScrollContext context.
+//  * @internal This function is not meant to be used inside an InfiniteMessageScrollContext context.
 //  *
-//  * @see InfiniteScrollContext
+//  * @see InfiniteMessageScrollContext
 //  *
 //  * @param className
 //  */
@@ -24,7 +24,7 @@
 //         listMaxSize,
 //         loadMore,
 //         renderItems
-//     } = useContext(InfiniteScrollContext)
+//     } = useContext(InfiniteMessageScrollContext)
 //     const [{head, tail}, {setOffset}] = useHeadTail()
 //     const [at, setAt] = useState<"head" | "tail">("tail")
 //     const lastObserver = useRef<IntersectionObserver>()

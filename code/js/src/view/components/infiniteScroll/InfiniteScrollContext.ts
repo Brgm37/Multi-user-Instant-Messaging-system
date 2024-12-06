@@ -1,5 +1,5 @@
 import {createContext, ReactNode} from "react";
-import useScroll, {UseScrollState} from "../../../service/utils/hooks/useScroll/UseScroll";
+import {UseScrollState} from "../../../service/utils/hooks/useScroll/UseScroll";
 
 /**
  * The context for the InfiniteScroll component.
@@ -18,8 +18,6 @@ import useScroll, {UseScrollState} from "../../../service/utils/hooks/useScroll/
  *
  * @property isLoading A boolean that indicates if the InfiniteScroll component is currently loading more items.
  *
- * @property listMaxSize The maximum size of the list of items.
- *
  * @method renderItems A function that is called to render each item in the list.
  *
  * @see Identifiable
@@ -27,7 +25,7 @@ import useScroll, {UseScrollState} from "../../../service/utils/hooks/useScroll/
 export interface InfiniteScrollContext<T extends Identifiable> {
     items: UseScrollState<T>,
     loadMore(offset: number, at: "head" | "tail"): void,
-    isLoading: 'head' | 'tail' | false,
+    isLoading: 'head' | 'tail' | 'receiving' | "sending" | false,
     renderItems(item: T): ReactNode;
 }
 

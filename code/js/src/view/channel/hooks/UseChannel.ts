@@ -22,7 +22,7 @@ const HAS_MORE = DEFAULT_LIMIT + 1
  * @param handler
  * @param messages
  */
-export function initList(
+function initList(
     handler: UseScrollHandler<Message>,
     messages: Message[],
 ): void {
@@ -40,13 +40,13 @@ export function initList(
  * @param list
  * @param message
  */
-export function addMessage(
+function addMessage(
     handler: UseScrollHandler<Message>,
     list: UseScrollState<Message>,
     message: Message
 ): void {
     const messages = [message]
-    if (list.hasMore.head) return
+    if (list.hasMore.head) handler.reset(list.list, list.hasMore)
     else handler.addItems(messages, "head", list.hasMore)
 }
 
@@ -58,7 +58,7 @@ export function addMessage(
  * @param list
  * @param result
  */
-export function addItems(
+function addItems(
     at: "head" | "tail",
     listHandler: UseScrollHandler<Message>,
     list: UseScrollState<Message>,
@@ -99,23 +99,38 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
     }, [id]);
 
     useEffect(() => {
-        console.log("list size", list.list.length, "max size", list.max)
+        if (state.tag !== "loading") return
+        if (state.at === "sending") dispatch({tag: "sendSuccess"})
+        if (state.at === "receiving") dispatch({tag: "loadSuccess"})
+        if (state.at === "head" || state.at === "tail") dispatch({tag: "loadSuccess"})
     }, [list]);
 
     useEffect(() => {
         if (messages.length === 0) return
         if (state.tag === "idle") return
+        if (state.tag === "loading") return
         const consumed: Message[] = []
+        let first: boolean = true
         messages.forEach(msg => {
             if (msg.channel == id) {
                 consumed.push(msg)
-                if (!list.list.some(it => it.id === msg.id)) addMessage(listHandler, list, msg)
+                if (!list.list.some(it => it.id === msg.id)) {
+                    if (first) {
+                        first = false
+                        dispatch({tag: "receiving-sse"})
+                    }
+                    addMessage(listHandler, list, msg)
+                }
             }
         })
         consumeMessage(consumed)
-    }, [messages]);
+    }, [messages, state]);
 
     const handler: UseChannelHandler = {
+        reset() {
+            if (state.tag !== "messages") return
+            dispatch({tag: "reload"})
+        },
         initChannel(): void {
             if (state.tag !== "idle") return
             service
@@ -123,7 +138,6 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
                 .then(response => {
                     if (response.tag === "success") {
                         initList(listHandler, response.value)
-                        dispatch({tag: "loadSuccess"})
                     } else dispatch({tag: "loadError", error: response.value, previous: state})
                 })
             dispatch({tag: "init"})
@@ -137,7 +151,6 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
                 .then(response => {
                     if (response.tag === "success") {
                         addItems(at, listHandler, list, response.value)
-                        dispatch({tag: "loadSuccess"})
                     } else dispatch({tag: "loadError", error: response.value, previous: state})
                 })
             dispatch({tag: "loadMore", at})
@@ -149,7 +162,6 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
                 .then(response => {
                     if (response.tag === "success") {
                         addMessage(listHandler, list, response.value)
-                        dispatch({tag: "sendSuccess"})
                     } else dispatch({tag: "sendError", error: response.value, previous: state})
                 })
             dispatch({tag: "sendMessage"})
@@ -160,5 +172,5 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
         }
     }
 
-    return [state, list,handler]
+    return [state, list, handler]
 }

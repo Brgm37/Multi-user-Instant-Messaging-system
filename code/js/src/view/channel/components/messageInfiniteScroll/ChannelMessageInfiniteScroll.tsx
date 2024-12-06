@@ -1,21 +1,11 @@
 import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
-import {InfiniteScrollContext} from "./InfiniteScrollContext";
-import {useHeadTail} from "./hooks/useHeadTail";
-import LoadingIcon from "../LoadingIcon";
+import {InfiniteScrollContext} from "../../../components/infiniteScroll/InfiniteScrollContext";
+import {useHeadTail} from "../../../components/infiniteScroll/hooks/useHeadTail";
+import LoadingIcon from "../../../components/LoadingIcon";
+import {InfiniteMessageScrollContext} from "./InfiniteMessageScrollContext";
 
-/**
- * InfiniteScroll component
- *
- * The InfiniteScroll component is a React component that provides infinite scrolling functionality.
- *
- * @internal This function is not meant to be used inside an InfiniteMessageScrollContext context.
- *
- * @see InfiniteScrollContext
- *
- * @param className
- * @param scrollStyle
- * @param isToAutoScroll
- */
+const TIMEOUT = 5000
+
 export default function (
     {className, scrollStyle}: { className?: string, scrollStyle?: string }
 ): React.JSX.Element {
@@ -26,20 +16,22 @@ export default function (
         renderItems
     } = useContext(InfiniteScrollContext)
 
+    const context = useContext(InfiniteMessageScrollContext)
+
     const [{head, tail}, {setOffset}] = useHeadTail()
-    const [at, setAt] = useState<"head" | "tail">("tail")
+    const [at, setAt] = useState<"head" | "tail" | "sending" | "receiving">("head")
+    const [pop, setPop] = useState<boolean>(false)
     const lastObserver = useRef<IntersectionObserver>()
     const firstObserver = useRef<IntersectionObserver>()
     const recordedElementRef = useRef<HTMLElement>()
+    const beginOfListRef = useRef<HTMLDivElement>(null)
 
     const lastItemRef = useCallback((node: HTMLElement) => {
         if (isLoading) return;
         if (lastObserver.current) lastObserver.current.disconnect();
         lastObserver.current = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting && items.hasMore.tail) {
-                if (items.list.length == items.max) {
-                    setOffset("head", 1);
-                }
+                if (items.list.length == items.max) setOffset("head", 1);
                 setOffset("tail", 1);
                 setAt("tail");
                 recordedElementRef.current = node;
@@ -53,9 +45,7 @@ export default function (
         if (firstObserver.current) firstObserver.current.disconnect();
         firstObserver.current = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting && items.hasMore.head) {
-                if (items.list.length == items.max) {
-                    setOffset("tail", -1);
-                }
+                if (items.list.length == items.max) setOffset("tail", -1);
                 setOffset("head", -1);
                 setAt("head");
                 recordedElementRef.current = node;
@@ -71,16 +61,51 @@ export default function (
     }, [head, tail]);
 
     useEffect(() => {
+        if (isLoading === "sending") setAt("sending")
+        let timeout: NodeJS.Timeout
+        if (isLoading === 'receiving') {
+            setAt("receiving")
+            setPop(true)
+            timeout = setTimeout(() => setPop(false), TIMEOUT)
+        }
+        return () => clearTimeout(timeout)
+    }, [isLoading]);
+
+    useEffect(() => {
         if (recordedElementRef.current) {
-            if (at === "head") recordedElementRef.current.scrollIntoView({behavior: "smooth", block: "end"})
-            else recordedElementRef.current.scrollIntoView({behavior: "smooth", block: "start"})
+            switch (at) {
+                case "head":
+                    recordedElementRef.current.scrollIntoView({behavior: "smooth", block: "end"})
+                    break;
+                case "tail":
+                    recordedElementRef.current.scrollIntoView({behavior: "smooth", block: "start"})
+                    break;
+                default:
+                    break;
+            }
         }
     }, [items.list]);
+
+    const handlePopupClick = () => {
+        if (items.hasMore.head) {
+            context.onNewMessage()
+        } else {
+            if (beginOfListRef.current) {
+                beginOfListRef.current.scrollIntoView({behavior: "smooth"});
+            }
+        }
+        setPop(false)
+    };
+
+    useEffect(() => {
+        if (beginOfListRef.current) beginOfListRef.current.scrollIntoView({behavior: "smooth"});
+    });
 
     return (
         <div className={className}>
             <ul className={scrollStyle}>
                 <div>{isLoading === 'head' && (<LoadingIcon/>)}</div>
+                <div ref={beginOfListRef}></div>
                 {
                     items.list.map((item, index) => {
                         if (index === 0) {
@@ -103,6 +128,16 @@ export default function (
                             )
                         }
                     })
+                }
+                {pop &&
+                    (
+                        <div
+                            className="popup"
+                            onClick={handlePopupClick}
+                        >
+                            New message received!
+                        </div>
+                    )
                 }
                 <div>{isLoading === 'tail' && (<LoadingIcon/>)}</div>
             </ul>

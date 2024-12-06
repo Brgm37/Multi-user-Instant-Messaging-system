@@ -1,5 +1,6 @@
 import * as React from "react";
-import InfiniteScroll from "../../components/infiniteScroll/InfiniteScroll";
+// import InfiniteScroll from "../../components/infiniteScroll/InfiniteScroll";
+import MessageInfiniteScroll from "./messageInfiniteScroll/ChannelMessageInfiniteScroll";
 
 export default function BasicChannelView(
     {error, errorDismiss, onSend}: { error?: string, errorDismiss?: () => void, onSend(msg: string): void }
@@ -21,7 +22,7 @@ export default function BasicChannelView(
 
     return (
         <div className={"flex flex-col h-screen"}>
-            <InfiniteScroll
+            <MessageInfiniteScroll
                 className={"flex-1 bg-gray-800 p-4 overflow-y-auto flex-col-reverse"}
                 scrollStyle={"flex-1 bg-gray-800 p-4 overflow-y-auto flex flex-col-reverse"}
             />

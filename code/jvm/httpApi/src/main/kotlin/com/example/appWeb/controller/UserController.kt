@@ -160,21 +160,6 @@ class UserController(
         const val USER_ID_URL = "/{userId}"
 
         /**
-         * The URL for the channel with the given id.
-         */
-        private const val CHANNEL_ID_URL = "/{channelId}"
-
-        /**
-         * The URL for the channels.
-         */
-        private const val CHANNELS_URL = "/channels"
-
-        /**
-         * The URL for the user with the given id, the channel with the given id and invitation code.
-         */
-        const val CHANNELS_CHANNEL_ID_URL = "$CHANNELS_URL$CHANNEL_ID_URL"
-
-        /**
          * The URL for the user to make an invitation to make a login.
          */
         const val INVITATION_URL = "/invitation"

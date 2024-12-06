@@ -26,3 +26,14 @@ body {
     background-color: #4a5568;
     border-radius: 4px;
 }
+
+.popup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}

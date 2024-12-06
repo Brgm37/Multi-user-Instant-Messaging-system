@@ -22,5 +22,7 @@ export type ChannelAction =
     { tag: "sendMessage" } |
     { tag: "sendSuccess" } |
     { tag: "sendError", error: string, previous: ChannelState } |
+    { tag: "receiving-sse" } |
+    { tag: "reload" } |
     { tag: "go-back" } |
     { tag: "reset"}

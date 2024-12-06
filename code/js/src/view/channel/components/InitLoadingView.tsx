@@ -1,9 +1,10 @@
 import * as React from 'react';
+import LoadingIcon from "../../components/LoadingIcon";
 
 export function InitLoadingView(): React.JSX.Element {
     return (
-        <div>
-            <h1>Initializing</h1>
+        <div className={"content-center"}>
+            <LoadingIcon/>
         </div>
     )
 }
