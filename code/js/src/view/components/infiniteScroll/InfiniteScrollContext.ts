@@ -18,8 +18,6 @@ import useScroll, {UseScrollState} from "../../../service/utils/hooks/useScroll/
  *
  * @property isLoading A boolean that indicates if the InfiniteScroll component is currently loading more items.
  *
- * @property listMaxSize The maximum size of the list of items.
- *
  * @method renderItems A function that is called to render each item in the list.
  *
  * @see Identifiable
