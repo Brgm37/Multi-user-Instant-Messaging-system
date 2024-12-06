@@ -25,7 +25,7 @@ export function CreateChannelsView(): React.JSX.Element {
                 onChange={handler.onNameChange}
                 placeholder={"Channel Name"}
                 className={"bg-gray-700 text-white p-2 rounded"}/>
-            <ToggleCreateChannelsView onGenerate={handler.onVisibilityChange}></ToggleCreateChannelsView>
+            <ToggleCreateChannelsView state={state} onGenerate={handler.onSubmit}></ToggleCreateChannelsView>
         </div>
     )
 }
