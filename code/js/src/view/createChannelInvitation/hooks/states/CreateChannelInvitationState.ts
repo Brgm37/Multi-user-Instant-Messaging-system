@@ -12,4 +12,4 @@ export type CreateChannelInvitationState =
     | { tag: "showingInvitationToken", invitationToken: string }
     | { tag: "creating" }
     | { tag: "error", error: string }
-    | { tag: "closing"};
+    | { tag: "closing", cId: string};
