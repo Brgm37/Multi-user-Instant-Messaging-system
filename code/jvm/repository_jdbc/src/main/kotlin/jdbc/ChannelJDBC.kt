@@ -510,6 +510,35 @@ class ChannelJDBC(
         }
     }
 
+    override fun findPublicChannel(
+        uId: UInt,
+        offset: UInt,
+        limit: UInt,
+    ): List<Channel> {
+        val selectQuery =
+            """
+            SELECT 
+            	channel_id, channel_name, channel_owner, channel_accessControl,
+            	channel_visibility, owner_name, channel_description, channel_icon
+            FROM v_channel
+            WHERE channel_visibility = '${PUBLIC.name}'
+            AND channel_id NOT IN (
+                SELECT channel
+                FROM channel_members
+                WHERE member = ?
+            )
+            LIMIT ?
+            OFFSET ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, uId.toInt())
+        stm.setInt(idx++, limit.toInt())
+        stm.setInt(idx, offset.toInt())
+        val rs = stm.executeQuery()
+        return rs.toChannelList()
+    }
+
     override fun findById(id: UInt): Channel? {
         val selectQuery =
             """

@@ -280,6 +280,22 @@ class ChannelController(
         }
     }
 
+    @GetMapping(PUBLIC)
+    fun getPublicChannels(
+        @RequestParam offset: UInt = OFFSET,
+        @RequestParam limit: UInt = LIMIT,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> =
+        when (val response = channelService.getPublic(authenticated.uId, offset, limit)) {
+            is Success -> {
+                ResponseEntity.ok(response.value.map(ChannelListOutputModel::fromDomain))
+            }
+
+            is Failure -> {
+                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+            }
+        }
+
     companion object {
         /**
          * The base URL for the channel endpoints.
@@ -317,5 +333,7 @@ class ChannelController(
         const val MY_CHANNELS_WITH_NAME = "${MY_CHANNELS}/{name}"
 
         const val ACCESS_CONTROL = "/accessControl/{cId}"
+
+        const val PUBLIC = "/public"
     }
 }

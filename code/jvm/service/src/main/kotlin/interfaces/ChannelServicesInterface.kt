@@ -161,4 +161,17 @@ interface ChannelServicesInterface {
         cId: UInt?,
         invitationCode: String?,
     ): Either<ChannelError, Channel>
+
+    /**
+     * Retrieves all public channels witch the user is not in.
+     *
+     * @param uId The ID of the user.
+     * @param offset The offset for the channels.
+     * @param limit The maximum number of channels to retrieve.
+     */
+    fun getPublic(
+        uId: UInt,
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
+    ): Either<ChannelError, List<Channel>>
 }

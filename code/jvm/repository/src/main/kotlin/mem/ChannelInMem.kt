@@ -104,6 +104,15 @@ class ChannelInMem : ChannelRepositoryInterface {
                 it.invitationCode.toString() == invitationCode
             }?.let { findById(it.cId) }
 
+    override fun findPublicChannel(
+        uId: UInt,
+        offset: UInt,
+        limit: UInt,
+    ): List<Channel> =
+        channels.filter {
+            it is Channel.Public && usersInChannels[it.cId]?.any { ac -> ac.first == uId } == false
+        }
+
     override fun findById(id: UInt): Channel? = channels.find { it.cId == id }
 
     override fun findAll(

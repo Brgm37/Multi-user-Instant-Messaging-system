@@ -285,6 +285,17 @@ class ChannelServices(
             success(channel)
         }
 
+    override fun getPublic(
+        uId: UInt,
+        offset: UInt,
+        limit: UInt,
+    ): Either<ChannelError, List<Channel>> =
+        repoManager.run {
+            userRepo.findById(uId) ?: return@run failure(UserNotFound)
+            val channels = channelRepo.findPublicChannel(uId, offset, limit)
+            success(channels)
+        }
+
     private fun makeTimeStamp(expirationDate: String) =
         try {
             Timestamp.valueOf(

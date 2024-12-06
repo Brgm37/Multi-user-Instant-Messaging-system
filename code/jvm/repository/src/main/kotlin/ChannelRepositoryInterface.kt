@@ -150,4 +150,16 @@ interface ChannelRepositoryInterface : Repository<Channel> {
      * @return The channel with the given invitation code
      */
     fun findByInvitationCode(invitationCode: String): Channel?
+
+    /**
+     * Retrieves all public channels
+     *
+     * @param offset The offset for the channels
+     * @param limit The maximum number of channels to retrieve
+     */
+    fun findPublicChannel(
+        uId: UInt,
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
+    ): List<Channel>
 }
