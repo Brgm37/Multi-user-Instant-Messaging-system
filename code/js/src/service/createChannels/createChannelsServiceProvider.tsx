@@ -51,15 +51,14 @@ export function CreateChannelServiceProvider(
             const response = await fetch(url)
             if (response.ok) {
                 const channels = await response.json()
-                return success(
-                    channels.map((c: any) => {
-                        jsonToChannel(
-                            c.filter((c: any) => {
-                                c.owner.id.toString() == user.id
-                            })
-                        )
-                    })
-                ) as Either<Channel, string>
+                const channel = channels.filter((c: any) => {
+                    c.owner.id.toString() === user.id
+                })
+                if (channel.length > 0) {
+                    return success(jsonToChannel(channel[0])) as Either<Channel, string>
+                }else {
+                    return failure("Channel not found") as Either<Channel, string>
+                }
             } else {
                 return failure(await response.text())
             }
