@@ -53,6 +53,7 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
     const [state, dispatch] = useReducer(reduce, makeInitialState())
     const service = useContext(CreateChannelsServiceContext)
 
+    /**
     useEffect(() => {
          if (state.tag !== "editing") return
          const timeout = setTimeout(() => {
@@ -64,7 +65,10 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
                  fetchChannel
                      .then(response => {
                          if (isFailure(response)) dispatch({type: "edit", inputValue: state.input.name})
-                         else dispatch({type: "error", message: ERROR_MESSAGE})
+                         else {
+                             dispatch({type: "edit", inputValue: state.input.name})
+                             state.input.isValid = false
+                         }
                      })
              }
          }, DEBOUNCE_DELAY)
@@ -80,6 +84,7 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
                 else dispatch({type: "success", input: state.input})
             })
     }, [state.tag]);
+    */
 
     const handler: UseCreateChannelHandler = {
         onNameChange(name: string) {
@@ -88,10 +93,11 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
                 .findChannelByName(name)
                 .then(response => {
                     if (response.tag === "success"){
-                        dispatch({type: "error", message: ERROR_MESSAGE})
+                        dispatch({type: "edit", inputValue: "name"})
                         state.input.isValid = false
-                    }else state.input.isValid = true
+                    }
                 })
+            state.input.isValid = true
             dispatch({type: "edit", inputValue: name})
         },
         goBack() {
