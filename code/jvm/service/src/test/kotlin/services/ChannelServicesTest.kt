@@ -6,6 +6,7 @@ import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
 import model.channels.AccessControl.READ_WRITE
 import model.channels.Channel
+import model.channels.ChannelInvitation
 import model.channels.ChannelName
 import model.channels.Visibility.PRIVATE
 import model.channels.Visibility.PUBLIC
@@ -292,4 +293,142 @@ class ChannelServicesTest {
             assertIs<Success<List<Channel>>>(result, "Channels retrieval failed")
             assertEquals(nr, result.value.size, "Number of channels is different")
         }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `update a channel`(manager: TransactionManager) =
+        testSetup(manager) { user ->
+            val uId = checkNotNull(user.uId) { "Owner id is null" }
+            val newChannel = createChannel(uId, "name", READ_WRITE.name, PUBLIC.name)
+            assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+            assertNotNull(newChannel.value.cId, "Channel id is null")
+            val newChannelId = checkNotNull(newChannel.value.cId) { "Channel id is null" }
+            val result =
+                updateChannel(
+                    newChannelId,
+                    "newName",
+                    READ_WRITE.name,
+                    PUBLIC.name,
+                    "newDescription",
+                    "newIcon",
+                )
+            assertIs<Success<Channel>>(result, "Channel update failed")
+            assertEquals("newName", result.value.name.name, "Channel name is different")
+            assertEquals(READ_WRITE, result.value.accessControl, "Access control is different")
+            assertIs<Channel.Public>(result.value, "Visibility is different")
+            assertEquals("newDescription", result.value.description, "Description is different")
+            assertEquals("newIcon", result.value.icon, "Icon is different")
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `join a channel with invitation code that has reached the max uses should return InvitationCodeMaxUsesReached`(
+        manager: TransactionManager,
+    ) = testSetup(manager) { user ->
+        val uId = checkNotNull(user.uId) { "Owner id is null" }
+        val newChannel = createChannel(uId, "name", READ_WRITE.name, PRIVATE.name)
+        assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+        val cId = assertNotNull(newChannel.value.cId, "Channel id is null")
+        val invitationCode = createChannelInvitation(cId, 0u, null, READ_WRITE.name, uId)
+        assertIs<Success<ChannelInvitation>>(invitationCode, "Channel invitation creation failed")
+        val user2 = makeUser(manager, "user2")
+        val user2Id = checkNotNull(user2?.uId) { "User2 id is null" }
+        val result = joinChannel(user2Id, cId, invitationCode.value.invitationCode.toString())
+        assertIs<Failure<ChannelError>>(result, "Channel join should have failed")
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `joining a Public channel successfully should return Channel`(manager: TransactionManager) =
+        testSetup(manager) { user ->
+            val uId = checkNotNull(user.uId) { "Owner id is null" }
+            val newChannel = createChannel(uId, "name", READ_WRITE.name, PUBLIC.name)
+            assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+            val cId = assertNotNull(newChannel.value.cId, "Channel id is null")
+            val user2 = makeUser(manager, "user2")
+            val user2Id = checkNotNull(user2?.uId) { "User2 id is< null" }
+            val result = joinChannel(user2Id, cId, null)
+            assertIs<Success<Channel>>(result, "Channel join failed")
+            assertEquals(newChannel.value.cId, result.value.cId, "Channel join failed")
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `joining a Private channel successfully should return Channel`(manager: TransactionManager) =
+        testSetup(manager) { user ->
+            val uId = checkNotNull(user.uId) { "Owner id is null" }
+            val newChannel = createChannel(uId, "name", READ_WRITE.name, PRIVATE.name)
+            assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+            val cId = assertNotNull(newChannel.value.cId, "Channel id is null")
+            val invitationCode = createChannelInvitation(cId, 1u, null, READ_WRITE.name, uId)
+            assertIs<Success<ChannelInvitation>>(invitationCode, "Channel invitation creation failed")
+            val user2 = makeUser(manager, "user2")
+            val user2Id = checkNotNull(user2?.uId) { "User2 id is null" }
+            val result = joinChannel(user2Id, cId, invitationCode.value.invitationCode.toString())
+            assertIs<Success<Channel>>(result, "Channel join failed")
+            assertEquals(newChannel.value.cId, result.value.cId, "Channel join failed")
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `trying to join a channel with a nonexistent channel should return ChannelNotFound`(
+        manager: TransactionManager,
+    ) = testSetup(manager) { user ->
+        val userId = checkNotNull(user.uId) { "User id is null" }
+        val result = joinChannel(userId, 0u, null)
+        assertIs<Failure<ChannelError>>(result, "Channel join should have failed")
+        assertEquals(ChannelError.ChannelNotFound, result.value, "Channel error is different")
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `trying to join a channel with a nonexistent user should return UserNotFound`(manager: TransactionManager) =
+        testSetup(manager) { user ->
+            val uId = checkNotNull(user.uId) { "Owner id is null" }
+            val newChannel = createChannel(uId, "name", READ_WRITE.name, PUBLIC.name)
+            assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+            val cId = assertNotNull(newChannel.value.cId, "Channel id is null")
+            val result = joinChannel(0u, cId, null)
+            assertIs<Failure<ChannelError>>(result, "Channel join should have failed")
+            assertEquals(ChannelError.UserNotFound, result.value, "Channel error is different")
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `trying to join a channel with a user that is already in the channel should return Channel`(
+        manager: TransactionManager,
+    ) = testSetup(manager) { user ->
+        val uId = checkNotNull(user.uId) { "Owner id is null" }
+        val newChannel = createChannel(uId, "name", READ_WRITE.name, PUBLIC.name)
+        assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+        val cId = assertNotNull(newChannel.value.cId, "Channel id is null")
+        val result = joinChannel(uId, cId, null)
+        assertIs<Success<Channel>>(result, "Channel join failed")
+        assertEquals(newChannel.value.cId, result.value.cId, "Channel join failed")
+    }
+
+    @ParameterizedTest
+    @MethodSource("transactionManagers")
+    fun `trying to join a channel with an expired invitation should return InvitationCodeHasExpired`(
+        manager: TransactionManager,
+    ) = testSetup(manager) { user ->
+        val uId = checkNotNull(user.uId) { "Owner id is null" }
+        val newChannel = createChannel(uId, "name", READ_WRITE.name, PRIVATE.name)
+        assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+        val cId = assertNotNull(newChannel.value.cId, "Channel id is null")
+        val invitationCode =
+            createChannelInvitation(
+                cId,
+                0u,
+                LocalDate.now().minusDays(1).toString(),
+                READ_WRITE.name,
+                uId,
+            )
+        assertIs<Success<ChannelInvitation>>(invitationCode, "Channel invitation creation failed")
+        val user2 = makeUser(manager, "user2")
+        val user2Id = checkNotNull(user2?.uId) { "User2 id is null" }
+        val result = joinChannel(user2Id, cId, invitationCode.value.invitationCode.toString())
+        assertIs<Failure<ChannelError>>(result, "Channel join should have failed")
+        assertEquals(ChannelError.InvitationCodeHasExpired, result.value, "Channel error is different")
+    }
 }

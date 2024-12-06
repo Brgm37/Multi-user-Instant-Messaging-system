@@ -7,10 +7,8 @@ import com.example.appWeb.model.dto.output.user.UserAuthenticatedOutputModel
 import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
 import com.example.appWeb.model.dto.output.user.UserInvitationOutputModel
 import com.example.appWeb.model.dto.output.user.UserSignUpOutputModel
-import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.UserProblem
 import com.example.appWeb.swagger.UserSwaggerConfig
-import errors.ChannelError.ChannelNotFound
 import errors.UserError
 import interfaces.UserServicesInterface
 import io.swagger.v3.oas.annotations.Parameter
@@ -25,10 +23,8 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import utils.Failure
 import utils.Success
@@ -100,8 +96,6 @@ class UserController(
                 cookie.path = "/api"
                 cookie.isHttpOnly = true
                 cookie.maxAge = auth.expirationDateInInt
-//                cookie.secure = false
-//                cookie.setAttribute("SameSite", "None")
                 res.addCookie(cookie)
                 ResponseEntity.ok(UserAuthenticatedOutputModel.fromDomain(auth))
             }
@@ -150,34 +144,6 @@ class UserController(
                     UserError.UserNotFound -> UserProblem.UserNotFound.response(NOT_FOUND)
                     UserError.UnableToDeleteToken -> UserProblem.UnableToLogout.response(INTERNAL_SERVER_ERROR)
                     else -> UserProblem.UnableToLogout.response(INTERNAL_SERVER_ERROR)
-                }
-            }
-        }
-
-    @PutMapping(CHANNELS_CHANNEL_ID_URL)
-    @UserSwaggerConfig.JoinChannel
-    fun joinChannel(
-        @PathVariable channelId: UInt,
-        @RequestParam invitationCode: String = "",
-        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
-    ): ResponseEntity<*> =
-        when (val response = userService.joinChannel(authenticated.uId, channelId, invitationCode)) {
-            is Success -> {
-                ResponseEntity.ok().build<Any>()
-            }
-
-            is Failure -> {
-                when (response.value) {
-                    UserError.UserNotFound -> UserProblem.UserNotFound.response(NOT_FOUND)
-                    ChannelNotFound -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
-                    UserError.InvitationCodeIsInvalid -> UserProblem.InvitationCodeIsInvalid.response(BAD_REQUEST)
-                    UserError.InvitationCodeHasExpired -> UserProblem.InvitationCodeHasExpired.response(BAD_REQUEST)
-                    UserError.InvitationCodeMaxUsesReached ->
-                        UserProblem.InvitationCodeMaxUsesReached.response(
-                            BAD_REQUEST,
-                        )
-
-                    else -> UserProblem.UnableToJoinChannel.response(INTERNAL_SERVER_ERROR)
                 }
             }
         }

@@ -1,16 +1,11 @@
 package services
 
 import TransactionManager
-import errors.ChannelError.ChannelNotFound
-import errors.Error
 import errors.UserError
 import errors.UserError.InvitationCodeHasExpired
 import errors.UserError.InvitationCodeIsInvalid
-import errors.UserError.InvitationCodeMaxUsesReached
 import interfaces.UserServicesInterface
 import jakarta.inject.Named
-import model.channels.Channel
-import model.channels.decrementUses
 import model.users.Password
 import model.users.User
 import model.users.UserInvitation
@@ -79,40 +74,6 @@ class UserServices(
         return repoManager.run {
             val user = userRepo.findById(id) ?: return@run failure(UserError.UserNotFound)
             success(user)
-        }
-    }
-
-    override fun joinChannel(
-        userId: UInt,
-        channelId: UInt,
-        invitationCode: String?,
-    ): Either<Error, Unit> {
-        return repoManager.run {
-            val channel =
-                channelRepo.findById(channelId) ?: return@run failure(ChannelNotFound)
-            userRepo.findById(userId) ?: return@run failure(UserError.UserNotFound)
-            if (channelRepo.isUserInChannel(channelId, userId)) {
-                return@run success(Unit)
-            }
-            if (channel is Channel.Public) {
-                channelRepo.joinChannel(channelId, userId, channel.accessControl)
-                return@run success(Unit)
-            }
-            val invitation = channelRepo.findInvitation(channelId) ?: return@run failure(InvitationCodeIsInvalid)
-            if (invitationCode != invitation.invitationCode.toString()) {
-                return@run failure(InvitationCodeIsInvalid)
-            }
-            if (invitation.isExpired) {
-                channelRepo.deleteInvitation(channelId)
-                return@run failure(InvitationCodeHasExpired)
-            }
-            if (invitation.maxUses == 0u) {
-                channelRepo.deleteInvitation(channelId)
-                return@run failure(InvitationCodeMaxUsesReached)
-            }
-            channelRepo.updateInvitation(invitation.decrementUses())
-            channelRepo.joinChannel(channelId, userId, invitation.accessControl)
-            success(Unit)
         }
     }
 

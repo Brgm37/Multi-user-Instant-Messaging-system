@@ -45,7 +45,7 @@ export function LoginBaseView(
                         <Link
                             to={
                                 {
-                                    pathname: "/register",
+                                    pathname: "/register/singIn",
                                 }
                             }
                             className={"text-blue-600 hover:underline"}> Register

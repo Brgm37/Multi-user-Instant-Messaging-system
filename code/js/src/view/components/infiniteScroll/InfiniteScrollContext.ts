@@ -1,4 +1,5 @@
 import {createContext, ReactNode} from "react";
+import useScroll, {UseScrollState} from "../../../service/utils/hooks/useScroll/UseScroll";
 
 /**
  * The context for the InfiniteScroll component.
@@ -24,20 +25,16 @@ import {createContext, ReactNode} from "react";
  * @see Identifiable
  */
 export interface InfiniteScrollContext<T extends Identifiable> {
-    list: T[],
-    hasMore: { head: boolean, tail: boolean },
+    items: UseScrollState<T>,
     loadMore(offset: number, at: "head" | "tail"): void,
     isLoading: 'head' | 'tail' | false,
-    listMaxSize: number
     renderItems(item: T): ReactNode;
 }
 
 const defaultInfiniteScrollContext: InfiniteScrollContext<Identifiable> = {
-    list: [],
-    hasMore: {head: false, tail: false},
+    items: {list: [], hasMore: {head: false, tail: false}, max: 0},
     loadMore: () => {throw Error("Not implemented!")},
     isLoading: false,
-    listMaxSize: 0,
     renderItems: () => {throw Error("Not implemented!")}
 }
 

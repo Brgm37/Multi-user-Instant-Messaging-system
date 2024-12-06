@@ -12,7 +12,7 @@ const TOKEN = configJson.session
 export function AuthValidator({children}: {children: React.ReactNode}): React.ReactElement {
     const cookie = getCookie(TOKEN)
     const location = useLocation()
-    if (!cookie) return <Navigate to={"/login"} state={{source: location.pathname}}></Navigate>
+    if (!cookie) return <Navigate to={"/register/login"} state={{source: location.pathname}}></Navigate>
     return (
         <AuthUserContext.Provider value={{id: cookie}}>
             {children}

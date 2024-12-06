@@ -1,14 +1,15 @@
-import {Message} from "../../../../model/Message";
-import {UseScrollState} from "../../../../service/utils/hooks/useScroll/UseScroll";
 
 /**
- * @type ChannelState
+ * ChannelState is a discriminated union type that represents the different states that a channel can be in.
  *
- * @description
- * This type is used to represent the state of the channel component.
+ * The states are:
+ * - idle: The channel is in an idle state.
+ * - messages: The channel is in a state where messages are being displayed.
+ * - loading: The channel is in a loading state.
+ * - error: The channel is in an error state.
  */
 export type ChannelState =
-    { tag: "idle", messages: UseScrollState<Message> } |
-    { tag: "messages", messages: UseScrollState<Message> } |
-    { tag: "loading", messages: UseScrollState<Message>, at: "head" | "tail" | "sending" } |
+    { tag: "idle" } |
+    { tag: "messages" } |
+    { tag: "loading", at: "head" | "tail" } |
     { tag: "error", message: string, previous: ChannelState }

@@ -1,6 +1,5 @@
 package interfaces
 
-import errors.Error
 import errors.UserError
 import model.users.User
 import model.users.UserInvitation
@@ -34,18 +33,6 @@ interface UserServicesInterface {
      * @param id The id of the user to get.
      */
     fun getUser(id: UInt): Either<UserError, User>
-
-    /**
-     * Associates a user to a channel.
-     * @param userId The id of the user to join the channel.
-     * @param channelId The id of the channel to join.
-     * @param invitationCode The invitation code to join the channel.
-     */
-    fun joinChannel(
-        userId: UInt,
-        channelId: UInt,
-        invitationCode: String?,
-    ): Either<Error, Unit>
 
     /**
      * Gets an invitation by inviterId and invitationCode
