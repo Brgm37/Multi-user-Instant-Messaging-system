@@ -100,8 +100,6 @@ class UserController(
                 cookie.path = "/api"
                 cookie.isHttpOnly = true
                 cookie.maxAge = auth.expirationDateInInt
-//                cookie.secure = false
-//                cookie.setAttribute("SameSite", "None")
                 res.addCookie(cookie)
                 ResponseEntity.ok(UserAuthenticatedOutputModel.fromDomain(auth))
             }
