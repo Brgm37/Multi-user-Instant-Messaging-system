@@ -140,12 +140,12 @@ class MessageJDBC(
     ) {
         val selectQuery =
             """
-                SELECT
-                    msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
-                    msgChannelName, msgAuthorUsername
-                FROM channel_members JOIN v_message ON channel = msgChannelId 
-                WHERE member = ? AND msgId > ?
-                ORDER BY msgTimestamp
+            SELECT
+                msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
+                msgChannelName, msgAuthorUsername
+            FROM channel_members JOIN v_message ON channel = msgChannelId 
+            WHERE member = ? AND msgId > ?
+            ORDER BY msgTimestamp
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
