@@ -15,11 +15,11 @@ import {RegisterServiceProvider} from "../service/registration/register/Register
 import {ChannelServiceProvider} from "../service/channel/ChannelServiceProvider";
 import {AuthValidator} from "../view/session/authValidator";
 import {FindChannelsView} from "../view/findChannels/FindChannelsView";
+import {FindChannelsMockServiceProvider} from "../service/findChannels/mock/FindChannelsMockServiceProvider";
+import {AboutView} from "../view/about/AboutView";
+import {CreateChannelsView} from "../view/createChannels/createChannelsView";
 import {ChannelsView} from "../view/channels/ChannelsView";
 import {ChannelsServicesProvider} from "../service/channels/ChannelsServicesProvider";
-import {
-    CreateChannelInvitationMockServiceProvider
-} from "../service/createChannelInvitation/mock/CreateChannelInvitationMockServiceProvider";
 import {CreateChannelInvitationView} from "../view/createChannelInvitation/CreateChannelInvitation";
 import {SseCommunicationServiceProvider} from "../service/sse/SseCommunicationServiceProvider";
 import {
@@ -30,6 +30,7 @@ import {FindChannelsServiceProvider} from "../service/findChannels/FindChannelsS
 import {
     CreateChannelInvitationServiceProvider
 } from "../service/createChannelInvitation/CreateChannelInvitationServiceProvider";
+import {CreateChannelServiceProvider} from "../service/createChannels/createChannelsServiceProvider";
 
 const router = createBrowserRouter(
     [
@@ -97,6 +98,24 @@ const router = createBrowserRouter(
                         </FindChannelsServiceProvider>,
                 },
             ]
+                },
+                {
+                    "path": "/channels/createChannel",
+                    "element":
+                        <CreateChannelServiceProvider>
+                            <CreateChannelsView/>
+                        </CreateChannelServiceProvider>
+                },
+        {
+            "path": "/about",
+            "element": <AboutView />,
+        },
+        {
+            "path": "/findChannels",
+            "element":
+                <FindChannelsMockServiceProvider>
+                    <FindChannelsView/>
+                </FindChannelsMockServiceProvider>,
         },
     ]
 )
