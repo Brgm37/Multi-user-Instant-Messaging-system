@@ -15,7 +15,6 @@ import {RegisterServiceProvider} from "../service/registration/register/Register
 import {ChannelServiceProvider} from "../service/channel/ChannelServiceProvider";
 import {AuthValidator} from "../view/session/authValidator";
 import {FindChannelsView} from "../view/findChannels/FindChannelsView";
-import {FindChannelsMockServiceProvider} from "../service/findChannels/mock/FindChannelsMockServiceProvider";
 import {ChannelsView} from "../view/channels/ChannelsView";
 import {ChannelsServicesProvider} from "../service/channels/ChannelsServicesProvider";
 import {
@@ -27,6 +26,10 @@ import {
     RegisterCommunicationServiceProvider
 } from "../service/registration/communication/RegisterCommunicationProvider";
 import {ChannelView} from "../view/channel/ChannelView";
+import {FindChannelsServiceProvider} from "../service/findChannels/FindChannelsServiceProvider";
+import {
+    CreateChannelInvitationServiceProvider
+} from "../service/createChannelInvitation/CreateChannelInvitationServiceProvider";
 
 const router = createBrowserRouter(
     [
@@ -75,23 +78,26 @@ const router = createBrowserRouter(
                             <ChannelView/>
                         </ChannelServiceProvider>
                     </SseCommunicationServiceProvider>,
-                }
+                    children: [
+                        {
+                            "path": "/channels/:id/createInvitation",
+                            "element":
+                                <CreateChannelInvitationServiceProvider>
+                                    <CreateChannelInvitationView/>
+                                </CreateChannelInvitationServiceProvider>
+                        ,
+                        },
+                    ]
+                },
+                {
+                    "path": "/channels/findChannels",
+                    "element":
+                        <FindChannelsServiceProvider>
+                            <FindChannelsView/>
+                        </FindChannelsServiceProvider>,
+                },
             ]
         },
-        {
-            "path": "/findChannels",
-            "element":
-                <FindChannelsMockServiceProvider>
-                    <FindChannelsView/>
-                </FindChannelsMockServiceProvider>,
-        },
-        {
-            "path": "/dummy",
-            "element":
-            <CreateChannelInvitationMockServiceProvider>
-                <CreateChannelInvitationView/>
-            </CreateChannelInvitationMockServiceProvider>,
-        }
     ]
 )
 

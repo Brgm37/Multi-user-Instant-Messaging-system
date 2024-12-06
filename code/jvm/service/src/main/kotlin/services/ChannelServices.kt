@@ -64,12 +64,15 @@ class ChannelServices(
         return repoManager.run {
             val user = userRepo.findById(owner) ?: return@run failure(UserNotFound)
             val uId = checkNotNull(user.uId) { "User id is null" }
+            val ic = icon?.ifBlank { null }
             val channel =
                 createChannel(
                     owner = UserInfo(uId, user.username),
                     name = ChannelName(name, user.username),
                     accessControl = AccessControl.valueOf(upperCaseAccessControl),
                     visibility = Visibility.valueOf(upperCaseVisibility),
+                    description = description,
+                    icon = ic,
                 )
             val checkChannel = channelRepo.findByName(channel.name.fullName)
             if (checkChannel != null) return@run failure(UnableToCreateChannel)
@@ -211,7 +214,6 @@ class ChannelServices(
         args.all { it.isNullOrBlank() }
         accessControl?.let { if (!AccessControl.validate(it)) return failure(InvalidChannelAccessControl) }
         visibility?.let { if (!Visibility.validate(it)) return failure(InvalidChannelVisibility) }
-        val newDescription = description?.ifBlank { null }
         val upperCaseAccessControl = accessControl?.uppercase()
         return repoManager.run {
             val channel = channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
@@ -223,7 +225,7 @@ class ChannelServices(
                             accessControl =
                                 upperCaseAccessControl?.let { AccessControl.valueOf(it) }
                                     ?: channel.accessControl,
-                            description = newDescription ?: channel.description,
+                            description = description ?: channel.description,
                             icon = icon ?: channel.icon,
                         )
                     }
@@ -234,7 +236,7 @@ class ChannelServices(
                             accessControl =
                                 upperCaseAccessControl?.let { AccessControl.valueOf(it) }
                                     ?: channel.accessControl,
-                            description = newDescription ?: channel.description,
+                            description = channel.description,
                             icon = icon ?: channel.icon,
                         )
                     }

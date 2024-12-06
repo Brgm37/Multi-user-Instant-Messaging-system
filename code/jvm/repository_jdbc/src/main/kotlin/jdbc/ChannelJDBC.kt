@@ -434,7 +434,7 @@ class ChannelJDBC(
             	channel_id, channel_name, channel_owner, channel_accessControl,
             	channel_visibility, owner_name, channel_description, channel_icon
             FROM v_channel
-            WHERE channel_name like ? and channel_visibility = '${PUBLIC.name}'
+            WHERE LOWER(channel_name) LIKE LOWER(?) AND channel_visibility = '${PUBLIC.name}'
             LIMIT ?
             OFFSET ?
             """.trimIndent()
@@ -584,9 +584,8 @@ class ChannelJDBC(
             	channel_id, channel_name, channel_owner, channel_accessControl,
             	channel_visibility, owner_name, channel_description, channel_icon
             FROM v_channel
-            WHERE channel_visibility = '${PUBLIC.name}'
-            LIMIT ?
-            OFFSET ?
+            WHERE channel_visibility = 'PUBLIC'
+            LIMIT ? OFFSET ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1

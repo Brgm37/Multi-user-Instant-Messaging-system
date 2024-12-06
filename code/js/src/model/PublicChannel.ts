@@ -1,4 +1,3 @@
-import {Channel, jsonToPublicChannel} from "./Channel";
 
 /**
  * @description Type for the state of the PublicChannels form.
@@ -11,16 +10,7 @@ export type PublicChannel = {
     id: number,
     name: string,
     owner: string,
+    description: string,
     icon: string,
-}
-
-/**
- * @description Converts an array of channels to an array of public channels.
- *
- * @param channels The array of channels to convert.
- * @returns PublicChannel[]
- */
-export function channelsToPublicChannels(channels: Channel[]): PublicChannel[] {
-    return channels.map(jsonToPublicChannel);
 }
 
