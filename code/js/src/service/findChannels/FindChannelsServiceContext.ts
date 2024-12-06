@@ -27,10 +27,10 @@ export interface FindChannelsServiceContext {
 
     /**
      * Join channel method.
-     * @param channelId
+     * @param cId
      */
     joinChannel(
-        channelId: number,
+        cId: number,
     ): Promise<Either<void, string>>
 
     /**
@@ -50,7 +50,7 @@ const defaultFindChannelsServiceContext: FindChannelsServiceContext = {
             reject(new Error("Not implemented"))
         })
     },
-    joinChannel: (channelId) => {
+    joinChannel: (cId) => {
         return new Promise<Either<void, string>>((resolve, reject) => {
             reject(new Error("Not implemented"))
         })

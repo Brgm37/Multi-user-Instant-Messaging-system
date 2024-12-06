@@ -31,14 +31,15 @@ export function FindChannelsServiceProvider({ children }: { children: React.Reac
                 return failure(await response.text()) as Either<PublicChannel[], string>
             }
         },
-        async joinChannel(channelId: number): Promise<Either<void, string>> {
+        async joinChannel(cId: number): Promise<Either<void, string>> {
             const init: RequestInit = {
                 method: "PUT",
                 headers: {"Content-Type": "application/json"},
                 signal,
-                credentials: "include"
+                credentials: "include",
+                body: JSON.stringify({cId})
             }
-            const url = baseUrl + '/' + channelId
+            const url = baseUrl + '/invitations'
             const response = await fetch(url, init);
             if (response.ok) {
                 return success(undefined) as Either<void, string>
@@ -53,7 +54,7 @@ export function FindChannelsServiceProvider({ children }: { children: React.Reac
                 signal,
                 credentials: "include"
             }
-            const response = await fetch(baseUrl + '?offset=' + offset + '&limit=' + limit, init);
+            const response = await fetch(baseUrl + '/public' +'?offset=' + offset + '&limit=' + limit, init);
             if (response.ok) {
                 const channels = await response.json()
                 return success(
