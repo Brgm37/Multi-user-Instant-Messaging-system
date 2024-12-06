@@ -5,6 +5,7 @@ import "../../styles/InfiniteScrollChannel.css";
 import {InfiniteScrollContext} from "../components/infiniteScroll/InfiniteScrollContext";
 import {Message} from "../../model/Message";
 import BasicChannelView from "./components/BasicChannelView";
+import {Navigate, Outlet, useParams} from "react-router-dom";
 
 export function ChannelView(): React.JSX.Element {
     const [state, messages, handler] = useChannel()

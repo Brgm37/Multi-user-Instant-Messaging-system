@@ -27,6 +27,9 @@ import {
 } from "../service/registration/communication/RegisterCommunicationProvider";
 import {ChannelView} from "../view/channel/ChannelView";
 import {FindChannelsServiceProvider} from "../service/findChannels/FindChannelsServiceProvider";
+import {
+    CreateChannelInvitationServiceProvider
+} from "../service/createChannelInvitation/CreateChannelInvitationServiceProvider";
 
 const router = createBrowserRouter(
     [
@@ -74,6 +77,16 @@ const router = createBrowserRouter(
                             <ChannelView/>
                         </ChannelServiceProvider>
                     </SseCommunicationServiceProvider>,
+                    children: [
+                        {
+                            "path": "/channels/:id/createInvitation",
+                            "element":
+                                <CreateChannelInvitationServiceProvider>
+                                    <CreateChannelInvitationView/>
+                                </CreateChannelInvitationServiceProvider>
+                        ,
+                        },
+                    ]
                 },
                 {
                     "path": "/channels/findChannels",
@@ -84,13 +97,6 @@ const router = createBrowserRouter(
                 },
             ]
         },
-        {
-            "path": "/dummy",
-            "element":
-            <CreateChannelInvitationMockServiceProvider>
-                <CreateChannelInvitationView/>
-            </CreateChannelInvitationMockServiceProvider>,
-        }
     ]
 )
 

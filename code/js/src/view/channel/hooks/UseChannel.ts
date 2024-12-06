@@ -99,10 +99,6 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
     }, [id]);
 
     useEffect(() => {
-        console.log("list size", list.list.length, "max size", list.max)
-    }, [list]);
-
-    useEffect(() => {
         if (messages.length === 0) return
         if (state.tag === "idle") return
         const consumed: Message[] = []

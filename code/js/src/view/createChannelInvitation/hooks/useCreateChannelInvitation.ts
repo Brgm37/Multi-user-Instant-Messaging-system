@@ -6,6 +6,10 @@ import {
     CreateChannelInvitationMockServiceContext
 } from "../../../service/createChannelInvitation/mock/CreateChannelInvitationMockServiceContext";
 import {isFailure} from "../../../model/Either";
+import {
+    CreateChannelInvitationServiceContext
+} from "../../../service/createChannelInvitation/CreateChannelInvitationServiceContext";
+import {useParams} from "react-router-dom";
 
 
 export function reduce(state: CreateChannelInvitationState, action: CreateChannelInvitationAction): CreateChannelInvitationState {
@@ -15,7 +19,7 @@ export function reduce(state: CreateChannelInvitationState, action: CreateChanne
                 case "create":
                     return { tag: "creating" }
                 case "close":
-                    return { tag: "closing" }
+                    return { tag: "closing", cId: action.cId }
                 case "error":
                     return { tag: "error", error: action.error }
                 default:
@@ -24,7 +28,7 @@ export function reduce(state: CreateChannelInvitationState, action: CreateChanne
         case "showingInvitationToken":
             switch (action.type) {
                 case "close":
-                    return { tag: "closing" }
+                    return { tag: "closing", cId: action.cId }
                 default:
                     return state
             }
@@ -40,7 +44,7 @@ export function reduce(state: CreateChannelInvitationState, action: CreateChanne
         case "error":
             switch (action.type) {
                 case "close":
-                    return { tag: "closing" }
+                    return { tag: "closing", cId: action.cId }
                 default:
                     return state
             }
@@ -54,14 +58,15 @@ export function reduce(state: CreateChannelInvitationState, action: CreateChanne
 const initialState: CreateChannelInvitationState = { tag: "editingInvitationToken", inputs: { maxUses: 1, accessControl: "READ_WRITE"} }
 
 export function useCreateChannelInvitation(): [CreateChannelInvitationState, UseCreateChannelInvitationHandler] {
-    const { createChannelInvitation } = useContext(CreateChannelInvitationMockServiceContext)
+    const { createChannelInvitation } = useContext(CreateChannelInvitationServiceContext)
     const [state, dispatch] = useReducer(reduce, initialState)
+    const { id } = useParams<{ id: string }>();
 
     const onCreate = (expirationDate: string, maxUses: string, accessControl: "READ_ONLY" | "READ_WRITE") => {
         if (state.tag !== "editingInvitationToken") return
         let maxUsesInt = parseInt(maxUses)
         dispatch({ type: "create", expirationDate, maxUses: maxUsesInt, accessControl })
-        createChannelInvitation(expirationDate, maxUsesInt, accessControl).then(r => {
+        createChannelInvitation(expirationDate, maxUsesInt, accessControl, id).then(r => {
                 if (isFailure(r)) dispatch({type: "error", error: r.value})
                 else dispatch({ type: "success", invitationToken: r.value.invitationCode })
             }
@@ -69,11 +74,11 @@ export function useCreateChannelInvitation(): [CreateChannelInvitationState, Use
     }
 
     const onClose = () => {
-        dispatch({ type: "close" })
+        dispatch({ type: "close", cId: id })
     }
 
     const onErrorClose = () => {
-        dispatch({ type: "close" })
+        dispatch({ type: "close", cId: id })
     }
 
     return [state, { onCreate, onClose, onErrorClose }]
