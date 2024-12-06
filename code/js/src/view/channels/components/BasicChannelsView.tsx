@@ -8,7 +8,7 @@ export default function BasicChannelsView(
     return (
         <div className="flex h-screen">
             <Sidebar />
-            <div className="flex-1 bg-gray-800 p-4 flex flex-col">
+            <div className="flex-1 bg-gray-800 flex flex-col">
                 {error && (
                     <div className="bg-red-500 text-white p-2 rounded">
                         {error}
