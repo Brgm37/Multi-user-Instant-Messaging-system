@@ -87,15 +87,37 @@ class ChannelInMem : ChannelRepositoryInterface {
         name: String,
         offset: UInt,
         limit: UInt,
-    ): List<Channel> {
-        TODO("Not yet implemented")
-    }
+    ): List<Channel> =
+        channels.filter {
+            it.name.fullName.contains(name) &&
+                usersInChannels[it.cId]?.any { ac -> ac.first == uId } == true
+        }
 
     override fun findAccessControl(
         uid: UInt,
         cId: UInt,
-    ): AccessControl? {
-        TODO("Not yet implemented")
+    ): AccessControl? = usersInChannels[cId]?.find { it.first == uid }?.second
+
+    override fun findByInvitationCode(invitationCode: String): Channel? =
+        invitations
+            .find {
+                it.invitationCode.toString() == invitationCode
+            }?.let { findById(it.cId) }
+
+    override fun findPublicChannel(
+        uId: UInt,
+        offset: UInt,
+        limit: UInt,
+    ): List<Channel> =
+        channels.filter {
+            it is Channel.Public && usersInChannels[it.cId]?.any { ac -> ac.first == uId } == false
+        }
+
+    override fun leaveChannel(
+        cId: UInt,
+        uId: UInt,
+    ) {
+        usersInChannels[cId]?.removeIf { it.first == uId }
     }
 
     override fun findById(id: UInt): Channel? = channels.find { it.cId == id }

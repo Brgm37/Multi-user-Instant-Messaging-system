@@ -142,4 +142,36 @@ interface ChannelRepositoryInterface : Repository<Channel> {
         uid: UInt,
         cId: UInt,
     ): AccessControl?
+
+    /**
+     * Retrieves a channel by its invitation code
+     *
+     * @param invitationCode The invitation code of the channel
+     * @return The channel with the given invitation code
+     */
+    fun findByInvitationCode(invitationCode: String): Channel?
+
+    /**
+     * Retrieves all public channels
+     *
+     * @param offset The offset for the channels
+     * @param limit The maximum number of channels to retrieve
+     */
+    fun findPublicChannel(
+        uId: UInt,
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
+    ): List<Channel>
+
+    /**
+     * Leaves a channel
+     *
+     * @param cId The ID of the channel
+     * @param uId The ID of the user
+     * @return The channel with the given ID
+     */
+    fun leaveChannel(
+        cId: UInt,
+        uId: UInt,
+    )
 }

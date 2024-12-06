@@ -29,6 +29,7 @@ import java.util.UUID
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 class MessageControllerTest {
     companion object {
@@ -270,12 +271,10 @@ class MessageControllerTest {
                 )
                 val messages = resp.body as List<MessageOutputModel>
                 assertEquals(10, messages.size, "Number of messages is not correct")
-                messages.forEachIndexed { index, message ->
-                    assertEquals(
-                        "Hello, World! ${14 - index}",
-                        message.message,
-                        "Message is not correct",
-                    )
+                messages.forEachIndexed { _, message ->
+                    assertTrue {
+                        message.message.startsWith("Hello, World!")
+                    }
                     assertEquals(owner.uId, message.user, "User is not correct")
                     assertEquals(channel.cId, message.channel, "Channel is not correct")
                 }

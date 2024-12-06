@@ -276,7 +276,7 @@ class ChannelJDBC(
             SELECT 
             	channel_id, channel_name, channel_owner, channel_accessControl,
             	channel_visibility, owner_name, channel_description, channel_icon
-            FROM v_channel JOIN channel_members c on c.id = v_channel.channel_id
+            FROM v_channel JOIN channel_members c on c.channel = v_channel.channel_id
             WHERE member = ?
             LIMIT ?
             OFFSET ?
@@ -489,6 +489,70 @@ class ChannelJDBC(
         stm.setInt(idx, cId.toInt())
         val rs = stm.executeQuery()
         return rs.toAccessControl()
+    }
+
+    override fun findByInvitationCode(invitationCode: String): Channel? {
+        val selectQuery =
+            """
+            SELECT 
+            	v_channel.channel_id, channel_name, channel_owner, channel_accessControl,
+            	channel_visibility, owner_name, channel_description, channel_icon
+            FROM v_channel JOIN channels_invitations c on c.channel_id = v_channel.channel_id
+            WHERE invitation = ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        stm.setString(1, encrypt.encrypt(invitationCode))
+        val rs = stm.executeQuery()
+        return if (rs.next()) {
+            rs.toChannel()
+        } else {
+            null
+        }
+    }
+
+    override fun findPublicChannel(
+        uId: UInt,
+        offset: UInt,
+        limit: UInt,
+    ): List<Channel> {
+        val selectQuery =
+            """
+            SELECT 
+            	channel_id, channel_name, channel_owner, channel_accessControl,
+            	channel_visibility, owner_name, channel_description, channel_icon
+            FROM v_channel
+            WHERE channel_visibility = '${PUBLIC.name}'
+            AND channel_id NOT IN (
+                SELECT channel
+                FROM channel_members
+                WHERE member = ?
+            )
+            LIMIT ?
+            OFFSET ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, uId.toInt())
+        stm.setInt(idx++, limit.toInt())
+        stm.setInt(idx, offset.toInt())
+        val rs = stm.executeQuery()
+        return rs.toChannelList()
+    }
+
+    override fun leaveChannel(
+        cId: UInt,
+        uId: UInt,
+    ) {
+        val deleteQuery =
+            """
+            DELETE FROM channel_members
+            WHERE channel = ? AND member = ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(deleteQuery)
+        var idx = 1
+        stm.setInt(idx++, cId.toInt())
+        stm.setInt(idx, uId.toInt())
+        stm.executeUpdate()
     }
 
     override fun findById(id: UInt): Channel? {

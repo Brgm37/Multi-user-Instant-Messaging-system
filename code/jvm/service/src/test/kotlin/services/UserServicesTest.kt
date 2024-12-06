@@ -1,17 +1,11 @@
 package services
 
 import TransactionManager
-import errors.ChannelError
 import errors.UserError
 import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
-import model.channels.AccessControl
-import model.channels.Channel
-import model.channels.ChannelInvitation
-import model.channels.ChannelName
 import model.users.Password
 import model.users.User
-import model.users.UserInfo
 import model.users.UserInvitation
 import model.users.UserToken
 import org.junit.jupiter.params.ParameterizedTest
@@ -66,76 +60,6 @@ class UserServicesTest {
         val invitation = UserInvitation(inviterUId, expirationDate)
         userRepo.createInvitation(invitation)
         return@run invitation
-    }
-
-    /**
-     * Create a user with an invitation
-     * @param manager The transaction manager.
-     * @return The user created
-     */
-    private fun createUserWithInvitation(manager: TransactionManager): User {
-        val userServices = UserServices(manager)
-        val invitation = makeInviterAndInvitation(manager)
-        val user =
-            userServices
-                .createUser(
-                    "userToJoinChannel",
-                    validPassword,
-                    invitation.invitationCode.toString(),
-                )
-                as Success<User>
-        return user.value
-    }
-
-    /**
-     * Create a public channel with an invitation
-     * @param manager The transaction manager.
-     * @param owner The owner of the channel
-     * @return The channel and the invitation code
-     */
-    private fun createChannelPublic(
-        manager: TransactionManager,
-        owner: User,
-    ) = manager.run {
-        val ownerId = checkNotNull(owner.uId)
-        val channel =
-            Channel.Public(
-                owner = UserInfo(ownerId, owner.username),
-                name = ChannelName("channel", owner.username),
-                accessControl = AccessControl.READ_WRITE,
-            )
-        return@run channelRepo.createChannel(channel)
-    }
-
-    /**
-     * Create a private channel with an invitation
-     * @param manager The transaction manager.
-     * @param owner The owner of the channel
-     * @param expirationDate The expiration date of the invitation
-     * @return a Private channel and a ChannelInvitation to join that channel
-     */
-    private fun createPrivateChannel(
-        manager: TransactionManager,
-        owner: User,
-        expirationDate: Timestamp = Timestamp.valueOf(LocalDateTime.now().plusHours(1)),
-    ) = manager.run {
-        val ownerId = checkNotNull(owner.uId)
-        val privateChannel =
-            Channel.Private(
-                owner = UserInfo(ownerId, owner.username),
-                name = ChannelName("channel", owner.username),
-                accessControl = AccessControl.READ_WRITE,
-            )
-        val channel = checkNotNull(channelRepo.createChannel(privateChannel))
-        val invitation =
-            ChannelInvitation(
-                cId = checkNotNull(channel.cId),
-                expirationDate = expirationDate,
-                maxUses = 1u,
-                accessControl = AccessControl.READ_WRITE,
-            )
-        channelRepo.createInvitation(invitation)
-        return@run Pair(channel, invitation)
     }
 
     @ParameterizedTest
@@ -294,149 +218,6 @@ class UserServicesTest {
         val result = userServices.getUser(0u)
         assertIs<Failure<UserError.UserNotFound>>(result)
         assertEquals(UserError.UserNotFound, result.value)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `joining a Public channel successfully should return Unit`(manager: TransactionManager) {
-        val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val channel = checkNotNull(createChannelPublic(manager, owner))
-        val cId = checkNotNull(channel.cId)
-        val user = createUserWithInvitation(manager)
-        val userId = checkNotNull(user.uId)
-        val result = UserServices(manager).joinChannel(userId, cId, null)
-        assertIs<Success<Unit>>(result)
-        assertEquals(Unit, result.value)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `joining a Private channel successfully should return Unit`(manager: TransactionManager) {
-        val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val (channel, invitationCode) = createPrivateChannel(manager, owner)
-        val user = createUserWithInvitation(manager)
-        val userId = checkNotNull(user.uId)
-        val userServices = UserServices(manager)
-        val result =
-            channel.cId?.let { userServices.joinChannel(userId, it, invitationCode.invitationCode.toString()) }
-        assertIs<Success<Unit>>(result)
-        assertEquals(Unit, result.value)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `trying to join a channel with a nonexistent channel should return ChannelNotFound`(
-        manager: TransactionManager,
-    ) {
-        val user = createUserWithInvitation(manager)
-        val userId = checkNotNull(user.uId)
-        val userServices = UserServices(manager)
-        val result = userServices.joinChannel(userId, 0u, "")
-        assertIs<Failure<ChannelError.ChannelNotFound>>(result)
-        assertEquals(ChannelError.ChannelNotFound, result.value)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `trying to join a channel with a nonexistent user should return UserNotFound`(manager: TransactionManager) {
-        val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val channel = checkNotNull(createChannelPublic(manager, owner))
-        val userServices = UserServices(manager)
-        val result = channel.cId?.let { userServices.joinChannel(0u, it, null) }
-        assertIs<Failure<UserError.UserNotFound>>(result)
-        assertEquals(UserError.UserNotFound, result.value)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `trying to join a channel with a user that is already in the channel should return Unit`(
-        manager: TransactionManager,
-    ) {
-        val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val channel = checkNotNull(createChannelPublic(manager, owner))
-        val user = createUserWithInvitation(manager)
-        val userId = checkNotNull(user.uId)
-        val userServices = UserServices(manager)
-        val result = channel.cId?.let { userServices.joinChannel(userId, it, null) }
-        assertIs<Success<Unit>>(result)
-        assertEquals(Unit, result.value)
-        val result2 = channel.cId?.let { userServices.joinChannel(userId, it, null) }
-        assertIs<Success<Unit>>(result2)
-        assertEquals(Unit, result2.value)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `joining a public channel should return Unit`(manager: TransactionManager) {
-        val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val channel = checkNotNull(createChannelPublic(manager, owner))
-        val user = createUserWithInvitation(manager)
-        val userId = checkNotNull(user.uId)
-        val userServices = UserServices(manager)
-        val result = channel.cId?.let { userServices.joinChannel(userId, it, null) }
-        assertIs<Success<Unit>>(result)
-        assertEquals(Unit, result.value)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `trying to join a private channel without an invitation should return InvitationCodeIsInvalid`(
-        manager: TransactionManager,
-    ) {
-        val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val (channel, _) = createPrivateChannel(manager, owner)
-        val user = createUserWithInvitation(manager)
-        val userId = checkNotNull(user.uId)
-        val userServices = UserServices(manager)
-        val result = channel.cId?.let { userServices.joinChannel(userId, it, null) }
-        assertIs<Failure<UserError.InvitationCodeIsInvalid>>(result)
-        assertEquals(UserError.InvitationCodeIsInvalid, result.value)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `trying to join a channel with an expired invitation should return InvitationCodeHasExpired`(
-        manager: TransactionManager,
-    ) {
-        val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val (channel, invitationCode) =
-            createPrivateChannel(
-                manager = manager,
-                owner = owner,
-                expirationDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5)),
-            )
-        val user = createUserWithInvitation(manager)
-        val userId = checkNotNull(user.uId)
-        val userServices = UserServices(manager)
-        val result =
-            channel.cId?.let { userServices.joinChannel(userId, it, invitationCode.invitationCode.toString()) }
-        assertIs<Failure<UserError.InvitationCodeHasExpired>>(result)
-        assertEquals(UserError.InvitationCodeHasExpired, result.value)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `join a channel with invitation code that has reached the max uses should return InvitationCodeMaxUsesReached`(
-        manager: TransactionManager,
-    ) {
-        val owner = checkNotNull(ChannelServicesTest.makeUser(manager))
-        val (channel, invitationCode) =
-            createPrivateChannel(
-                manager = manager,
-                owner = owner,
-            )
-        val user = createUserWithInvitation(manager)
-        val userId = checkNotNull(user.uId)
-        val userServices = UserServices(manager)
-        val result =
-            channel.cId?.let { userServices.joinChannel(userId, it, invitationCode.invitationCode.toString()) }
-        assertIs<Success<Unit>>(result)
-        val user2 = checkNotNull(ChannelServicesTest.makeUser(manager, "user2"))
-        val user2Id = checkNotNull(user2.uId)
-        val result2 =
-            channel.cId?.let { userServices.joinChannel(user2Id, it, invitationCode.invitationCode.toString()) }
-        assertIs<Failure<UserError.InvitationCodeMaxUsesReached>>(result2)
-        assertEquals(UserError.InvitationCodeMaxUsesReached, result2.value)
     }
 
 //    @ParameterizedTest

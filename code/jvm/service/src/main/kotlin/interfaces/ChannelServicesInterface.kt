@@ -3,8 +3,8 @@ package interfaces
 import errors.ChannelError
 import model.channels.AccessControl
 import model.channels.Channel
+import model.channels.ChannelInvitation
 import utils.Either
-import java.util.UUID
 
 /**
  * The offset for the channels.
@@ -80,7 +80,7 @@ interface ChannelServicesInterface {
         expirationDate: String?,
         accessControl: String?,
         owner: UInt,
-    ): Either<ChannelError, UUID>
+    ): Either<ChannelError, ChannelInvitation>
 
     /**
      * Get a channel by its Name.
@@ -149,4 +149,39 @@ interface ChannelServicesInterface {
         uId: UInt,
         cId: UInt,
     ): Either<ChannelError, AccessControl?>
+
+    /**
+     * Associates a user to a channel.
+     * @param uId The id of the user to join the channel.
+     * @param cId The id of the channel to join.
+     * @param invitationCode The invitation code to join the channel.
+     */
+    fun joinChannel(
+        uId: UInt,
+        cId: UInt?,
+        invitationCode: String?,
+    ): Either<ChannelError, Channel>
+
+    /**
+     * Retrieves all public channels witch the user is not in.
+     *
+     * @param uId The ID of the user.
+     * @param offset The offset for the channels.
+     * @param limit The maximum number of channels to retrieve.
+     */
+    fun getPublic(
+        uId: UInt,
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
+    ): Either<ChannelError, List<Channel>>
+
+    /**
+     * Deletes a user from a channel. If the user is the owner of the channel, the channel is deleted.
+     *
+     * @param uId The ID of the user.
+     */
+    fun deleteOrLeaveChannel(
+        uId: UInt,
+        cId: UInt,
+    ): Either<ChannelError, Unit>
 }

@@ -2,6 +2,7 @@ package com.example.appWeb.controller
 
 import com.example.appWeb.model.dto.input.channel.CreateChannelInputModel
 import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputModel
+import com.example.appWeb.model.dto.input.channel.JoinChannelInputModel
 import com.example.appWeb.model.dto.input.channel.UpdateChannelInputModel
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.output.channel.AccessControlOutPutModel
@@ -23,6 +24,7 @@ import org.hibernate.validator.constraints.Range
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -263,6 +265,48 @@ class ChannelController(
             is Failure -> ChannelProblem.AccessControlNotFound.response(NOT_FOUND)
         }
 
+    @PutMapping(CHANNEL_INVITATION_URL)
+    fun joinChannel(
+        @RequestBody invitation: JoinChannelInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> {
+        val args = arrayOf(invitation.cId, invitation.invitationCode)
+        if (args.all { it == null }) return ChannelProblem.UnableToJoinChannel.response(BAD_REQUEST)
+        return when (
+            val response =
+                channelService.joinChannel(authenticated.uId, invitation.cId, invitation.invitationCode)
+        ) {
+            is Success -> ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
+            is Failure -> ChannelProblem.UnableToJoinChannel.response(BAD_REQUEST)
+        }
+    }
+
+    @GetMapping(PUBLIC)
+    fun getPublicChannels(
+        @RequestParam offset: UInt = OFFSET,
+        @RequestParam limit: UInt = LIMIT,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> =
+        when (val response = channelService.getPublic(authenticated.uId, offset, limit)) {
+            is Success -> {
+                ResponseEntity.ok(response.value.map(ChannelListOutputModel::fromDomain))
+            }
+
+            is Failure -> {
+                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+            }
+        }
+
+    @DeleteMapping(CHANNEL_ID_URL)
+    fun deleteChannel(
+        @PathVariable @Range(min = 1) channelId: UInt,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> =
+        when (channelService.deleteOrLeaveChannel(authenticated.uId, channelId)) {
+            is Success -> ResponseEntity.ok(Unit)
+            is Failure -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+        }
+
     companion object {
         /**
          * The base URL for the channel endpoints.
@@ -300,5 +344,7 @@ class ChannelController(
         const val MY_CHANNELS_WITH_NAME = "${MY_CHANNELS}/{name}"
 
         const val ACCESS_CONTROL = "/accessControl/{cId}"
+
+        const val PUBLIC = "/public"
     }
 }
