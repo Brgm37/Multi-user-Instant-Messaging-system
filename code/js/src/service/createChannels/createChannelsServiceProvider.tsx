@@ -13,10 +13,11 @@ const channelNameHeader = "name"
 const visibilityHeader = "visibility"
 const accessControlHeader = "accessControl"
 
-export function ChannelServiceProvider(
+export function CreateChannelServiceProvider(
     {children}: { children: React.ReactNode }
 ): React.JSX.Element {
     const signal = useSignal()
+    const user = useContext(AuthUserContext)
     const service: CreateChannelsServiceContext = {
 
         async createChannel(
@@ -43,12 +44,10 @@ export function ChannelServiceProvider(
                 const error = await response.text()
                 return failure(error) as Either<CreateChannel, string>
             }
-
         },
 
         findChannelByName: async (name: string): Promise<Either<Channel, string>> => {
             const url = urlBase + `/my/${name}`
-            const user = useContext(AuthUserContext)
             const response = await fetch(url)
             if (response.ok) {
                 const channels = await response.json()
