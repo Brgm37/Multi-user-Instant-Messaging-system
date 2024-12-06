@@ -63,6 +63,7 @@ export function jsonToPublicChannel(json: any): PublicChannel {
         id: json.id,
         name: json.name.displayName,
         owner: json.owner.name,
+        description: json.description,
         icon: json.icon
     }
 }

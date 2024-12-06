@@ -10,6 +10,7 @@ export type PublicChannel = {
     id: number,
     name: string,
     owner: string,
+    description: string,
     icon: string,
 }
 
