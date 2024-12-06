@@ -9,7 +9,7 @@ import {FindChannelsLoadingView} from "./components/FindChannelsLoadingView";
 import {UseFindChannelsHandler} from "./hooks/handler/UseFindChannelsHandler";
 import {SearchBar} from "../components/SearchBar";
 
-export function FindChannelsView(): React.JSX.Element {
+export function     FindChannelsView(): React.JSX.Element {
     const [state, handler]: [FindChannelState, UseFindChannelsHandler] = useFindChannels();
 
     if(state.tag === "redirect") {
@@ -43,15 +43,17 @@ export function FindChannelsView(): React.JSX.Element {
                     className={"bg-gray-700 text-white p-2 rounded ml-auto"}
                 />
             </header>
-            <main className={"p-8"}>
-                {state.tag === "navigating" && state.searchBar === "" && (
-                    <section className="text-center mb-8">
-                        <h1 className="text-4xl font-bold">FIND YOUR CHANNEL</h1>
-                        <p className="text-gray-400">From gaming, to music, to learning, there's a place for you.</p>
-                    </section>
-                )}
-                {view(state)}
-            </main>
+            <div className={"h-myscreen overflow-y-auto scrollbar-hidden"}>
+                <main className={"p-8"}>
+                    {state.tag === "navigating" && state.searchBar === "" && (
+                        <section className="text-center mb-8">
+                            <h1 className="text-4xl font-bold">FIND YOUR CHANNEL</h1>
+                            <p className="text-gray-400">From gaming, to music, to learning, there's a place for you.</p>
+                        </section>
+                    )}
+                    {view(state)}
+                </main>
+            </div>
         </div>
     )
 }
