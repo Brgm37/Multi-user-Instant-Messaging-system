@@ -18,7 +18,7 @@ export default async function(
         }
         return success(authInfo) as Either<AuthInfo, string>
     } else {
-        const error = response.text()
-        return failure(error) as Either<AuthInfo, string>
+        const error = await response.json()
+        return failure(error.title) as Either<AuthInfo, string>
     }
 }
