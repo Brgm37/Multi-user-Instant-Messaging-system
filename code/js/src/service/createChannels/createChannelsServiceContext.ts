@@ -17,10 +17,14 @@ export interface CreateChannelsServiceContext {
 
 const defaultCreateChannelsServiceContext: CreateChannelsServiceContext = {
     createChannel: () => {
-        throw Error("Not implemented")
+        return new Promise<Either<CreateChannel, string>>((_, reject) => {
+            reject(new Error("Not implemented"))
+        })
     },
     findChannelByName: () => {
-        throw Error("Not implemented")
+        return new Promise<Either<Channel, string>>((_, reject) => {
+            reject(new Error("Not implemented"))
+        })
     }
 }
 
