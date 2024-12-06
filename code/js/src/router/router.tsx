@@ -29,6 +29,7 @@ import {
     RegisterCommunicationServiceProvider
 } from "../service/registration/communication/RegisterCommunicationProvider";
 import {ChannelView} from "../view/channel/ChannelView";
+import {CreateChannelServiceProvider} from "../service/createChannels/createChannelsServiceProvider";
 
 const router = createBrowserRouter(
     [
@@ -76,7 +77,14 @@ const router = createBrowserRouter(
                             <ChannelView/>
                         </ChannelServiceProvider>
                     </SseCommunicationServiceProvider>,
-                }
+                },
+                {
+                    "path": "/channels/createChannel",
+                    "element":
+                        <CreateChannelServiceProvider>
+                            <CreateChannelsView/>
+                        </CreateChannelServiceProvider>
+                },
             ]
         },
         {
@@ -89,11 +97,6 @@ const router = createBrowserRouter(
                 <FindChannelsMockServiceProvider>
                     <FindChannelsView/>
                 </FindChannelsMockServiceProvider>,
-        },
-        {
-            "path": "/createChannel",
-            "element": <CreateChannelsView/>
-
         },
         {
             "path": "/dummy",
