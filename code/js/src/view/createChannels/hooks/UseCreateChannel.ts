@@ -17,14 +17,14 @@ function reduce(state: CreateChannelsState, action: CreateChannelsAction): Creat
         case "editing":
             switch (action.type) {
                 case "edit": {
-                    const input = {...state.input, [action.input]: action.inputValue}
-                    return {...state, input}
+                    const input = {...state.input, name: action.inputValue}
+                    return {tag: "editing", input: input}
                 }
                 case "submit": {
                     return {tag: "submitting", input: state.input}
                 }
                 default:
-                    throw Error("Invalid action")
+                    throw Error("Invalid action" + action.type)
             }
         case "submitting":
             switch (action.type) {
@@ -37,9 +37,8 @@ function reduce(state: CreateChannelsState, action: CreateChannelsAction): Creat
             }
         case "error":
             switch (action.type) {
-                case "edit":
-                    const input = {...state.input, [action.input]: action.inputValue }
-                    return {tag: "editing", input}
+                case "go-back":
+                    return {tag: "editing", input: state.input}
                 default:
                     throw Error("Invalid action")
             }
@@ -64,7 +63,7 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
              if(fetchChannel){
                  fetchChannel
                      .then(response => {
-                         if (isFailure(response)) dispatch({type: "success", input: state.input})
+                         if (isFailure(response)) dispatch({type: "edit", inputValue: state.input.name})
                          else dispatch({type: "error", message: ERROR_MESSAGE})
                      })
              }
@@ -91,17 +90,13 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
                     if (response.tag === "success"){
                         dispatch({type: "error", message: ERROR_MESSAGE})
                         state.input.isValid = false
-                    }
+                    }else state.input.isValid = true
                 })
-            dispatch({type: "edit", input: "name", inputValue: name})
+            dispatch({type: "edit", inputValue: name})
         },
-        onVisibilityChange(visibility: string) {
-            if (state.tag !== "editing") return
-            dispatch({type: "edit", input: "visibility", inputValue: visibility})
-        },
-        onAccessChange(access: string) {
-            if (state.tag !== "editing") return
-            dispatch({type: "edit", input: "access", inputValue: access})
+        goBack() {
+            if (state.tag !== "error") return
+            dispatch({type: "edit", inputValue: state.input.name})
         },
         onSubmit() {
             if (state.tag !== "editing") return
@@ -114,8 +109,6 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
                 })
             dispatch({type: "submit"})
         }
-
-        
     }
     return [state, handler]
 }
