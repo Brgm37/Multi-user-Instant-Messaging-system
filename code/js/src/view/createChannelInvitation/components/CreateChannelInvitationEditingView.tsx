@@ -1,5 +1,6 @@
 import React from "react";
 import {AccessControl} from "../../../model/AccessControl";
+import {UseCreateChannelInvitationHandler} from "../hooks/handler/UseCreateChannelInvitationHandler";
 
 /**
  * list of options for the expiration date of the invitation code
@@ -52,14 +53,12 @@ function expirationDateToTimeFormat(expirationDate: string): string {
     }
 }
 
-export function CreateChannelInvitationEditingView(
-    {onGenerate}: {onGenerate: (expirationDate: string, maxUses: string, accessControl: AccessControl) => void}
-): React.JSX.Element {
+export function CreateChannelInvitationEditingView({handler}: {handler: UseCreateChannelInvitationHandler}): React.ReactElement {
     const handleGenerateCode = () => {
         const expirationDate = expirationDateToTimeFormat((document.querySelector("select[title=expirationDate]") as HTMLSelectElement).value);
         const maxUses = (document.querySelector("select[title=maxUses]") as HTMLSelectElement).value;
         const accessControl = (document.querySelector("select[title=permissions]") as HTMLSelectElement).value as AccessControl;
-        onGenerate(expirationDate, maxUses, accessControl);
+        handler.onCreate(expirationDate, maxUses, accessControl);
     }
 
     return (

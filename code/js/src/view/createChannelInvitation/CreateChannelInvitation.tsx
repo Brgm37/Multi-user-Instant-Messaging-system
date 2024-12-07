@@ -15,7 +15,7 @@ export function CreateChannelInvitationView(): React.JSX.Element {
     const view = ((state: CreateChannelInvitationState) => {
         switch (state.tag) {
             case "editingInvitationToken":
-                return <CreateChannelInvitationEditingView onGenerate={handler.onCreate}></CreateChannelInvitationEditingView>
+                return <CreateChannelInvitationEditingView handler={handler}/>
             case "creating":
                 return <div>Creating...</div>
             case "showingInvitationToken":
