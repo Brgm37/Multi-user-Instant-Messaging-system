@@ -14,12 +14,8 @@ import utils.Either
 import utils.failure
 import utils.success
 import java.sql.Timestamp
+import java.time.LocalDate
 import java.time.LocalDateTime
-
-/**
- * The number of days an invitation is valid.
- */
-private const val INVITATION_EXPIRATION_DAYS = 7L
 
 /**
  * The number of days a token is valid.
@@ -114,13 +110,25 @@ class UserServices(
             success(Unit)
         }
 
-    override fun createInvitation(inviterUId: UInt): Either<UserError, UserInvitation> {
+    override fun createInvitation(
+        inviterUId: UInt,
+        expirationDate: String?,
+        ): Either<UserError, UserInvitation> {
+        val timestamp =
+            if (expirationDate != null) {
+                makeTimeStamp(expirationDate) ?: return failure(UserError.UnableToCreateInvitation)
+            } else {
+                LocalDateTime
+                .now()
+                .plusWeeks(1)
+                .let(Timestamp::valueOf)
+    }
         return repoManager.run {
             userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
             val invitation =
                 UserInvitation(
                     inviterId = inviterUId,
-                    expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(INVITATION_EXPIRATION_DAYS)),
+                    expirationDate = timestamp,
                 )
             if (userRepo.createInvitation(invitation)) {
                 success(invitation)
@@ -129,4 +137,13 @@ class UserServices(
             }
         }
     }
+    private fun makeTimeStamp(expirationDate: String) =
+        try {
+            Timestamp.valueOf(
+                LocalDateTime
+                    .parse(expirationDate),
+            )
+        } catch (e: IllegalArgumentException) {
+            null
+        }
 }

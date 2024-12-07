@@ -30,13 +30,11 @@ export function EditChannelServiceProvider(
         },
         async editChannel(
             id: string,
-            name?: string,
             description?: string,
             visibility?: string,
             icon?: string
         ): Promise<Either<void, string>> {
             const body: any = {}
-            if (name) body["name"] = name
             if (description) body["description"] = description
             if (visibility) body["visibility"] = visibility
             if (icon) body["icon"] = icon

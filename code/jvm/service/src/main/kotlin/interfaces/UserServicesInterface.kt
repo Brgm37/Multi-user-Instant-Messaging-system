@@ -63,6 +63,10 @@ interface UserServicesInterface {
     /**
      * Creates an invitation.
      * @param inviterUId The id of the inviter.
+     *
      */
-    fun createInvitation(inviterUId: UInt): Either<UserError, UserInvitation>
+    fun createInvitation(
+        inviterUId: UInt,
+        expirationDate: String?,
+    ): Either<UserError, UserInvitation>
 }

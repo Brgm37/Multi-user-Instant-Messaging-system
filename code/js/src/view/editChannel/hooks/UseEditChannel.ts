@@ -11,6 +11,9 @@ export function useEditChannel(): [EditChannelState, EditChannelHandler] {
     const {id} = useParams()
     const [state, dispatch] = useReducer(reduce, {tag: "idle"})
     const handler: EditChannelHandler = {
+        goBack(): void {
+            dispatch({type: "closeError"})
+        },
         loadChannel(): void {
             if (state.tag !== "idle") return
             context.loadChannel(id).then(result => {
@@ -19,11 +22,10 @@ export function useEditChannel(): [EditChannelState, EditChannelHandler] {
             })
             dispatch({type: "init"})
         },
-        onSubmit(name: string, description: string, visibility: "PUBLIC" | "PRIVATE", icon: string): void {
+        onSubmit(description: string, visibility: "PUBLIC" | "PRIVATE", icon: string): void {
             if (state.tag === "idle") return
             context.editChannel(
                 id,
-                name,
                 description,
                 visibility,
                 icon

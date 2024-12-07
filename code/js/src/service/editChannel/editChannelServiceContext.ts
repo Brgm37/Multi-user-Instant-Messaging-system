@@ -5,7 +5,6 @@ import {Channel} from "../../model/Channel";
 export interface EditChannelServiceContext {
     editChannel(
         id: string,
-        name?: string,
         description?: string,
         visibility?: string,
         icon?: string,

@@ -52,9 +52,10 @@ export function CreateChannelServiceProvider(
             const response = await fetch(url)
             if (response.ok) {
                 const channels = await response.json()
-                const channel = channels.filter((c: any) => {
-                    c.owner.id.toString() === user.id
-                })
+                const channelsIOwn = channels.filter((c: any) =>
+                     c.owner.id === Number(user.id)
+                )
+                const channel = channelsIOwn.filter((c: any) => c.name.displayName.toLowerCase() === name.toLowerCase())
                 if (channel.length > 0) {
                     return success(jsonToChannel(channel[0])) as Either<Channel, string>
                 }else {
