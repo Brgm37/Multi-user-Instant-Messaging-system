@@ -98,10 +98,10 @@ export function Sidebar(): React.JSX.Element {
 
             <div className="w-12 h-0.5 bg-gray-700"></div>
 
-            <div className={"w-full"}>
+            <div className={"w-full scrollable-sidebar"}>
                 <InfiniteScroll
                     className="scrollable-sidebar"
-                    scrollStyle="space-y-2"
+                    scrollStyle="scrollable-sidebar space-y-2"
                 />
             </div>
         </div>
