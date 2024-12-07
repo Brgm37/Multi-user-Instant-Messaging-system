@@ -17,14 +17,15 @@ export function CreateUserInvitationServiceProvider(
             const init: RequestInit = {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({expirationDate}),
                 signal,
-                credentials: "include"
+                credentials: "include",
+                body: JSON.stringify({expirationDate})
             }
-            const response = await fetch(baseUrl + "/invitations", init)
+            const response = await fetch(baseUrl + "/invitation", init)
             if (response.ok) {
-                const data = await response.json()
-                return success(data) as Either<{invitationCode: string}, string>
+                const code = await response.json()
+                const invitationCode = code.invitationCode
+                return success({invitationCode}) as Either<{invitationCode: string}, string>
             } else {
                 const error = await response.text()
                 return failure(error) as Either<{invitationCode: string}, string>
