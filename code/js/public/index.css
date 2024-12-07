@@ -51,3 +51,23 @@ body {
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
+
+.scroll-container {
+    overflow-y: auto;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.scroll-style {
+    display: flex;
+    flex-direction: column;
+}
+
+.scrollable-sidebar {
+    -ms-overflow-style: none;
+}
+
+.scrollable-sidebar::-webkit-scrollbar {
+    display: none;
+}

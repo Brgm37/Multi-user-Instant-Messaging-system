@@ -15,11 +15,10 @@ import {RegisterServiceProvider} from "../service/registration/register/Register
 import {ChannelServiceProvider} from "../service/channel/ChannelServiceProvider";
 import {AuthValidator} from "../view/session/authValidator";
 import {FindChannelsView} from "../view/findChannels/FindChannelsView";
+import {AboutView} from "../view/about/AboutView";
+import {CreateChannelsView} from "../view/createChannels/createChannelsView";
 import {ChannelsView} from "../view/channels/ChannelsView";
 import {ChannelsServicesProvider} from "../service/channels/ChannelsServicesProvider";
-import {
-    CreateChannelInvitationMockServiceProvider
-} from "../service/createChannelInvitation/mock/CreateChannelInvitationMockServiceProvider";
 import {CreateChannelInvitationView} from "../view/createChannelInvitation/CreateChannelInvitation";
 import {SseCommunicationServiceProvider} from "../service/sse/SseCommunicationServiceProvider";
 import {
@@ -30,6 +29,9 @@ import {FindChannelsServiceProvider} from "../service/findChannels/FindChannelsS
 import {
     CreateChannelInvitationServiceProvider
 } from "../service/createChannelInvitation/CreateChannelInvitationServiceProvider";
+import {CreateChannelServiceProvider} from "../service/createChannels/createChannelsServiceProvider";
+import {ImagePickerProvider} from "../view/components/ImagePicker/ImagePickerProvider";
+import ImagePicker from "../view/components/ImagePicker/ImagePicker";
 
 const router = createBrowserRouter(
     [
@@ -96,7 +98,22 @@ const router = createBrowserRouter(
                             <FindChannelsView/>
                         </FindChannelsServiceProvider>,
                 },
+                {
+                    "path": "/channels/createChannel",
+                    "element":
+                        <CreateChannelServiceProvider>
+                            <ImagePickerProvider>
+                                <CreateChannelsView/>
+                                <ImagePicker/>
+                            </ImagePickerProvider>
+
+                        </CreateChannelServiceProvider>,
+                },
             ]
+                },
+        {
+            "path": "/about",
+            "element": <AboutView />,
         },
     ]
 )
