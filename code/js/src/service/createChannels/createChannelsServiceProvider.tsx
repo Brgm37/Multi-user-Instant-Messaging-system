@@ -12,6 +12,10 @@ const urlBase = urlBuilder("/channels")
 const channelNameHeader = "name"
 const visibilityHeader = "visibility"
 const accessControlHeader = "accessControl"
+const descriptionHeader = "description"
+const iconHeader = "icon"
+
+const defaultIconSrc = "/defaultIcons/default.png"
 
 export function CreateChannelServiceProvider(
     {children}: { children: React.ReactNode }
@@ -23,15 +27,19 @@ export function CreateChannelServiceProvider(
         async createChannel(
             name: string,
             visibility: string,
-            accessControl: string
-        ): Promise<Either<CreateChannel, string>> {
+            accessControl: string,
+            description: string | undefined = "",
+            icon: string = defaultIconSrc
+        ): Promise<Either<Channel, string>> {
             const init: RequestInit = {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({
-                    [channelNameHeader]: name,
-                    [visibilityHeader]: visibility,
-                    [accessControlHeader]: accessControl
+                    name,
+                    visibility,
+                    accessControl,
+                    description,
+                    icon
                 }),
                 signal,
                 credentials: "include"
@@ -39,10 +47,10 @@ export function CreateChannelServiceProvider(
             const response = await fetch(urlBase, init)
             if (response.ok) {
                 const data = await response.json()
-                return success(jsonToChannel(data)) as Either<CreateChannel, string>
+                return success(jsonToChannel(data)) as Either<Channel, string>
             } else {
                 const error = await response.text()
-                return failure(error) as Either<CreateChannel, string>
+                return failure(error) as Either<Channel, string>
             }
         },
 

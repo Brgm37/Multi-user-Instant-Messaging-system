@@ -1,4 +1,4 @@
-import {CreateChannelsState, makeInitialState} from "./states/createChannelsState";
+import {ChannelInput, CreateChannelsState, makeInitialState} from "./states/createChannelsState";
 import {CreateChannelsAction} from "./states/createChannelsAction";
 import {useContext, useEffect, useReducer} from "react";
 import {CreateChannelsServiceContext} from "../../../service/createChannels/createChannelsServiceContext";
@@ -16,36 +16,40 @@ function reduce(state: CreateChannelsState, action: CreateChannelsAction): Creat
     switch (state.tag) {
         case "editing":
             switch (action.type) {
-                case "edit": {
-                    const input = {...state.input, name: action.inputValue}
-                    return {tag: "editing", input: input}
+                case "editName": {
+                    const input = { ...state.input, name: action.inputValue };
+                    return { tag: "editing", input: input };
+                }
+                case "editDescription": {
+                    const input = { ...state.input, description: action.inputValue };
+                    return { tag: "editing", input: input };
                 }
                 case "submit": {
-                    return {tag: "submitting", input: state.input}
+                    return { tag: "submitting", input: state.input };
                 }
                 default:
-                    throw Error("Invalid action" + action.type)
+                    throw Error("Invalid action" + action.type);
             }
         case "submitting":
             switch (action.type) {
                 case "success":
-                    return {tag: "redirecting", input: state.input}
+                    return { tag: "redirecting", input: state.input };
                 case "error":
-                    return {tag: "error", message: action.message, input: state.input}
+                    return { tag: "error", message: action.message, input: state.input };
                 default:
-                    throw Error("Invalid action")
+                    throw Error("Invalid action");
             }
         case "error":
             switch (action.type) {
                 case "go-back":
-                    return {tag: "editing", input: state.input}
+                    return { tag: "editing", input: state.input };
                 default:
-                    throw Error("Invalid action")
+                    throw Error("Invalid action");
             }
         case "redirecting":
-            throw Error("Already in final State 'redirecting' and should not reduce to any other State.")
+            throw Error("Already in final State 'redirecting' and should not reduce to any other State.");
         default:
-            throw Error("Invalid state")
+            throw Error("Invalid state");
     }
 }
 
@@ -88,34 +92,37 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
 
     const handler: UseCreateChannelHandler = {
         onNameChange(name: string) {
-            if (state.tag !== "editing") return
-            service
-                .findChannelByName(name)
-                .then(response => {
-                    if (response.tag === "success"){
-                        dispatch({type: "edit", inputValue: "name"})
-                        state.input.isValid = false
-                    }
-                })
-            state.input.isValid = true
-            dispatch({type: "edit", inputValue: name})
+            if (state.tag !== "editing") return;
+            service.findChannelByName(name).then(response => {
+                if (response.tag === "success") {
+                    dispatch({ type: "editName", inputValue: "name" });
+                    state.input.isValid = false;
+                }
+            });
+            state.input.isValid = true;
+            dispatch({ type: "editName", inputValue: name });
         },
+
+        onDescriptionChange(description: string) {
+            if (state.tag !== "editing") return;
+            dispatch({ type: "editDescription", inputValue: description });
+        },
+
         goBack() {
-            if (state.tag !== "error") return
-            dispatch({type: "edit", inputValue: state.input.name})
+            if (state.tag !== "error") return;
+            dispatch({ type: "editName", inputValue: state.input.name });
         },
-        onSubmit() {
-            if (state.tag !== "editing") return
-            if (!state.input.isValid) return
-            service
-                .createChannel(state.input.name, state.input.visibility, state.input.access)
+        onSubmit(channel: ChannelInput) {
+            if (state.tag !== "editing") return;
+            if (!state.input.isValid) return;
+            service.createChannel(channel.name, channel.visibility, channel.access, channel.description, channel.icon)
                 .then(response => {
-                    if (response.tag === "success") dispatch({type: "success", input: state.input})
-                    else dispatch({type: "error", message: response.value})
-                })
-            dispatch({type: "submit"})
+                    if (response.tag === "success") dispatch({ type: "success", input: state.input });
+                    else dispatch({ type: "error", message: response.value });
+                });
+            dispatch({ type: "submit" });
         }
-    }
+    };
     return [state, handler]
 }
 
