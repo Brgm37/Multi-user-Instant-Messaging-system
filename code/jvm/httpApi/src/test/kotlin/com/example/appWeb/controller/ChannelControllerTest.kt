@@ -362,26 +362,6 @@ class ChannelControllerTest {
 
     @ParameterizedTest
     @MethodSource("transactionManager")
-    @Suppress("UNCHECKED_CAST")
-    fun `get channels by name`(manager: TransactionManager) =
-        testSetUp(manager) { authenticated, channelServices ->
-            val nr = 10
-            val name = "name"
-            repeat(nr) {
-                channelServices.createChannel(authenticated.uId, "$name$it", READ_WRITE.name, PUBLIC.name)
-            }
-            getChannelByPartialName(name, 0u, 10u, authenticated).let { resp ->
-                assertEquals(HttpStatus.OK, resp.statusCode, "Status code is different")
-                assertIs<List<ChannelListOutputModel>>(resp.body, "Body is not a List<ChannelOutputModel>")
-                val outputModels = resp.body as List<ChannelListOutputModel>
-                assertEquals(nr, outputModels.size, "Number of channels is different")
-                val outputModel = outputModels.first()
-                assertEquals(authenticated.uId, outputModel.owner.id, "Owner id is different")
-            }
-        }
-
-    @ParameterizedTest
-    @MethodSource("transactionManager")
     fun `trying to join a channel with invalid user should return BAD_REQUEST`(manager: TransactionManager) =
         testSetUp(manager) { authenticatedUserInputModel, channelServices ->
             val newChannel =

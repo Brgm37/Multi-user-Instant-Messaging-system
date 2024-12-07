@@ -21,6 +21,8 @@ function resetList(
     result: Channel[],
 ): void {
     const channels = result.slice(0, limit)
+    if (channels.length < limit) limit = channels.length
+    else limit = DEFAULT_LIMIT
     const hasMore = {head: false, tail: result.length === HAS_MORE}
     listHandler.reset(channels, hasMore)
 }

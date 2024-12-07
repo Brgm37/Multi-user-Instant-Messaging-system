@@ -11,7 +11,7 @@ import {UseChannelHandler} from "./handler/UseChannelHandler";
 import {list} from "postcss";
 
 const LIST_SIZE = envConfig.messages_limit
-const DEFAULT_LIMIT = envConfig.default_limit
+const DEFAULT_LIMIT = envConfig.default_messages_limit
 let limit = DEFAULT_LIMIT
 const HAS_MORE = DEFAULT_LIMIT + 1
 

@@ -29,6 +29,7 @@ export default function BasicChannelView(
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => setMessage(event.target.value)
 
     const sendMessage = () => {
+        if (message === "") return
         onSend(message)
         setMessage("")
     }
