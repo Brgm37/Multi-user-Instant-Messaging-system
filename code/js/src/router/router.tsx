@@ -30,6 +30,7 @@ import {
 } from "../service/registration/communication/RegisterCommunicationProvider";
 import {ChannelView} from "../view/channel/ChannelView";
 import {CreateChannelServiceProvider} from "../service/createChannels/createChannelsServiceProvider";
+import {CreateUserInvitationView} from "../view/createUserInvitation/CreateUserInvitationView";
 
 const router = createBrowserRouter(
     [
@@ -105,6 +106,10 @@ const router = createBrowserRouter(
             <CreateChannelInvitationMockServiceProvider>
                 <CreateChannelInvitationView/>
             </CreateChannelInvitationMockServiceProvider>,
+        },
+        {
+            "path": "/userInvitation",
+            "element": <CreateUserInvitationView/>,
         }
     ]
 )
