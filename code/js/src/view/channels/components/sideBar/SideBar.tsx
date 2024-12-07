@@ -12,7 +12,7 @@ export function Sidebar(): React.JSX.Element {
     const [channels, setChannels] = useState<Channel[]>([]);
     const [search, setSearch] = useState<string>("");
     const [isInputVisible, setInputVisible] = useState<boolean>(false);
-    const {findChannelsByName} = useContext(ChannelsServiceContext);
+    const {findChannelsByName, logout} = useContext(ChannelsServiceContext);
     const navigate = useNavigate();
 
     const onSearchChange = (value: React.ChangeEvent<HTMLInputElement>) => setSearch(value.target.value);
@@ -98,6 +98,13 @@ export function Sidebar(): React.JSX.Element {
                     Create Channel
                 </div>
             </Link>
+
+            <button
+                className="w-14 h-14 overflow-hidden rounded-full transition-transform duration-300 ease-in-out transform hover:scale-110 hover:shadow-lg"
+                onClick={logout}
+            >
+                Logout
+            </button>
 
             <div className="w-12 h-0.5 bg-gray-700"></div>
 
