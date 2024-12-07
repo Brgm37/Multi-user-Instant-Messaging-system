@@ -2,15 +2,12 @@ import {ChannelInput, CreateChannelsState, makeInitialState} from "./states/crea
 import {CreateChannelsAction} from "./states/createChannelsAction";
 import {useContext, useEffect, useReducer} from "react";
 import {CreateChannelsServiceContext} from "../../../service/createChannels/createChannelsServiceContext";
-import {isFailure} from "../../../model/Either";
 import {UseCreateChannelHandler} from "./handler/UseCreateChannelHandler";
 
 /**
  * The delay for debounce.
  */
 const DEBOUNCE_DELAY = 500;
-
-const ERROR_MESSAGE = "An error occurred while creating the channel. Please try again later."
 
 function reduce(state: CreateChannelsState, action: CreateChannelsAction): CreateChannelsState {
     switch (state.tag) {
@@ -24,8 +21,12 @@ function reduce(state: CreateChannelsState, action: CreateChannelsAction): Creat
                     const input = { ...state.input, description: action.inputValue };
                     return { tag: "editing", input: input };
                 }
-                case "submit": {
-                    return { tag: "submitting", input: state.input };
+                case "validation": {
+                    if (action.name === state.input.name) {
+                        const input = {...state.input, name: action.name};
+                        return {tag: "validating", input: input};
+                    }
+                    return state;
                 }
                 default:
                     throw Error("Invalid action" + action.type);
@@ -42,7 +43,46 @@ function reduce(state: CreateChannelsState, action: CreateChannelsAction): Creat
         case "error":
             switch (action.type) {
                 case "go-back":
-                    return { tag: "editing", input: state.input };
+                    const input: ChannelInput = {
+                        name: state.input.name,
+                        visibility: state.input.visibility,
+                        access: state.input.access,
+                        description: state.input.description,
+                        icon: state.input.icon
+                    }
+                    return { tag: "editing", input: input };
+                default:
+                    throw Error("Invalid action");
+            }
+        case "validating":
+            switch (action.type) {
+                case "editName": {
+                    const input = {
+                        name: action.inputValue,
+                        visibility: state.input.visibility,
+                        access: state.input.access,
+                        description: state.input.description,
+                        icon: state.input.icon
+                    }
+                    return { tag: "editing", input: input };
+                }
+                case "editDescription": {
+                    const input = {
+                        name: state.input.name,
+                        visibility: state.input.visibility,
+                        access: state.input.access,
+                        description: action.inputValue,
+                        icon: state.input.icon
+                    }
+                    return { tag: "editing", input: input };
+                }
+                case "validated": {
+                    const input = { ...state.input, isValid: action.isValidInput };
+                    return { tag: "validating", input: input };
+                }
+                case "submit": {
+                    return { tag: "submitting", input: state.input };
+                }
                 default:
                     throw Error("Invalid action");
             }
@@ -60,29 +100,23 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
     useEffect(() => {
         const timeout = setTimeout(() => {
             if (state.tag !== "editing") return;
+            if (state.input.name === "") return;
+            dispatch({ type: "validation", name: state.input.name });
             service.findChannelByName(state.input.name).then(response => {
                 if (response.tag === "success") {
-                    dispatch({ type: "editName", inputValue: state.input.name })
-                    state.input.isValid = false;
+                    dispatch({ type: "validated", isValidInput: false });
                 }else{
-                    state.input.isValid = true
+                    dispatch({ type: "validated", isValidInput: true });
                 }
             })
+
         }, DEBOUNCE_DELAY);
         return () => clearTimeout(timeout);
-    }, [state.tag, state.input.name]);
+    }, [state.input.name]);
 
     const handler: UseCreateChannelHandler = {
         onNameChange(name: string) {
-            if (state.tag !== "editing") return;
-            service.findChannelByName(name).then(response => {
-                if (response.tag === "success") {
-                    state.input.isValid = false;
-                }else{
-                    state.input.isValid = true
-
-                }
-            })
+            if (state.tag !== "editing" && state.tag !== "validating") return;
             dispatch({ type: "editName", inputValue: name })
         },
 
@@ -90,18 +124,17 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
             if (state.tag !== "editing") return;
             dispatch({ type: "editDescription", inputValue: description });
         },
-
         goBack() {
             if (state.tag !== "error") return;
             dispatch({ type: "editName", inputValue: state.input.name });
         },
         onSubmit(channel: ChannelInput) {
-            if (state.tag !== "editing") return;
+            if (state.tag !== "validating") return;
             if (!state.input.isValid) return;
             service.createChannel(channel.name, channel.visibility, channel.access, channel.description, channel.icon)
                 .then(response => {
                     if (response.tag === "success") dispatch({ type: "success", input: state.input });
-                    else dispatch({ type: "error", message: ERROR_MESSAGE });
+                    else dispatch({ type: "error", message: response.value});
                 });
             dispatch({ type: "submit" });
         }
