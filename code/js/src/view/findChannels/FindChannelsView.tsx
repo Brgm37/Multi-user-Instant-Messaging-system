@@ -41,7 +41,7 @@ export function     FindChannelsView(): React.JSX.Element {
                     value={state.searchBar}
                     onChange={handler.onSearchChange}
                     placeholder={"Search for channels"}
-                    className={"bg-gray-700 text-white p-2 rounded ml-auto"}
+                    className={"bg-black text-white p-2 rounded ml-auto"}
                 />
             </header>
             <div className={"h-myscreen overflow-y-auto scrollbar-hidden"}>
