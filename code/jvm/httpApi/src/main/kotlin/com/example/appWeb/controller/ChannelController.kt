@@ -71,10 +71,10 @@ class ChannelController(
     @GetMapping(CHANNEL_ID_URL)
     @ChannelSwaggerConfig.GetChannel
     fun getChannel(
-        @PathVariable @Range(min = 1) channelId: UInt,
+        @PathVariable @Range(min = 1) cId: UInt,
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
-        when (val response = channelService.getChannel(channelId)) {
+        when (val response = channelService.getChannel(cId)) {
             is Success -> {
                 ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
             }
@@ -98,6 +98,24 @@ class ChannelController(
 
             is Success -> {
                 ResponseEntity.ok(response.value.map(ChannelListOutputModel::fromDomain))
+            }
+        }
+
+    @GetMapping(CHANNEL_BY_NAME)
+    @ChannelSwaggerConfig.GetChannelByName
+    fun getChannelByName(
+        @PathVariable name: String,
+        @RequestParam offset: UInt = OFFSET,
+        @RequestParam limit: UInt = LIMIT,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> =
+        when (val response = channelService.getByName(decodeName(name), offset, limit)) {
+            is Success -> {
+                ResponseEntity.ok(response.value.map(ChannelListOutputModel::fromDomain))
+            }
+
+            is Failure -> {
+                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
             }
         }
 
@@ -133,6 +151,43 @@ class ChannelController(
         }
     }
 
+    @DeleteMapping(CHANNEL_ID_URL)
+    fun deleteChannel(
+        @PathVariable @Range(min = 1) cId: UInt,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> =
+        when (channelService.deleteOrLeaveChannel(authenticated.uId, cId)) {
+            is Success -> ResponseEntity.ok(Unit)
+            is Failure -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+        }
+
+    @PutMapping(CHANNEL_ID_URL)
+    fun updateChannel(
+        @PathVariable @Range(min = 1) cId: UInt,
+        @Valid @RequestBody channel: UpdateChannelInputModel,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> {
+        channelService
+            .updateChannel(
+                id = cId,
+                name = channel.name,
+                accessControl = channel.accessControl,
+                visibility = channel.visibility,
+                description = channel.description,
+                icon = channel.icon,
+            ).let { response ->
+                return when (response) {
+                    is Success -> {
+                        ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
+                    }
+
+                    is Failure -> {
+                        ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+                    }
+                }
+            }
+    }
+
     @PostMapping(CHANNEL_INVITATION_URL)
     @ChannelSwaggerConfig.CreateChannelInvitation
     fun createChannelInvitation(
@@ -160,110 +215,6 @@ class ChannelController(
             }
         }
     }
-
-    @GetMapping(CHANNEL_NAME_URL)
-    @ChannelSwaggerConfig.GetChannelByName
-    fun getChannelByName(
-        @PathVariable name: String,
-        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
-    ): ResponseEntity<*> =
-        when (val response = channelService.getByName(decodeName(name))) {
-            is Success -> {
-                ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
-            }
-
-            is Failure -> {
-                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
-            }
-        }
-
-    @GetMapping(CHANNEL_PARTIAL_NAME_URL)
-    @ChannelSwaggerConfig.GetChannelByPartialName
-    fun getChannelByPartialName(
-        @PathVariable name: String,
-        @RequestParam offset: UInt = OFFSET,
-        @RequestParam limit: UInt = LIMIT,
-        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
-    ): ResponseEntity<*> =
-        when (val response = channelService.getByName(decodeName(name), offset, limit)) {
-            is Success -> {
-                ResponseEntity.ok(response.value.map(ChannelListOutputModel::fromDomain))
-            }
-
-            is Failure -> {
-                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
-            }
-        }
-
-    @GetMapping(MY_CHANNELS)
-    fun getMyChannels(
-        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
-        @RequestParam offset: UInt = OFFSET,
-        @RequestParam limit: UInt = LIMIT,
-    ): ResponseEntity<*> =
-        when (val response = channelService.getChannels(authenticated.uId, offset, limit)) {
-            is Success -> {
-                ResponseEntity.ok(response.value.map(ChannelListOutputModel::fromDomain))
-            }
-
-            is Failure -> {
-                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
-            }
-        }
-
-    @GetMapping(MY_CHANNELS_WITH_NAME)
-    fun getMyChannelsWithName(
-        @PathVariable name: String,
-        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
-        @RequestParam offset: UInt = OFFSET,
-        @RequestParam limit: UInt = LIMIT,
-    ): ResponseEntity<*> =
-        when (val response = channelService.getByName(authenticated.uId, decodeName(name), offset, limit)) {
-            is Success -> {
-                ResponseEntity.ok(response.value.map(ChannelListOutputModel::fromDomain))
-            }
-
-            is Failure -> {
-                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
-            }
-        }
-
-    @PutMapping(CHANNEL_ID_URL)
-    fun updateChannel(
-        @PathVariable @Range(min = 1) channelId: UInt,
-        @Valid @RequestBody channel: UpdateChannelInputModel,
-        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
-    ): ResponseEntity<*> {
-        channelService
-            .updateChannel(
-                id = channelId,
-                name = channel.name,
-                accessControl = channel.accessControl,
-                visibility = channel.visibility,
-                description = channel.description,
-                icon = channel.icon,
-            ).let { response ->
-                return when (response) {
-                    is Success -> {
-                        ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
-                    }
-
-                    is Failure -> {
-                        ChannelProblem.ChannelNotFound.response(NOT_FOUND)
-                    }
-                }
-            }
-    }
-
-    @GetMapping(ACCESS_CONTROL)
-    fun getAccessControl(
-        @PathVariable cId: UInt,
-        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
-    ): ResponseEntity<*> =
-        when (val response = channelService.getAccessControl(authenticated.uId, cId)) {
-            is Success -> ResponseEntity.ok(AccessControlOutPutModel.fromAccessControl(response.value))
-            is Failure -> ChannelProblem.AccessControlNotFound.response(NOT_FOUND)
-        }
 
     @PutMapping(CHANNEL_INVITATION_URL)
     fun joinChannel(
@@ -297,14 +248,64 @@ class ChannelController(
             }
         }
 
-    @DeleteMapping(CHANNEL_ID_URL)
-    fun deleteChannel(
-        @PathVariable @Range(min = 1) channelId: UInt,
+    @GetMapping(PUBLIC_BY_NAME)
+    fun getPublicChannelsByName(
+        @PathVariable name: String,
+        @RequestParam offset: UInt = OFFSET,
+        @RequestParam limit: UInt = LIMIT,
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
-        when (channelService.deleteOrLeaveChannel(authenticated.uId, channelId)) {
-            is Success -> ResponseEntity.ok(Unit)
-            is Failure -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+        when (val response = channelService.getPublicByName(authenticated.uId, decodeName(name), offset, limit)) {
+            is Success -> {
+                ResponseEntity.ok(response.value.map(ChannelListOutputModel::fromDomain))
+            }
+
+            is Failure -> {
+                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+            }
+        }
+
+    @GetMapping(MY_CHANNELS)
+    fun getMyChannels(
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+        @RequestParam offset: UInt = OFFSET,
+        @RequestParam limit: UInt = LIMIT,
+    ): ResponseEntity<*> =
+        when (val response = channelService.getChannels(authenticated.uId, offset, limit)) {
+            is Success -> {
+                ResponseEntity.ok(response.value.map(ChannelListOutputModel::fromDomain))
+            }
+
+            is Failure -> {
+                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+            }
+        }
+
+    @GetMapping(MY_CHANNELS_BY_NAME)
+    fun getMyChannelsWithName(
+        @PathVariable name: String,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+        @RequestParam offset: UInt = OFFSET,
+        @RequestParam limit: UInt = LIMIT,
+    ): ResponseEntity<*> =
+        when (val response = channelService.getByName(authenticated.uId, decodeName(name), offset, limit)) {
+            is Success -> {
+                ResponseEntity.ok(response.value.map(ChannelListOutputModel::fromDomain))
+            }
+
+            is Failure -> {
+                ChannelProblem.ChannelNotFound.response(NOT_FOUND)
+            }
+        }
+
+    @GetMapping(ACCESS_CONTROL)
+    fun getAccessControl(
+        @PathVariable cId: UInt,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+    ): ResponseEntity<*> =
+        when (val response = channelService.getAccessControl(authenticated.uId, cId)) {
+            is Success -> ResponseEntity.ok(AccessControlOutPutModel.fromAccessControl(response.value))
+            is Failure -> ChannelProblem.AccessControlNotFound.response(NOT_FOUND)
         }
 
     companion object {
@@ -316,22 +317,17 @@ class ChannelController(
         /**
          * The URL for the channel with the given id.
          */
-        const val CHANNEL_ID_URL = "/{channelId}"
+        const val CHANNEL_ID_URL = "/{cId}"
+
+        /**
+         * The URL for the channel with the given name.
+         */
+        const val CHANNEL_BY_NAME = "/name/{name}"
 
         /**
          * The URL for the channel invitations.
          */
         const val CHANNEL_INVITATION_URL = "/invitations"
-
-        /**
-         * The URL for the channel with the given name.
-         */
-        const val CHANNEL_NAME_URL = "/name/{name}"
-
-        /**
-         * The URL for the channel with the given partial name.
-         */
-        const val CHANNEL_PARTIAL_NAME_URL = "/search/{name}"
 
         /**
          * The URL for the user's channels.
@@ -341,10 +337,21 @@ class ChannelController(
         /**
          * The URL for the user's channels with the given name.
          */
-        const val MY_CHANNELS_WITH_NAME = "${MY_CHANNELS}/{name}"
+        const val MY_CHANNELS_BY_NAME = "${MY_CHANNELS}/{name}"
 
-        const val ACCESS_CONTROL = "/accessControl/{cId}"
-
+        /**
+         * The URL for the public channels.
+         */
         const val PUBLIC = "/public"
+
+        /**
+         * The URL for the public channels with the given name.
+         */
+        const val PUBLIC_BY_NAME = "$PUBLIC/{name}"
+
+        /**
+         * The URL for the access control of a user in a channel.
+         */
+        const val ACCESS_CONTROL = "/accessControl/{cId}"
     }
 }

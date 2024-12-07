@@ -264,7 +264,7 @@ class ChannelServicesTest {
             val newChannel = createChannel(uId, name, READ_WRITE.name, PUBLIC.name)
             assertIs<Success<Channel>>(newChannel, "Channel creation failed")
             assertNotNull(newChannel.value.cId, "Channel id is null")
-            val result = getByName(newChannel.value.name.fullName)
+            val result = getPublicByName(newChannel.value.name.fullName)
             assertIs<Success<Channel>>(result, "Channel retrieval failed")
             assertEquals(newChannel.value, result.value, "Channel is different")
         }
@@ -273,7 +273,7 @@ class ChannelServicesTest {
     @MethodSource("transactionManagers")
     fun `fail to find a channel by its name`(manager: TransactionManager) =
         testSetup(manager) { _ ->
-            val result = getByName("name")
+            val result = getPublicByName("name")
             assertIs<Failure<ChannelError>>(result, "Channel retrieval should have failed")
             assertEquals(ChannelError.ChannelNotFound, result.value, "Channel error is different")
         }
@@ -289,7 +289,7 @@ class ChannelServicesTest {
                 assertIs<Success<Channel>>(newChannel, "Channel creation failed")
                 assertNotNull(newChannel.value.cId, "Channel id is null")
             }
-            val result = getByName("name", 0u, nr.toUInt())
+            val result = getPublicByName("name", 0u, nr.toUInt())
             assertIs<Success<List<Channel>>>(result, "Channels retrieval failed")
             assertEquals(nr, result.value.size, "Number of channels is different")
         }

@@ -404,7 +404,7 @@ class ChannelJDBC(
         }
     }
 
-    override fun findByName(name: String): Channel? {
+    override fun findPublicByName(name: String): Channel? {
         val selectQuery =
             """
             SELECT 
@@ -423,7 +423,8 @@ class ChannelJDBC(
         }
     }
 
-    override fun findByName(
+    override fun findPublicByName(
+        uId: UInt,
         name: String,
         offset: UInt,
         limit: UInt,
@@ -434,13 +435,20 @@ class ChannelJDBC(
             	channel_id, channel_name, channel_owner, channel_accessControl,
             	channel_visibility, owner_name, channel_description, channel_icon
             FROM v_channel
-            WHERE LOWER(channel_name) LIKE LOWER(?) AND channel_visibility = '${PUBLIC.name}'
+            WHERE compare_partial_name(channel_name, ?)  
+            AND channel_visibility = '${PUBLIC.name}'
+            AND channel_id NOT IN (
+                SELECT channel
+                FROM channel_members
+                WHERE member = ?
+            )
             LIMIT ?
             OFFSET ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
-        stm.setString(idx++, "%$name%")
+        stm.setString(idx++, name)
+        stm.setInt(idx++, uId.toInt())
         stm.setInt(idx++, limit.toInt())
         stm.setInt(idx, offset.toInt())
         val rs = stm.executeQuery()
@@ -466,6 +474,30 @@ class ChannelJDBC(
         val stm = connection.prepareStatement(selectQuery)
         var idx = 1
         stm.setInt(idx++, uId.toInt())
+        stm.setString(idx++, name)
+        stm.setInt(idx++, limit.toInt())
+        stm.setInt(idx, offset.toInt())
+        val rs = stm.executeQuery()
+        return rs.toChannelList()
+    }
+
+    override fun findByName(
+        name: String,
+        offset: UInt,
+        limit: UInt,
+    ): List<Channel> {
+        val selectQuery =
+            """
+            SELECT 
+            	channel_id, channel_name, channel_owner, channel_accessControl,
+            	channel_visibility, owner_name, channel_description, channel_icon
+            FROM v_channel
+            WHERE compare_partial_name(channel_name, ?)
+            LIMIT ?
+            OFFSET ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
         stm.setString(idx++, name)
         stm.setInt(idx++, limit.toInt())
         stm.setInt(idx, offset.toInt())

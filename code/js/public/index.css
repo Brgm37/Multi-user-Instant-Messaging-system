@@ -65,6 +65,11 @@ body {
 }
 
 .scrollable-sidebar {
+    flex-direction: column;
+    height: 100vh;
+    display: flex;
+    overflow-y: auto;
+    overflow-x: hidden;
     -ms-overflow-style: none;
 }
 

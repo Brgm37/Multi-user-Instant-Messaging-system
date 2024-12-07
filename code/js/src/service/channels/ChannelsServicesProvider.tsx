@@ -14,6 +14,7 @@ export function ChannelsServicesProvider(
 ): React.ReactElement {
     const signal = useSignal()
     const navigate = useNavigate()
+    const getInit: RequestInit = {method: "GET", credentials: "include", signal}
     const service: ChannelsServiceContext = {
         async logout(): Promise<void> {
             const url = userUrlBase + "/logout"
@@ -28,7 +29,7 @@ export function ChannelsServicesProvider(
         },
         findChannels: async (offset: number, limit: number): Promise<Either<Channel[], string>> => {
             const url = channelUrlBase + `/my?offset=${offset}&limit=${limit}`
-            const response = await fetch(url)
+            const response = await fetch(url, getInit)
             if (response.ok) {
                 const channels = await response.json()
                 return success(
@@ -42,7 +43,7 @@ export function ChannelsServicesProvider(
         },
         findChannelsByName: async (name: string, offset: number, limit: number): Promise<Either<Channel[], string>> => {
             const url = channelUrlBase + `/my/${name}?offset=${offset}&limit=${limit}`
-            const response = await fetch(url)
+            const response = await fetch(url, getInit)
             if (response.ok) {
                 const channels = await response.json()
                 return success(

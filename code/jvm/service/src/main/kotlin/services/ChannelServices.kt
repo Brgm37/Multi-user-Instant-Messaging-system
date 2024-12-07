@@ -74,7 +74,7 @@ class ChannelServices(
                     description = description,
                     icon = ic,
                 )
-            val checkChannel = channelRepo.findByName(channel.name.fullName)
+            val checkChannel = channelRepo.findPublicByName(channel.name.fullName)
             if (checkChannel != null) return@run failure(UnableToCreateChannel)
             val createdChannel = channelRepo.createChannel(channel) ?: return@run failure(UnableToCreateChannel)
             success(createdChannel)
@@ -166,10 +166,10 @@ class ChannelServices(
             }
     }
 
-    override fun getByName(name: String): Either<ChannelError, Channel> =
+    override fun getPublicByName(name: String): Either<ChannelError, Channel> =
         repoManager
             .run {
-                val channel = channelRepo.findByName(name) ?: return@run failure(ChannelNotFound)
+                val channel = channelRepo.findPublicByName(name) ?: return@run failure(ChannelNotFound)
                 val cId = checkNotNull(channel.cId) { "Channel id is null" }
                 val messages = messageRepo.findMessagesByChannelId(cId, MSG_LIMIT, MSG_OFFSET)
                 return@run when (channel) {
@@ -178,14 +178,15 @@ class ChannelServices(
                 }
             }
 
-    override fun getByName(
+    override fun getPublicByName(
+        uId: UInt,
         name: String,
         offset: UInt,
         limit: UInt,
     ): Either<ChannelError, List<Channel>> =
         repoManager
             .run {
-                val channels = channelRepo.findByName(name, offset, limit)
+                val channels = channelRepo.findPublicByName(uId, name, offset, limit)
                 success(channels)
             }
 
@@ -199,6 +200,16 @@ class ChannelServices(
             val user = userRepo.findById(userId) ?: return@run failure(UserNotFound)
             val uId = checkNotNull(user.uId) { "User id is null" }
             val channels = channelRepo.findByName(uId, name, offset, limit)
+            success(channels)
+        }
+
+    override fun getByName(
+        name: String,
+        offset: UInt,
+        limit: UInt,
+    ): Either<ChannelError, List<Channel>> =
+        repoManager.run {
+            val channels = channelRepo.findByName(name, offset, limit)
             success(channels)
         }
 

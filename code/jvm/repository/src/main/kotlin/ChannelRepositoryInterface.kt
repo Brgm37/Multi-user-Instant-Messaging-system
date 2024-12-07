@@ -100,7 +100,7 @@ interface ChannelRepositoryInterface : Repository<Channel> {
      * @param name The name of the channel
      * @return The channel with the given name
      */
-    fun findByName(name: String): Channel?
+    fun findPublicByName(name: String): Channel?
 
     /**
      * Retrieves a channel list by its name
@@ -109,7 +109,8 @@ interface ChannelRepositoryInterface : Repository<Channel> {
      * @param offset The offset for the channels
      * @param limit The maximum number of channels to retrieve
      */
-    fun findByName(
+    fun findPublicByName(
+        uId: UInt,
         name: String,
         offset: UInt = OFFSET,
         limit: UInt = LIMIT,
@@ -125,6 +126,19 @@ interface ChannelRepositoryInterface : Repository<Channel> {
      */
     fun findByName(
         uId: UInt,
+        name: String,
+        offset: UInt = OFFSET,
+        limit: UInt = LIMIT,
+    ): List<Channel>
+
+    /**
+     * Retrieves all channels with a name that partially matches the given name.
+     *
+     * @param name The name of the channel
+     * @param offset The offset for the channels
+     * @param limit The maximum number of channels to retrieve
+     */
+    fun findByName(
         name: String,
         offset: UInt = OFFSET,
         limit: UInt = LIMIT,

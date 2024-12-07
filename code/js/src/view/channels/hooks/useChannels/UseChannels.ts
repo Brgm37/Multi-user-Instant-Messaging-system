@@ -1,5 +1,5 @@
 import {ChannelsState} from "./state/ChannelsState";
-import {useContext, useReducer} from "react";
+import {useContext, useEffect, useReducer} from "react";
 import {ChannelsHandler} from "./handler/ChannelsHandler";
 import {ChannelsServiceContext} from "../../../../service/channels/ChannelsServiceContext";
 import useScroll, {
@@ -50,6 +50,15 @@ export default function (): [ChannelsState, UseScrollState<Channel>, ChannelsHan
     const initialState: ChannelsState = {tag: "idle"}
     const [state, dispatch] = useReducer(reduce, initialState)
     const {findChannels} = useContext(ChannelsServiceContext)
+
+
+    useEffect(() => {
+        if (state.tag === "idle") return
+        if (state.tag === "scrolling") return
+        if (state.tag === "error") return
+        if (state.tag === "loading") dispatch({tag: "loadSuccess"})
+    }, [list]);
+
     const handler: ChannelsHandler = {
         goBack(): void {
             if (state.tag !== "error") return
