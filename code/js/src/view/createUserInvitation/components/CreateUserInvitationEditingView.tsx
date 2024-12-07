@@ -1,4 +1,5 @@
 import React from "react";
+import {expirationDateToTimeFormat} from "../../../service/utils/expirationDateToTimeFormat";
 
 const expirationDateOptions = [
     "30 minutes",
@@ -8,29 +9,11 @@ const expirationDateOptions = [
     "7 days"
 ]
 
-function expirationDateToTimeFormat(expirationDate: string): string {
-    switch (expirationDate) {
-        case "30 minutes":
-            return "00:30:00";
-        case "1 hour":
-            return "01:00:00";
-        case "6 hours":
-            return "06:00:00";
-        case "1 day":
-            return "24:00:00";
-        case "7 days":
-            return "168:00:00";
-        default:
-            throw new Error("Invalid expiration date");
-    }
-}
-
 export function CreateUserInvitationEditingView(
     {onGenerate}: {onGenerate: (expirationDate: string) => void}
 ): React.JSX.Element {
     const handleGenerateCode = () => {
         const expirationDate = expirationDateToTimeFormat((document.querySelector("select[title=expirationDate]") as HTMLSelectElement).value);
-
         onGenerate(expirationDate);
     }
 

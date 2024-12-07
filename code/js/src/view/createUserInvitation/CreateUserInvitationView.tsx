@@ -1,10 +1,10 @@
 import React from "react";
-import {CreateChannelInvitationState} from "../createChannelInvitation/hooks/states/CreateChannelInvitationState";
 
 import {CreateUserInvitationState} from "./hooks/states/CreateUserInvitationState";
 import {UseCreateUserInvitationHandler} from "./hooks/handler/UseCreateUserInvitationHandler";
 import {useCreateUserInvitation} from "./hooks/UseCreateUserInvitation";
 import {CreateUserInvitationEditingView} from "./components/CreateUserInvitationEditingView";
+import {FaClipboard} from "react-icons/fa";
 
 
 export function CreateUserInvitationView(): React.JSX.Element {
@@ -17,7 +17,23 @@ export function CreateUserInvitationView(): React.JSX.Element {
             case "creating":
                 return <div>Creating...</div>
             case "showingInvitationCode":
-                return <div>Showing invitation code...${state.invitationCode}</div>
+                return (
+                    <div className="flex flex-col items-center p-6 bg-gray-800 rounded-lg shadow-lg max-w-sm mx-auto">
+                        <div className="text-xl font-bold text-white mb-4 text-center">
+                            {state.invitationCode}
+                        </div>
+                        <button
+                            onClick={() => {
+                                navigator.clipboard.writeText(state.invitationCode)
+                                    .then(() => alert('Invitation code copied to clipboard!'));
+                            }}
+                            className="mt-2 p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200 ease-in-out w-full flex justify-center items-center"
+                        >
+                            <FaClipboard className="h-6 w-6" aria-hidden="true"/>
+                        </button>
+                    </div>
+                )
+                //return <div>Showing invitation code...${state.invitationCode}</div>
             case "error":
                 return <div>Error: ${state.message}</div>
             case "closing":
