@@ -8,7 +8,7 @@ export interface CreateUserInvitationServiceContext {
 }
 
 const defaultCreateUserInvitationServiceContext: CreateUserInvitationServiceContext = {
-    createUserInvitation: () => {
+    createUserInvitation: (expirationDate) => {
         return new Promise<Either<{invitationCode: string}, string>>((_, reject) => {
             reject(new Error("Not implemented"))
         })
