@@ -11,7 +11,7 @@ export function ChannelsView(): React.JSX.Element {
     const provider: InfiniteScrollContext<Channel> = {
         isLoading: state.tag !== "loading" || state.at === "both" ? false : state.at,
         items: channels,
-        loadMore: handler.loadMore,
+        loadMore(offset, at) {handler.loadMore(offset, at)},
         renderItems(item: Channel): React.ReactNode {
             return (
                 <div
