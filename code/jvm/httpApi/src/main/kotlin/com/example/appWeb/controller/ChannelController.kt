@@ -322,7 +322,7 @@ class ChannelController(
         /**
          * The URL for the channel with the given name.
          */
-        const val CHANNEL_BY_NAME = "/{name}"
+        const val CHANNEL_BY_NAME = "/name/{name}"
 
         /**
          * The URL for the channel invitations.
