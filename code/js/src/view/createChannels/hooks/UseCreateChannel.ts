@@ -10,7 +10,7 @@ import {UseCreateChannelHandler} from "./handler/UseCreateChannelHandler";
  */
 const DEBOUNCE_DELAY = 500;
 
-const ERROR_MESSAGE = "Channel name already exists"
+const ERROR_MESSAGE = "An error occurred while creating the channel. Please try again later."
 
 function reduce(state: CreateChannelsState, action: CreateChannelsAction): CreateChannelsState {
     switch (state.tag) {
@@ -57,51 +57,33 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
     const [state, dispatch] = useReducer(reduce, makeInitialState())
     const service = useContext(CreateChannelsServiceContext)
 
-    /**
     useEffect(() => {
-         if (state.tag !== "editing") return
-         const timeout = setTimeout(() => {
-             const fetchChannel=
-                 state.input.name !== "" ?
-                 service.findChannelByName(state.input.name) :
-                 null
-             if(fetchChannel){
-                 fetchChannel
-                     .then(response => {
-                         if (isFailure(response)) dispatch({type: "edit", inputValue: state.input.name})
-                         else {
-                             dispatch({type: "edit", inputValue: state.input.name})
-                             state.input.isValid = false
-                         }
-                     })
-             }
-         }, DEBOUNCE_DELAY)
-         return () => clearTimeout(timeout)
-    }, [state.tag, state.input.name]);
-
-    useEffect(() => {
-        if (state.tag !== "submitting") return
-        service
-            .createChannel(state.input.name, state.input.visibility, state.input.access)
-            .then(response => {
-                if (isFailure(response)) dispatch({type: "error", message: response.value})
-                else dispatch({type: "success", input: state.input})
+        const timeout = setTimeout(() => {
+            if (state.tag !== "editing") return;
+            service.findChannelByName(state.input.name).then(response => {
+                if (response.tag === "success") {
+                    dispatch({ type: "editName", inputValue: state.input.name })
+                    state.input.isValid = false;
+                }else{
+                    state.input.isValid = true
+                }
             })
-    }, [state.tag]);
-    */
+        }, DEBOUNCE_DELAY);
+        return () => clearTimeout(timeout);
+    }, [state.tag, state.input.name]);
 
     const handler: UseCreateChannelHandler = {
         onNameChange(name: string) {
             if (state.tag !== "editing") return;
             service.findChannelByName(name).then(response => {
                 if (response.tag === "success") {
-                    dispatch({ type: "editName", inputValue: name })
                     state.input.isValid = false;
                 }else{
                     state.input.isValid = true
-                    dispatch({ type: "editName", inputValue: name })
+
                 }
             })
+            dispatch({ type: "editName", inputValue: name })
         },
 
         onDescriptionChange(description: string) {
@@ -119,7 +101,7 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
             service.createChannel(channel.name, channel.visibility, channel.access, channel.description, channel.icon)
                 .then(response => {
                     if (response.tag === "success") dispatch({ type: "success", input: state.input });
-                    else dispatch({ type: "error", message: response.value });
+                    else dispatch({ type: "error", message: ERROR_MESSAGE });
                 });
             dispatch({ type: "submit" });
         }
