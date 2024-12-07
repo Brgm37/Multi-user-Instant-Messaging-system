@@ -7,12 +7,39 @@
     100% {transform: rotate(360deg);}
 }
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     overflow: hidden;
     height: 100vh;
     margin: 0;
+    line-height: 1.6;
 }
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 10px;
+    }
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 .card:hover {
     transform: scale(1.05);
     transition: transform 0.3s;
@@ -42,14 +69,28 @@ body {
 }
 
 .popup {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    z-index: 50;
+    background-color: black;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    word-break: break-word;
+    width: 100%;
+    text-align: center;
+}
+
+.group:hover .popup {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .scroll-container {
