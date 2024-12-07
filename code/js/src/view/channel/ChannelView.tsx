@@ -43,6 +43,7 @@ export function ChannelView(): React.JSX.Element {
                     error={state.tag === "error" ? state.message : undefined}
                     errorDismiss={handler.goBack}
                     onSend={handler.sendMsg}
+                    onError={handler.error}
                 />
             </InfiniteMessageScrollContext.Provider>
         </InfiniteScrollContext.Provider>

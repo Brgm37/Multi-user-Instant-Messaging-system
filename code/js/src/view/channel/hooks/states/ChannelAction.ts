@@ -25,4 +25,5 @@ export type ChannelAction =
     { tag: "receiving-sse" } |
     { tag: "reload" } |
     { tag: "go-back" } |
-    { tag: "reset"}
+    { tag: "reset"} |
+    { tag: "error", error: string}
