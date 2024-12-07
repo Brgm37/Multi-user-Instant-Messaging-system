@@ -9,6 +9,8 @@ import {UseCreateChannelHandler} from "./handler/UseCreateChannelHandler";
  */
 const DEBOUNCE_DELAY = 500;
 
+const ERROR_MESSAGE = "An error occurred while creating the channel. Please try again later.";
+
 function reduce(state: CreateChannelsState, action: CreateChannelsAction): CreateChannelsState {
     switch (state.tag) {
         case "editing":
@@ -134,7 +136,7 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
             service.createChannel(channel.name, channel.visibility, channel.access, channel.description, channel.icon)
                 .then(response => {
                     if (response.tag === "success") dispatch({ type: "success", input: state.input });
-                    else dispatch({ type: "error", message: response.value});
+                    else dispatch({ type: "error", message: ERROR_MESSAGE});
                 });
             dispatch({ type: "submit" });
         }
