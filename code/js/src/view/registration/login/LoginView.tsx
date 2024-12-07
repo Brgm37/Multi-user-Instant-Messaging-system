@@ -25,7 +25,7 @@ export function LoginView(): React.JSX.Element {
 
     if (state.tag === "redirect") {
         let source = location.state?.source;
-        if (!source) source = "/channels";
+        if (!source) source = "/channels/findChannels";
         else location.state.source = undefined;
         return <Navigate to={source} replace={true} />;
     }

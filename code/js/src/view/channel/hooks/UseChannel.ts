@@ -8,6 +8,7 @@ import envConfig from "../../../../envConfig.json";
 import reduce from "./reducer/Reducer";
 import {SseCommunicationServiceContext} from "../../../service/sse/SseCommunicationService";
 import {UseChannelHandler} from "./handler/UseChannelHandler";
+import {list} from "postcss";
 
 const LIST_SIZE = envConfig.messages_limit
 const DEFAULT_LIMIT = envConfig.default_messages_limit
@@ -124,6 +125,9 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
     }, [messages, state]);
 
     const handler: UseChannelHandler = {
+        error(error: string): void {
+            dispatch({tag: "error", error})
+        },
         reset() {
             if (state.tag !== "messages") return
             dispatch({tag: "reload"})

@@ -11,5 +11,6 @@ export type UseChannelHandler = {
     loadMore(at: "head" | "tail"): void
     sendMsg(msg: string): void
     goBack(): void,
-    reset(): void
+    reset(): void,
+    error(error: string): void
 }
