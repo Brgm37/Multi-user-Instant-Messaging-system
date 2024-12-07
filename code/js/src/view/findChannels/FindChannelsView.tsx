@@ -9,7 +9,7 @@ import {FindChannelsLoadingView} from "./components/FindChannelsLoadingView";
 import {UseFindChannelsHandler} from "./hooks/handler/UseFindChannelsHandler";
 import {InputBar} from "../components/InputBar";
 
-export function     FindChannelsView(): React.JSX.Element {
+export function FindChannelsView(): React.JSX.Element {
     const [state, handler]: [FindChannelState, UseFindChannelsHandler] = useFindChannels();
 
     if(state.tag === "redirect") {
