@@ -1,4 +1,12 @@
 export type UseFindChannelsHandler = {
+
+    /**
+     * The function to call when the component is initialized.
+     *
+     * @returns void
+     */
+    onInit: () => void
+
     /**
      * The function to call when the search bar changes.
      * @param searchBar
@@ -28,5 +36,5 @@ export type UseFindChannelsHandler = {
      * @param limit The limit of channels to fetch.
      * @returns void
      */
-    onFetchMore: () => void
+    onFetchMore: (offset: number, at: "head" | "tail") => void
 }

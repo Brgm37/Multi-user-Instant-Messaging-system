@@ -1,132 +1,122 @@
-import {Action} from "./states/FindChannelsAction";
 import {FindChannelState} from "./states/FindChannelsState";
-import {useContext, useEffect, useReducer} from "react";
+import {useContext, useEffect, useReducer, useRef, useState} from "react";
 import {UseFindChannelsHandler} from "./handler/UseFindChannelsHandler";
-import {isFailure} from "../../../model/Either";
 import envConfig from "../../../../envConfig.json"
+import reduce from "./reducer/FindChannelReducer";
 import {FindChannelsServiceContext} from "../../../service/findChannels/FindChannelsServiceContext";
+import useScroll, {HasMore, UseScrollHandler, UseScrollState} from "../../../service/utils/hooks/useScroll/UseScroll";
+import {PublicChannel} from "../../../model/PublicChannel";
 
-/**
- * The delay for debounce.
- */
-const DEBOUNCE_DELAY = 500;
+const LIST_SIZE = envConfig.channels_limit
+const DEFAULT_LIMIT = envConfig.default_limit
+let limit = DEFAULT_LIMIT
+const HAS_MORE = DEFAULT_LIMIT + 1
 
 /**
  * The number of channels to fetch per request.
  */
 const CHANNELS_PER_FETCH = envConfig.public_channels_limit
 
-/**
- * The default offset.
- */
-const DEFAULT_OFFSET = envConfig.default_offset
-
-/**
- * The reducer function for the find channels form.
- *
- * @param state
- * @param action
- *
- * @returns FindChannelState
- */
-export function reduce(state: FindChannelState, action: Action): FindChannelState {
-    switch (state.tag) {
-        case "navigating":
-            switch (action.type) {
-                case "error":
-                    return { tag: "error", error: action.error, channels: [], searchBar: state.searchBar }
-                case "fetchMore":
-                    return { tag: "fetchingMore", searchBar: state.searchBar, channels: state.channels }
-                case "join":
-                    return { tag: "joining", channels: state.channels , searchBar: state.searchBar, channelId: action.channelId }
-                case "edit":
-                    return { tag: "editing", searchBar: action.inputValue, channels: [] }
-                default:
-                    return state
-            }
-        case "fetchingMore":
-            switch (action.type) {
-                case "success":
-                    return { tag: "navigating", searchBar: state.searchBar, channels: [...state.channels, ...action.channels] }
-                case "error":
-                    return { tag: "error", error: action.error, channels: state.channels, searchBar: state.searchBar }
-                default:
-                    return state
-            }
-        case "error":
-            switch (action.type) {
-                case "closeError": 
-                    return { tag: "navigating", searchBar: "", channels: state.channels } 
-                default:
-                    return state
-            }
-        case "joining":
-            switch (action.type) {
-                case "joined":
-                    return { tag: "redirect", channelId: state.channelId, searchBar: state.searchBar }
-                case "error":
-                    return { tag: "error", error: action.error, channels: state.channels, searchBar: state.searchBar }
-                default:
-                    return state
-            }
-        case "editing":
-            switch (action.type) {
-                case "error":
-                    return { tag: "error", error: action.error, channels: [], searchBar: state.searchBar };
-                case "fetchMore":
-                    return { tag: "fetchingMore", searchBar: state.searchBar, channels: state.channels };
-                case "join":
-                    return { tag: "joining", channels: state.channels, searchBar: state.searchBar, channelId: action.channelId };
-                case "edit":
-                    return { tag: "editing", searchBar: action.inputValue, channels: [] };
-                case "success":
-                    return { tag: "navigating", searchBar: state.searchBar, channels: action.channels };
-                default:
-                    return state;
-            }
-        case "redirect":
-            throw Error("Already in final State 'redirect' and should not reducer to any other State.")
-        default:
-            throw Error("Invalid state")
-    }
+function resetList(
+    listHandler: UseScrollHandler<PublicChannel>,
+    result: PublicChannel[],
+): void {
+    const channels = result.slice(0, limit)
+    if (channels.length < limit) limit = channels.length
+    else limit = DEFAULT_LIMIT
+    const hasMore = {head: false, tail: result.length === HAS_MORE}
+    listHandler.reset(channels, hasMore)
 }
 
-const initialState: FindChannelState = { tag: "navigating", searchBar: "", channels: [] }
+function addItems(
+    at: "head" | "tail",
+    offset: number,
+    listHandler: UseScrollHandler<PublicChannel>,
+    list: UseScrollState<PublicChannel>,
+    result: PublicChannel[],
+): void {
+    const channels = result.slice(0, limit)
+    if (channels.length < limit) limit = channels.length
+    else limit = DEFAULT_LIMIT
+    const tail =
+        result.length === HAS_MORE && at === "tail" ||
+        at === "head" && list.list.length === LIST_SIZE
+    const hasMore: HasMore = {
+        head: offset > 0 && list.list.length === LIST_SIZE,
+        tail
+    }
+    listHandler.addItems(channels, at, hasMore)
+}
 
-export function useFindChannels(): [FindChannelState, UseFindChannelsHandler] {
-    const { getChannelsByPartialName, getPublicChannels, joinChannel } = useContext(FindChannelsServiceContext)
+export function useFindChannels(): [FindChannelState, UseScrollState<PublicChannel>, string, UseFindChannelsHandler] {
+    const [list, listHandler] = useScroll<PublicChannel>(LIST_SIZE)
+    const [searchValue, setSearchValue] = useState<string>("")
+    const initialState: FindChannelState = {tag: "idle"}
     const [state, dispatch] = useReducer(reduce, initialState)
+    const {getChannelsByPartialName, getPublicChannels, joinChannel} = useContext(FindChannelsServiceContext)
+    const wasMounted = useRef(false)
 
     useEffect(() => {
-        if (state.tag !== "editing") return;
-        const timeout = setTimeout(() => {
-            const fetchChannels =
-                state.searchBar === ""
-                    ? getPublicChannels(DEFAULT_OFFSET, CHANNELS_PER_FETCH)
-                    : getChannelsByPartialName(state.searchBar, DEFAULT_OFFSET, CHANNELS_PER_FETCH);
-            fetchChannels
+        if (!wasMounted.current) {
+            wasMounted.current = true
+            return
+        }
+        if (state.tag === "idle") return
+        if (state.tag === "error") return
+        if (searchValue === "") {
+            getPublicChannels(0, HAS_MORE)
                 .then((response) => {
-                    if (isFailure(response)) dispatch({ type: "error", error: response.value })
-                    else dispatch({ type: "success", channels: response.value })
+                    if (response.tag === "success") resetList(listHandler, response.value)
+                    else dispatch({type: "error", error: response.value})
                 })
-        }, DEBOUNCE_DELAY);
-        return () => clearTimeout(timeout);
-    }, [state.searchBar, state.tag]);
+        } else {
+            getChannelsByPartialName(searchValue, 0, HAS_MORE)
+                .then((response) => {
+                    if (response.tag === "success") resetList(listHandler, response.value)
+                    else dispatch({type: "error", error: response.value})
+                })
+        }
+    }, [searchValue]);
 
-    const onSearchChange = (searchBar: string) => {
-        if (state.tag !== "navigating" && state.tag !== "editing") return
-        dispatch({type: "edit", inputValue: searchBar, inputName: "searchBar"})
+    useEffect(() => {
+        if (state.tag === "idle") return
+        if (state.tag === "error") return
+        if (state.tag === "scrolling") return
+        if (state.tag === "loading") dispatch({type: "success"})
+    }, [list]);
+
+    const onInit = () => {
+        if (state.tag != "idle") return
+        dispatch({type: "init"})
+        getPublicChannels(0, HAS_MORE)
+            .then((response) => {
+                if (response.tag === "success") resetList(listHandler, response.value)
+                else dispatch({type: "error", error: response.value})
+            })
     }
 
-    const onFetchMore = () => {
-        if (state.tag != "navigating") return
-        dispatch({type: "fetchMore"})
-        getPublicChannels(state.channels.length, CHANNELS_PER_FETCH)
-            .then((response) => {
-                if (isFailure(response)) {
-                    dispatch({type: "error", error: response.value})
-                } else dispatch({type: "success", channels: response.value})
-            })
+    const onSearchChange = (searchBar: string) => {
+        setSearchValue(searchBar)
+    }
+
+    const onFetchMore = (offset: number, at: "head" | "tail") => {
+        if (state.tag != "scrolling") return
+        if (at === "head" && !list.hasMore.head) return
+        if (at === "tail" && !list.hasMore.tail) return
+        if (searchValue === "") {
+            getPublicChannels(offset*limit, CHANNELS_PER_FETCH)
+                .then((response) => {
+                    if (response.tag === "success") addItems(at, offset, listHandler, list, response.value)
+                    else dispatch({type: "error", error: response.value})
+                })
+        } else {
+            getChannelsByPartialName(searchValue, offset*limit, CHANNELS_PER_FETCH)
+                .then((response) => {
+                    if (response.tag === "success") addItems(at, offset, listHandler, list, response.value)
+                    else dispatch({type: "error", error: response.value})
+                })
+        }
+        dispatch({type: "loadMore", at: "tail"})
     }
 
     const onErrorClose = () => {
@@ -135,16 +125,24 @@ export function useFindChannels(): [FindChannelState, UseFindChannelsHandler] {
     }
 
     const onJoin = (channelId: number) => {
-        if (state.tag != "navigating") return
-        dispatch({type: "join", channelId: channelId})
+        if (state.tag !== "scrolling") return
         joinChannel(channelId)
             .then((response) => {
-                if (isFailure(response)) dispatch({ type: "error", error: response.value })
-                else dispatch({type: "joined"})
+                if (response.tag === "success") dispatch({type: "joinSuccess"})
+                else dispatch({type: "error", error: response.value})
             })
+        dispatch({type: "join", channelId: channelId})
     }
 
-    return [state, {onSearchChange, onErrorClose, onJoin, onFetchMore}]
+    const handler: UseFindChannelsHandler = {
+        onInit,
+        onSearchChange,
+        onFetchMore,
+        onErrorClose,
+        onJoin
+    }
+
+    return [state, list, searchValue,handler]
 }
 
 

@@ -1,14 +1,15 @@
 import React from "react";
-import {PublicChannel} from "../../../model/PublicChannel";
-import {PublicChannelsList} from "../../components/PublicChannelsList"
+import InfiniteScroll from "../../components/infiniteScroll/InfiniteScroll";
 
-export function FindChannelsNavigatingView(
-    {channels, onClick}: {channels: PublicChannel[], onClick: (channelId: number) => void}
-): React.JSX.Element {
+export function FindChannelsNavigatingView(): React.JSX.Element {
     return (
         <div>
             <section className={"p-8"}>
-                <PublicChannelsList channels={channels} onClick={onClick}/>
+                <InfiniteScroll
+                    className={"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"}
+                    scrollStyle={"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"}
+                />
+                {/*<PublicChannelsList channels={channels} onClick={onClick}/>*/}
             </section>
         </div>
     )
