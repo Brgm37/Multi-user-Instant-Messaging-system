@@ -85,8 +85,8 @@ sealed interface Channel {
             name: ChannelName,
             accessControl: AccessControl,
             visibility: Visibility,
-            description: String? = null,
-            icon: String? = null,
+            description: String?,
+            icon: String?,
         ): Channel =
             when (visibility) {
                 Visibility.PUBLIC -> Public(id, owner, name, accessControl, emptyList(), description, icon)

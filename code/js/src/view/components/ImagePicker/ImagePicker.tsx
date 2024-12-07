@@ -30,7 +30,7 @@ const imagesList: Image[] = [
 ];
 
 const ImagePicker = () => {
-    const { isOpen, close, image, selectImage, save } = useImagePicker();
+    const { isOpen, close, selectImage, save } = useImagePicker();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     const handleImageClick = (src: string) => {

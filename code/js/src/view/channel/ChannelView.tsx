@@ -1,7 +1,6 @@
 import * as React from "react";
 import {useChannel} from "./hooks/UseChannel";
 import {InitLoadingView} from "./components/InitLoadingView";
-import "../../styles/InfiniteScrollChannel.css";
 import {InfiniteScrollContext} from "../components/infiniteScroll/InfiniteScrollContext";
 import {Message} from "../../model/Message";
 import BasicChannelView from "./components/BasicChannelView";

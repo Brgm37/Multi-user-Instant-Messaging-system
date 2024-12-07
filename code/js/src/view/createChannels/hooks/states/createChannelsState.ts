@@ -6,7 +6,9 @@ export type ChannelInput = {
     name: string,
     visibility: Visibility,
     access: AccessControl,
-    isValid: boolean
+    isValid: boolean,
+    description?: string,
+    icon?: string
 }
 
 export type CreateChannelsState =

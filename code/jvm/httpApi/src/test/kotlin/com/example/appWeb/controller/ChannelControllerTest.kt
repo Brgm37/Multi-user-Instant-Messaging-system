@@ -135,7 +135,7 @@ class ChannelControllerTest {
                 val outputModels = resp.body as List<ChannelListOutputModel>
                 assertEquals(nr, outputModels.size, "Number of channels is different")
                 val outputModel = outputModels.first()
-                assertEquals(authenticated.uId, outputModel.ownerOutputModel.id, "Owner id is different")
+                assertEquals(authenticated.uId, outputModel.owner.id, "Owner id is different")
             }
         }
 
@@ -376,7 +376,7 @@ class ChannelControllerTest {
                 val outputModels = resp.body as List<ChannelListOutputModel>
                 assertEquals(nr, outputModels.size, "Number of channels is different")
                 val outputModel = outputModels.first()
-                assertEquals(authenticated.uId, outputModel.ownerOutputModel.id, "Owner id is different")
+                assertEquals(authenticated.uId, outputModel.owner.id, "Owner id is different")
             }
         }
 

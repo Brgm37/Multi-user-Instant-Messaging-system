@@ -1,35 +1,32 @@
 import * as React from 'react'
-import {Dev} from "../hooks/states/AboutState";
-import {useAboutService} from "../hooks/UseAboutForm";
+import {FaGithub, FaLinkedin} from "react-icons/fa";
+import {Dev} from "../AboutView";
 
-
-export function DevView(
-    {dev}: { dev: Dev}): React.JSX.Element  {
-    const [state, handler] = useAboutService()
-    const onClick = (dev: Dev) => {
-        handler.onSelectDev(dev)
-    }
-
+export function DevView({ dev }: { dev: Dev }): React.JSX.Element {
     return (
-        <div>
-            <button onClick={() => onClick(dev)}>
-                <img
-                    src={dev.imageURL}
-                    style={{width: "30px", height: "30px", borderRadius: "50%"}}
-                />
-                {dev.name}
-            </button>
-            {state.tag === "devView" && (
-                <>
-                    <p>{dev.num}</p>
-                    <p>{dev.bio || null}</p>
-                    <p>{dev.email}</p>
-                    <a href={dev.github.href} onClick={handler.onAcessGithub}>GitHub</a>
-                    <br/>
-                    <a href={dev.linkdIn.href} onClick={handler.onAcessLinkedIn}>LinkedIn</a>
-                </>
-            )}
+        <div key={dev.num} className="max-w-sm rounded overflow-hidden shadow-lg m-4 bg-gray-900">
+            <img className="w-full" src={dev.imageURL} alt={`${dev.name} Image`} />
+            <div className="px-6 py-4">
+                <div className="font-bold text-xl mb-2">{dev.name}</div>
+                <p className="text-base">{dev.num}</p>
+                <p className="text-base">{dev.email}</p>
+                <div className="flex space-x-2 mt-4">
+                    <a href={dev.github.href} target="_blank" rel="noopener noreferrer">
+                        <FaGithub size={28}/>
+                    </a>
+                    <a href={dev.linkedIn.href} target="_blank" rel="noopener noreferrer">
+                        <FaLinkedin size={28}/>
+                    </a>
+                </div>
+            </div>
+            <div className="px-6 pb-2 w-full">
+                <button
+                    className="bg-black text-white font-bold py-2 px-4 rounded w-full"
+                    onClick={() => window.location.href = `mailto:${dev.email}`}
+                >
+                    Contact
+                </button>
+            </div>
         </div>
-
-    )
+    );
 }

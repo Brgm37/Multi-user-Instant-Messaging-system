@@ -12,6 +12,6 @@
  */
 export type CreateChannelInvitationAction =
     { type: "create", expirationDate?: string, maxUses: number, accessControl?: "READ_ONLY" | "READ_WRITE" }
-    | { type: "close" }
+    | { type: "close", cId: string }
     | { type: "success", invitationToken: string }
     | { type: "error", error: string }

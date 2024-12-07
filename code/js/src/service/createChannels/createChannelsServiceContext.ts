@@ -8,7 +8,9 @@ export interface CreateChannelsServiceContext {
         name: string,
         visibility: string,
         accessControl: string,
-    ): Promise<Either<CreateChannel, string>>
+        description?: string,
+        icon?: string
+    ): Promise<Either<Channel, string>>
 
     findChannelByName(
         name: string,
@@ -16,12 +18,12 @@ export interface CreateChannelsServiceContext {
 }
 
 const defaultCreateChannelsServiceContext: CreateChannelsServiceContext = {
-    createChannel: () => {
-        return new Promise<Either<CreateChannel, string>>((_, reject) => {
+    createChannel: (name, visibility, accessControl, description, icon) => {
+        return new Promise<Either<Channel, string>>((_, reject) => {
             reject(new Error("Not implemented"))
         })
     },
-    findChannelByName: () => {
+    findChannelByName: (name) => {
         return new Promise<Either<Channel, string>>((_, reject) => {
             reject(new Error("Not implemented"))
         })

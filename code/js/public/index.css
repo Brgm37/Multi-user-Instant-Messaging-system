@@ -9,6 +9,9 @@
 
 body {
     font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    margin: 0;
 }
 .card:hover {
     transform: scale(1.05);
@@ -27,6 +30,17 @@ body {
     border-radius: 4px;
 }
 
+@layer utilities {
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hidden {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+}
+
 .popup {
     position: fixed;
     bottom: 20px;
@@ -36,4 +50,24 @@ body {
     padding: 10px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.scroll-container {
+    overflow-y: auto;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.scroll-style {
+    display: flex;
+    flex-direction: column;
+}
+
+.scrollable-sidebar {
+    -ms-overflow-style: none;
+}
+
+.scrollable-sidebar::-webkit-scrollbar {
+    display: none;
 }

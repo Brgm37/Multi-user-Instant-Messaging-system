@@ -7,6 +7,13 @@ export type UseCreateChannelHandler = {
      * @returns void
      */
     onNameChange: (name: string) => void
+
+    /**
+     * The function to call when the description changes.
+     * @param description The new description.
+     * @returns void
+     */
+    onDescriptionChange: (description: string) => void
     /**
      * The function to call to go back to the editing state.
      * @returns void
