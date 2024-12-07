@@ -36,15 +36,19 @@ export default function BasicChannelView(
 
     const handleSend = () => sendMessage()
 
-    const handleInvite = () => {
-        navigation("/channels/" + id + "/createInvitation");
-    }
+    const handleInvite = () => navigation("/channels/" + id + "/createInvitation");
+
+    const isOwner = channel !== undefined && channel.owner.id === Number(userContext.id)
+
+    const isChannelPrivate = channel !== undefined && channel.visibility === "PRIVATE"
+
+    const isAccessControlReadWrite = channel !== undefined && channel.accessControl === "READ_WRITE"
 
     return (
         <div className="relative h-screen">
             <div className={"flex flex-col h-full"}>
                 <div className={"flex items-center p-3"}>
-                    {channel !== undefined && channel.owner.id === Number(userContext.id) && (
+                    {isOwner && isChannelPrivate && (
                         <button
                             className={"rounded hover:bg-gray-800 p-2"}
                             onClick={handleInvite}
@@ -68,7 +72,7 @@ export default function BasicChannelView(
                     </div>
                 )}
                 <footer className={"flex items-center p-3"}>
-                    {channel !== undefined && channel.accessControl === "READ_WRITE" && (
+                    {isAccessControlReadWrite && (
                         <>
                             <input
                                 className={"flex-1 p-2 bg-gray-900 text-gray-200 border border-gray-700"}
