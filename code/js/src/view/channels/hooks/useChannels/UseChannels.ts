@@ -59,10 +59,6 @@ export default function (): [ChannelsState, UseScrollState<Channel>, ChannelsHan
         if (state.tag === "loading") dispatch({tag: "loadSuccess"})
     }, [list]);
 
-    useEffect(() => {
-        console.log(state)
-    }, [state]);
-
     const handler: ChannelsHandler = {
         goBack(): void {
             if (state.tag !== "error") return
