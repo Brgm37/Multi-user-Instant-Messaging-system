@@ -15,7 +15,7 @@ export function RegisterView(): React.JSX.Element {
     const location = useLocation()
     if (state.tag === "redirect") {
         let source = location.state?.source
-        if (!source) source = "/channels"
+        if (!source) source = "/channels/findChannels"
         else location.state.source = undefined
         return <Navigate to={source} replace={true}></Navigate>
     }
