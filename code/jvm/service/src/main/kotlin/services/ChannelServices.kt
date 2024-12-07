@@ -26,7 +26,6 @@ import utils.Either
 import utils.failure
 import utils.success
 import java.sql.Timestamp
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
@@ -328,9 +327,8 @@ class ChannelServices(
     private fun makeTimeStamp(expirationDate: String) =
         try {
             Timestamp.valueOf(
-                LocalDate
-                    .parse(expirationDate)
-                    .atStartOfDay(),
+                LocalDateTime
+                    .parse(expirationDate),
             )
         } catch (e: IllegalArgumentException) {
             null
