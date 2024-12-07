@@ -1,5 +1,4 @@
 import {Either} from "../../model/Either";
-import {CreateChannel} from "../../view/createChannels/model/CreateChannel";
 import {Channel} from "../../model/Channel";
 import {Context, createContext} from "react";
 

@@ -5,15 +5,8 @@ import {Either, failure, success} from "../../model/Either";
 import {Channel, jsonToChannel} from "../../model/Channel";
 import {AuthUserContext} from "../../view/session/AuthUserContext";
 import useSignal from "../utils/hooks/useSignal/useSignal";
-import {CreateChannel} from "../../view/createChannels/model/CreateChannel";
 
 const urlBase = urlBuilder("/channels")
-
-const channelNameHeader = "name"
-const visibilityHeader = "visibility"
-const accessControlHeader = "accessControl"
-const descriptionHeader = "description"
-const iconHeader = "icon"
 
 const defaultIconSrc = "/defaultIcons/default.png"
 
