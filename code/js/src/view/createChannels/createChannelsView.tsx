@@ -13,8 +13,10 @@ export function CreateChannelsView(): React.JSX.Element {
 
     const view = ((state: CreateChannelsState) =>{
         switch (state.tag) {
-            case "redirecting":
+            case "redirecting": {
+                window.location.reload()
                 return <Navigate to={"/channels"}/>
+            }
             case "error":
                 return <div>{state.message}</div>
             case "submitting":
