@@ -95,12 +95,13 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
             if (state.tag !== "editing") return;
             service.findChannelByName(name).then(response => {
                 if (response.tag === "success") {
-                    dispatch({ type: "editName", inputValue: "name" });
+                    dispatch({ type: "editName", inputValue: name })
                     state.input.isValid = false;
+                }else{
+                    state.input.isValid = true
+                    dispatch({ type: "editName", inputValue: name })
                 }
-            });
-            state.input.isValid = true;
-            dispatch({ type: "editName", inputValue: name });
+            })
         },
 
         onDescriptionChange(description: string) {
