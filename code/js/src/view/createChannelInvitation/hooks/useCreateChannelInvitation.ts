@@ -64,7 +64,7 @@ export function useCreateChannelInvitation(): [CreateChannelInvitationState, Use
 
     const onCreate = (expirationDate: string, maxUses: string, accessControl: "READ_ONLY" | "READ_WRITE") => {
         if (state.tag !== "editingInvitationToken") return
-        let maxUsesInt = parseInt(maxUses)
+        const maxUsesInt = Number(maxUses)
         dispatch({ type: "create", expirationDate, maxUses: maxUsesInt, accessControl })
         createChannelInvitation(expirationDate, maxUsesInt, accessControl, id).then(r => {
                 if (isFailure(r)) dispatch({type: "error", error: r.value})

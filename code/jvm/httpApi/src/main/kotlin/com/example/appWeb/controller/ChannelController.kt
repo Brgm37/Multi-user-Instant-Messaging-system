@@ -204,7 +204,7 @@ class ChannelController(
             )
         return when (response) {
             is Success -> {
-                ResponseEntity.ok(ChannelInvitationOutputModel(response.value.toString()))
+                ResponseEntity.ok(ChannelInvitationOutputModel(response.value.invitationCode.toString()))
             }
 
             is Failure -> {

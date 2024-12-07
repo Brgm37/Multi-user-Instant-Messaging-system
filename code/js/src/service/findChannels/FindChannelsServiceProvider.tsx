@@ -3,7 +3,7 @@ import useSignal from "../utils/hooks/useSignal/useSignal";
 import React from "react";
 import {Either, failure, success} from "../../model/Either";
 import {FindChannelsServiceContext} from "./FindChannelsServiceContext";
-import {Channel, jsonToPublicChannel} from "../../model/Channel";
+import {jsonToPublicChannel} from "../../model/Channel";
 import {PublicChannel} from "../../model/PublicChannel";
 
 const baseUrl = urlBuilder("/channels")
@@ -18,7 +18,7 @@ export function FindChannelsServiceProvider({ children }: { children: React.Reac
                 signal,
                 credentials: "include"
             }
-            const url = baseUrl + '/search/' + partialName + `?offset=${offset}&limit=${limit}`
+            const url = baseUrl + '/public/' + partialName + `?offset=${offset}&limit=${limit}`
             const response = await fetch(url, init);
             if (response.ok) {
                 const channels = await response.json()

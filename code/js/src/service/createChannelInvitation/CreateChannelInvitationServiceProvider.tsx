@@ -1,5 +1,5 @@
 import React, {ReactNode} from "react";
-import {Either} from "../../model/Either";
+import {Either, failure, success} from "../../model/Either";
 import useSignal from "../utils/hooks/useSignal/useSignal";
 import {AccessControl} from "../../model/AccessControl";
 import {urlBuilder} from "../utils/UrlBuilder";
@@ -28,10 +28,11 @@ export function CreateChannelInvitationServiceProvider(props: { children: ReactN
             const url = baseUrl + "/invitations"
             const response = await fetch(url, init);
             if (response.ok) {
-                const invitationCode = await response.json()
-                return {tag: "success", value: {invitationCode}} as Either<{invitationCode: string}, string>
+                const invCode = await response.json()
+               const invitationCode = invCode.invitationCode
+                return success({invitationCode}) as Either<{invitationCode: string}, string>
             } else {
-                return {tag: "failure", value: await response.text()} as Either<{invitationCode: string}, string>
+                return failure(await response.text()) as Either<{invitationCode: string}, string>
             }
         }
         }
