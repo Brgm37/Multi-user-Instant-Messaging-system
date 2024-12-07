@@ -12,8 +12,8 @@ import {ChannelsState} from "./ChannelsState";
  *
  */
 export type ChannelsAction =
-    { tag: "init" } |
-    { tag: "loadMore", at: "head" | "tail" } |
-    { tag: "loadSuccess" } |
-    { tag: "loadError", message: string, previous: ChannelsState } |
-    { tag: "goBack"}
+    | { tag: "init" }
+    | { tag: "loadMore", at: "head" | "tail" }
+    | { tag: "loadSuccess" }
+    | { tag: "loadError", message: string, previous: ChannelsState }
+    | { tag: "goBack" }
