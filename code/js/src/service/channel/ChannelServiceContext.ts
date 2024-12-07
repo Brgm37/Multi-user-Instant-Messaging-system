@@ -45,6 +45,15 @@ export interface ChannelServiceContext {
         cId: string,
         msg: string,
     ): Promise<Either<Message, string>>
+
+    /**
+     * Leave or delete a channel.
+     *
+     * @param cId
+     */
+    leaveOrDelete(
+        cId: string,
+    ): Promise<Either<void, string>>
 }
 
 /**
@@ -60,6 +69,9 @@ const defaultChannelService: ChannelServiceContext = {
     async sendMsg(): Promise<Either<Message, string>> {
         throw Error("Not implemented")
     },
+    async leaveOrDelete(): Promise<Either<void, string>> {
+        throw Error("Not implemented")
+    }
 }
 
 /**
