@@ -7,7 +7,7 @@ export default function ():AbortSignal {
     const controller = new AbortController()
     useEffect(() => {
         return () => {
-            controller.abort()
+            controller.abort("Component unmounted")
         }
     }, []);
     return controller.signal
