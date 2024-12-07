@@ -1,11 +1,10 @@
 import React from "react";
 import {CreateChannelInvitationState} from "../createChannelInvitation/hooks/states/CreateChannelInvitationState";
-import {
-    CreateChannelInvitationEditingView
-} from "../createChannelInvitation/components/CreateChannelInvitationEditingView";
+
 import {CreateUserInvitationState} from "./hooks/states/CreateUserInvitationState";
 import {UseCreateUserInvitationHandler} from "./hooks/handler/UseCreateUserInvitationHandler";
 import {useCreateUserInvitation} from "./hooks/UseCreateUserInvitation";
+import {CreateUserInvitationEditingView} from "./components/CreateUserInvitationEditingView";
 
 
 export function CreateUserInvitationView(): React.JSX.Element {
@@ -14,7 +13,7 @@ export function CreateUserInvitationView(): React.JSX.Element {
     const view = ((state: CreateUserInvitationState) => {
         switch (state.tag) {
             case "editingInvitationCode":
-                return <CreateChannelInvitationEditingView onGenerate={handler.onCreate}></CreateChannelInvitationEditingView>
+                return <CreateUserInvitationEditingView onGenerate={handler.onCreate}></CreateUserInvitationEditingView>
             case "creating":
                 return <div>Creating...</div>
             case "showingInvitationCode":
