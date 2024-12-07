@@ -50,10 +50,11 @@ export function Sidebar(): React.JSX.Element {
     return (
         <div className="relative w-20 bg-gray-900 flex flex-col items-center py-4 space-y-4">
             <div
-                className="w-14 h-14 overflow-hidden rounded-full transition-transform duration-300 ease-in-out transform hover:scale-110 hover:shadow-lgr cursor-pointer"
+                className="w-14 h-14 overflow-hidden rounded-full transition-transform duration-300 ease-in-out transform hover:scale-110 hover:shadow-lg cursor-pointer flex items-center justify-center"
                 onClick={toggleInput}
             >
-                <img src="/sideBarIcons/black_search.webp" alt="Search" className="w-14 h-14 rounded-full"/>
+                <img src="/sideBarIcons/black_search.webp" alt="Search"
+                     className="w-full h-full object-cover object-center"/>
             </div>
 
             <div
@@ -62,8 +63,8 @@ export function Sidebar(): React.JSX.Element {
                     type="text"
                     value={search}
                     onChange={onSearchChange}
-                    placeholder="Search your channel"
-                    className="bg-black text-white text-center w-full w-40 h-6 p-2"
+                    placeholder="Search in your channels"
+                    className="bg-black text-white text-center w-full h-6 p-2 text-xs"
                     list="suggestions"
                 />
                 <datalist id="suggestions" className={"bg-pink-700 text-white p-2 rounded ml-auto w-full "}>
