@@ -5,6 +5,13 @@ import {ChannelsServiceContext} from "./ChannelsServiceContext";
 import {urlBuilder} from "../utils/UrlBuilder";
 import useSignal from "../utils/hooks/useSignal/useSignal";
 import {useNavigate} from "react-router-dom";
+import configJson from "../../../envConfig.json";
+import removeCookie from "../session/RemoveCookie";
+
+/**
+ * The authentication cookie.
+ */
+const auth_cookie = configJson.session
 
 const channelUrlBase = urlBuilder("/channels")
 const userUrlBase = urlBuilder("/users")
@@ -24,8 +31,13 @@ export function ChannelsServicesProvider(
                 signal
             }
             const response = await fetch(url, init)
-            if (!response.ok) throw new Error(await response.text())
-            else navigate("/register")
+            if (!response.ok) {
+                throw new Error(await response.text())
+            }
+            else {
+                removeCookie(auth_cookie)
+                navigate("/register")
+            }
         },
         findChannels: async (offset: number, limit: number): Promise<Either<Channel[], string>> => {
             const url = channelUrlBase + `/my?offset=${offset}&limit=${limit}`
