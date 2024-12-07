@@ -270,7 +270,7 @@ class ChannelJDBCTest {
     fun `find by name`() =
         testSetup { _, channel ->
             val name = checkNotNull(channel.name) { "Channel name is null" }
-            val foundChannels = findByName(name.fullName)
+            val foundChannels = findPublicByName(name.fullName)
             assertNotNull(foundChannels) { "Channel is null" }
         }
 
@@ -288,7 +288,7 @@ class ChannelJDBCTest {
                     ),
                 )
             val name = checkNotNull(newChannel?.name) { "Channel name is null" }
-            val foundChannels = findByName(name.name, 0u, 10u)
+            val foundChannels = findPublicByName(name.name, 0u, 10u)
             assertEquals(newChannel, foundChannels.first())
         }
 }

@@ -74,9 +74,10 @@ class ChannelInMem : ChannelRepositoryInterface {
         userId: UInt,
     ): AccessControl? = usersInChannels[cId]?.find { it.first == userId }?.second
 
-    override fun findByName(name: String): Channel? = channels.find { it.name.fullName == name }
+    override fun findPublicByName(name: String): Channel? = channels.find { it.name.fullName == name }
 
-    override fun findByName(
+    override fun findPublicByName(
+        uId: UInt,
         name: String,
         offset: UInt,
         limit: UInt,
@@ -91,6 +92,15 @@ class ChannelInMem : ChannelRepositoryInterface {
         channels.filter {
             it.name.fullName.contains(name) &&
                 usersInChannels[it.cId]?.any { ac -> ac.first == uId } == true
+        }
+
+    override fun findByName(
+        name: String,
+        offset: UInt,
+        limit: UInt,
+    ): List<Channel> =
+        channels.filter {
+            it.name.fullName.contains(name)
         }
 
     override fun findAccessControl(
