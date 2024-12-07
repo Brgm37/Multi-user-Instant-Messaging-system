@@ -22,6 +22,8 @@ export function reduce(state: CreateUserInvitationState, action: CreateUserInvit
                     return { tag: "creating" }
                 case "close":
                     return { tag: "closing" }
+                case "error":
+                    return { tag: "error", message: action.message }
                 default:
                     throw Error("Invalid action")
             }
@@ -66,7 +68,10 @@ export function useCreateUserInvitation(): [CreateUserInvitationState, UseCreate
         dispatch({ type: "create", expirationDate })
         createUserInvitation(expirationDate).then(r => {
                 if (isFailure(r)) dispatch({type: "error", message: r.value})
-                else dispatch({ type: "success", invitationCode: r.value.invitationCode })
+                else{
+                    console.log("worked" + JSON.stringify(r.value))
+                    dispatch({ type: "success", invitationCode: r.value.invitationCode })
+                }
             }
         )
     }
