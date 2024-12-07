@@ -18,11 +18,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
- * The number of days an invitation is valid.
- */
-private const val INVITATION_EXPIRATION_DAYS = 7L
-
-/**
  * The number of days a token is valid.
  */
 private const val TOKEN_EXPIRATION_DAYS = 7L
@@ -133,7 +128,7 @@ class UserServices(
             val invitation =
                 UserInvitation(
                     inviterId = inviterUId,
-                    expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(INVITATION_EXPIRATION_DAYS)),
+                    expirationDate = timestamp,
                 )
             if (userRepo.createInvitation(invitation)) {
                 success(invitation)
@@ -145,9 +140,8 @@ class UserServices(
     private fun makeTimeStamp(expirationDate: String) =
         try {
             Timestamp.valueOf(
-                LocalDate
-                    .parse(expirationDate)
-                    .atStartOfDay(),
+                LocalDateTime
+                    .parse(expirationDate),
             )
         } catch (e: IllegalArgumentException) {
             null
