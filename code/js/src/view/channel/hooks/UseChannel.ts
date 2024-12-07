@@ -10,7 +10,7 @@ import {SseCommunicationServiceContext} from "../../../service/sse/SseCommunicat
 import {UseChannelHandler} from "./handler/UseChannelHandler";
 
 const LIST_SIZE = envConfig.messages_limit
-const DEFAULT_LIMIT = envConfig.default_limit
+const DEFAULT_LIMIT = envConfig.default_messages_limit
 let limit = DEFAULT_LIMIT
 const HAS_MORE = DEFAULT_LIMIT + 1
 
@@ -81,12 +81,11 @@ function addItems(
  * The hook to use the channel reducer.
  */
 export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannelHandler] {
-    const {id} = useParams()
     const {messages, consumeMessage} = useContext(SseCommunicationServiceContext)
-    const [list, listHandler] = useScroll<Message>(LIST_SIZE)
-    const initialState: ChannelState = {tag: "idle"}
     const service = useContext(ChannelServiceContext)
-    const [state, dispatch] = useReducer(reduce, initialState)
+    const {id} = useParams()
+    const [list, listHandler] = useScroll<Message>(LIST_SIZE)
+    const [state, dispatch] = useReducer(reduce, {tag: "idle"})
     const isInitialMount = useRef(true);
 
     useEffect(() => {
@@ -106,8 +105,7 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
 
     useEffect(() => {
         if (messages.length === 0) return
-        if (state.tag === "idle") return
-        if (state.tag === "loading") return
+        if (state.tag === "idle" || state.tag === "loading") return
         const consumed: Message[] = []
         let first: boolean = true
         messages.forEach(msg => {
@@ -135,9 +133,8 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
             service
                 .loadMore(id, "0", HAS_MORE, "before")
                 .then(response => {
-                    if (response.tag === "success") {
-                        initList(listHandler, response.value)
-                    } else dispatch({tag: "loadError", error: response.value, previous: state})
+                    if (response.tag === "success") initList(listHandler, response.value)
+                    else dispatch({tag: "loadError", error: response.value, previous: state})
                 })
             dispatch({tag: "init"})
         },
@@ -148,9 +145,8 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
             service
                 .loadMore(id, timestamp, HAS_MORE, befAft)
                 .then(response => {
-                    if (response.tag === "success") {
-                        addItems(at, listHandler, list, response.value)
-                    } else dispatch({tag: "loadError", error: response.value, previous: state})
+                    if (response.tag === "success") addItems(at, listHandler, list, response.value)
+                    else dispatch({tag: "loadError", error: response.value, previous: state})
                 })
             dispatch({tag: "loadMore", at})
         },
@@ -159,9 +155,8 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
             service
                 .sendMsg(id, msg)
                 .then(response => {
-                    if (response.tag === "success") {
-                        addMessage(listHandler, list, response.value)
-                    } else dispatch({tag: "sendError", error: response.value, previous: state})
+                    if (response.tag === "success") addMessage(listHandler, list, response.value)
+                    else dispatch({tag: "sendError", error: response.value, previous: state})
                 })
             dispatch({tag: "sendMessage"})
         },

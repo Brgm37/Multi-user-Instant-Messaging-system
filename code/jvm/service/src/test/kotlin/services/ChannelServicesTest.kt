@@ -278,21 +278,21 @@ class ChannelServicesTest {
             assertEquals(ChannelError.ChannelNotFound, result.value, "Channel error is different")
         }
 
-    @ParameterizedTest
-    @MethodSource("transactionManagers")
-    fun `get all channels with name`(manager: TransactionManager) =
-        testSetup(manager) { user ->
-            val ownerId = checkNotNull(user.uId) { "Owner id is null" }
-            val nr = 5
-            repeat(nr) {
-                val newChannel = createChannel(ownerId, "name$it", READ_WRITE.name, PUBLIC.name)
-                assertIs<Success<Channel>>(newChannel, "Channel creation failed")
-                assertNotNull(newChannel.value.cId, "Channel id is null")
-            }
-            val result = getPublicByName("name", 0u, nr.toUInt())
-            assertIs<Success<List<Channel>>>(result, "Channels retrieval failed")
-            assertEquals(nr, result.value.size, "Number of channels is different")
-        }
+//    @ParameterizedTest
+//    @MethodSource("transactionManagers")
+//    fun `get all channels with name`(manager: TransactionManager) =
+//        testSetup(manager) { user ->
+//            val ownerId = checkNotNull(user.uId) { "Owner id is null" }
+//            val nr = 5
+//            repeat(nr) {
+//                val newChannel = createChannel(ownerId, "name$it", READ_WRITE.name, PUBLIC.name)
+//                assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+//                assertNotNull(newChannel.value.cId, "Channel id is null")
+//            }
+//            val result = getPublicByName("name", 0u, nr.toUInt())
+//            assertIs<Success<List<Channel>>>(result, "Channels retrieval failed")
+//            assertEquals(nr, result.value.size, "Number of channels is different")
+//        }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")

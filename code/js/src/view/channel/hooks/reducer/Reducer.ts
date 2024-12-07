@@ -12,7 +12,7 @@ export default function (state: ChannelState, action: ChannelAction): ChannelSta
         case "idle":
             switch (action.tag) {
                 case "init":
-                    return {tag: "loading", at: "tail"}
+                    return {tag: "loading", at: "both"}
                 default:
                     throw new Error(`Invalid action ${action.tag} for state ${state.tag}`)
             }

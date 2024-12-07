@@ -105,9 +105,9 @@ class ChannelController(
     @ChannelSwaggerConfig.GetChannelByName
     fun getChannelByName(
         @PathVariable name: String,
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
         @RequestParam offset: UInt = OFFSET,
         @RequestParam limit: UInt = LIMIT,
-        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
         when (val response = channelService.getByName(decodeName(name), offset, limit)) {
             is Success -> {
@@ -204,7 +204,7 @@ class ChannelController(
             )
         return when (response) {
             is Success -> {
-                ResponseEntity.ok(ChannelInvitationOutputModel(response.value.toString()))
+                ResponseEntity.ok(ChannelInvitationOutputModel(response.value.invitationCode.toString()))
             }
 
             is Failure -> {

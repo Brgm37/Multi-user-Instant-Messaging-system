@@ -1,5 +1,6 @@
 import React from "react";
 import {AccessControl} from "../../../model/AccessControl";
+import {UseCreateChannelInvitationHandler} from "../hooks/handler/UseCreateChannelInvitationHandler";
 
 /**
  * list of options for the expiration date of the invitation code
@@ -36,30 +37,39 @@ const maxUsesOptions = [
 ]
 
 function expirationDateToTimeFormat(expirationDate: string): string {
+    const currentTime = Date.now();
+    let additionalTime = 0;
     switch (expirationDate) {
         case "30 minutes":
-            return "00:30:00";
+            additionalTime = 30 * 60 * 1000;
+            break;
         case "1 hour":
-            return "01:00:00";
+            additionalTime = 60 * 60 * 1000;
+            break;
         case "6 hours":
-            return "06:00:00";
+            additionalTime = 6 * 60 * 60 * 1000;
+            break;
         case "1 day":
-            return "24:00:00";
+            additionalTime = 24 * 60 * 60 * 1000;
+            break;
         case "7 days":
-            return "168:00:00";
+            additionalTime = 7 * 24 * 60 * 60 * 1000;
+            break;
         default:
             throw new Error("Invalid expiration date");
     }
+
+    const actualDate = new Date(currentTime + additionalTime);
+    return actualDate.toLocaleString("sv-SE", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" }).replace(" ", "T");
 }
 
-export function CreateChannelInvitationEditingView(
-    {onGenerate}: {onGenerate: (expirationDate: string, maxUses: string, accessControl: AccessControl) => void}
-): React.JSX.Element {
+
+export function CreateChannelInvitationEditingView({handler}: {handler: UseCreateChannelInvitationHandler}): React.ReactElement {
     const handleGenerateCode = () => {
         const expirationDate = expirationDateToTimeFormat((document.querySelector("select[title=expirationDate]") as HTMLSelectElement).value);
         const maxUses = (document.querySelector("select[title=maxUses]") as HTMLSelectElement).value;
         const accessControl = (document.querySelector("select[title=permissions]") as HTMLSelectElement).value as AccessControl;
-        onGenerate(expirationDate, maxUses, accessControl);
+        handler.onCreate(expirationDate, maxUses, accessControl);
     }
 
     return (

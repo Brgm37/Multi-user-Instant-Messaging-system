@@ -25,7 +25,7 @@ import {UseScrollState} from "../../../service/utils/hooks/useScroll/UseScroll";
 export interface InfiniteScrollContext<T extends Identifiable> {
     items: UseScrollState<T>,
     loadMore(offset: number, at: "head" | "tail"): void,
-    isLoading: 'head' | 'tail' | 'receiving' | "sending" | false,
+    isLoading: 'head' | 'tail' | 'receiving' | "sending" | "both" | false,
     renderItems(item: T): ReactNode;
 }
 
