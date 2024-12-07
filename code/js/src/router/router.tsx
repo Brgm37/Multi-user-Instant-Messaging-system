@@ -33,6 +33,7 @@ import {CreateChannelServiceProvider} from "../service/createChannels/createChan
 import {ImagePickerProvider} from "../view/components/ImagePicker/ImagePickerProvider";
 import ImagePicker from "../view/components/ImagePicker/ImagePicker";
 import {CreateUserInvitationView} from "../view/createUserInvitation/CreateUserInvitationView";
+import {CreateUserInvitationServiceProvider} from "../service/CreateUserInvitation/createUserInvitationServiceProvider";
 
 const router = createBrowserRouter(
     [
@@ -109,6 +110,14 @@ const router = createBrowserRouter(
                             </ImagePickerProvider>
 
                         </CreateChannelServiceProvider>,
+                },
+                {
+                    "path": "/channels/createUserInvitation",
+                    "element":
+                        <CreateUserInvitationServiceProvider>
+                            <CreateUserInvitationView />
+                        </CreateUserInvitationServiceProvider>,
+
                 },
             ]
                 },
