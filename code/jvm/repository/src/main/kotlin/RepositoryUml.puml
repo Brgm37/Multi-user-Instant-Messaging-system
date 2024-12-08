@@ -18,6 +18,14 @@ interface ChannelRepositoryInterface {
     + deleteInvitation(invitation: ChannelInvitation)
     + createInvitation(invitation: ChannelInvitation)
     + findUserAccessControl(channelId: UInt, userId: UInt): AccessControl?
+    + findPublicByName(name: String): Channel?
+    + findPublicByName(name: String): Channel?
+    + findByName(uId: Int, name: String, offset: Int, limit: Int): List<Channel>
+    + findByName(name: String, offset: Int, limit: Int): List<Channel>
+    + findAccessControl(uid: UInt, channelId: UInt): AccessControl?
+    + findByInvitationCode(invitationCode: String): Channel?
+    + findPublicChannel(uId: UInt, offset: Int, limit: Int): List<Channel>
+    + leaveChannel(channelId: UInt, userId: UInt)
 }
 
 interface UserRepositoryInterface {
@@ -34,7 +42,9 @@ interface UserRepositoryInterface {
 
 interface MessageRepositoryInterface {
     + createMessage(message: Message): Message?
-    + findMessages(channelId: Uint, limit: UInt, offset: UInt): List<Message>
+    + findMessagesByChannelId(channelId: Uint, limit: UInt, offset: UInt): List<Message>
+    + emitAllMessages(uId: UInt, lastEventId: UInt, emitter: (Message) -> Unit)
+    + findMessagesByTimeStamp(channelId: UInt, timestamp: Timestamp, limit: UInt, isBefore: Boolean): List<Message>
 }
 
 Repository <|-- UserRepositoryInterface
@@ -48,7 +58,6 @@ namespace model.user {}
 MessageRepositoryInterface o-- message
 UserRepositoryInterface o-- user
 ChannelRepositoryInterface o-- channel
-
 
 
 interface Transaction {
