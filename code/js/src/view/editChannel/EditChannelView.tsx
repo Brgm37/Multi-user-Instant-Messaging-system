@@ -5,7 +5,6 @@ import {EditChannelState} from "./hooks/states/EditChannelState";
 import {EditChannelErrorView} from "./components/EditChannelErrorView";
 import {EditChannelLoadingView} from "./components/EditChannelLoadingView";
 import {EditChannelEditingVIew} from "./components/EditChannelEditingVIew";
-import {ImagePickerProvider} from "../components/ImagePicker/ImagePickerProvider";
 
 export default function (): React.JSX.Element {
     const [state, handler] = useEditChannel()
@@ -38,7 +37,6 @@ export default function (): React.JSX.Element {
 
     const goBack = () => {
         navigate(-1)
-        window.location.reload()
     }
 
     return (

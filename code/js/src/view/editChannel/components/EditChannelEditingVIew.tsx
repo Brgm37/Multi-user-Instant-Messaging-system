@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {useImagePicker} from "../../components/ImagePicker/ImagePickerProvider";
+import {Visibility} from "../../createChannels/hooks/states/createChannelsState";
 
 const visibilityOptions = [
     "PUBLIC",
@@ -10,9 +11,14 @@ export function EditChannelEditingVIew(
     {initDescription, initVisibility, handleSubmit}: {initDescription: string, initVisibility: string, handleSubmit: (d: string, v: string, i: string) => void}
 ): React.JSX.Element {
     const [description, setDescription] = React.useState(initDescription)
-    const [visibility, setVisibility] = React.useState(initVisibility)
     const {open, image} = useImagePicker()
     const descriptionHandler = (e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)
+
+    const handler = () => {
+        const visibility = (document.querySelector("select[title=visibility]") as HTMLSelectElement).value as Visibility;
+        if (visibility === initVisibility && description === initDescription && image === undefined) return
+        handleSubmit(description, visibility, image)
+    }
     return (
         <div className="flex items-center justify-center flex-col">
             <div>
@@ -35,16 +41,15 @@ export function EditChannelEditingVIew(
                     <select
                         id="visibility"
                         title={"visibility"}
+                        defaultValue={initVisibility}
                         className="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:outline-none focus:border-blue-500">
                         {visibilityOptions.map((option) => (
                             <option
                                 key={option}
-                                value={option}
-                                onClick={_ => setVisibility(option)}>
+                                value={option}>
                                 {option}
                             </option>
                         ))}
-                        value={visibility}
                     </select>
                 </div>
                 <div className="mb-4 justify-center flex">
@@ -56,9 +61,8 @@ export function EditChannelEditingVIew(
             <div className="flex justify-between">
                 <button
                     type={"submit"}
-                    onClick={_ => handleSubmit(description, visibility, image)}
+                    onClick={handler}
                     className="w-full p-2 bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
-                    disabled={description === initDescription && visibility === initVisibility && image === undefined}
                 >
                     Edit Channel
                 </button>

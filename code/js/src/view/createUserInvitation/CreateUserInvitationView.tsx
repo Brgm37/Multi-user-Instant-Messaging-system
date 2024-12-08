@@ -33,7 +33,6 @@ export function CreateUserInvitationView(): React.JSX.Element {
                         </button>
                     </div>
                 )
-                //return <div>Showing invitation code...${state.invitationCode}</div>
             case "error":
                 return <div>Error: ${state.message}</div>
             case "closing":

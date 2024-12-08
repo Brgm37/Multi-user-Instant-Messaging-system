@@ -36,18 +36,19 @@ import {CreateUserInvitationView} from "../view/createUserInvitation/CreateUserI
 import {CreateUserInvitationServiceProvider} from "../service/CreateUserInvitation/createUserInvitationServiceProvider";
 import {EditChannelServiceProvider} from "../service/editChannel/editChannelServiceProvider";
 import EditChannelView from "../view/editChannel/EditChannelView";
+import {JoinChannelServiceProvider} from "../service/joinChannel/JoinChannelServiceProvider";
+import {JoinChannelView} from "../view/JoinChannels/JoinChannelView";
 
 const router = createBrowserRouter(
     [
         {
             "path": "/",
-            "element": <Navigate to="/channels" replace/>,
+            "element": <Navigate to="/channels/findChannels" replace/>,
         },
         {
             "path": "/register",
             "element":
                 <RegisterCommunicationServiceProvider>
-                    <Navigate to={"/register/login"} replace/>
                     <Outlet/>
                 </RegisterCommunicationServiceProvider>,
             "children": [
@@ -72,6 +73,7 @@ const router = createBrowserRouter(
             "element":
                 <AuthValidator>
                     <ChannelsServicesProvider>
+                        <Navigate to={"/channels/findChannels"} replace/>
                         <ChannelsView/>
                     </ChannelsServicesProvider>
                 </AuthValidator>,
@@ -130,6 +132,13 @@ const router = createBrowserRouter(
                         </CreateUserInvitationServiceProvider>,
 
                 },
+                {
+                    "path": "/channels/joinChannel",
+                    "element":
+                        <JoinChannelServiceProvider>
+                            <JoinChannelView/>
+                        </JoinChannelServiceProvider>,
+                }
             ]
         },
         {

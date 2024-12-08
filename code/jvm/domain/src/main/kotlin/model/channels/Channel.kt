@@ -92,5 +92,33 @@ sealed interface Channel {
                 Visibility.PUBLIC -> Public(id, owner, name, accessControl, emptyList(), description, icon)
                 Visibility.PRIVATE -> Private(id, owner, name, accessControl, emptyList(), description, icon)
             }
+
+        /**
+         * Converts a public channel to a private channel.
+         */
+        fun publicToPrivate(channel: Public): Private =
+            Private(
+                channel.cId,
+                channel.owner,
+                channel.name,
+                channel.accessControl,
+                channel.messages,
+                channel.description,
+                channel.icon,
+            )
+
+        /**
+         * Converts a private channel to a public channel.
+         */
+        fun privateToPublic(channel: Private): Public =
+            Public(
+                channel.cId,
+                channel.owner,
+                channel.name,
+                channel.accessControl,
+                channel.messages,
+                channel.description,
+                channel.icon,
+            )
     }
 }
