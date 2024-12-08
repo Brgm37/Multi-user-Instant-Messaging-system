@@ -5,6 +5,7 @@ import {UseCreateUserInvitationHandler} from "./hooks/handler/UseCreateUserInvit
 import {useCreateUserInvitation} from "./hooks/UseCreateUserInvitation";
 import {CreateUserInvitationEditingView} from "./components/CreateUserInvitationEditingView";
 import {FaClipboard} from "react-icons/fa";
+import {Navigate} from "react-router-dom";
 
 
 export function CreateUserInvitationView(): React.JSX.Element {
@@ -36,7 +37,7 @@ export function CreateUserInvitationView(): React.JSX.Element {
             case "error":
                 return <div>Error: ${state.message}</div>
             case "closing":
-                return <div>Closing...</div>
+                return <Navigate to={"/channels/findChannels"}/>
         }
     })
 
@@ -45,7 +46,10 @@ export function CreateUserInvitationView(): React.JSX.Element {
             <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-96">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg font-semibold">User invite code settings</h2>
-                    <button className="text-gray-400 hover:text-gray-200">
+                    <button
+                        className="text-gray-400 hover:text-gray-200"
+                        onClick={handler.onClose}
+                    >
                         <i className="fas fa-times"></i>
                     </button>
                 </div>

@@ -15,11 +15,6 @@ export type UseCreateChannelHandler = {
      */
     onDescriptionChange: (description: string) => void
     /**
-     * The function to call to go back to the editing state.
-     * @returns void
-     */
-    goBack(): void
-    /**
      * The function to call when the user clicks on the submit button.
      *
      * @returns void
