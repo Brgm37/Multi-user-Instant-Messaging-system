@@ -69,7 +69,6 @@ export function useCreateUserInvitation(): [CreateUserInvitationState, UseCreate
         createUserInvitation(expirationDate).then(r => {
                 if (isFailure(r)) dispatch({type: "error", message: r.value})
                 else{
-                    console.log("worked" + JSON.stringify(r.value))
                     dispatch({ type: "success", invitationCode: r.value.invitationCode })
                 }
             }
