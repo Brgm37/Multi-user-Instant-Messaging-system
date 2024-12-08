@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+/**
+ * The loading icon.
+ */
 export default function (): React.JSX.Element {
     return (
         <div

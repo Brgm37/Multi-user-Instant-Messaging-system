@@ -5,9 +5,14 @@ import {AccessControl} from "../../model/AccessControl";
 import {urlBuilder} from "../utils/UrlBuilder";
 import { CreateChannelInvitationServiceContext } from "./CreateChannelInvitationServiceContext";
 
+/**
+ * The URL for the channel.
+ */
 const baseUrl = urlBuilder("/channels")
 
-
+/**
+ * The create channel invitation service provider.
+ */
 export function CreateChannelInvitationServiceProvider(props: { children: ReactNode }): React.JSX.Element {
     const signal = useSignal()
     const service = {

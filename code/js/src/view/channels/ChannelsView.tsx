@@ -5,6 +5,9 @@ import {Channel} from "../../model/Channel";
 import BasicChannelsView from "./components/BasicChannelsView";
 import {Link} from "react-router-dom";
 
+/**
+ * The channels view.
+ */
 export function ChannelsView(): React.JSX.Element {
     const [state, channels, handler] = useChannels()
     if (state.tag === "idle") handler.loadChannels()

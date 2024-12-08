@@ -4,8 +4,17 @@ import {useContext, useReducer} from "react";
 import {UseJoinChannelHandler} from "./handler/UseJoinChannelHandler";
 import {JoinChannelServiceContext} from "../../../service/joinChannel/JoinChannelServiceContext";
 
+/**
+ * The error message to display when an error occurs while joining a channel.
+ */
 const ERROR_MESSAGE = "An error occurred while joining the channel. Please try again later.";
 
+/**
+ * Reducer function for the JoinChannel component.
+ *
+ * @param state The current state of the component.
+ * @param action The action to perform.
+ */
 function reduce (state: JoinChannelStates, action: JoinChannelActions): JoinChannelStates {
     switch (state.tag) {
         case "UseJoin":
@@ -33,6 +42,9 @@ function reduce (state: JoinChannelStates, action: JoinChannelActions): JoinChan
     }
 }
 
+/**
+ * The hook for the JoinChannel component.
+ */
 export function useJoinChannel(): [JoinChannelStates, UseJoinChannelHandler] {
     const [state, dispatch] = useReducer(reduce, { tag: "UseJoin" })
     const service = useContext(JoinChannelServiceContext)

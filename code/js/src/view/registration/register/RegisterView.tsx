@@ -9,6 +9,9 @@ import {passwordValidation} from "../../../service/registration/validation/Passw
 import {useEffect} from "react";
 import {RegisterCommunicationContext} from "../../../service/registration/communication/RegisterCommunicationProvider";
 
+/**
+ * The register view.
+ */
 export function RegisterView(): React.JSX.Element {
     const context = React.useContext(RegisterCommunicationContext);
     const [state, handler] = useRegister();

@@ -44,6 +44,9 @@ export interface FindChannelsServiceContext {
     ): Promise<Either<PublicChannel[], string>>
 }
 
+/**
+ * Default FindChannels service context.
+ */
 const defaultFindChannelsServiceContext: FindChannelsServiceContext = {
     getChannelsByPartialName: (partialName, offset, limit) => {
         return new Promise<Either<PublicChannel[], string>>((resolve, reject) => {
@@ -62,5 +65,8 @@ const defaultFindChannelsServiceContext: FindChannelsServiceContext = {
     }
 }
 
+/**
+ * FindChannels service context.
+ */
 export const FindChannelsServiceContext: Context<FindChannelsServiceContext> =
     createContext<FindChannelsServiceContext>(defaultFindChannelsServiceContext)

@@ -11,11 +11,19 @@ import {Channel} from "../../../../model/Channel";
 import envConfig from "../../../../../envConfig.json"
 import reduce from "./reducer/UseChannelsReducer";
 
+/**
+ * The default values.
+ */
 const LIST_SIZE = envConfig.channels_limit
 const DEFAULT_LIMIT = envConfig.default_limit
 let limit = DEFAULT_LIMIT
 const HAS_MORE = DEFAULT_LIMIT + 1
 
+/**
+ * Resets the list.
+ * @param listHandler
+ * @param result
+ */
 function resetList(
     listHandler: UseScrollHandler<Channel>,
     result: Channel[],
@@ -27,6 +35,14 @@ function resetList(
     listHandler.reset(channels, hasMore)
 }
 
+/**
+ * Adds items to the list.
+ * @param at
+ * @param offset
+ * @param listHandler
+ * @param list
+ * @param result
+ */
 function addItems(
     at: "head" | "tail",
     offset: number,
@@ -47,6 +63,9 @@ function addItems(
     listHandler.addItems(channels, at, hasMore)
 }
 
+/**
+ * The useChannels hook.
+ */
 export default function (): [ChannelsState, UseScrollState<Channel>, ChannelsHandler] {
     const [list, listHandler] = useScroll<Channel>(LIST_SIZE)
     const initialState: ChannelsState = {tag: "idle"}

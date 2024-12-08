@@ -1,5 +1,8 @@
 import React from "react";
 
+/**
+ * The view for fetching more channels.
+ */
 export function FindChannelsFetchingMoreView(
 ): React.JSX.Element {
     return (

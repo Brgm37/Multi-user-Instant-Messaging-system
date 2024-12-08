@@ -4,8 +4,14 @@ import useSignal from "../utils/hooks/useSignal/useSignal";
 import {Either, failure, success} from "../../model/Either";
 import {JoinChannelServiceContext} from "./JoinChannelServiceContext";
 
+/**
+ * The URL for the channel.
+ */
 const baseUrl = urlBuilder("/channels")
 
+/**
+ * The join channel service provider.
+ */
 export function JoinChannelServiceProvider(
     { children }: { children: React.ReactNode }
 ): React.JSX.Element {

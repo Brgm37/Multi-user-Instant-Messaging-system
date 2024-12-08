@@ -1,6 +1,10 @@
 import * as React from 'react';
 import {useEffect, useState} from "react";
 
+/**
+ * The search bar for finding channels.
+ * @param handleChange The function to call when the search value changes.
+ */
 export default function (
     {handleChange}: { handleChange: (value: string) => void }
 ): React.JSX.Element {

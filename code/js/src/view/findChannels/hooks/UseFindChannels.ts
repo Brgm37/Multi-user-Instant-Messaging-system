@@ -7,6 +7,9 @@ import {FindChannelsServiceContext} from "../../../service/findChannels/FindChan
 import useScroll, {HasMore, UseScrollHandler, UseScrollState} from "../../../service/utils/hooks/useScroll/UseScroll";
 import {PublicChannel} from "../../../model/PublicChannel";
 
+/**
+ * The default values
+ */
 const LIST_SIZE = envConfig.channels_limit
 const DEFAULT_LIMIT = envConfig.default_limit
 let limit = DEFAULT_LIMIT
@@ -17,6 +20,12 @@ const HAS_MORE = DEFAULT_LIMIT + 1
  */
 const CHANNELS_PER_FETCH = envConfig.public_channels_limit
 
+/**
+ * Resets the list.
+ *
+ * @param listHandler
+ * @param result
+ */
 function resetList(
     listHandler: UseScrollHandler<PublicChannel>,
     result: PublicChannel[],
@@ -28,6 +37,15 @@ function resetList(
     listHandler.reset(channels, hasMore)
 }
 
+/**
+ * Adds items to the list.
+ *
+ * @param at
+ * @param offset
+ * @param listHandler
+ * @param list
+ * @param result
+ */
 function addItems(
     at: "head" | "tail",
     offset: number,
@@ -48,6 +66,9 @@ function addItems(
     listHandler.addItems(channels, at, hasMore)
 }
 
+/**
+ * The use find channels.
+ */
 export function useFindChannels(): [FindChannelState, UseScrollState<PublicChannel>, string, UseFindChannelsHandler] {
     const [list, listHandler] = useScroll<PublicChannel>(LIST_SIZE)
     const [searchValue, setSearchValue] = useState<string>("")

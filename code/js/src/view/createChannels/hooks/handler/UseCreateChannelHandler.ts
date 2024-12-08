@@ -1,23 +1,18 @@
 import {ChannelInput} from "../states/createChannelsState";
 
+/**
+ * The handler for the create channel view.
+ *
+ * The handler is used to interact with the create channel view.
+ * It provides methods to handle the name and description changes,
+ * and to submit the channel.
+ *
+ * @method onNameChange - The function to call when the name changes.
+ * @method onDescriptionChange - The function to call when the description changes.
+ * @method onSubmit - The function to call when the user clicks on the submit button.
+ */
 export type UseCreateChannelHandler = {
-    /**
-     * The function to call when the name changes.
-     * @param name The new name.
-     * @returns void
-     */
     onNameChange: (name: string) => void
-
-    /**
-     * The function to call when the description changes.
-     * @param description The new description.
-     * @returns void
-     */
     onDescriptionChange: (description: string) => void
-    /**
-     * The function to call when the user clicks on the submit button.
-     *
-     * @returns void
-     */
     onSubmit: (channel: ChannelInput) => void
 }

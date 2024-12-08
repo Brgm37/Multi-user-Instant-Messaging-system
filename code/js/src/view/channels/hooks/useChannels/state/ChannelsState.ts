@@ -7,6 +7,11 @@
  * - scrolling: The view is scrolling.
  * - error: The view has encountered an error and the message is displayed.
  *
+ * @type ChannelsState
+ * @prop tag The type of the state.
+ * @prop at The position to load more channels.
+ * @prop message The error message.
+ * @prop previous The previous state of the channels view.
  */
 export type ChannelsState =
     { tag: "idle" } |

@@ -7,6 +7,12 @@
  * - messages: The channel is in a state where messages are being displayed.
  * - loading: The channel is in a loading state.
  * - error: The channel is in an error state.
+ *
+ * @type ChannelState
+ * @prop tag The type of the state.
+ * @prop at The position to load more messages.
+ * @prop message The error message.
+ * @prop previous The previous state of the channel.
  */
 export type ChannelState =
     { tag: "idle" } |

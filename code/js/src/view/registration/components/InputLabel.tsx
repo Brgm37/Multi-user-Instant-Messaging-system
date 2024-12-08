@@ -1,11 +1,21 @@
 import * as React from 'react';
 
+/**
+ * The input label props.
+ */
 type InputLabelProps = {
     value: string,
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
     error: string,
 }
 
+/**
+ * The input label component.
+ * @param label
+ * @param type
+ * @param disabled
+ * @param input
+ */
 export function InputLabel(
     {label, type, disabled, input}: {label: string, type: string, disabled: boolean, input: InputLabelProps}
 ) {

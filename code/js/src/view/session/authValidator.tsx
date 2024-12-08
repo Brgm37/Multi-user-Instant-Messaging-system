@@ -14,7 +14,9 @@ const userUrl = urlBuilder("/users")
  */
 const TOKEN = configJson.session
 
-
+/**
+ * The authentication validator.
+ */
 export function AuthValidator({children}: { children: React.ReactNode }): React.ReactElement {
     const signal = useSignal()
     const cookie = getCookie(TOKEN)

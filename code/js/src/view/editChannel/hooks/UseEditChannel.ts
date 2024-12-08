@@ -5,7 +5,9 @@ import {useContext, useReducer} from "react";
 import reduce from "./reducer/EditChannelReducer";
 import {useParams} from "react-router-dom";
 
-
+/**
+ * The use edit channel hook.
+ */
 export function useEditChannel(): [EditChannelState, EditChannelHandler] {
     const context = useContext(EditChannelServiceContext)
     const {id} = useParams()

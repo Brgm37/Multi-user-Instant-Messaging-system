@@ -7,7 +7,9 @@ import {CreateUserInvitationEditingView} from "./components/CreateUserInvitation
 import {FaClipboard} from "react-icons/fa";
 import {Navigate} from "react-router-dom";
 
-
+/**
+ * The user invitation view.
+ */
 export function CreateUserInvitationView(): React.JSX.Element {
     const [state, handler]: [CreateUserInvitationState, UseCreateUserInvitationHandler]= useCreateUserInvitation();
 

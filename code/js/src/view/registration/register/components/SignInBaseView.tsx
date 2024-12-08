@@ -6,6 +6,9 @@ import {InputFormContext} from "../../components/InputFormContext";
 import {InputLabelContext} from "../../components/input/InputContext";
 import LoadingIcon from "../../../components/LoadingIcon";
 
+/**
+ * The view for the sign in base view.
+ */
 type SignInBaseViewProps = {
     inputsDisabled: boolean,
     isValid: boolean,
@@ -13,6 +16,9 @@ type SignInBaseViewProps = {
     onSubmit?: () => void
 }
 
+/**
+ * The view for the sign in base view.
+ */
 export function SignInBaseView(
     {inputsDisabled, error, isValid, onSubmit}: SignInBaseViewProps
 ) {

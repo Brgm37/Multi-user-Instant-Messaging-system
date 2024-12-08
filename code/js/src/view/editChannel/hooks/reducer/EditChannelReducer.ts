@@ -1,7 +1,11 @@
 import {EditChannelState} from "../states/EditChannelState";
 import {EditChannelAction} from "../states/EditChannelAction";
 
-
+/**
+ * The reducer function.
+ * @param state
+ * @param action
+ */
 export default function (state: EditChannelState, action: EditChannelAction): EditChannelState {
     switch (state.tag) {
         case "idle":

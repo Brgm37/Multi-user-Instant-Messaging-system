@@ -1,11 +1,19 @@
 import zxcvbn from 'zxcvbn'
 import {ZXCVBNResult} from "zxcvbn";
 
+/**
+ * Password validation patterns
+ */
 const upperCasePatter = /[A-Z]/
 const lowerCasePatter = /[a-z]/
 const digitPatter = /[0-9]/
 const specialCharacter = /[!@#$%^&*(),.?":{}|<>]/
 
+/**
+ * Validate the password
+ * @param password The password to validate
+ * @returns The error message or true if the password is valid
+ */
 export function passwordValidation(password: string): string | true {
     if (password.length == 0) {
       return ""

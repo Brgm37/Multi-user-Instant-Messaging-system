@@ -1,6 +1,8 @@
 import React from "react";
 
-
+/**
+ * The view for finding channels.
+ */
 export function FindChannelsLoadingView(
 ): React.JSX.Element {
     return (

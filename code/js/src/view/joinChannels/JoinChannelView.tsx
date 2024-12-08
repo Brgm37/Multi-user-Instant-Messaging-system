@@ -4,7 +4,9 @@ import {useJoinChannel} from "./hooks/UseJoinChannel";
 import {UseJoinChannelHandler} from "./hooks/handler/UseJoinChannelHandler";
 import {JoinChannelStates} from "./hooks/states/JoinChannelStates";
 
-
+/**
+ * The join channel view.
+ */
 export function JoinChannelView(): React.JSX.Element {
     const [state, handler]: [JoinChannelStates, UseJoinChannelHandler] = useJoinChannel()
     const [token, setToken] = React.useState("")

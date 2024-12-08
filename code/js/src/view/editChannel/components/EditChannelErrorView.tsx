@@ -1,5 +1,10 @@
 import * as React from 'react';
 
+/**
+ * The props for the edit channel error view.
+ * @param error
+ * @param goBack
+ */
 export function EditChannelErrorView(
     {error, goBack}: { error: string, goBack: () => void }
 ): React.JSX.Element {

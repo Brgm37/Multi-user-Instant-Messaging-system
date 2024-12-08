@@ -37,6 +37,11 @@ const maxUsesOptions = [
     "100"
 ]
 
+/**
+ * The view for creating a channel invitation code.
+ *
+ * @param handler
+ */
 export function CreateChannelInvitationEditingView({handler}: {handler: UseCreateChannelInvitationHandler}): React.ReactElement {
     const handleGenerateCode = () => {
         const expirationDate = expirationDateToTimeFormat((document.querySelector("select[title=expirationDate]") as HTMLSelectElement).value);

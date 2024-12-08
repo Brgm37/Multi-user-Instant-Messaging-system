@@ -16,8 +16,6 @@ const channelApiUrl = urlBuilder("/channels")
  */
 const messageApiUrl = urlBuilder("/messages")
 
-
-
 /**
  * The headers for the message.
  */
@@ -28,6 +26,9 @@ const msgHeaders = "msg"
  */
 const channelHeaders = "channel"
 
+/**
+ * The channel service provider.
+ */
 export function ChannelServiceProvider({children}: { children: React.ReactNode }): React.JSX.Element {
     const signal = useSignal()
 

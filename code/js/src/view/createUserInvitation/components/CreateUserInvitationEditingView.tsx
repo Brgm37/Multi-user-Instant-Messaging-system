@@ -1,6 +1,11 @@
 import React from "react";
 import {expirationDateToTimeFormat} from "../../../service/utils/expirationDateToTimeFormat";
 
+/**
+ * The view for creating a user invitation.
+ *
+ * @param onGenerate The function to call when the user wants to generate a new invitation code.
+ */
 const expirationDateOptions = [
     "30 minutes",
     "1 hour",
@@ -9,6 +14,11 @@ const expirationDateOptions = [
     "7 days"
 ]
 
+/**
+ * The view for creating a user invitation.
+ * @param onGenerate
+ * @constructor
+ */
 export function CreateUserInvitationEditingView(
     {onGenerate}: {onGenerate: (expirationDate: string) => void}
 ): React.JSX.Element {
