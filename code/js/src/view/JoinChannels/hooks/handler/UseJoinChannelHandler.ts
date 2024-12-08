@@ -5,4 +5,9 @@ export type UseJoinChannelHandler = {
      * @param joinCode
      */
     onJoin: (joinCode: string) => void
+
+    /**
+     * Close the join channel component
+     */
+    onClose: () => void
 }

@@ -14,10 +14,19 @@ function reduce (state: JoinChannelStates, action: JoinChannelActions): JoinChan
                     return { tag: "UseJoinSuccess", id: action.id }
                 case "error":
                     return { tag: "UseJoinError", message: action.message }
+                case "close":
+                    return { tag: "UseJoinClose" }
                 default:
                     throw new Error("Invalid action")
             }
         case "UseJoinError":
+            switch (action.type) {
+                case "close":
+                    return { tag: "UseJoinClose" }
+                default:
+                    throw new Error("Invalid action")
+            }
+        case "UseJoinClose":
             throw new Error("Final state reached")
         case "UseJoinSuccess":
             throw new Error("Final state reached")
@@ -37,6 +46,9 @@ export function useJoinChannel(): [JoinChannelStates, UseJoinChannelHandler] {
                     dispatch({ type: "error", message: ERROR_MESSAGE })
                 }
             })
+        },
+        onClose: () => {
+            dispatch({ type: "close" })
         }
     }
     return [state, handler]

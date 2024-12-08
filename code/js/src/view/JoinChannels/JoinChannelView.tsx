@@ -37,6 +37,8 @@ export function JoinChannelView(): React.JSX.Element {
                 return <div>Error: {state.message}</div>
             case "UseJoinSuccess":
                 return <Navigate to={`/channels/${state.id}`}/>
+            case "UseJoinClose":
+                return <Navigate to={"/channels/findChannels"}/>
         }
     })
     return (
@@ -44,7 +46,10 @@ export function JoinChannelView(): React.JSX.Element {
             <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-96">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg font-semibold">Join Channel</h2>
-                    <button className="text-gray-400 hover:text-gray-200">
+                    <button
+                        className="text-gray-400 hover:text-gray-200"
+                        onClick={handler.onClose}
+                    >
                         <i className="fas fa-times"></i>
                     </button>
                 </div>
