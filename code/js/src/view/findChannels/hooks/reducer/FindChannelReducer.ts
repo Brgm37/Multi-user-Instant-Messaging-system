@@ -18,7 +18,7 @@ export default function (state: FindChannelState, action: FindChannelAction) : F
                 case "error":
                     return { tag: "error", error: action.error, }
                 default:
-                    throw new Error("Invalid action: " + action.type + " for state: " + state.tag)
+                    throw new Error("Invalid action: " + action.type + " in state: " + state.tag)
             }
         case "loading":
             switch (action.type) {
@@ -27,7 +27,7 @@ export default function (state: FindChannelState, action: FindChannelAction) : F
                 case "error":
                     return { tag: "error", error: action.error, }
                 default:
-                    throw new Error("Invalid action: " + action.type + " for state: " + state.tag)
+                    throw new Error("Invalid action: " + action.type + " in state: " + state.tag)
             }
         case "scrolling":
             switch (action.type) {
@@ -38,14 +38,14 @@ export default function (state: FindChannelState, action: FindChannelAction) : F
                 case "join":
                     return { tag: "joining", channelId: action.channelId }
                 default:
-                    throw new Error("Invalid action: " + action.type + " for state: " + state.tag)
+                    throw new Error("Invalid action: " + action.type + " in state: " + state.tag)
             }
         case "error":
             switch (action.type) {
                 case "closeError":
                     return { tag: "idle" }
                 default:
-                    throw new Error("Invalid action: " + action.type + " for state: " + state.tag)
+                    throw new Error("Invalid action: " + action.type + " in state: " + state.tag)
             }
         case "joining":
             switch (action.type) {
@@ -54,7 +54,7 @@ export default function (state: FindChannelState, action: FindChannelAction) : F
                 case "error":
                     return { tag: "error", error: action.error, }
                 default:
-                    throw new Error("Invalid action: " + action.type + " for state: " + state.tag)
+                    throw new Error("Invalid action: " + action.type + " in state: " + state.tag)
             }
         case "redirect":
             throw new Error("Final state reached")

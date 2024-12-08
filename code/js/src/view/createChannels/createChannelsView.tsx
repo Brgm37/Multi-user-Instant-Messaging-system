@@ -4,9 +4,6 @@ import {CreateChannelsState} from "./hooks/states/createChannelsState";
 import {UseCreateChannelHandler} from "./hooks/handler/UseCreateChannelHandler";
 import {Navigate} from "react-router-dom";
 import {CreateChannelsBaseView} from "./components/CreateChannelsBaseView";
-import {useContext} from "react";
-import {useImagePicker} from "../components/ImagePicker/ImagePickerProvider";
-import {InputBar} from "../components/InputBar";
 
 export function CreateChannelsView(): React.JSX.Element {
     const [state, handler]: [CreateChannelsState, UseCreateChannelHandler] = useCreateChannel()
@@ -23,6 +20,8 @@ export function CreateChannelsView(): React.JSX.Element {
                 return <div>Submitting...</div>
             case "editing":
                 return <CreateChannelsBaseView handler={handler} state={state}/>
+            case "validating":
+                return <CreateChannelsBaseView handler={handler} state={state}/>
         }
     })
     return (
@@ -32,7 +31,7 @@ export function CreateChannelsView(): React.JSX.Element {
                 <div className={"p-5 ml-auto"}></div>
             </header>
             <div className="container mx-auto p-8">
-                {view(state)}
+            {view(state)}
             </div>
         </div>
     )

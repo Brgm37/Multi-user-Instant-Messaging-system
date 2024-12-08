@@ -203,10 +203,7 @@ class ChannelController(
                 accessControl = invitation.accessControl,
             )
         return when (response) {
-            is Success -> {
-                ResponseEntity.ok(ChannelInvitationOutputModel(response.value.invitationCode.toString()))
-            }
-
+            is Success -> ResponseEntity.ok(ChannelInvitationOutputModel(response.value.invitationCode.toString()))
             is Failure -> {
                 when (response.value) {
                     ChannelError.ChannelNotFound -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)

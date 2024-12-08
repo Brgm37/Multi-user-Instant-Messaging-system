@@ -90,8 +90,10 @@ export default function (
         if (beginOfListRef.current) {
             switch (at) {
                 case "sending": {
-                    if (beginOfListRef.current && !items.hasMore.head)
-                        beginOfListRef.current.scrollIntoView({ behavior: "smooth" });
+                    if (beginOfListRef.current && !items.hasMore.head) {
+                        setPop(false)
+                        beginOfListRef.current.scrollIntoView({behavior: "smooth"});
+                    }
                     break;
                 }
                 case "both": {
@@ -154,7 +156,7 @@ export default function (
                 {pop &&
                     (
                         <div
-                            className="popup-new-message"
+                            className="popup-new-message cursor-pointer"
                             onClick={handlePopupClick}
                         >
                             New message received!

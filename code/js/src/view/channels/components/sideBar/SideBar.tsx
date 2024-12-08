@@ -7,6 +7,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {IoIosAdd} from "react-icons/io";
 import {IoInformationCircleSharp, IoLogOutOutline} from "react-icons/io5";
 import {FaSearch} from "react-icons/fa";
+import {RiUserAddFill} from "react-icons/ri";
 
 const TIMEOUT = 500;
 
@@ -76,6 +77,18 @@ export function Sidebar(): React.JSX.Element {
                         {channels.map(channel => (<option key={channel.id} value={channel.name}/>))}
                     </datalist>
                 </div>
+
+                <Link to={"/channels/createUserInvitation"} className={"relative group"}>
+                    <div
+                        className="w-12 h-12 bg-black overflow-hidden rounded-full transition-transform duration-300 ease-in-out transform hover:scale-110 hover:shadow-lg cursor-pointer flex items-center justify-center">
+                        <RiUserAddFill className="w-6 h-6"/>
+                    </div>
+                    <div
+                        className="absolute left-16 top-1/2 transform -translate-y-1/2 z-50 bg-black text-white text-sm font-bold px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 tooltip-arrow pointer-events-none group-hover:pointer-events-auto"
+                        style={{width: "max-content"}}
+                    >Create User Invitation
+                    </div>
+                </Link>
 
                 <Link to={"/channels/findChannels"} className={"relative group"}>
                     <div

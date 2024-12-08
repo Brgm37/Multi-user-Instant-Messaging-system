@@ -19,6 +19,7 @@ export type Channel = Identifiable & {
     messages: Message[],
     hasMore: boolean,
     accessControl: AccessControl,
+    description: string,
     visibility: ChannelVisibility,
     owner: Owner,
     icon: string,
@@ -46,6 +47,7 @@ export function jsonToChannel(json: any): Channel {
         messages: messages,
         hasMore: json.hasMore,
         accessControl: json.access,
+        description: json.description,
         visibility: json.visibility,
         owner: json.owner,
         icon: json.icon

@@ -9,7 +9,7 @@ This project focuses on an instant messaging system where users can communicate 
 - Channel
 - Message
 
-Detailed [UML diagrams](./Conceptual_Module/README.md) represent the main entities of the system.
+Detailed [UML diagrams](../Conceptual_Module/README.md) represent the main entities of the system.
 
 ## Key Aspects
 
@@ -28,9 +28,9 @@ Detailed [UML diagrams](./Conceptual_Module/README.md) represent the main entiti
 
 # Physical Model
 
-The [physical model](../code/jvm/repository_jdbc/src/sql/create.sql) is depicted in the following diagram:
+The [physical model](../../code/jvm/repository_jdbc/src/sql/create.sql) is depicted in the following diagram:
 
-<img src="../code/jvm/repository_jdbc/src/sql/ChIMP-scheme.svg">
+<img src="../../code/jvm/repository_jdbc/src/sql/ChIMP-scheme.svg">
 
 ## Key Aspects
 
@@ -82,7 +82,7 @@ The [physical model](../code/jvm/repository_jdbc/src/sql/create.sql) is depicted
 
 ## Data Access
 
-Data access is facilitated through the repository_jdbc module, with the relevant [queries](./dataAccess/README.md).
+Data access is facilitated through the repository_jdbc module, with the relevant [queries](../dataAccess/README.md).
 
 # OpenAPI Specification
 

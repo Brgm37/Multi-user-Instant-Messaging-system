@@ -1,6 +1,7 @@
 package com.example.appWeb.controller
 
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
+import com.example.appWeb.model.dto.input.user.CreateUserInvitationInputModel
 import com.example.appWeb.model.dto.input.user.UserLogInInputModel
 import com.example.appWeb.model.dto.input.user.UserSignUpInputModel
 import com.example.appWeb.model.dto.output.user.UserAuthenticatedOutputModel
@@ -113,9 +114,10 @@ class UserController(
     @PostMapping(INVITATION_URL)
     @UserSwaggerConfig.CreateInvitation
     fun createInvitation(
+        @Valid @RequestBody expirationDate : CreateUserInvitationInputModel,
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
-        when (val response = userService.createInvitation(authenticated.uId)) {
+        when (val response = userService.createInvitation(authenticated.uId, expirationDate.expirationDate)) {
             is Success -> {
                 ResponseEntity.ok(UserInvitationOutputModel.fromDomain(response.value))
             }

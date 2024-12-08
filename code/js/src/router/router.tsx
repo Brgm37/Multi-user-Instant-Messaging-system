@@ -32,12 +32,18 @@ import {
 import {CreateChannelServiceProvider} from "../service/createChannels/createChannelsServiceProvider";
 import {ImagePickerProvider} from "../view/components/ImagePicker/ImagePickerProvider";
 import ImagePicker from "../view/components/ImagePicker/ImagePicker";
+import {CreateUserInvitationView} from "../view/createUserInvitation/CreateUserInvitationView";
+import {CreateUserInvitationServiceProvider} from "../service/CreateUserInvitation/createUserInvitationServiceProvider";
+import {EditChannelServiceProvider} from "../service/editChannel/editChannelServiceProvider";
+import EditChannelView from "../view/editChannel/EditChannelView";
+import {JoinChannelServiceProvider} from "../service/joinChannel/JoinChannelServiceProvider";
+import {JoinChannelView} from "../view/JoinChannels/JoinChannelView";
 
 const router = createBrowserRouter(
     [
         {
             "path": "/",
-            "element": <Navigate to="/channels" replace/>,
+            "element": <Navigate to="/channels/findChannels" replace/>,
         },
         {
             "path": "/register",
@@ -68,6 +74,7 @@ const router = createBrowserRouter(
             "element":
                 <AuthValidator>
                     <ChannelsServicesProvider>
+                        <Navigate to={"/channels/findChannels"} replace/>
                         <ChannelsView/>
                     </ChannelsServicesProvider>
                 </AuthValidator>,
@@ -75,11 +82,11 @@ const router = createBrowserRouter(
                 {
                     "path": "/channels/:id",
                     "element":
-                    <SseCommunicationServiceProvider>
-                        <ChannelServiceProvider>
-                            <ChannelView/>
-                        </ChannelServiceProvider>
-                    </SseCommunicationServiceProvider>,
+                        <SseCommunicationServiceProvider>
+                            <ChannelServiceProvider>
+                                <ChannelView/>
+                            </ChannelServiceProvider>
+                        </SseCommunicationServiceProvider>,
                     children: [
                         {
                             "path": "/channels/:id/createInvitation",
@@ -87,8 +94,17 @@ const router = createBrowserRouter(
                                 <CreateChannelInvitationServiceProvider>
                                     <CreateChannelInvitationView/>
                                 </CreateChannelInvitationServiceProvider>
-                        ,
                         },
+                        {
+                            "path": "/channels/:id/edit",
+                            "element":
+                                <EditChannelServiceProvider>
+                                    <ImagePickerProvider>
+                                        <EditChannelView/>
+                                        <ImagePicker/>
+                                    </ImagePickerProvider>
+                                </EditChannelServiceProvider>
+                        }
                     ]
                 },
                 {
@@ -110,11 +126,26 @@ const router = createBrowserRouter(
                         </CreateChannelServiceProvider>,
                 },
                 {
+                    "path": "/channels/createUserInvitation",
+                    "element":
+                        <CreateUserInvitationServiceProvider>
+                            <CreateUserInvitationView/>
+                        </CreateUserInvitationServiceProvider>,
+
+                },
+                {
+                    "path": "/channels/joinChannel",
+                    "element":
+                        <JoinChannelServiceProvider>
+                            <JoinChannelView/>
+                        </JoinChannelServiceProvider>,
+                },
+                {
                     "path": "/channels/about",
                     "element": <AboutView />,
                 },
             ]
-                },
+        },
     ]
 )
 

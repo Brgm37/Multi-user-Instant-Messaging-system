@@ -5,15 +5,8 @@ import {Either, failure, success} from "../../model/Either";
 import {Channel, jsonToChannel} from "../../model/Channel";
 import {AuthUserContext} from "../../view/session/AuthUserContext";
 import useSignal from "../utils/hooks/useSignal/useSignal";
-import {CreateChannel} from "../../view/createChannels/model/CreateChannel";
 
 const urlBase = urlBuilder("/channels")
-
-const channelNameHeader = "name"
-const visibilityHeader = "visibility"
-const accessControlHeader = "accessControl"
-const descriptionHeader = "description"
-const iconHeader = "icon"
 
 const defaultIconSrc = "/defaultIcons/default.png"
 
@@ -59,9 +52,10 @@ export function CreateChannelServiceProvider(
             const response = await fetch(url)
             if (response.ok) {
                 const channels = await response.json()
-                const channel = channels.filter((c: any) => {
-                    c.owner.id.toString() === user.id
-                })
+                const channelsIOwn = channels.filter((c: any) =>
+                     c.owner.id === Number(user.id)
+                )
+                const channel = channelsIOwn.filter((c: any) => c.name.displayName.toLowerCase() === name.toLowerCase())
                 if (channel.length > 0) {
                     return success(jsonToChannel(channel[0])) as Either<Channel, string>
                 }else {

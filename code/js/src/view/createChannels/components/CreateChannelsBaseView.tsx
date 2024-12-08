@@ -46,7 +46,7 @@ export function CreateChannelsBaseView(
                     onChange={handler.onNameChange}
                     placeholder={"Channel Name"}
                     className={"w-full p-2 bg-gray-700 rounded border border-gray-600 focus:outline-none focus:border-blue-500"}/>
-                {!state.input.isValid && state.input.name.length > 0 &&
+                {state.input.isValid !== undefined && !state.input.isValid && state.input.name.length > 0 &&
                     <span className="text-sm text-red-400">
                         You can´t have two channels with the same name.
                     </span>
@@ -103,7 +103,7 @@ export function CreateChannelsBaseView(
                     type={"submit"}
                     onClick={handleSubmit}
                     className="w-full p-2 bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
-                    disabled={!state.input.isValid}
+                    disabled={!state.input.isValid || state.tag !== "validating"}
                 >
                     Create Channel
                 </button>

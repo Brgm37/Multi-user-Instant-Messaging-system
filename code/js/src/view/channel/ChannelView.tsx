@@ -9,7 +9,6 @@ import {AuthUserContext} from "../session/AuthUserContext";
 import {useContext} from "react";
 
 const defaultAvatar = "/defaultIcons/blank-default-pfp.webp"
-const defaultAvatarUser = "/defaultIcons/blank-default-pfp-user.webp"
 
 export function ChannelView(): React.JSX.Element {
     const [state, messages, handler] = useChannel();

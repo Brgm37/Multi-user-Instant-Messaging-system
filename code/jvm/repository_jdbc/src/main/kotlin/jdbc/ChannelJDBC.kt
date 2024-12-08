@@ -466,7 +466,7 @@ class ChannelJDBC(
             SELECT 
             	channel_id, channel_name, channel_owner, channel_accessControl,
             	channel_visibility, owner_name, channel_description, channel_icon
-            FROM v_channel JOIN channel_members c on c.id = v_channel.channel_id
+            FROM v_channel JOIN channel_members c on c.channel = v_channel.channel_id
             WHERE member = ? AND compare_partial_name(channel_name, ?)
             LIMIT ?
             OFFSET ?
