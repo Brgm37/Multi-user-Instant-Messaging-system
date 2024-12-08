@@ -72,10 +72,8 @@ class UserServicesTest {
             userServices
                 .createUser(usernameDefault2, validPassword, invitation.invitationCode.toString())
 
-        assertIs<Success<User>>(newUser, "User creation failed with error" + (newUser as? Failure)?.value)
+        assertIs<Success<UserToken>>(newUser, "User creation failed with error" + (newUser as? Failure)?.value)
         assertNotNull(newUser.value.uId, "User id is null")
-        assertEquals(usernameDefault2, newUser.value.username, "Username is different")
-        assertEquals(passwordDefault, newUser.value.password, "Password is different")
     }
 
     @ParameterizedTest
@@ -176,7 +174,7 @@ class UserServicesTest {
                     validPassword,
                     invitation.invitationCode.toString(),
                 )
-                as Success<User>
+                as Success<UserToken>
         val userId = checkNotNull(user.value.uId)
         val result = userServices.deleteUser(userId)
         assertIs<Success<Unit>>(result)
@@ -204,11 +202,11 @@ class UserServicesTest {
                     validPassword,
                     invitation.invitationCode.toString(),
                 )
-                as Success<User>
+                as Success<UserToken>
         val userId = checkNotNull(user.value.uId)
         val result = userServices.getUser(userId)
         assertIs<Success<User>>(result)
-        assertEquals(user.value, result.value)
+        assertEquals(user.value.uId, result.value.uId)
     }
 
     @ParameterizedTest
