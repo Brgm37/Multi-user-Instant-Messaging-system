@@ -20,7 +20,7 @@ interface UserServicesInterface {
         username: String,
         password: String,
         invitationCode: String,
-    ): Either<UserError, User>
+    ): Either<UserError, UserToken>
 
     /**
      * Deletes a user.

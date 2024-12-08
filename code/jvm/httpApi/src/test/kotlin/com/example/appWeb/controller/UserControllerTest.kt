@@ -8,7 +8,6 @@ import com.example.appWeb.model.dto.input.user.UserSignUpInputModel
 import com.example.appWeb.model.dto.output.user.UserAuthenticatedOutputModel
 import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
 import com.example.appWeb.model.dto.output.user.UserInvitationOutputModel
-import com.example.appWeb.model.dto.output.user.UserSignUpOutputModel
 import com.example.appWeb.model.problem.UserProblem
 import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
@@ -102,9 +101,9 @@ class UserControllerTest {
                 invitationCode = invitation.invitationCode.toString(),
             )
 
-        val response = userController.signUp(userSignUpInput)
+        val response = userController.signUp(userSignUpInput, MockHttpServletResponse())
         assertEquals(HttpStatus.OK, response.statusCode)
-        assertIs<UserSignUpOutputModel>(response.body)
+        assertIs<UserAuthenticatedOutputModel>(response.body)
     }
 
     @ParameterizedTest
@@ -123,7 +122,7 @@ class UserControllerTest {
                 invitationCode = invitation.invitationCode.toString(),
             )
 
-        val response = userController.signUp(userSignUpInput)
+        val response = userController.signUp(userSignUpInput, MockHttpServletResponse())
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
         assertIs<UserProblem.UsernameAlreadyExists>(response.body)
         assertEquals(response.body, UserProblem.UsernameAlreadyExists)
@@ -142,7 +141,7 @@ class UserControllerTest {
                 invitationCode = "invalidCode",
             )
 
-        val response = userController.signUp(userSignUpInput)
+        val response = userController.signUp(userSignUpInput, MockHttpServletResponse())
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
         assertIs<UserProblem.InvitationCodeIsInvalid>(response.body)
         assertEquals(response.body, UserProblem.InvitationCodeIsInvalid)
@@ -164,7 +163,7 @@ class UserControllerTest {
                 invitationCode = expiredInvitation.invitationCode.toString(),
             )
 
-        val response = userController.signUp(userSignUpInput)
+        val response = userController.signUp(userSignUpInput, MockHttpServletResponse())
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
         assertIs<UserProblem.InvitationCodeHasExpired>(response.body)
         assertEquals(response.body, UserProblem.InvitationCodeHasExpired)

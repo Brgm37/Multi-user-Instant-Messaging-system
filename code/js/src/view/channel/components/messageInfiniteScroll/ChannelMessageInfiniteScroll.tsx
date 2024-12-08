@@ -65,40 +65,26 @@ export default function (
     useEffect(() => {
         if (isLoading === "sending") setAt(isLoading);
         if (isLoading === "both") setAt(isLoading);
-        let timeout: NodeJS.Timeout;
-        if (isLoading === 'receiving' && !pop) {
-            setAt("receiving");
+        if (isLoading === 'receiving') {
+            setAt(isLoading);
             setPop(true);
-            timeout = setTimeout(() => setPop(false), TIMEOUT);
+            setTimeout(() => setPop(false), TIMEOUT);
         }
-        return () => clearTimeout(timeout);
-    }, [isLoading, pop]);
+    }, [isLoading]);
 
     useEffect(() => {
-        if (recordedElementRef.current) {
-            switch (at) {
-                case "head":
-                    recordedElementRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
-                    break;
-                case "tail":
-                    recordedElementRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-                    break;
-                default:
-                    break;
-            }
-        }
-        if (beginOfListRef.current) {
+        if (beginOfListRef.current || recordedElementRef.current) {
             switch (at) {
                 case "sending": {
                     if (beginOfListRef.current && !items.hasMore.head) {
-                        setPop(false)
                         beginOfListRef.current.scrollIntoView({behavior: "smooth"});
                     }
                     break;
                 }
                 case "both": {
-                    if (beginOfListRef.current)
-                        beginOfListRef.current.scrollIntoView({ behavior: "auto" });
+                    if (beginOfListRef.current) {
+                        beginOfListRef.current.scrollIntoView({behavior: "auto"});
+                    }
                     break;
                 }
                 case "receiving":{
@@ -108,11 +94,19 @@ export default function (
                     }
                     break;
                 }
+                case "head": {
+                    recordedElementRef.current.scrollIntoView({behavior: "smooth", block: "end"});
+                }
+                    break;
+                case "tail": {
+                    recordedElementRef.current.scrollIntoView({behavior: "smooth", block: "start"});
+                }
+                    break;
                 default:
                     break;
             }
         }
-    }, [items.list]);
+    }, [items.list, at]);
 
     const handlePopupClick = () => {
         if (items.hasMore.head) {
@@ -128,8 +122,8 @@ export default function (
     return (
         <div className={className}>
             <ul className={scrollStyle}>
-                {isLoading === 'head' && (<LoadingIcon />)}
                 <div ref={beginOfListRef}></div>
+                {isLoading === 'head' && (<LoadingIcon/>)}
                 {
                     items.list.map((item, index) => {
                         if (index === 0) {
@@ -163,7 +157,7 @@ export default function (
                         </div>
                     )
                 }
-                {isLoading === 'tail' && (<LoadingIcon />)}
+                {isLoading === 'tail' && (<LoadingIcon/>)}
             </ul>
         </div>
     );

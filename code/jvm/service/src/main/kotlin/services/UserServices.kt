@@ -33,7 +33,7 @@ class UserServices(
         username: String,
         password: String,
         invitationCode: String,
-    ): Either<UserError, User> {
+    ): Either<UserError, UserToken> {
         if (username.isEmpty()) return failure(UserError.UsernameIsEmpty)
         if (!Password.isValidPassword(password)) return failure(UserError.PasswordIsInvalid)
         val user =
@@ -53,7 +53,14 @@ class UserServices(
             }
             val createdUser = userRepo.createUser(user) ?: return@run failure(UserError.UnableToCreateUser)
             userRepo.deleteInvitation(invitation)
-            success(createdUser)
+            val uId = checkNotNull(createdUser.uId)
+            val token =
+                UserToken(
+                    uId = uId,
+                    expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(TOKEN_EXPIRATION_DAYS)),
+                )
+            if (!userRepo.createToken(token)) return@run failure(UserError.UnableToCreateToken)
+            success(token)
         }
     }
 

@@ -3,13 +3,8 @@ package controller.user
 import TransactionManager
 import com.example.appWeb.controller.UserController
 import controller.TestConfig
-import model.channels.AccessControl
-import model.channels.Channel
-import model.channels.ChannelInvitation
-import model.channels.ChannelName
 import model.users.Password
 import model.users.User
-import model.users.UserInfo
 import model.users.UserInvitation
 import model.users.UserToken
 import org.example.appWeb.HttpApiApplication
@@ -64,36 +59,6 @@ abstract class AbstractUserControllerTest {
                 }
         return invitation
     }
-
-    private fun privateChannelInvitationPair(
-        expirationDate: Timestamp = Timestamp.valueOf(LocalDate.now().plusDays(1).atStartOfDay()),
-        maxUses: UInt = 1u,
-    ) = manager
-        .run {
-            val owner =
-                userRepo
-                    .findByToken(token.token.toString())
-                    ?: throw IllegalStateException("User not found")
-            val ownerId = checkNotNull(owner.uId) { "User not found" }
-            val channel =
-                Channel.Private(
-                    owner = UserInfo(ownerId, owner.username),
-                    name = ChannelName("channel", ownerId.toString()),
-                    accessControl = AccessControl.READ_WRITE,
-                )
-            val channelWithId = channelRepo.createChannel(channel)
-            val invitation =
-                channelWithId?.cId?.let {
-                    ChannelInvitation(
-                        cId = it,
-                        expirationDate = expirationDate,
-                        maxUses = maxUses,
-                        accessControl = AccessControl.READ_WRITE,
-                    )
-                }
-            channelRepo.createInvitation(checkNotNull(invitation))
-            return@run Pair(channelWithId, invitation)
-        }
 
     @BeforeEach
     fun setUp() {

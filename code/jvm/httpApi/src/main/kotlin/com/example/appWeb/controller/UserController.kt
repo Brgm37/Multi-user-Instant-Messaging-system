@@ -7,7 +7,6 @@ import com.example.appWeb.model.dto.input.user.UserSignUpInputModel
 import com.example.appWeb.model.dto.output.user.UserAuthenticatedOutputModel
 import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
 import com.example.appWeb.model.dto.output.user.UserInvitationOutputModel
-import com.example.appWeb.model.dto.output.user.UserSignUpOutputModel
 import com.example.appWeb.model.problem.UserProblem
 import com.example.appWeb.swagger.UserSwaggerConfig
 import errors.UserError
@@ -44,6 +43,7 @@ class UserController(
     @UserSwaggerConfig.SignUp
     fun signUp(
         @Valid @RequestBody user: UserSignUpInputModel,
+        res: HttpServletResponse,
     ): ResponseEntity<*> {
         val response =
             userService.createUser(
@@ -53,7 +53,13 @@ class UserController(
             )
         return when (response) {
             is Success -> {
-                ResponseEntity.ok(UserSignUpOutputModel.fromDomain(response.value))
+                val auth = response.value
+                val cookie = Cookie(AUTH_COOKIE, auth.token.toString())
+                cookie.path = "/api"
+                cookie.isHttpOnly = true
+                cookie.maxAge = auth.expirationDateInInt
+                res.addCookie(cookie)
+                ResponseEntity.ok(UserAuthenticatedOutputModel.fromDomain(response.value))
             }
 
             is Failure -> {
