@@ -58,7 +58,7 @@ export function EditChannelEditingVIew(
                          onClick={open}/>
                 </div>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between cursor-pointer">
                 <button
                     type={"submit"}
                     onClick={handler}

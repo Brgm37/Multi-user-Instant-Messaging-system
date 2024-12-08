@@ -8,6 +8,7 @@ import {AuthUserContext} from "../../session/AuthUserContext";
 import {MdDelete, MdEdit} from "react-icons/md";
 import {FaPersonRunning} from "react-icons/fa6";
 import {IoMdPersonAdd} from "react-icons/io";
+import {IoSend} from "react-icons/io5";
 
 export default function BasicChannelView(
     {error, errorDismiss, onSend, onError}: { error?: string, errorDismiss?: () => void, onSend(msg: string): void, onError(err: string): void }
@@ -131,8 +132,8 @@ export default function BasicChannelView(
                 </header>
 
                 <MessageInfiniteScroll
-                    className={"flex-1 bg-gray-800 p-4 overflow-y-auto flex-col-reverse"}
-                    scrollStyle={"flex-1 bg-gray-800 p-4 overflow-y-auto flex flex-col-reverse"}
+                    className={"flex-1 bg-gray-800 p-4 overflow-y-auto flex-col-reverse custom-scrollbar"}
+                    scrollStyle={"flex-1 bg-gray-800  overflow-y-auto flex flex-col-reverse"}
                 />
                 {error && (
                     <div className="bg-red-500 text-white p-2 rounded">
@@ -148,15 +149,18 @@ export default function BasicChannelView(
                     {isAccessControlReadWrite && (
                         <>
                             <input
-                                className={"flex-1 p-2 bg-gray-900 text-gray-200 border border-gray-700"}
+                                className={"flex-1 p-2 bg-gray-900 text-gray-200 border border-gray-700 mr-1"}
                                 placeholder={"Type a message"}
                                 value={message}
                                 onChange={handleInput}
                                 onKeyDown={handleKeyDown}/>
-                            <button
-                                className={"rounded ml-auto hover:bg-gray-800 p-2"}
-                                onClick={handleSend}>Send
-                            </button>
+
+                            <div
+                                className="w-10 h-10 bg-gray-900 overflow-hidden rounded-lg cursor-pointer flex items-center justify-center"
+                                onClick={handleSend}
+                            >
+                                <IoSend className="w-6 h-6"/>
+                            </div>
                         </>
                     )}
                 </footer>

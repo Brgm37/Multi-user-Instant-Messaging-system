@@ -80,7 +80,7 @@ export default function (
     return (
         <div className={className}>
             <ul className={scrollStyle}>
-                <div>{isLoading === 'head' && (<LoadingIcon/>)}</div>
+                {isLoading === 'head' && (<LoadingIcon/>)}
                 {
                     items.list.map((item, index) => {
                         if (index === 0) {
@@ -104,7 +104,7 @@ export default function (
                         }
                     })
                 }
-                <div>{isLoading === 'tail' && (<LoadingIcon/>)}</div>
+                {isLoading === 'tail' && (<LoadingIcon/>)}
             </ul>
         </div>
     )
