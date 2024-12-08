@@ -11,7 +11,12 @@ import {
 } from "../../../service/createChannelInvitation/CreateChannelInvitationServiceContext";
 import {useParams} from "react-router-dom";
 
-
+/**
+ * The reducer function.
+ *
+ * @param state
+ * @param action
+ */
 export function reduce(state: CreateChannelInvitationState, action: CreateChannelInvitationAction): CreateChannelInvitationState {
     switch (state.tag) {
         case "editingInvitationToken":
@@ -55,8 +60,14 @@ export function reduce(state: CreateChannelInvitationState, action: CreateChanne
     }
 }
 
+/**
+ * The initial state.
+ */
 const initialState: CreateChannelInvitationState = { tag: "editingInvitationToken", inputs: { maxUses: 1, accessControl: "READ_WRITE"} }
 
+/**
+ * The useCreateChannelInvitation hook.
+ */
 export function useCreateChannelInvitation(): [CreateChannelInvitationState, UseCreateChannelInvitationHandler] {
     const { createChannelInvitation } = useContext(CreateChannelInvitationServiceContext)
     const [state, dispatch] = useReducer(reduce, initialState)

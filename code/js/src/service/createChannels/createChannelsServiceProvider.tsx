@@ -6,10 +6,19 @@ import {Channel, jsonToChannel} from "../../model/Channel";
 import {AuthUserContext} from "../../view/session/AuthUserContext";
 import useSignal from "../utils/hooks/useSignal/useSignal";
 
+/**
+ * The URL for the channel.
+ */
 const urlBase = urlBuilder("/channels")
 
+/**
+ * The default icon source.
+ */
 const defaultIconSrc = "/defaultIcons/default.png"
 
+/**
+ * The create channel service provider.
+ */
 export function CreateChannelServiceProvider(
     {children}: { children: React.ReactNode }
 ): React.JSX.Element {

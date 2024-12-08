@@ -4,10 +4,22 @@ import { useHeadTail } from "../../../components/infiniteScroll/hooks/useHeadTai
 import LoadingIcon from "../../../components/LoadingIcon";
 import { InfiniteMessageScrollContext } from "./InfiniteMessageScrollContext";
 
+/**
+ * The timeout for the popup.
+ */
 const TIMEOUT = 3000;
 
+/**
+ * The type of the at.
+ */
 type At = "head" | "tail" | "sending" | "receiving" | "both";
 
+/**
+ * The infinite message scroll.
+ *
+ * @param className the class name
+ * @param scrollStyle the scroll style
+ */
 export default function (
     { className, scrollStyle }: { className?: string, scrollStyle?: string }
 ): React.JSX.Element {

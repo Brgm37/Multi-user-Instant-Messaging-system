@@ -2,7 +2,20 @@ import {Context, createContext} from "react";
 import {Either} from "../../model/Either";
 import {Channel} from "../../model/Channel";
 
+/**
+ * The context for the edit channel service.
+ *
+ * @method editChannel
+ * @method loadChannel
+ */
 export interface EditChannelServiceContext {
+    /**
+     * Edit a channel.
+     * @param id
+     * @param description
+     * @param visibility
+     * @param icon
+     */
     editChannel(
         id: string,
         description?: string,
@@ -10,9 +23,16 @@ export interface EditChannelServiceContext {
         icon?: string,
     ): Promise<Either<void, string>>
 
+    /**
+     * Load a channel.
+     * @param id
+     */
     loadChannel(id: string): Promise<Either<Channel, string>>
 }
 
+/**
+ * The default edit channel service context.
+ */
 const defaultEditChannelServiceContext: EditChannelServiceContext = {
     editChannel: (): Promise<Either<void, string>> => {
         throw new Error("Not implemented")
@@ -22,5 +42,8 @@ const defaultEditChannelServiceContext: EditChannelServiceContext = {
     }
 }
 
+/**
+ * The context for the edit channel service.
+ */
 export const EditChannelServiceContext: Context<EditChannelServiceContext> =
     createContext(defaultEditChannelServiceContext)

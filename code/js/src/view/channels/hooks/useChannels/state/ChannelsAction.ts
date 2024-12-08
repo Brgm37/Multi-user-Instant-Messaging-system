@@ -10,6 +10,11 @@ import {ChannelsState} from "./ChannelsState";
  * - loadError: Load channels with an error.
  * - goBack: Go back to the previous state.
  *
+ * @type ChannelsAction
+ * @prop tag The type of the action.
+ * @prop at The position to load more channels.
+ * @prop message The error message.
+ * @prop previous The previous state of the channels view.
  */
 export type ChannelsAction =
     | { tag: "init" }

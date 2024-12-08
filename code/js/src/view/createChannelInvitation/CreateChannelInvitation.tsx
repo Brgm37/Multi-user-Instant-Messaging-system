@@ -6,6 +6,9 @@ import {CreateChannelInvitationEditingView} from "./components/CreateChannelInvi
 import {Navigate} from "react-router-dom";
 import {FaClipboard} from "react-icons/fa";
 
+/**
+ * The create channel invitation view.
+ */
 export function CreateChannelInvitationView(): React.JSX.Element {
     const [state, handler]: [CreateChannelInvitationState, UseCreateChannelInvitationHandler] = useCreateChannelInvitation();
 

@@ -11,7 +11,6 @@ const TIMEOUT = 500
 /**
  * The input for the username.
  *
- *
  * @param initialValue The initial value of the input.
  * @param isDisabled The disabled state of the input.
  */

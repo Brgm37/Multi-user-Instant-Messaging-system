@@ -14,8 +14,6 @@ const auth_cookie = configJson.session
 
 /**
  * The hook for the login form.
- *
- * @returns [State, UseLoginFormHandler]
  */
 export default function (): [LoginState, LoginHandler] {
     const {login} = useContext(LoginServiceContext)

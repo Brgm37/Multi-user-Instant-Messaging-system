@@ -1,6 +1,9 @@
 /**
- * The ChannelHandler type is a collection of functions
- * that can be used to interact with the channel state.
+ * The handler for the channels.
+ *
+ * The handler is used to interact with the channels.
+ * It provides methods to load the initial set of channels,
+ * load more channels, and go back to the previous state.
  *
  * @method loadChannels - Load the initial set of channels
  * @method loadMore - Load more channels

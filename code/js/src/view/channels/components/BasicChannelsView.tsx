@@ -2,6 +2,13 @@ import * as React from "react";
 import {Outlet} from "react-router-dom";
 import {Sidebar} from "./sideBar/SideBar";
 
+/**
+ * The basic view for the channels.
+ *
+ * @param error
+ * @param errorDismiss
+ * @constructor
+ */
 export default function BasicChannelsView(
     {error, errorDismiss}: { error?: string, errorDismiss?: () => void }
 ): React.JSX.Element {

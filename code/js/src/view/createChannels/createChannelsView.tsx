@@ -5,6 +5,9 @@ import {UseCreateChannelHandler} from "./hooks/handler/UseCreateChannelHandler";
 import {Navigate} from "react-router-dom";
 import {CreateChannelsBaseView} from "./components/CreateChannelsBaseView";
 
+/**
+ * The channels view.
+ */
 export function CreateChannelsView(): React.JSX.Element {
     const [state, handler]: [CreateChannelsState, UseCreateChannelHandler] = useCreateChannel()
 

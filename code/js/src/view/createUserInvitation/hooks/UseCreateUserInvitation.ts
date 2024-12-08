@@ -57,8 +57,14 @@ export function reduce(state: CreateUserInvitationState, action: CreateUserInvit
     }
 }
 
+/**
+ * The initial state of the CreateUserInvitation component.
+ */
 const initialState: CreateUserInvitationState = { tag: "editingInvitationCode" }
 
+/**
+ * The useCreateUserInvitation hook.
+ */
 export function useCreateUserInvitation(): [CreateUserInvitationState, UseCreateUserInvitationHandler] {
     const { createUserInvitation } = useContext(CreateUserInvitationServiceContext)
     const [state, dispatch] = useReducer(reduce, initialState)

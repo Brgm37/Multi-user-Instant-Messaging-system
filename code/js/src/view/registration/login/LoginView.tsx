@@ -8,6 +8,9 @@ import {usernameValidation} from "../../../service/registration/validation/Usern
 import {LoginBaseView} from "./components/LoginBaseView";
 import {RegisterCommunicationContext} from "../../../service/registration/communication/RegisterCommunicationProvider";
 
+/**
+ * The login view.
+ */
 export function LoginView(): React.JSX.Element {
     const context = useContext(RegisterCommunicationContext)
     const location = useLocation();

@@ -10,8 +10,14 @@ import {FaSearch} from "react-icons/fa";
 import {RiUserAddFill} from "react-icons/ri";
 import {TbDoorEnter} from "react-icons/tb";
 
+/**
+ * The timeout for the search.
+ */
 const TIMEOUT = 500;
 
+/**
+ * The sidebar component.
+ */
 export function Sidebar(): React.JSX.Element {
     const [channels, setChannels] = useState<Channel[]>([]);
     const [search, setSearch] = useState<string>("");

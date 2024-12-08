@@ -5,10 +5,24 @@ import {urlBuilder} from "../utils/UrlBuilder";
 import {jsonToMessage, Message} from "../../model/Message";
 import {useEffect, useState} from "react";
 
+/**
+ * The URL for the messages.
+ */
 const msgSseUrl = urlBuilder("/messages/sse");
+
+/**
+ * The inactivity timeout.
+ */
 const INACTIVITY_TIMEOUT = 30000; // 30 seconds
+
+/**
+ * The ping interval.
+ */
 const PING_INTERVAL = 25000; // 25 seconds
 
+/**
+ * The SSE communication service provider.
+ */
 export function SseCommunicationServiceProvider(
     {children}: { children: React.ReactNode }
 ): React.JSX.Element {

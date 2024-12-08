@@ -14,8 +14,6 @@ const auth_cookie = configJson.session
 
 /**
  * The hook to handle the registration.
- *
- * @return The state and handler of the registration.
  */
 export default function(): [RegisterState, RegisterHandler] {
     const {signIn} = useContext(RegisterServiceContext)

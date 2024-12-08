@@ -8,8 +8,14 @@ import {InfiniteMessageScrollContext} from "./components/messageInfiniteScroll/I
 import {AuthUserContext} from "../session/AuthUserContext";
 import {useContext} from "react";
 
+/**
+ * The default avatar.
+ */
 const defaultAvatar = "/defaultIcons/blank-default-pfp.webp"
 
+/**
+ * The channel view.
+ */
 export function ChannelView(): React.JSX.Element {
     const [state, messages, handler] = useChannel();
     const { id } = useContext(AuthUserContext);

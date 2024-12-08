@@ -1,6 +1,9 @@
 import * as React from 'react'
 import {DevView} from "./components/DevView";
 
+/**
+ * The about us view.
+ */
 export function AboutView(): React.JSX.Element  {
     return (
         <div className="container mx-auto p-4">
@@ -14,6 +17,9 @@ export function AboutView(): React.JSX.Element  {
     )
 }
 
+/**
+ * The developer type.
+ */
 export type Dev = {
     name: string,
     num: number,
@@ -23,6 +29,9 @@ export type Dev = {
     imageURL: string,
 }
 
+/**
+ * The developers.
+ */
 const Developers: Dev[] =
     [
         {

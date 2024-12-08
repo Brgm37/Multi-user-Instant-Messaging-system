@@ -6,6 +6,9 @@ import {EditChannelErrorView} from "./components/EditChannelErrorView";
 import {EditChannelLoadingView} from "./components/EditChannelLoadingView";
 import {EditChannelEditingVIew} from "./components/EditChannelEditingVIew";
 
+/**
+ * The edit channel view.
+ */
 export default function (): React.JSX.Element {
     const [state, handler] = useEditChannel()
     const navigate = useNavigate()

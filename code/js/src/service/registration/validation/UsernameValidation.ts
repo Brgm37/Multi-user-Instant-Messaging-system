@@ -1,6 +1,14 @@
+/**
+ * Username validation patterns.
+ */
 const upperCasePatter = /[A-Z]/
 const lowerCasePatter = /[a-z]/
 
+/**
+ * Validate the username.
+ * @param username The username to validate.
+ * @returns A string with the error message or true if the username is valid.
+ */
 export function usernameValidation(username: string): string | true {
     if (username.length === 0) {
         return ""

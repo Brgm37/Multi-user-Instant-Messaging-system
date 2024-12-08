@@ -10,6 +10,14 @@ import {FaPersonRunning} from "react-icons/fa6";
 import {IoMdPersonAdd} from "react-icons/io";
 import {IoSend} from "react-icons/io5";
 
+/**
+ * The basic channel view.
+ *
+ * @param error
+ * @param errorDismiss
+ * @param onSend
+ * @param onError
+ */
 export default function BasicChannelView(
     {error, errorDismiss, onSend, onError}: { error?: string, errorDismiss?: () => void, onSend(msg: string): void, onError(err: string): void }
 ): React.JSX.Element {

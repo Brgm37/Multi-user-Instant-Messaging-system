@@ -1,4 +1,9 @@
 
+/**
+ * Convert expiration date to time format
+ * @param expirationDate - expiration date
+ * @returns time format
+ */
 export function expirationDateToTimeFormat(expirationDate: string): string {
     const currentTime = Date.now();
     let additionalTime = 0;

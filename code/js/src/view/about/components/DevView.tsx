@@ -2,6 +2,11 @@ import * as React from 'react'
 import {FaGithub, FaLinkedin} from "react-icons/fa";
 import {Dev} from "../AboutView";
 
+/**
+ * The dev view.
+ *
+ * @param dev the dev.
+ */
 export function DevView({ dev }: { dev: Dev }): React.JSX.Element {
     return (
         <div key={dev.num} className="max-w-sm rounded overflow-hidden shadow-lg m-4 bg-gray-900">

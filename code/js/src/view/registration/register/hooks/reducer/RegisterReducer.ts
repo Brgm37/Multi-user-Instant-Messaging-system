@@ -4,11 +4,8 @@ import {RegisterAction} from "../states/RegisterAction";
 /**
  * The reducer for the registration form.
  *
- *
  * @param state The current state of the registration form.
  * @param action The action to be performed.
- *
- * @returns The new state of the registration form.
  */
 export default function (state: RegisterState, action: RegisterAction): RegisterState {
     switch (state.tag) {

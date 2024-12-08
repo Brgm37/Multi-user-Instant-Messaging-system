@@ -5,7 +5,6 @@ import {Either} from "../../../model/Either";
  * The context for the register service.
  *
  * @method signIn
- * @method stateValidator
  */
 export interface RegisterServiceContext {
     /**
@@ -22,6 +21,9 @@ export interface RegisterServiceContext {
     ): Promise<Either<AuthInfo, string>>
 }
 
+/**
+ * The default register service context.
+ */
 const defaultRegisterServiceContext: RegisterServiceContext = {
     signIn: () => {
         return new Promise<Either<AuthInfo, string>>((_, reject) => {
@@ -30,5 +32,8 @@ const defaultRegisterServiceContext: RegisterServiceContext = {
     }
 }
 
+/**
+ * The context for the register service.
+ */
 export const RegisterServiceContext: Context<RegisterServiceContext> =
     createContext(defaultRegisterServiceContext)

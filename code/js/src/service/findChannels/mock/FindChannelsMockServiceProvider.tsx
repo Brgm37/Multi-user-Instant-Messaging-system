@@ -4,6 +4,9 @@ import {FindChannelsMockServiceContext} from "./FindChannelsMockServiceContext";
 import {Either, failure, success} from "../../../model/Either";
 import {Channel} from "../../../model/Channel";
 
+/**
+ * The list of the mock channels.
+ */
 const mockChannels = [
     {
         name: {name: "test", displayName: "TEST CHANNEL 1"},
@@ -37,7 +40,9 @@ const mockChannels = [
     }
 ]
 
-
+/**
+ * The find channels mock service provider.
+ */
 export function FindChannelsMockServiceProvider(props: { children: ReactNode }): React.JSX.Element {
     const signal = useSignal()
     const service : FindChannelsMockServiceContext = {
