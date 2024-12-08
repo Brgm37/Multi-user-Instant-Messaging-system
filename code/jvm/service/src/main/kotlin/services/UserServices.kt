@@ -14,7 +14,6 @@ import utils.Either
 import utils.failure
 import utils.success
 import java.sql.Timestamp
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
@@ -113,16 +112,16 @@ class UserServices(
     override fun createInvitation(
         inviterUId: UInt,
         expirationDate: String?,
-        ): Either<UserError, UserInvitation> {
+    ): Either<UserError, UserInvitation> {
         val timestamp =
             if (expirationDate != null) {
                 makeTimeStamp(expirationDate) ?: return failure(UserError.UnableToCreateInvitation)
             } else {
                 LocalDateTime
-                .now()
-                .plusWeeks(1)
-                .let(Timestamp::valueOf)
-    }
+                    .now()
+                    .plusWeeks(1)
+                    .let(Timestamp::valueOf)
+            }
         return repoManager.run {
             userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
             val invitation =
@@ -137,6 +136,7 @@ class UserServices(
             }
         }
     }
+
     private fun makeTimeStamp(expirationDate: String) =
         try {
             Timestamp.valueOf(

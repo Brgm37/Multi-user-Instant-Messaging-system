@@ -273,22 +273,4 @@ class ChannelJDBCTest {
             val foundChannels = findPublicByName(name.fullName)
             assertNotNull(foundChannels) { "Channel is null" }
         }
-
-    @Test
-    fun `find by partial name`() =
-        testSetup { user, _ ->
-            val uId = checkNotNull(user.uId) { "User id is null" }
-            val newChannel =
-                createChannel(
-                    Channel.createChannel(
-                        owner = UserInfo(uId, user.username),
-                        name = ChannelName("new_channel", user.username),
-                        accessControl = READ_WRITE,
-                        visibility = PUBLIC,
-                    ),
-                )
-            val name = checkNotNull(newChannel?.name) { "Channel name is null" }
-            val foundChannels = findPublicByName(name.name, 0u, 10u)
-            assertEquals(newChannel, foundChannels.first())
-        }
 }

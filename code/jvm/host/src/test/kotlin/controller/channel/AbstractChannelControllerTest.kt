@@ -418,7 +418,7 @@ abstract class AbstractChannelControllerTest {
 
         client
             .get()
-            .uri("${ChannelController.CHANNEL_BASE_URL}/search/${encodeName(channelName.fullName)}")
+            .uri("${ChannelController.CHANNEL_BASE_URL}/name/${encodeName(channelName.fullName)}")
             .header("Authorization", "Bearer ${token.token}")
             .exchange()
             .expectStatus()

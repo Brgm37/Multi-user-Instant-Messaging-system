@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import utils.Failure
 import utils.Success
 import utils.encryption.DummyEncrypt
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 import java.util.stream.Stream
 import kotlin.test.assertEquals
@@ -248,7 +248,7 @@ class ChannelServicesTest {
                 createChannelInvitation(
                     newChannelId,
                     uId,
-                    LocalDate.now().plusDays(1).toString(),
+                    LocalDateTime.now().plusDays(1).toString(),
                     null,
                     uId,
                 )
@@ -277,22 +277,6 @@ class ChannelServicesTest {
             assertIs<Failure<ChannelError>>(result, "Channel retrieval should have failed")
             assertEquals(ChannelError.ChannelNotFound, result.value, "Channel error is different")
         }
-
-//    @ParameterizedTest
-//    @MethodSource("transactionManagers")
-//    fun `get all channels with name`(manager: TransactionManager) =
-//        testSetup(manager) { user ->
-//            val ownerId = checkNotNull(user.uId) { "Owner id is null" }
-//            val nr = 5
-//            repeat(nr) {
-//                val newChannel = createChannel(ownerId, "name$it", READ_WRITE.name, PUBLIC.name)
-//                assertIs<Success<Channel>>(newChannel, "Channel creation failed")
-//                assertNotNull(newChannel.value.cId, "Channel id is null")
-//            }
-//            val result = getPublicByName("name", 0u, nr.toUInt())
-//            assertIs<Success<List<Channel>>>(result, "Channels retrieval failed")
-//            assertEquals(nr, result.value.size, "Number of channels is different")
-//        }
 
     @ParameterizedTest
     @MethodSource("transactionManagers")
@@ -420,7 +404,7 @@ class ChannelServicesTest {
             createChannelInvitation(
                 cId,
                 0u,
-                LocalDate.now().minusDays(1).toString(),
+                LocalDateTime.now().minusDays(1).toString(),
                 READ_WRITE.name,
                 uId,
             )

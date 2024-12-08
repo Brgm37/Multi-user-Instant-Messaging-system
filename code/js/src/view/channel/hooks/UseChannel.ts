@@ -8,7 +8,6 @@ import envConfig from "../../../../envConfig.json";
 import reduce from "./reducer/Reducer";
 import {SseCommunicationServiceContext} from "../../../service/sse/SseCommunicationService";
 import {UseChannelHandler} from "./handler/UseChannelHandler";
-import {list} from "postcss";
 
 const LIST_SIZE = envConfig.messages_limit
 const DEFAULT_LIMIT = envConfig.default_messages_limit
@@ -98,6 +97,10 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
         }
     }, [id]);
 
+    // useEffect(() => {
+    //     console.log("state", state)
+    // }, [state]);
+
     useEffect(() => {
         if (state.tag !== "loading") return
         if (state.at === "sending") dispatch({tag: "sendSuccess"})
@@ -144,6 +147,7 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
         },
         loadMore(at: "head" | "tail"): void {
             if (state.tag !== "messages") return
+            if (at === "head" && list.hasMore.head || at === "tail" && list.hasMore.tail) return
             const timestamp = at === "head" ? list.list[0].timestamp : list.list[list.list.length - 1].timestamp
             const befAft = at === "head" ? "after" : "before"
             service

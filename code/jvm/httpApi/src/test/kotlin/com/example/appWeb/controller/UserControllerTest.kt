@@ -2,6 +2,7 @@ package com.example.appWeb.controller
 
 import TransactionManager
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
+import com.example.appWeb.model.dto.input.user.CreateUserInvitationInputModel
 import com.example.appWeb.model.dto.input.user.UserLogInInputModel
 import com.example.appWeb.model.dto.input.user.UserSignUpInputModel
 import com.example.appWeb.model.dto.output.user.UserAuthenticatedOutputModel
@@ -264,8 +265,9 @@ class UserControllerTest {
         val user = checkNotNull(makeUser(manager))
         val userId = checkNotNull(user.uId)
         val authenticated = AuthenticatedUserInputModel(userId, makeToken(manager, userId).token.toString())
-
-        val response = userController.createInvitation(authenticated)
+        val expirationDate =
+            CreateUserInvitationInputModel(LocalDateTime.now().plusHours(1).toString())
+        val response = userController.createInvitation(expirationDate, authenticated)
         assertEquals(HttpStatus.OK, response.statusCode)
         assertIs<UserInvitationOutputModel>(response.body)
         assertNotNull((response.body as UserInvitationOutputModel).invitationCode)
@@ -279,7 +281,9 @@ class UserControllerTest {
 
         val invalidUserId = 0u
 
-        val response = userController.createInvitation(AuthenticatedUserInputModel(invalidUserId, ""))
+        val expirationDate =
+            CreateUserInvitationInputModel(LocalDateTime.now().plusHours(1).toString())
+        val response = userController.createInvitation(expirationDate, AuthenticatedUserInputModel(invalidUserId, ""))
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
         assertIs<UserProblem.InviterNotFound>(response.body)
         assertEquals(response.body, UserProblem.InviterNotFound)

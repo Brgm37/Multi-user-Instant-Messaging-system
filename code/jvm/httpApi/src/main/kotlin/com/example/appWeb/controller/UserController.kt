@@ -114,7 +114,7 @@ class UserController(
     @PostMapping(INVITATION_URL)
     @UserSwaggerConfig.CreateInvitation
     fun createInvitation(
-        @Valid @RequestBody expirationDate : CreateUserInvitationInputModel,
+        @Valid @RequestBody expirationDate: CreateUserInvitationInputModel,
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
         when (val response = userService.createInvitation(authenticated.uId, expirationDate.expirationDate)) {

@@ -14,12 +14,15 @@ export function JoinChannelServiceProvider(
         async joinChannel(
             invitationToken: string
         ): Promise<Either<{ id: string }, string>> {
+            const body = {
+                "invitationCode": invitationToken
+            }
             const init: RequestInit = {
                 method: "PUT",
                 headers: {"Content-Type": "application/json"},
                 signal,
                 credentials: "include",
-                body: JSON.stringify({invitationToken})
+                body: JSON.stringify(body)
             }
             const url = baseUrl + '/invitations'
             const response = await fetch(url, init);

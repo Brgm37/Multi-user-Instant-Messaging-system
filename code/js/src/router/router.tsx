@@ -37,7 +37,7 @@ import {CreateUserInvitationServiceProvider} from "../service/CreateUserInvitati
 import {EditChannelServiceProvider} from "../service/editChannel/editChannelServiceProvider";
 import EditChannelView from "../view/editChannel/EditChannelView";
 import {JoinChannelServiceProvider} from "../service/joinChannel/JoinChannelServiceProvider";
-import {JoinChannelView} from "../view/JoinChannels/JoinChannelView";
+import {JoinChannelView} from "../view/joinChannels/JoinChannelView";
 
 const router = createBrowserRouter(
     [

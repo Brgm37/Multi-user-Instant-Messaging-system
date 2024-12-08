@@ -324,7 +324,7 @@ class UserServicesTest {
         val userServices = UserServices(manager)
         val inviter = checkNotNull(ChannelServicesTest.makeUser(manager))
         val inviterId = checkNotNull(inviter.uId)
-        val result = userServices.createInvitation(inviterId)
+        val result = userServices.createInvitation(inviterId, null)
         assertIs<Success<UserInvitation>>(result)
         assertEquals(inviter.uId, result.value.inviterId)
     }
@@ -335,7 +335,7 @@ class UserServicesTest {
         manager: TransactionManager,
     ) {
         val userServices = UserServices(manager)
-        val result = userServices.createInvitation(0u)
+        val result = userServices.createInvitation(0u, null)
         assertIs<Failure<UserError.InviterNotFound>>(result)
         assertEquals(UserError.InviterNotFound, result.value)
     }

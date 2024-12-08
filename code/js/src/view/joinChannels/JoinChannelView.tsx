@@ -1,8 +1,8 @@
-import {JoinChannelStates} from "./hooks/states/JoinChannelStates";
-import {UseJoinChannelHandler} from "./hooks/handler/UseJoinChannelHandler";
 import React from "react";
-import {useJoinChannel} from "./hooks/UseJoinChannel";
 import {Navigate} from "react-router-dom";
+import {useJoinChannel} from "./hooks/UseJoinChannel";
+import {UseJoinChannelHandler} from "./hooks/handler/UseJoinChannelHandler";
+import {JoinChannelStates} from "./hooks/states/JoinChannelStates";
 
 
 export function JoinChannelView(): React.JSX.Element {
@@ -36,9 +36,9 @@ export function JoinChannelView(): React.JSX.Element {
             case "UseJoinError":
                 return <div>Error: {state.message}</div>
             case "UseJoinSuccess":
-                return <Navigate to={`/channels/${state.id}`}/>
-            case "UseJoinClose":
                 return <Navigate to={"/channels/findChannels"}/>
+            case "UseJoinClose":
+                return <Navigate to={"/channels/findChannels"} />
         }
     })
     return (

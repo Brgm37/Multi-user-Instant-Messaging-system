@@ -22,6 +22,8 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.sql.Timestamp
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 private const val VALID_USERNAME = "username"
 private const val VALID_PASSWORD = "Password123"
@@ -337,11 +339,19 @@ abstract class AbstractUserControllerTest {
     fun `creating an invitation with a valid token should return OK and the invitation`() {
         val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
 
+        val currentDateTime = LocalDateTime.now().plusDays(1)
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        val formattedDateTime = currentDateTime.format(formatter)
+
         client
             .post()
             .uri(UserController.USER_BASE_URL + UserController.INVITATION_URL)
             .header("Authorization", "Bearer ${token.token}")
-            .exchange()
+            .bodyValue(
+                mapOf(
+                    "expirationDate" to formattedDateTime,
+                ),
+            ).exchange()
             .expectStatus()
             .isOk
             .expectBody()
