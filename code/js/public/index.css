@@ -12,6 +12,8 @@ body {
     overflow: hidden;
     height: 100vh;
     margin: 0;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 .card:hover {
@@ -102,4 +104,8 @@ body {
 
 .scrollable-sidebar::-webkit-scrollbar {
     display: none;
+}
+
+.text-xxs {
+    font-size: 0.625rem;
 }

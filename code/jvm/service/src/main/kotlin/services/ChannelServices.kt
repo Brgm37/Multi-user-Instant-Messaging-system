@@ -15,6 +15,8 @@ import jakarta.inject.Named
 import model.channels.AccessControl
 import model.channels.Channel
 import model.channels.Channel.Companion.createChannel
+import model.channels.Channel.Companion.privateToPublic
+import model.channels.Channel.Companion.publicToPrivate
 import model.channels.Channel.Private
 import model.channels.Channel.Public
 import model.channels.ChannelInvitation
@@ -227,6 +229,7 @@ class ChannelServices(
         val upperCaseAccessControl = accessControl?.uppercase()
         return repoManager.run {
             val channel = channelRepo.findById(id) ?: return@run failure(ChannelNotFound)
+            val v = visibility?.let { Visibility.valueOf(it.uppercase()) }
             val updatedChannel =
                 when (channel) {
                     is Public -> {
@@ -251,7 +254,17 @@ class ChannelServices(
                         )
                     }
                 }
-            channelRepo.save(updatedChannel)
+            val edit =
+                v?.let {
+                    if (it == Visibility.PUBLIC && updatedChannel is Private) {
+                        privateToPublic(updatedChannel)
+                    } else if (it == Visibility.PRIVATE && updatedChannel is Public) {
+                        publicToPrivate(updatedChannel)
+                    } else {
+                        updatedChannel
+                    }
+                } ?: updatedChannel
+            channelRepo.save(edit)
             success(updatedChannel)
         }
     }

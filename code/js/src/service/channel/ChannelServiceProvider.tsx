@@ -16,6 +16,8 @@ const channelApiUrl = urlBuilder("/channels")
  */
 const messageApiUrl = urlBuilder("/messages")
 
+
+
 /**
  * The headers for the message.
  */
@@ -93,6 +95,22 @@ export function ChannelServiceProvider({children}: { children: React.ReactNode }
             } else {
                 const error = await response.text()
                 return failure(error) as Either<Message, string>
+            }
+        },
+        async leaveOrDelete(cId: string): Promise<Either<void, string>> {
+            const init: RequestInit = {
+                method: "DELETE",
+                headers: {"Content-Type": "application/json"},
+                signal,
+                credentials: "include"
+            }
+            const url = `${channelApiUrl}/${cId}`
+            const response = await fetch(url, init);
+            if (response.ok) {
+                return success(undefined) as Either<void, string>
+            } else {
+                const error = await response.text()
+                return failure(error) as Either<void, string>
             }
         }
     }

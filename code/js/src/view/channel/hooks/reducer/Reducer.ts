@@ -13,6 +13,8 @@ export default function (state: ChannelState, action: ChannelAction): ChannelSta
             switch (action.tag) {
                 case "init":
                     return {tag: "loading", at: "both"}
+                case "error":
+                    return {tag: "error", message: action.error, previous: state}
                 default:
                     throw new Error(`Invalid action ${action.tag} for state ${state.tag}`)
             }
@@ -28,6 +30,8 @@ export default function (state: ChannelState, action: ChannelAction): ChannelSta
                     return {tag: "error", message: action.error, previous: state}
                 case "reset":
                     return {tag: "idle"}
+                case "error":
+                    return {tag: "error", message: action.error, previous: state}
                 default:
                     throw new Error(`Invalid action ${action.tag} for state ${state.tag}`)
             }
@@ -52,6 +56,8 @@ export default function (state: ChannelState, action: ChannelAction): ChannelSta
                     return {tag: "idle"}
                 case "reset":
                     return {tag: "idle"}
+                case "error":
+                    return {tag: "error", message: action.error, previous: state}
                 default:
                     throw new Error(`Invalid action ${action.tag} for state ${state.tag}`)
             }
