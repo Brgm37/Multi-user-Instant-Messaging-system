@@ -105,3 +105,7 @@ body {
 .scrollable-sidebar::-webkit-scrollbar {
     display: none;
 }
+
+.text-xxs {
+    font-size: 0.625rem;
+}

@@ -126,7 +126,7 @@ export default function (
     return (
         <div className={className}>
             <ul className={scrollStyle}>
-                <div>{isLoading === 'head' && (<LoadingIcon />)}</div>
+                {isLoading === 'head' && (<LoadingIcon />)}
                 <div ref={beginOfListRef}></div>
                 {
                     items.list.map((item, index) => {
@@ -161,7 +161,7 @@ export default function (
                         </div>
                     )
                 }
-                <div>{isLoading === 'tail' && (<LoadingIcon />)}</div>
+                {isLoading === 'tail' && (<LoadingIcon />)}
             </ul>
         </div>
     );
