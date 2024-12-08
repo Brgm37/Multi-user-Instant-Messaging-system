@@ -109,12 +109,12 @@ const router = createBrowserRouter(
 
                         </CreateChannelServiceProvider>,
                 },
+                {
+                    "path": "/channels/about",
+                    "element": <AboutView />,
+                },
             ]
                 },
-        {
-            "path": "/about",
-            "element": <AboutView />,
-        },
     ]
 )
 
