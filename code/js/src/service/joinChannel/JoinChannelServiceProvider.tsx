@@ -6,10 +6,14 @@ import {JoinChannelServiceContext} from "./JoinChannelServiceContext";
 
 const baseUrl = urlBuilder("/channels")
 
-export function JoinChannelServiceProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
+export function JoinChannelServiceProvider(
+    { children }: { children: React.ReactNode }
+): React.JSX.Element {
     const signal = useSignal()
-    const service = {
-        async joinChannel(invitationToken: string): Promise<Either<void, string>> {
+    const service: JoinChannelServiceContext = {
+        async joinChannel(
+            invitationToken: string
+        ): Promise<Either<{ id: string }, string>> {
             const init: RequestInit = {
                 method: "PUT",
                 headers: {"Content-Type": "application/json"},
@@ -20,9 +24,10 @@ export function JoinChannelServiceProvider({ children }: { children: React.React
             const url = baseUrl + '/invitations'
             const response = await fetch(url, init);
             if (response.ok) {
-                return success(undefined) as Either<void, string>
+                const data = await response.json()
+                return success(data.id) as Either<{ id: string }, string>
             } else {
-                return failure(await response.text()) as Either<void, string>
+                return failure(await response.text()) as Either<{ id: string }, string>
             }
         }
     }

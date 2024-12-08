@@ -1,4 +1,4 @@
 
 export type JoinChannelActions =
-    { type: "success" } |
+    { type: "success", id: string } |
     { type: "error", message: string }

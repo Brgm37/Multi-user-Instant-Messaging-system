@@ -8,12 +8,12 @@ export interface JoinChannelServiceContext {
      */
     joinChannel(
         invitationToken: string,
-    ): Promise<Either<void, string>>
+    ): Promise<Either<{ id: string }, string>>
 }
 
 const defaultJoinChannelServiceContext: JoinChannelServiceContext = {
     joinChannel: (invitationToken) => {
-        return new Promise<Either<void, string>>((resolve, reject) => {
+        return new Promise<Either<{ id: string }, string>>((resolve, reject) => {
             reject(new Error("Not implemented"))
         })
     }
