@@ -76,6 +76,7 @@ export default function (): [ChannelsState, UseScrollState<Channel>, ChannelsHan
         },
         loadMore(offset, at): void {
             if (state.tag !== "scrolling") return
+            if (at === "head" && !list.hasMore.head || at === "tail" && !list.hasMore.tail) return
             findChannels(offset * limit, HAS_MORE)
                 .then(result => {
                     if (result.tag === "success") addItems(at, offset, listHandler, list, result.value)
