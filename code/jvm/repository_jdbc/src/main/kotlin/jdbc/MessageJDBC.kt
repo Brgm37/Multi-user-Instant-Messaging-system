@@ -9,6 +9,7 @@ import utils.encryption.DummyEncrypt
 import utils.encryption.Encrypt
 import java.sql.Connection
 import java.sql.ResultSet
+import java.sql.Timestamp
 
 /**
  * @property AUTHOR_ID the author id column of the v_message table
@@ -120,7 +121,7 @@ class MessageJDBC(
                 msgChannelName, msgAuthorUsername
             FROM v_message
             WHERE msgChannelId = ?
-            ORDER BY msgTimestamp DESC
+            ORDER BY msgTimestamp
             LIMIT ? OFFSET ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
@@ -128,6 +129,57 @@ class MessageJDBC(
         stm.setInt(idx++, channelId.toInt())
         stm.setInt(idx++, limit.toInt())
         stm.setInt(idx, offset.toInt())
+        val rs = stm.executeQuery()
+        return rs.toMessageList()
+    }
+
+    override fun emitAllMessages(
+        uId: UInt,
+        lastEventId: UInt,
+        emitter: (Message) -> Unit,
+    ) {
+        val selectQuery =
+            """
+            SELECT
+                msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
+                msgChannelName, msgAuthorUsername
+            FROM channel_members JOIN v_message ON channel = msgChannelId 
+            WHERE member = ? AND msgId > ?
+            ORDER BY msgTimestamp
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, uId.toInt())
+        stm.setInt(idx, lastEventId.toInt())
+        val rs = stm.executeQuery()
+        while (rs.next()) {
+            emitter(rs.toMessage())
+        }
+    }
+
+    override fun findMessagesByTimeStamp(
+        channelId: UInt,
+        timestamp: Timestamp?,
+        limit: UInt,
+        isBefore: Boolean,
+    ): List<Message> {
+        val beforeOrAfter = if (isBefore) "<" else ">"
+        val selectQuery =
+            """
+            SELECT 
+                msgId, msgChannelId, msgContent, msgAuthorId, msgTimestamp,
+                msgChannelName, msgAuthorUsername
+            FROM v_message
+            WHERE msgChannelId = ?
+            AND msgTimestamp $beforeOrAfter ?
+            ORDER BY msgTimestamp DESC
+            LIMIT ?
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, channelId.toInt())
+        timestamp?.let { stm.setTimestamp(idx++, it) } ?: stm.setTimestamp(idx++, Timestamp(System.currentTimeMillis()))
+        stm.setInt(idx, limit.toInt())
         val rs = stm.executeQuery()
         return rs.toMessageList()
     }
@@ -152,8 +204,8 @@ class MessageJDBC(
     }
 
     override fun findAll(
-        offset: Int,
-        limit: Int,
+        offset: UInt,
+        limit: UInt,
     ): List<Message> {
         val selectQuery =
             """
@@ -161,8 +213,13 @@ class MessageJDBC(
                 msgId, msgChannelId, msgContent, msgauthorid, msgTimestamp,
                 msgChannelName, msgAuthorUsername
             FROM v_message
+            ORDER BY msgTimestamp
+            LIMIT ? OFFSET ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
+        var idx = 1
+        stm.setInt(idx++, limit.toInt())
+        stm.setInt(idx, offset.toInt())
         val rs = stm.executeQuery()
         val messages = mutableListOf<Message>()
         while (rs.next()) {

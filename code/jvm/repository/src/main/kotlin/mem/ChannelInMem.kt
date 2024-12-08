@@ -37,32 +37,32 @@ class ChannelInMem : ChannelRepositoryInterface {
     ): List<Channel> = channels.filter { it.owner.uId == userId }
 
     override fun joinChannel(
-        channelId: UInt,
-        userId: UInt,
+        cId: UInt,
+        uId: UInt,
         accessControl: AccessControl,
     ) {
-        if (!channels.any { it.cId == channelId }) {
+        if (!channels.any { it.cId == cId }) {
             return
         }
         usersInChannels
-            .getOrPut(channelId) { mutableListOf() }
-            .add(userId to accessControl)
+            .getOrPut(cId) { mutableListOf() }
+            .add(uId to accessControl)
     }
 
     override fun isUserInChannel(
-        channelId: UInt,
-        userId: UInt,
-    ): Boolean = usersInChannels[channelId]?.any { it.first == userId } ?: false
+        cId: UInt,
+        uId: UInt,
+    ): Boolean = usersInChannels[cId]?.any { it.first == uId } ?: false
 
-    override fun findInvitation(channelId: UInt): ChannelInvitation? = invitations.find { it.cId == channelId }
+    override fun findInvitation(cId: UInt): ChannelInvitation? = invitations.find { it.cId == cId }
 
     override fun updateInvitation(invitation: ChannelInvitation) {
         invitations.removeIf { it.cId == invitation.cId }
         invitations.add(invitation)
     }
 
-    override fun deleteInvitation(channelId: UInt) {
-        invitations.removeIf { it.cId == channelId }
+    override fun deleteInvitation(cId: UInt) {
+        invitations.removeIf { it.cId == cId }
     }
 
     override fun createInvitation(invitation: ChannelInvitation) {
@@ -70,20 +70,76 @@ class ChannelInMem : ChannelRepositoryInterface {
     }
 
     override fun findUserAccessControl(
-        channelId: UInt,
+        cId: UInt,
         userId: UInt,
-    ): AccessControl? = usersInChannels[channelId]?.find { it.first == userId }?.second
+    ): AccessControl? = usersInChannels[cId]?.find { it.first == userId }?.second
+
+    override fun findPublicByName(name: String): Channel? = channels.find { it.name.fullName == name }
+
+    override fun findPublicByName(
+        uId: UInt,
+        name: String,
+        offset: UInt,
+        limit: UInt,
+    ): List<Channel> = channels.filter { it.name.fullName.contains(name) }
+
+    override fun findByName(
+        uId: UInt,
+        name: String,
+        offset: UInt,
+        limit: UInt,
+    ): List<Channel> =
+        channels.filter {
+            it.name.fullName.contains(name) &&
+                usersInChannels[it.cId]?.any { ac -> ac.first == uId } == true
+        }
+
+    override fun findByName(
+        name: String,
+        offset: UInt,
+        limit: UInt,
+    ): List<Channel> =
+        channels.filter {
+            it.name.fullName.contains(name)
+        }
+
+    override fun findAccessControl(
+        uid: UInt,
+        cId: UInt,
+    ): AccessControl? = usersInChannels[cId]?.find { it.first == uid }?.second
+
+    override fun findByInvitationCode(invitationCode: String): Channel? =
+        invitations
+            .find {
+                it.invitationCode.toString() == invitationCode
+            }?.let { findById(it.cId) }
+
+    override fun findPublicChannel(
+        uId: UInt,
+        offset: UInt,
+        limit: UInt,
+    ): List<Channel> =
+        channels.filter {
+            it is Channel.Public && usersInChannels[it.cId]?.any { ac -> ac.first == uId } == false
+        }
+
+    override fun leaveChannel(
+        cId: UInt,
+        uId: UInt,
+    ) {
+        usersInChannels[cId]?.removeIf { it.first == uId }
+    }
 
     override fun findById(id: UInt): Channel? = channels.find { it.cId == id }
 
     override fun findAll(
-        offset: Int,
-        limit: Int,
+        offset: UInt,
+        limit: UInt,
     ): List<Channel> =
         channels
             .filterIsInstance<Channel.Public>()
-            .drop(offset)
-            .take(limit)
+            .drop(offset.toInt())
+            .take(limit.toInt())
 
     override fun save(entity: Channel) {
         channels.removeIf { it.cId == entity.cId }

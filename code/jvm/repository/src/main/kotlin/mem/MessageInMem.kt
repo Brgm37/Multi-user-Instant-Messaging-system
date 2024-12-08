@@ -2,6 +2,7 @@ package mem
 
 import MessageRepositoryInterface
 import model.messages.Message
+import java.sql.Timestamp
 
 /**
  * In-memory implementation of the message repository
@@ -33,12 +34,29 @@ class MessageInMem : MessageRepositoryInterface {
             .reversed()
     }
 
+    override fun emitAllMessages(
+        uId: UInt,
+        lastEventId: UInt,
+        emitter: (Message) -> Unit,
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun findMessagesByTimeStamp(
+        channelId: UInt,
+        timestamp: Timestamp?,
+        limit: UInt,
+        isBefore: Boolean,
+    ): List<Message> {
+        TODO("Not yet implemented")
+    }
+
     override fun findById(id: UInt): Message? = messages.find { it.msgId == id }
 
     override fun findAll(
-        offset: Int,
-        limit: Int,
-    ): List<Message> = messages.drop(offset).take(limit)
+        offset: UInt,
+        limit: UInt,
+    ): List<Message> = messages.drop(offset.toInt()).take(limit.toInt())
 
     override fun save(entity: Message) {
         messages.removeIf { it.msgId == entity.msgId }

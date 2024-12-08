@@ -16,6 +16,8 @@ data class CreateChannelInputModel(
     @get:NotBlank val name: String,
     @get:NotBlank val visibility: String,
     @get:NotBlank val accessControl: String,
+    val description: String? = null,
+    val icon: String? = null,
 ) {
     @AssertTrue(message = "Invalid visibility")
     fun isValidVisibility(): Boolean = Visibility.validate(visibility)

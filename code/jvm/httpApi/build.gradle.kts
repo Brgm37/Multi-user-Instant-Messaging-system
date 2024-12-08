@@ -22,6 +22,7 @@ repositories {
 dependencies {
     api(project(":service"))
     implementation("org.springframework:spring-webmvc:6.1.13")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")

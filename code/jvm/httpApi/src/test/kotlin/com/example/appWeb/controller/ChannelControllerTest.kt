@@ -3,6 +3,7 @@ package com.example.appWeb.controller
 import TransactionManager
 import com.example.appWeb.model.dto.input.channel.CreateChannelInputModel
 import com.example.appWeb.model.dto.input.channel.CreateChannelInvitationInputModel
+import com.example.appWeb.model.dto.input.channel.JoinChannelInputModel
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
 import com.example.appWeb.model.dto.output.channel.ChannelInvitationOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
@@ -13,6 +14,8 @@ import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
 import model.channels.AccessControl.READ_WRITE
 import model.channels.Channel
+import model.channels.ChannelInvitation
+import model.channels.Visibility.PRIVATE
 import model.channels.Visibility.PUBLIC
 import model.users.Password
 import model.users.User
@@ -27,6 +30,7 @@ import java.util.UUID
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 class ChannelControllerTest {
     companion object {
@@ -45,13 +49,15 @@ class ChannelControllerTest {
             }
         }
 
+        private var nr = 0
+
         private fun makeUser(manager: TransactionManager) =
             manager
                 .run {
                     userRepo
                         .createUser(
                             User(
-                                username = "owner",
+                                username = "owner${nr++}",
                                 password = Password("Password123"),
                             ),
                         )
@@ -62,7 +68,7 @@ class ChannelControllerTest {
             uId: UInt,
         ) = manager
             .run {
-                val token = UserToken(userId = uId, token = UUID.randomUUID())
+                val token = UserToken(uId = uId, token = UUID.randomUUID())
                 userRepo
                     .createToken(token)
                 token
@@ -98,7 +104,7 @@ class ChannelControllerTest {
                 val outputModel = resp.body as ChannelOutputModel
                 assertEquals(cId, outputModel.id, "Channel id is different")
                 assertEquals(authenticated.uId, outputModel.owner.id, "Owner id is different")
-                assertEquals("@owner/name", outputModel.name.name, "Channel name is different")
+                assertTrue { outputModel.name.name.startsWith("@owner") }
                 assertEquals(READ_WRITE.name, outputModel.accessControl, "Access control is different")
                 assertEquals(PUBLIC.name, outputModel.visibility, "Visibility is different")
             }
@@ -129,7 +135,7 @@ class ChannelControllerTest {
                 val outputModels = resp.body as List<ChannelListOutputModel>
                 assertEquals(nr, outputModels.size, "Number of channels is different")
                 val outputModel = outputModels.first()
-                assertEquals(authenticated.uId, outputModel.ownerOutputModel.id, "Owner id is different")
+                assertEquals(authenticated.uId, outputModel.owner.id, "Owner id is different")
             }
         }
 
@@ -142,6 +148,8 @@ class ChannelControllerTest {
                     name = "name",
                     accessControl = READ_WRITE.name,
                     visibility = PUBLIC.name,
+                    description = null,
+                    icon = null,
                 ),
                 authenticated,
             ).let { resp ->
@@ -149,7 +157,7 @@ class ChannelControllerTest {
                 assertIs<ChannelOutputModel>(resp.body, "Body is not a ChannelOutputModel")
                 val outputModel = resp.body as ChannelOutputModel
                 assertEquals(authenticated.uId, outputModel.owner.id, "Owner id is different")
-                assertEquals("@owner/name", outputModel.name.name, "Channel name is different")
+                assertTrue { outputModel.name.name.startsWith("@owner") }
                 assertEquals(READ_WRITE.name, outputModel.accessControl, "Access control is different")
                 assertEquals(PUBLIC.name, outputModel.visibility, "Visibility is different")
             }
@@ -164,16 +172,22 @@ class ChannelControllerTest {
                     name = "name",
                     accessControl = " ",
                     visibility = PUBLIC.name,
+                    description = null,
+                    icon = null,
                 ),
                 CreateChannelInputModel(
                     name = "name",
                     accessControl = READ_WRITE.name,
                     visibility = " ",
+                    description = null,
+                    icon = null,
                 ),
                 CreateChannelInputModel(
                     name = " ",
                     accessControl = READ_WRITE.name,
                     visibility = PUBLIC.name,
+                    description = null,
+                    icon = null,
                 ),
             ).forEach {
                 createChannel(it, authenticated)
@@ -196,6 +210,8 @@ class ChannelControllerTest {
                     name = "name",
                     accessControl = READ_WRITE.name,
                     visibility = "invalid",
+                    description = null,
+                    icon = null,
                 ),
                 authenticated,
             ).let { resp ->
@@ -216,6 +232,8 @@ class ChannelControllerTest {
                     name = "name",
                     accessControl = "invalid",
                     visibility = PUBLIC.name,
+                    description = null,
+                    icon = null,
                 ),
                 authenticated,
             ).let { resp ->
@@ -236,6 +254,8 @@ class ChannelControllerTest {
                     name = "name",
                     accessControl = READ_WRITE.name,
                     visibility = PUBLIC.name,
+                    description = null,
+                    icon = null,
                 ),
                 AuthenticatedUserInputModel(0u, "token"),
             ).let { resp ->
@@ -305,6 +325,115 @@ class ChannelControllerTest {
             ).let { resp ->
                 assertEquals(HttpStatus.NOT_FOUND, resp.statusCode, "Status code is different")
                 assertIs<ChannelProblem.ChannelNotFound>(resp.body, "Body is not a ChannelProblem.ChannelNotFound")
+            }
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManager")
+    fun `get a channel by name`(manager: TransactionManager) =
+        testSetUp(manager) { authenticated, channelServices ->
+            val name = "channel1"
+            val newChannel =
+                channelServices
+                    .createChannel(authenticated.uId, name, READ_WRITE.name, PUBLIC.name)
+            assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+            assertEquals(
+                HttpStatus.OK,
+                getChannelByName(newChannel.value.name.fullName, authenticated).statusCode,
+                "Status code is different",
+            )
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManager")
+    fun `fail to get a channel by name`(manager: TransactionManager) =
+        testSetUp(manager) { authenticated, _ ->
+            assertEquals(HttpStatus.OK, getChannelByName("name", authenticated).statusCode, "Status code is different")
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManager")
+    fun `trying to join a channel with invalid user should return BAD_REQUEST`(manager: TransactionManager) =
+        testSetUp(manager) { authenticatedUserInputModel, channelServices ->
+            val newChannel =
+                channelServices
+                    .createChannel(authenticatedUserInputModel.uId, "name", READ_WRITE.name, PUBLIC.name)
+            assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+            val cId = checkNotNull(newChannel.value.cId) { "Channel id is null" }
+            val authenticated = AuthenticatedUserInputModel(123u, "")
+            val join = JoinChannelInputModel(cId)
+            joinChannel(join, authenticated).let { resp ->
+                assertEquals(HttpStatus.BAD_REQUEST, resp.statusCode, "Status code is different")
+                assertIs<ChannelProblem.UnableToJoinChannel>(resp.body, "Body is not a ChannelProblem.ChannelNotFound")
+            }
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManager")
+    fun `joining a channel with valid user and valid invitation code should return OK`(manager: TransactionManager) =
+        testSetUp(manager) { authenticatedUserInputModel, channelServices ->
+            val newChannel =
+                channelServices
+                    .createChannel(authenticatedUserInputModel.uId, "name", READ_WRITE.name, PUBLIC.name)
+            assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+            val cId = checkNotNull(newChannel.value.cId) { "Channel id is null" }
+            val invitation =
+                channelServices.createChannelInvitation(
+                    cId,
+                    1u,
+                    null,
+                    READ_WRITE.name,
+                    authenticatedUserInputModel.uId,
+                )
+            assertIs<Success<ChannelInvitation>>(invitation, "Channel invitation creation failed")
+            val user = makeUser(manager)
+            val token = makeToken(manager, checkNotNull(user?.uId) { "User id is null" })
+            val userId = checkNotNull(user?.uId) { "User id is null" }
+            val authenticated = AuthenticatedUserInputModel(userId, token.token.toString())
+            val join = JoinChannelInputModel(cId, invitation.value.invitationCode.toString())
+            assertEquals(HttpStatus.OK, joinChannel(join, authenticated).statusCode, "Status code is different")
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManager")
+    fun `trying to join a channel that does not exists should return BAD_REQUEST`(manager: TransactionManager) =
+        testSetUp(manager) { authenticatedUserInputModel, _ ->
+            val join = JoinChannelInputModel(1u)
+            joinChannel(join, authenticatedUserInputModel).let { resp ->
+                assertEquals(HttpStatus.BAD_REQUEST, resp.statusCode, "Status code is different")
+                assertIs<ChannelProblem.UnableToJoinChannel>(resp.body, "Body is not a ChannelProblem.ChannelNotFound")
+            }
+        }
+
+    @ParameterizedTest
+    @MethodSource("transactionManager")
+    fun `trying to join a channel with invalid invitation code should return BAD_REQUEST`(manager: TransactionManager) =
+        testSetUp(manager) { authenticatedUserInputModel, channelServices ->
+            val newChannel =
+                channelServices
+                    .createChannel(authenticatedUserInputModel.uId, "name", READ_WRITE.name, PRIVATE.name)
+            assertIs<Success<Channel>>(newChannel, "Channel creation failed")
+            val cId = checkNotNull(newChannel.value.cId) { "Channel id is null" }
+            val invitation =
+                channelServices.createChannelInvitation(
+                    cId,
+                    1u,
+                    null,
+                    READ_WRITE.name,
+                    authenticatedUserInputModel.uId,
+                )
+            assertIs<Success<UUID>>(invitation, "Channel invitation creation failed")
+            val user = makeUser(manager)
+            val token = makeToken(manager, checkNotNull(user?.uId) { "User id is null" })
+            val userId = checkNotNull(user?.uId) { "User id is null" }
+            val authenticated = AuthenticatedUserInputModel(userId, token.token.toString())
+            val join = JoinChannelInputModel(cId, "invalid")
+            joinChannel(join, authenticated).let { resp ->
+                assertEquals(HttpStatus.BAD_REQUEST, resp.statusCode, "Status code is different")
+                assertIs<ChannelProblem.UnableToJoinChannel>(
+                    resp.body,
+                    "Body is not a ChannelProblem.UnableToJoinChannel",
+                )
             }
         }
 }

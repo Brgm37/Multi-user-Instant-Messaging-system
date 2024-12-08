@@ -22,13 +22,14 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.sql.Timestamp
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 private const val VALID_USERNAME = "username"
 private const val VALID_PASSWORD = "Password123"
 private const val INVALID_PASSWORD = "password"
 private const val INVITER_USERNAME = "owner"
 private const val NON_EXISTENT_USERNAME = "nonexistent"
-private const val INVALID_INVITATION_CODE = "invalid"
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(
@@ -42,21 +43,6 @@ abstract class AbstractUserControllerTest {
     @Autowired
     private lateinit var manager: TransactionManager
 
-    private fun makeUserName(): () -> String {
-        var count = 0
-        return {
-            count++
-            "user$count"
-        }
-    }
-
-    private val usernameMaker = makeUserName()
-
-    private val username: String
-        get() {
-            return usernameMaker()
-        }
-
     private lateinit var token: UserToken
 
     private fun userInvitation(
@@ -66,7 +52,7 @@ abstract class AbstractUserControllerTest {
             manager
                 .run {
                     val user =
-                        userRepo.findByToken(token.token.toString()) ?: throw IllegalStateException("User not found")
+                        userRepo.findToken(token.token.toString()) ?: throw IllegalStateException("User not found")
                     val uId = checkNotNull(user.uId) { "User not found" }
                     val userInvitation =
                         UserInvitation(
@@ -85,7 +71,9 @@ abstract class AbstractUserControllerTest {
     ) = manager
         .run {
             val owner =
-                userRepo.findByToken(token.token.toString()) ?: throw IllegalStateException("User not found")
+                userRepo
+                    .findByToken(token.token.toString())
+                    ?: throw IllegalStateException("User not found")
             val ownerId = checkNotNull(owner.uId) { "User not found" }
             val channel =
                 Channel.Private(
@@ -252,7 +240,7 @@ abstract class AbstractUserControllerTest {
             manager
                 .run {
                     val user =
-                        userRepo.findByToken(token.token.toString()) ?: throw IllegalStateException("User not found")
+                        userRepo.findToken(token.token.toString()) ?: throw IllegalStateException("User not found")
                     return@run checkNotNull(user.uId) { "User not found" }
                 }
 
@@ -351,11 +339,19 @@ abstract class AbstractUserControllerTest {
     fun `creating an invitation with a valid token should return OK and the invitation`() {
         val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
 
+        val currentDateTime = LocalDateTime.now().plusDays(1)
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        val formattedDateTime = currentDateTime.format(formatter)
+
         client
             .post()
             .uri(UserController.USER_BASE_URL + UserController.INVITATION_URL)
             .header("Authorization", "Bearer ${token.token}")
-            .exchange()
+            .bodyValue(
+                mapOf(
+                    "expirationDate" to formattedDateTime,
+                ),
+            ).exchange()
             .expectStatus()
             .isOk
             .expectBody()
@@ -411,178 +407,5 @@ abstract class AbstractUserControllerTest {
             .exchange()
             .expectStatus()
             .isUnauthorized
-    }
-
-    @Test
-    fun `joining a channel with a valid token and valid params should return OK`() {
-        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
-
-        val (channel, invitation) =
-            privateChannelInvitationPair()
-
-        client
-            .put()
-            .uri(
-                UserController.USER_BASE_URL + UserController.CHANNELS_CHANNEL_ID_URL,
-                channel.cId,
-                invitation.invitationCode,
-            ).header("Authorization", "Bearer ${token.token}")
-            .exchange()
-            .expectStatus()
-            .isOk
-    }
-
-    @Test
-    fun `trying to join a channel without being authenticated should return UNAUTHORIZED`() {
-        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
-
-        val (channel, invitation) =
-            privateChannelInvitationPair()
-
-        client
-            .put()
-            .uri(
-                UserController.USER_BASE_URL + UserController.CHANNELS_CHANNEL_ID_URL,
-                channel.cId,
-                invitation.invitationCode,
-            ).exchange()
-            .expectStatus()
-            .isUnauthorized
-    }
-
-    @Test
-    fun `trying to join a channel with an invalid token should return UNAUTHORIZED`() {
-        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
-
-        val (channel, invitation) =
-            privateChannelInvitationPair()
-
-        client
-            .put()
-            .uri(
-                UserController.USER_BASE_URL + UserController.CHANNELS_CHANNEL_ID_URL,
-                channel.cId,
-                invitation.invitationCode,
-            ).header("Authorization", "Bearer invalid")
-            .exchange()
-            .expectStatus()
-            .isUnauthorized
-    }
-
-    @Test
-    fun `trying to join a channel with an invalid invitation code should return BAD_REQUEST`() {
-        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
-
-        val userToken =
-            manager.run {
-                val user =
-                    checkNotNull(userRepo.createUser(User(username = username, password = Password(VALID_PASSWORD))))
-                val userId = checkNotNull(user.uId) { "User not found" }
-                val userToken = UserToken(userId)
-                userRepo.createToken(userToken)
-                return@run userToken
-            }
-
-        val (channel, _) =
-            privateChannelInvitationPair()
-
-        client
-            .put()
-            .uri(
-                UserController.USER_BASE_URL + UserController.CHANNELS_CHANNEL_ID_URL,
-                channel.cId,
-                INVALID_INVITATION_CODE,
-            ).header("Authorization", "Bearer ${userToken.token}")
-            .exchange()
-            .expectStatus()
-            .isBadRequest
-    }
-
-    @Test
-    fun `trying to join a channel that does not exist should return NOT_FOUND`() {
-        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
-
-        val userToken =
-            manager.run {
-                val user =
-                    checkNotNull(userRepo.createUser(User(username = username, password = Password(VALID_PASSWORD))))
-                val userId = checkNotNull(user.uId) { "User not found" }
-                val userToken = UserToken(userId)
-                userRepo.createToken(userToken)
-                return@run userToken
-            }
-
-        client
-            .put()
-            .uri(
-                UserController.USER_BASE_URL + UserController.CHANNELS_CHANNEL_ID_URL,
-                0,
-                INVALID_INVITATION_CODE,
-            ).header("Authorization", "Bearer ${userToken.token}")
-            .exchange()
-            .expectStatus()
-            .isNotFound
-    }
-
-    @Test
-    fun `trying to join a channel with an expired invitation code should return BAD_REQUEST`() {
-        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
-
-        val userToken =
-            manager.run {
-                val user =
-                    checkNotNull(userRepo.createUser(User(username = username, password = Password(VALID_PASSWORD))))
-                val userId = checkNotNull(user.uId) { "User not found" }
-                val userToken = UserToken(userId)
-                userRepo.createToken(userToken)
-                return@run userToken
-            }
-
-        val (channel, invitation) =
-            privateChannelInvitationPair(
-                expirationDate = Timestamp.valueOf(LocalDate.now().minusDays(1).atStartOfDay()),
-            )
-
-        client
-            .put()
-            .uri(
-                UserController.USER_BASE_URL + UserController.CHANNELS_CHANNEL_ID_URL,
-                channel.cId,
-                invitation.invitationCode,
-            ).header("Authorization", "Bearer ${userToken.token}")
-            .exchange()
-            .expectStatus()
-            .isBadRequest
-    }
-
-    @Test
-    fun `trying to join a channel with an invitation code that reached the maximum uses should return BAD_REQUEST`() {
-        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port").build()
-
-        val userToken =
-            manager.run {
-                val user =
-                    checkNotNull(userRepo.createUser(User(username = username, password = Password(VALID_PASSWORD))))
-                val userId = checkNotNull(user.uId) { "User not found" }
-                val userToken = UserToken(userId)
-                userRepo.createToken(userToken)
-                return@run userToken
-            }
-
-        val (channel, invitation) =
-            privateChannelInvitationPair(
-                maxUses = 0u,
-            )
-
-        client
-            .put()
-            .uri(
-                UserController.USER_BASE_URL + UserController.CHANNELS_CHANNEL_ID_URL,
-                channel.cId,
-                invitation.invitationCode,
-            ).header("Authorization", "Bearer ${userToken.token}")
-            .exchange()
-            .expectStatus()
-            .isBadRequest
     }
 }

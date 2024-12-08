@@ -17,11 +17,8 @@ class UserInMem : UserRepositoryInterface {
             .copy(uId = nextId++)
             .also { users.add(it) }
 
-    override fun findInvitation(
-        inviterUId: UInt,
-        invitationCode: String,
-    ): UserInvitation? =
-        invitations.find { it.inviterId == inviterUId && it.invitationCode.toString() == invitationCode }
+    override fun findInvitation(invitationCode: String): UserInvitation? =
+        invitations.find { it.invitationCode.toString() == invitationCode }
 
     override fun deleteInvitation(invitation: UserInvitation) {
         invitations.removeIf { it.invitationCode == invitation.invitationCode }
@@ -34,7 +31,7 @@ class UserInMem : UserRepositoryInterface {
 
     override fun validateToken(token: String): Boolean {
         val tokenObj = tokens.find { it.token == UUID.fromString(token) } ?: return false
-        return !tokenObj.isExpired()
+        return !tokenObj.isExpired
     }
 
     override fun findByUsername(username: String): User? = users.find { it.username == username }
@@ -46,7 +43,7 @@ class UserInMem : UserRepositoryInterface {
 
     override fun deleteToken(token: String): Boolean = tokens.removeIf { it.token == UUID.fromString(token) }
 
-    override fun findByToken(token: String): User? {
+    override fun findToken(token: String): UserToken? {
         val tokenObj =
             try {
                 UUID.fromString(token)
@@ -55,15 +52,19 @@ class UserInMem : UserRepositoryInterface {
             }
         return tokens
             .find { it.token == tokenObj }
-            ?.let { findById(it.userId) }
+    }
+
+    override fun findByToken(token: String): User? {
+        val tokenObj = findToken(token) ?: return null
+        return findById(tokenObj.uId)
     }
 
     override fun findById(id: UInt): User? = users.find { it.uId == id }
 
     override fun findAll(
-        offset: Int,
-        limit: Int,
-    ): List<User> = users.drop(offset).take(limit)
+        offset: UInt,
+        limit: UInt,
+    ): List<User> = users.drop(offset.toInt()).take(limit.toInt())
 
     override fun save(entity: User) {
         users.removeIf { it.uId == entity.uId }

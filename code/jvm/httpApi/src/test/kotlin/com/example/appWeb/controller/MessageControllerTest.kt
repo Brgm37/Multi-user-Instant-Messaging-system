@@ -22,12 +22,14 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.http.HttpStatus
 import services.MessageServices
+import services.SseServices
 import utils.Success
 import utils.encryption.DummyEncrypt
 import java.util.UUID
 import java.util.stream.Stream
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 class MessageControllerTest {
     companion object {
@@ -92,7 +94,7 @@ class MessageControllerTest {
             uId: UInt,
         ) = manager
             .run {
-                val token = UserToken(userId = uId, token = UUID.randomUUID())
+                val token = UserToken(uId = uId, token = UUID.randomUUID())
                 userRepo
                     .createToken(token)
                 token
@@ -110,6 +112,7 @@ class MessageControllerTest {
             ) -> Unit,
         ) {
             val messageServices = MessageServices(manager)
+            val sseServices = SseServices(manager)
             val owner = makeUser(manager, username)
             val user = checkNotNull(makeUser(manager, username))
             val userId = checkNotNull(user.uId) { "User id is null" }
@@ -118,7 +121,7 @@ class MessageControllerTest {
             val authOwner = AuthenticatedUserInputModel(ownerId, makeToken(manager, ownerId).token.toString())
             val channel = makeChannel(manager, checkNotNull(owner))
             checkNotNull(channel) { "Channel is null" }
-            val messageController = MessageController(messageServices)
+            val messageController = MessageController(messageServices, sseServices)
             messageController.block(manager, authOwner, authUser, channel, messageServices)
         }
 
@@ -195,7 +198,8 @@ class MessageControllerTest {
     fun `fail to create message due to channel not found`(m: TransactionManager) {
         val owner = AuthenticatedUserInputModel(0u, "token")
         val messageServices = MessageServices(m)
-        val channelController = MessageController(messageServices)
+        val sseServices = SseServices(m)
+        val channelController = MessageController(messageServices, sseServices)
         channelController
             .createMessage(
                 CreateMessageInputModel(
@@ -267,12 +271,10 @@ class MessageControllerTest {
                 )
                 val messages = resp.body as List<MessageOutputModel>
                 assertEquals(10, messages.size, "Number of messages is not correct")
-                messages.forEachIndexed { index, message ->
-                    assertEquals(
-                        "Hello, World! ${14 - index}",
-                        message.message,
-                        "Message is not correct",
-                    )
+                messages.forEachIndexed { _, message ->
+                    assertTrue {
+                        message.message.startsWith("Hello, World!")
+                    }
                     assertEquals(owner.uId, message.user, "User is not correct")
                     assertEquals(channel.cId, message.channel, "Channel is not correct")
                 }

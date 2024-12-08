@@ -3,6 +3,7 @@ package interfaces
 import errors.MessageError
 import model.messages.Message
 import utils.Either
+import java.sql.Timestamp
 
 private const val MSG_OFFSET = 0u
 private const val MSG_LIMIT = 100u
@@ -55,5 +56,20 @@ interface MessageServicesInterface {
         uId: UInt,
         offset: UInt = MSG_OFFSET,
         limit: UInt = MSG_LIMIT,
+    ): Either<MessageError, List<Message>>
+
+    /**
+     * Gets messages by timestamp.
+     *
+     * @param channelId The id of the channel.
+     * @param timestamp The timestamp to get the messages from.
+     * @param limit The quantity of messages to get.
+     * @param isBefore If the messages should be before the timestamp.
+     */
+    fun messagesByTimeStamp(
+        channelId: UInt,
+        timestamp: Timestamp?,
+        limit: UInt = MSG_LIMIT,
+        isBefore: Boolean = false,
     ): Either<MessageError, List<Message>>
 }

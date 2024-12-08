@@ -11,14 +11,10 @@ interface UserRepositoryInterface : Repository<User> {
     fun createUser(user: User): User?
 
     /**
-     * Retrieves an invitation associated to the user
-     * @param inviterUId The ID of the inviter
+     * Retrieves an invitation by its code
      * @param invitationCode The invitation code
      */
-    fun findInvitation(
-        inviterUId: UInt,
-        invitationCode: String,
-    ): UserInvitation?
+    fun findInvitation(invitationCode: String): UserInvitation?
 
     /**
      * Deletes an invitation associated to the user
@@ -58,9 +54,18 @@ interface UserRepositoryInterface : Repository<User> {
     fun deleteToken(token: String): Boolean
 
     /**
-     * Finds a user by its token
+     * Retrieves a token by its value
+     *
+     * @param token The token to find
+     * @return The token if found, null otherwise
+     */
+    fun findToken(token: String): UserToken?
+
+    /**
+     * Retrieves a user by its ID
+     *
      * @param token The ID of the user
-     * @return The user with the given ID
+     * @return The user if found, null otherwise
      */
     fun findByToken(token: String): User?
 }

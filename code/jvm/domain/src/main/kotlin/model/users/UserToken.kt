@@ -2,18 +2,19 @@ package model.users
 
 import java.sql.Timestamp
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 /**
  * Represents a user token.
  *
- * @property userId The ID of the user.
+ * @property uId The ID of the user.
  * @property token The token.
  * @property creationDate The creation date of the token.
  * @property expirationDate The expiration date of the token.
  * @throws IllegalArgumentException If the creation date is after the expiration date.
  */
 data class UserToken(
-    val userId: UInt,
+    val uId: UInt,
     val token: UUID = UUID.randomUUID(),
     val creationDate: Timestamp = Timestamp(System.currentTimeMillis()),
     val expirationDate: Timestamp = Timestamp.valueOf(creationDate.toLocalDateTime().plusWeeks(1)),
@@ -24,8 +25,15 @@ data class UserToken(
 
     /**
      * Checks if the token is valid.
-     *
-     * @return true if the token is valid, false otherwise.
      */
-    fun isExpired(): Boolean = expirationDate < Timestamp(System.currentTimeMillis())
+    val isExpired: Boolean
+        get() = expirationDate < Timestamp(System.currentTimeMillis())
+
+    val expirationDateInInt: Int
+        get() {
+            val currTime = System.currentTimeMillis()
+            val expirationTime = expirationDate.time
+            val maxAgeInMillis = expirationTime - currTime
+            return TimeUnit.MILLISECONDS.toSeconds(maxAgeInMillis).toInt()
+        }
 }

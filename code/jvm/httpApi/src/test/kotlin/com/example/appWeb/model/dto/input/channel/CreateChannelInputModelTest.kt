@@ -11,6 +11,8 @@ class CreateChannelInputModelTest {
                 name = "name",
                 visibility = "PUBLIC",
                 accessControl = "READ_WRITE",
+                description = null,
+                icon = null,
             )
 
         // When
@@ -28,6 +30,8 @@ class CreateChannelInputModelTest {
                 name = "name",
                 visibility = "INVALID",
                 accessControl = "READ_WRITE",
+                description = null,
+                icon = null,
             )
 
         // When
@@ -45,6 +49,8 @@ class CreateChannelInputModelTest {
                 name = "name",
                 visibility = "PUBLIC",
                 accessControl = "READ_ONLY",
+                description = null,
+                icon = null,
             )
 
         // When
@@ -62,6 +68,8 @@ class CreateChannelInputModelTest {
                 name = "name",
                 visibility = "PUBLIC",
                 accessControl = "INVALID",
+                description = null,
+                icon = null,
             )
 
         // When

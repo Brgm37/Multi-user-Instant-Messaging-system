@@ -15,4 +15,8 @@ sealed class ChannelError : Error() {
     data object InvalidChannelVisibility : ChannelError()
 
     data object InvalidChannelAccessControl : ChannelError()
+
+    data object InvitationCodeIsInvalid : ChannelError()
+
+    data object InvitationCodeHasExpired : ChannelError()
 }

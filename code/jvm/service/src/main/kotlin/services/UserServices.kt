@@ -1,16 +1,11 @@
 package services
 
 import TransactionManager
-import errors.ChannelError.ChannelNotFound
-import errors.Error
 import errors.UserError
 import errors.UserError.InvitationCodeHasExpired
 import errors.UserError.InvitationCodeIsInvalid
-import errors.UserError.InvitationCodeMaxUsesReached
 import interfaces.UserServicesInterface
 import jakarta.inject.Named
-import model.channels.Channel
-import model.channels.decrementUses
 import model.users.Password
 import model.users.User
 import model.users.UserInvitation
@@ -20,11 +15,6 @@ import utils.failure
 import utils.success
 import java.sql.Timestamp
 import java.time.LocalDateTime
-
-/**
- * The number of days an invitation is valid.
- */
-private const val INVITATION_EXPIRATION_DAYS = 7L
 
 /**
  * The number of days a token is valid.
@@ -43,7 +33,6 @@ class UserServices(
         username: String,
         password: String,
         invitationCode: String,
-        inviterUId: UInt,
     ): Either<UserError, User> {
         if (username.isEmpty()) return failure(UserError.UsernameIsEmpty)
         if (!Password.isValidPassword(password)) return failure(UserError.PasswordIsInvalid)
@@ -53,11 +42,10 @@ class UserServices(
                 password = Password(password),
             )
         return repoManager.run {
-            userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
             if (userRepo.findByUsername(username) != null) return@run failure(UserError.UsernameAlreadyExists)
             val invitation =
                 userRepo
-                    .findInvitation(inviterUId, invitationCode)
+                    .findInvitation(invitationCode)
                     ?: return@run failure(InvitationCodeIsInvalid)
             if (invitation.isExpired) {
                 userRepo.deleteInvitation(invitation)
@@ -84,61 +72,11 @@ class UserServices(
         }
     }
 
-    override fun joinChannel(
-        userId: UInt,
-        channelId: UInt,
-        invitationCode: String?,
-    ): Either<Error, Unit> {
+    override fun getInvitation(invitationCode: String): Either<UserError, UserInvitation> {
         return repoManager.run {
-            val channel =
-                channelRepo.findById(channelId) ?: return@run failure(ChannelNotFound)
-            userRepo.findById(userId) ?: return@run failure(UserError.UserNotFound)
-            if (channelRepo.isUserInChannel(channelId, userId)) {
-                return@run success(Unit)
-            }
-            if (channel is Channel.Public) {
-                channelRepo.joinChannel(channelId, userId, channel.accessControl)
-                return@run success(Unit)
-            }
-            val invitation = channelRepo.findInvitation(channelId) ?: return@run failure(InvitationCodeIsInvalid)
-            if (invitationCode != invitation.invitationCode.toString()) {
-                return@run failure(InvitationCodeIsInvalid)
-            }
-            if (invitation.isExpired) {
-                channelRepo.deleteInvitation(channelId)
-                return@run failure(InvitationCodeHasExpired)
-            }
-            if (invitation.maxUses == 0u) {
-                channelRepo.deleteInvitation(channelId)
-                return@run failure(InvitationCodeMaxUsesReached)
-            }
-            channelRepo.updateInvitation(invitation.decrementUses())
-            channelRepo.joinChannel(channelId, userId, invitation.accessControl)
-            success(Unit)
-        }
-    }
-
-    override fun getUserByToken(token: String): Either<UserError, User> =
-        repoManager.run {
-            val user = userRepo.findByToken(token) ?: return@run failure(UserError.UserNotFound)
-            success(user)
-        }
-
-    override fun isValidToken(token: String): Either<UserError, Boolean> =
-        repoManager.run {
-            val session = userRepo.validateToken(token)
-            success(session)
-        }
-
-    override fun getInvitation(
-        inviterUId: UInt,
-        invitationCode: String,
-    ): Either<UserError, UserInvitation> {
-        return repoManager.run {
-            userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
             val invitation =
                 userRepo
-                    .findInvitation(inviterUId, invitationCode) ?: return@run failure(UserError.InvitationNotFound)
+                    .findInvitation(invitationCode) ?: return@run failure(UserError.InvitationNotFound)
             success(invitation)
         }
     }
@@ -153,7 +91,7 @@ class UserServices(
             val userId = checkNotNull(user.uId)
             val token =
                 UserToken(
-                    userId = userId,
+                    uId = userId,
                     expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(TOKEN_EXPIRATION_DAYS)),
                 )
             if (userRepo.createToken(token)) success(token) else failure(UserError.UnableToCreateToken)
@@ -171,13 +109,25 @@ class UserServices(
             success(Unit)
         }
 
-    override fun createInvitation(inviterUId: UInt): Either<UserError, UserInvitation> {
+    override fun createInvitation(
+        inviterUId: UInt,
+        expirationDate: String?,
+    ): Either<UserError, UserInvitation> {
+        val timestamp =
+            if (expirationDate != null) {
+                makeTimeStamp(expirationDate) ?: return failure(UserError.UnableToCreateInvitation)
+            } else {
+                LocalDateTime
+                    .now()
+                    .plusWeeks(1)
+                    .let(Timestamp::valueOf)
+            }
         return repoManager.run {
             userRepo.findById(inviterUId) ?: return@run failure(UserError.InviterNotFound)
             val invitation =
                 UserInvitation(
                     inviterId = inviterUId,
-                    expirationDate = Timestamp.valueOf(LocalDateTime.now().plusDays(INVITATION_EXPIRATION_DAYS)),
+                    expirationDate = timestamp,
                 )
             if (userRepo.createInvitation(invitation)) {
                 success(invitation)
@@ -186,4 +136,14 @@ class UserServices(
             }
         }
     }
+
+    private fun makeTimeStamp(expirationDate: String) =
+        try {
+            Timestamp.valueOf(
+                LocalDateTime
+                    .parse(expirationDate),
+            )
+        } catch (e: IllegalArgumentException) {
+            null
+        }
 }

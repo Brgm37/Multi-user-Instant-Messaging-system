@@ -22,4 +22,8 @@ sealed class ChannelProblem(
     data object InvalidChannelVisibility : Problem(URI("$PROBLEM_URI_PATH/invalid-channel-visibility"))
 
     data object InvalidChannelAccessControl : Problem(URI("$PROBLEM_URI_PATH/invalid-channel-access-control"))
+
+    data object AccessControlNotFound : Problem(URI("$PROBLEM_URI_PATH/access-control-not-found"))
+
+    data object UnableToJoinChannel : Problem(URI("$PROBLEM_URI_PATH/unable-to-join-channel"))
 }

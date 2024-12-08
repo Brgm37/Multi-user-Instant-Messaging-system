@@ -2,19 +2,16 @@ package com.example.appWeb.controller
 
 import TransactionManager
 import com.example.appWeb.model.dto.input.user.AuthenticatedUserInputModel
+import com.example.appWeb.model.dto.input.user.CreateUserInvitationInputModel
 import com.example.appWeb.model.dto.input.user.UserLogInInputModel
 import com.example.appWeb.model.dto.input.user.UserSignUpInputModel
 import com.example.appWeb.model.dto.output.user.UserAuthenticatedOutputModel
 import com.example.appWeb.model.dto.output.user.UserInfoOutputModel
 import com.example.appWeb.model.dto.output.user.UserInvitationOutputModel
 import com.example.appWeb.model.dto.output.user.UserSignUpOutputModel
-import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.UserProblem
 import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
-import model.channels.AccessControl
-import model.channels.Channel
-import model.channels.Visibility
 import model.users.Password
 import model.users.User
 import model.users.UserInvitation
@@ -22,12 +19,10 @@ import model.users.UserToken
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.http.HttpStatus
-import services.ChannelServices
+import org.springframework.mock.web.MockHttpServletResponse
 import services.UserServices
-import utils.Success
 import utils.encryption.DummyEncrypt
 import java.sql.Timestamp
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import java.util.stream.Stream
@@ -86,7 +81,7 @@ class UserControllerTest {
             uId: UInt,
         ) = manager
             .run {
-                val token = UserToken(userId = uId, token = UUID.randomUUID())
+                val token = UserToken(uId = uId, token = UUID.randomUUID())
                 userRepo
                     .createToken(token)
                 token
@@ -105,7 +100,6 @@ class UserControllerTest {
                 username = "newUser",
                 password = "Password123",
                 invitationCode = invitation.invitationCode.toString(),
-                inviterUId = invitation.inviterId,
             )
 
         val response = userController.signUp(userSignUpInput)
@@ -127,7 +121,6 @@ class UserControllerTest {
                 username = existingUser.username,
                 password = "Password123",
                 invitationCode = invitation.invitationCode.toString(),
-                inviterUId = invitation.inviterId,
             )
 
         val response = userController.signUp(userSignUpInput)
@@ -141,14 +134,12 @@ class UserControllerTest {
     fun `trying to sign up with invalid invitation code should return BAD_REQUEST`(manager: TransactionManager) {
         val userServices = UserServices(manager)
         val userController = UserController(userServices)
-        val invitation = makeInviterAndInvitation(manager)
 
         val userSignUpInput =
             UserSignUpInputModel(
                 username = "newUser",
                 password = "Password123",
                 invitationCode = "invalidCode",
-                inviterUId = invitation.inviterId,
             )
 
         val response = userController.signUp(userSignUpInput)
@@ -171,7 +162,6 @@ class UserControllerTest {
                 username = "newUser",
                 password = "Password123",
                 invitationCode = expiredInvitation.invitationCode.toString(),
-                inviterUId = expiredInvitation.inviterId,
             )
 
         val response = userController.signUp(userSignUpInput)
@@ -228,7 +218,7 @@ class UserControllerTest {
 
         val userLogInInput = UserLogInInputModel(user.username, user.password.value)
 
-        val response = userController.login(userLogInInput)
+        val response = userController.login(userLogInInput, MockHttpServletResponse())
         assertEquals(HttpStatus.OK, response.statusCode)
         assertIs<UserAuthenticatedOutputModel>(response.body)
         assertNotNull((response.body as UserAuthenticatedOutputModel).token)
@@ -244,7 +234,7 @@ class UserControllerTest {
 
         val userLogInInput = UserLogInInputModel("invalidUsername", user.password.value)
 
-        val response = userController.login(userLogInInput)
+        val response = userController.login(userLogInInput, MockHttpServletResponse())
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
         assertIs<UserProblem.UserNotFound>(response.body)
         assertEquals(response.body, UserProblem.UserNotFound)
@@ -260,7 +250,7 @@ class UserControllerTest {
 
         val userLogInInput = UserLogInInputModel(user.username, "invalidPassword")
 
-        val response = userController.login(userLogInInput)
+        val response = userController.login(userLogInInput, MockHttpServletResponse())
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
         assertIs<UserProblem.PasswordIsInvalid>(response.body)
         assertEquals(response.body, UserProblem.PasswordIsInvalid)
@@ -275,8 +265,9 @@ class UserControllerTest {
         val user = checkNotNull(makeUser(manager))
         val userId = checkNotNull(user.uId)
         val authenticated = AuthenticatedUserInputModel(userId, makeToken(manager, userId).token.toString())
-
-        val response = userController.createInvitation(authenticated)
+        val expirationDate =
+            CreateUserInvitationInputModel(LocalDateTime.now().plusHours(1).toString())
+        val response = userController.createInvitation(expirationDate, authenticated)
         assertEquals(HttpStatus.OK, response.statusCode)
         assertIs<UserInvitationOutputModel>(response.body)
         assertNotNull((response.body as UserInvitationOutputModel).invitationCode)
@@ -290,7 +281,9 @@ class UserControllerTest {
 
         val invalidUserId = 0u
 
-        val response = userController.createInvitation(AuthenticatedUserInputModel(invalidUserId, ""))
+        val expirationDate =
+            CreateUserInvitationInputModel(LocalDateTime.now().plusHours(1).toString())
+        val response = userController.createInvitation(expirationDate, AuthenticatedUserInputModel(invalidUserId, ""))
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
         assertIs<UserProblem.InviterNotFound>(response.body)
         assertEquals(response.body, UserProblem.InviterNotFound)
@@ -341,195 +334,5 @@ class UserControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
         assertIs<UserProblem.UserNotFound>(response.body)
         assertEquals(response.body, UserProblem.UserNotFound)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManager")
-    fun `joining a channel with valid user and valid invitation code should return OK`(manager: TransactionManager) {
-        val userServices = UserServices(manager)
-        val channelServices = ChannelServices(manager)
-        val userController = UserController(userServices)
-
-        val user = checkNotNull(makeUser(manager))
-        val userId = checkNotNull(user.uId)
-        val authenticated = AuthenticatedUserInputModel(userId, makeToken(manager, userId).token.toString())
-        val owner = checkNotNull(makeUser(manager))
-        val ownerId = checkNotNull(owner.uId)
-        val channel =
-            channelServices
-                .createChannel(
-                    ownerId,
-                    "channel",
-                    AccessControl.READ_WRITE.name,
-                    Visibility.PRIVATE.name,
-                ) as Success<Channel>
-        val channelId = checkNotNull(channel.value.cId)
-        val invitationCode =
-            channelServices.createChannelInvitation(
-                channelId,
-                1u,
-                LocalDate.now().plusDays(1).toString(),
-                AccessControl.READ_WRITE.name,
-                ownerId,
-            ) as Success<UUID>
-
-        val response = userController.joinChannel(channelId, invitationCode.value.toString(), authenticated)
-        assertEquals(HttpStatus.OK, response.statusCode)
-        assertNull(response.body)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManager")
-    fun `trying to join a channel with invalid user should return NOT_FOUND`(manager: TransactionManager) {
-        val userServices = UserServices(manager)
-        val channelServices = ChannelServices(manager)
-        val userController = UserController(userServices)
-
-        val user = checkNotNull(makeUser(manager))
-        val userId = checkNotNull(user.uId)
-        val authenticated = AuthenticatedUserInputModel(0u, makeToken(manager, userId).token.toString())
-        val owner = checkNotNull(makeUser(manager))
-        val ownerId = checkNotNull(owner.uId)
-        val channel =
-            channelServices
-                .createChannel(
-                    ownerId,
-                    "channel",
-                    AccessControl.READ_WRITE.name,
-                    Visibility.PUBLIC.name,
-                ) as Success<Channel>
-        val channelId = checkNotNull(channel.value.cId)
-        val invitationCode =
-            channelServices.createChannelInvitation(
-                channelId,
-                1u,
-                LocalDate.now().plusDays(1).toString(),
-                AccessControl.READ_WRITE.name,
-                ownerId,
-            ) as Success<UUID>
-
-        val response = userController.joinChannel(channelId, invitationCode.value.toString(), authenticated)
-        assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
-        assertIs<UserProblem.UserNotFound>(response.body)
-        assertEquals(response.body, UserProblem.UserNotFound)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManager")
-    fun `trying to join a channel that does not exists should return NOT_FOUND`(manager: TransactionManager) {
-        val userServices = UserServices(manager)
-        val userController = UserController(userServices)
-
-        val user = checkNotNull(makeUser(manager))
-        val userId = checkNotNull(user.uId)
-        val authenticated = AuthenticatedUserInputModel(userId, makeToken(manager, userId).token.toString())
-
-        val channelId = 0u
-        val invitationCode = "invitationCode"
-
-        val response = userController.joinChannel(channelId, invitationCode, authenticated)
-        assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
-        assertIs<ChannelProblem.ChannelNotFound>(response.body)
-        assertEquals(response.body, ChannelProblem.ChannelNotFound)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManager")
-    fun `trying to join a channel with invalid invitation code should return BAD_REQUEST`(manager: TransactionManager) {
-        val userServices = UserServices(manager)
-        val channelServices = ChannelServices(manager)
-        val userController = UserController(userServices)
-
-        val user = checkNotNull(makeUser(manager))
-        val userId = checkNotNull(user.uId)
-        val authenticated = AuthenticatedUserInputModel(userId, makeToken(manager, userId).token.toString())
-        val owner = checkNotNull(makeUser(manager))
-        val ownerId = checkNotNull(owner.uId)
-        val channel =
-            channelServices
-                .createChannel(
-                    ownerId,
-                    "channel",
-                    AccessControl.READ_WRITE.name,
-                    Visibility.PRIVATE.name,
-                ) as Success<Channel>
-        val channelId = checkNotNull(channel.value.cId)
-
-        val response = userController.joinChannel(channelId, "invalidInvitationCode", authenticated)
-        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
-        assertIs<UserProblem.InvitationCodeIsInvalid>(response.body)
-        assertEquals(response.body, UserProblem.InvitationCodeIsInvalid)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManager")
-    fun `trying to join a channel with expired invitation code should return BAD_REQUEST`(manager: TransactionManager) {
-        val userServices = UserServices(manager)
-        val channelServices = ChannelServices(manager)
-        val userController = UserController(userServices)
-
-        val user = checkNotNull(makeUser(manager))
-        val userId = checkNotNull(user.uId)
-        val authenticated = AuthenticatedUserInputModel(userId, makeToken(manager, userId).token.toString())
-        val owner = checkNotNull(makeUser(manager))
-        val ownerId = checkNotNull(owner.uId)
-        val channel =
-            channelServices
-                .createChannel(
-                    ownerId,
-                    "channel",
-                    AccessControl.READ_WRITE.name,
-                    Visibility.PRIVATE.name,
-                ) as Success<Channel>
-        val channelId = checkNotNull(channel.value.cId)
-        val invitationCode =
-            channelServices.createChannelInvitation(
-                channelId,
-                1u,
-                LocalDate.now().minusDays(1).toString(),
-                AccessControl.READ_WRITE.name,
-                ownerId,
-            ) as Success<UUID>
-
-        val response = userController.joinChannel(channelId, invitationCode.value.toString(), authenticated)
-        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
-        assertIs<UserProblem.InvitationCodeHasExpired>(response.body)
-        assertEquals(response.body, UserProblem.InvitationCodeHasExpired)
-    }
-
-    @ParameterizedTest
-    @MethodSource("transactionManager")
-    fun `trying to join a channel with max uses reached should return BAD_REQUEST`(manager: TransactionManager) {
-        val userServices = UserServices(manager)
-        val channelServices = ChannelServices(manager)
-        val userController = UserController(userServices)
-
-        val user = checkNotNull(makeUser(manager))
-        val userId = checkNotNull(user.uId)
-        val authenticated = AuthenticatedUserInputModel(userId, makeToken(manager, userId).token.toString())
-        val owner = checkNotNull(makeUser(manager))
-        val ownerId = checkNotNull(owner.uId)
-        val channel =
-            channelServices
-                .createChannel(
-                    ownerId,
-                    "channel",
-                    AccessControl.READ_WRITE.name,
-                    Visibility.PRIVATE.name,
-                ) as Success<Channel>
-        val channelId = checkNotNull(channel.value.cId)
-        val invitationCode =
-            channelServices.createChannelInvitation(
-                channelId,
-                0u,
-                LocalDate.now().plusDays(1).toString(),
-                AccessControl.READ_WRITE.name,
-                ownerId,
-            ) as Success<UUID>
-
-        val response = userController.joinChannel(channelId, invitationCode.value.toString(), authenticated)
-        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
-        assertIs<UserProblem.InvitationCodeMaxUsesReached>(response.body)
-        assertEquals(response.body, UserProblem.InvitationCodeMaxUsesReached)
     }
 }

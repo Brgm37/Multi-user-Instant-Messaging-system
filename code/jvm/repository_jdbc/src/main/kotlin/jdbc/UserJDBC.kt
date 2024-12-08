@@ -123,19 +123,15 @@ class UserJDBC(
         }
     }
 
-    override fun findInvitation(
-        inviterUId: UInt,
-        invitationCode: String,
-    ): UserInvitation? {
+    override fun findInvitation(invitationCode: String): UserInvitation? {
         val selectQuery =
             """
             SELECT user_id, invitation, expiration_date
             FROM users_invitations
-            WHERE user_id = ? AND invitation = ?
+            WHERE invitation = ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
-        stm.setInt(1, inviterUId.toInt())
-        stm.setString(2, invitationCode)
+        stm.setString(1, invitationCode)
         val rs = stm.executeQuery()
         return if (rs.next()) {
             rs.toUserInvitation()
@@ -182,18 +178,44 @@ class UserJDBC(
         return rs.next()
     }
 
-    override fun findByToken(token: String): User? {
+    override fun findToken(token: String): UserToken? {
         val selectQuery =
             """
-            SELECT user_id
+            SELECT user_id, token, creation, expiration
             FROM users_tokens
-            WHERE token = ?
+            WHERE token = ? AND expiration > now()
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
         stm.setString(1, token)
         val rs = stm.executeQuery()
         return if (rs.next()) {
-            findById(rs.getInt(USERS_INVITATIONS_TABLE_USER_ID).toUInt())
+            UserToken(
+                uId = rs.getInt(USERS_TOKENS_TABLE_USER_ID).toUInt(),
+                token = UUID.fromString(token),
+                creationDate = rs.getTimestamp(USERS_TOKENS_TABLE_CREATION),
+                expirationDate = rs.getTimestamp(USERS_TOKENS_TABLE_EXPIRATION),
+            )
+        } else {
+            null
+        }
+    }
+
+    override fun findByToken(token: String): User? {
+        val selectQuery =
+            """
+            SELECT id, name, password
+            FROM users
+            WHERE id = (
+                SELECT user_id
+                FROM users_tokens
+                WHERE token = ?
+            )
+            """.trimIndent()
+        val stm = connection.prepareStatement(selectQuery)
+        stm.setString(1, token)
+        val rs = stm.executeQuery()
+        return if (rs.next()) {
+            rs.toUser()
         } else {
             null
         }
@@ -234,9 +256,9 @@ class UserJDBC(
     }
 
     override fun createToken(token: UserToken): Boolean {
-        val tokenCount = countUserTokens(token.userId)
+        val tokenCount = countUserTokens(token.uId)
         if (tokenCount >= MAX_TOKENS) {
-            deleteOldestToken(token.userId)
+            deleteOldestToken(token.uId)
         }
         val insertQuery =
             """
@@ -245,7 +267,7 @@ class UserJDBC(
             """.trimIndent()
         val stm = connection.prepareStatement(insertQuery)
         var idx = 1
-        stm.setInt(idx++, token.userId.toInt())
+        stm.setInt(idx++, token.uId.toInt())
         stm.setString(idx++, token.token.toString())
         stm.setTimestamp(idx++, token.creationDate)
         stm.setTimestamp(idx, token.expirationDate)
@@ -291,8 +313,8 @@ class UserJDBC(
     }
 
     override fun findAll(
-        offset: Int,
-        limit: Int,
+        offset: UInt,
+        limit: UInt,
     ): List<User> {
         val selectQuery =
             """
@@ -302,8 +324,8 @@ class UserJDBC(
             LIMIT ?
             """.trimIndent()
         val stm = connection.prepareStatement(selectQuery)
-        stm.setInt(1, offset)
-        stm.setInt(2, limit)
+        stm.setInt(1, offset.toInt())
+        stm.setInt(2, limit.toInt())
         val rs = stm.executeQuery()
         val users = mutableListOf<User>()
         while (rs.next()) {
