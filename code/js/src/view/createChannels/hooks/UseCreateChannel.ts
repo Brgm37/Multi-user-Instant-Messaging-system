@@ -43,19 +43,7 @@ function reduce(state: CreateChannelsState, action: CreateChannelsAction): Creat
                     throw Error("Invalid action");
             }
         case "error":
-            switch (action.type) {
-                case "go-back":
-                    const input: ChannelInput = {
-                        name: state.input.name,
-                        visibility: state.input.visibility,
-                        access: state.input.access,
-                        description: state.input.description,
-                        icon: state.input.icon
-                    }
-                    return { tag: "editing", input: input };
-                default:
-                    throw Error("Invalid action");
-            }
+            throw Error("Already in final State 'redirecting' and should not reduce to any other State.");
         case "validating":
             switch (action.type) {
                 case "editName": {
@@ -125,10 +113,6 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
         onDescriptionChange(description: string) {
             if (state.tag !== "editing") return;
             dispatch({ type: "editDescription", inputValue: description });
-        },
-        goBack() {
-            if (state.tag !== "error") return;
-            dispatch({ type: "editName", inputValue: state.input.name });
         },
         onSubmit(channel: ChannelInput) {
             if (state.tag !== "validating") return;
