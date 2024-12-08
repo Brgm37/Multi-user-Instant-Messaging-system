@@ -9,6 +9,9 @@ import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
 
+/**
+ * Resolves the [AuthenticatedUserInputModel] from the request.
+ */
 @Component
 class AuthenticatedUserArgumentResolver : HandlerMethodArgumentResolver {
     override fun supportsParameter(parameter: MethodParameter) =

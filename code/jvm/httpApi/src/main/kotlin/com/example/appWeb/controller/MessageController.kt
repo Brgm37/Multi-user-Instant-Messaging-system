@@ -134,6 +134,7 @@ class MessageController(
     }
 
     @GetMapping(MESSAGE_SSE_URL)
+    @MessageSwaggerConfig.GetMessageEventStream
     fun getMessageEventStream(
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
         request: HttpServletRequest,
