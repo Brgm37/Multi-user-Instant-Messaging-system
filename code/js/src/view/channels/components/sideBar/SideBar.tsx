@@ -139,6 +139,8 @@ export function Sidebar(): React.JSX.Element {
                     />
                 </div>
 
+                <div className="w-12 h-0.5 bg-gray-700"></div>
+
                 <Link to={"/channels/about"} className={"relative group"}>
                     <div
                         className="w-10 h-10 bg-black overflow-hidden rounded-full transition-transform duration-300 ease-in-out transform hover:scale-110 hover:shadow-lg cursor-pointer flex items-center justify-center">
@@ -151,7 +153,6 @@ export function Sidebar(): React.JSX.Element {
                         About Devs
                     </div>
                 </Link>
-
             </div>
-            );
-            }
+    );
+}
