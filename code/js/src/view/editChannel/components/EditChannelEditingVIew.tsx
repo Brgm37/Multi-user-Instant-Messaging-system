@@ -2,11 +2,20 @@ import * as React from 'react';
 import {useImagePicker} from "../../components/ImagePicker/ImagePickerProvider";
 import {Visibility} from "../../createChannels/hooks/states/createChannelsState";
 
+/**
+ * The visibility options.
+ */
 const visibilityOptions = [
     "PUBLIC",
     "PRIVATE"
 ]
 
+/**
+ * The edit channel editing view.
+ * @param initDescription the initial description
+ * @param initVisibility the initial visibility
+ * @param handleSubmit the function to handle the submit
+ */
 export function EditChannelEditingVIew(
     {initDescription, initVisibility, handleSubmit}: {initDescription: string, initVisibility: string, handleSubmit: (d: string, v: string, i: string) => void}
 ): React.JSX.Element {

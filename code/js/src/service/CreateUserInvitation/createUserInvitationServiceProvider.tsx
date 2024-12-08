@@ -4,8 +4,14 @@ import {Either, failure, success} from "../../model/Either";
 import {CreateUserInvitationServiceContext} from "./createUserInvitationServiceContext";
 import React from "react";
 
+/**
+ * The URL for the user.
+ */
 const baseUrl = urlBuilder("/users")
 
+/**
+ * The create user invitation service provider.
+ */
 export function CreateUserInvitationServiceProvider(
     {children}: { children: React.ReactNode }
 ): React.JSX.Element {

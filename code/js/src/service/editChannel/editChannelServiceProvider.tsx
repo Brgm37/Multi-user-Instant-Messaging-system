@@ -6,8 +6,14 @@ import {Either, success} from "../../model/Either";
 import {urlBuilder} from "../utils/UrlBuilder";
 import {Channel, jsonToChannel} from "../../model/Channel";
 
+/**
+ * The URL for the channel.
+ */
 const urlBase = urlBuilder("/channels")
 
+/**
+ * The edit channel service provider.
+ */
 export function EditChannelServiceProvider(
     {children}: { children: ReactNode }
 ): React.JSX.Element {

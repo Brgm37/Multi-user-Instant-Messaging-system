@@ -13,9 +13,19 @@ import removeCookie from "../session/RemoveCookie";
  */
 const auth_cookie = configJson.session
 
+/**
+ * The URL for the channel.
+ */
 const channelUrlBase = urlBuilder("/channels")
+
+/**
+ * The URL for the user.
+ */
 const userUrlBase = urlBuilder("/users")
 
+/**
+ * The channel service provider.
+ */
 export function ChannelsServicesProvider(
     {children}: { children: React.ReactNode }
 ): React.ReactElement {

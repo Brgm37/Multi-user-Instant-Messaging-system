@@ -1,6 +1,13 @@
 import {Cookies} from "react-cookie";
 import {CookieOptions} from "react-router-dom";
 
+/**
+ * Set a cookie.
+ *
+ * @param name
+ * @param value
+ * @param seconds
+ */
 export function setCookie(name: string, value: string, seconds: number) {
     const cookie = new Cookies()
     const expires = new Date()

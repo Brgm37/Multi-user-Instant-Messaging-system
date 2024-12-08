@@ -27,8 +27,6 @@ const invitationCodeHeader = "invitationCode"
 
 /**
  * The provider for the register service.
- *
- * @param children
  */
 export function RegisterServiceProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
     const signal = useSignal()

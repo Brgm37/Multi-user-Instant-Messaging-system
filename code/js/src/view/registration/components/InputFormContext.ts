@@ -1,6 +1,14 @@
 import * as React from "react";
 import {ChangeEvent, Context} from "react";
 
+/**
+ * The props for the InputElement component.
+ *
+ * @param value The input value.
+ * @param onChange The input change handler.
+ * @param error The input error message.
+ * @param validate The input validation function.
+ */
 type InputElementProps = {
     value: string,
     onChange: (event: ChangeEvent<HTMLInputElement>) => void,

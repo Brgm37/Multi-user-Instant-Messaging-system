@@ -1,10 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, {ReactNode} from "react";
 import useSignal from "../../utils/hooks/useSignal/useSignal";
-import {Either, failure, success} from "../../../model/Either";
+import {Either, success} from "../../../model/Either";
 import { CreateChannelInvitationMockServiceContext } from './CreateChannelInvitationMockServiceContext';
 import {AccessControl} from "../../../model/AccessControl";
 
+/**
+ * @description The create channel invitation mock service provider.
+ */
 export function CreateChannelInvitationMockServiceProvider(props: { children: ReactNode }): React.JSX.Element {
     const signal = useSignal()
     const service = {

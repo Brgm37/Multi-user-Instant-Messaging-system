@@ -7,6 +7,11 @@
  * - "edit": The user is currently editing the form.
  * - "go-back": When an error occurs the user can go back to editing state.
  * - "error": An error occurred while submitting the form.
+ *
+ * @type LoginAction
+ * @prop type The type of the action.
+ * @prop isValid The validity of the form.
+ * @prop message The error message.
  */
 export type LoginAction =
     { type: "submit" } |

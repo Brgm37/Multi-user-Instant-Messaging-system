@@ -5,6 +5,9 @@ import {InputLabelContext} from "../../components/input/InputContext";
 import Input from "../../components/input/Input";
 import LoadingIcon from "../../../components/LoadingIcon";
 
+/**
+ * The view for the login page.
+ */
 type LoginBaseViewProps = {
     inputsDisabled: boolean,
     isValid: boolean,
@@ -12,6 +15,9 @@ type LoginBaseViewProps = {
     onSubmit?: () => void,
 }
 
+/**
+ * The view for the login page.
+ */
 export function LoginBaseView(
     {onSubmit, inputsDisabled, error, isValid}: LoginBaseViewProps
 ): React.JSX.Element {

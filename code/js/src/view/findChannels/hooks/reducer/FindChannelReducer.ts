@@ -6,8 +6,6 @@ import {FindChannelAction} from "../states/FindChannelsAction";
  *
  * @param state
  * @param action
- *
- * @returns FindChannelState
  */
 export default function (state: FindChannelState, action: FindChannelAction) : FindChannelState {
     switch (state.tag) {

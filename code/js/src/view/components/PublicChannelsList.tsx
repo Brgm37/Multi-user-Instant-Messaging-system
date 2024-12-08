@@ -1,11 +1,21 @@
 import React from 'react';
 import {PublicChannel} from "../../model/PublicChannel";
 
+/**
+ * The props for the public channels list.
+ */
 type PublicChannelsListProps = {
     channels: PublicChannel[];
     onClick : (channelId: number) => void;
 }
 
+/**
+ * The public channels list.
+ *
+ * @param channels
+ * @param onClick
+ * @constructor
+ */
 export function PublicChannelsList(
     {channels, onClick}: PublicChannelsListProps
 ): React.JSX.Element  {

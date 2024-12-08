@@ -9,8 +9,17 @@ import {UseCreateChannelHandler} from "./handler/UseCreateChannelHandler";
  */
 const DEBOUNCE_DELAY = 500;
 
+/**
+ * The error message.
+ */
 const ERROR_MESSAGE = "An error occurred while creating the channel. Please try again later.";
 
+/**
+ * Reduces the state.
+ *
+ * @param state
+ * @param action
+ */
 function reduce(state: CreateChannelsState, action: CreateChannelsAction): CreateChannelsState {
     switch (state.tag) {
         case "editing":
@@ -83,6 +92,9 @@ function reduce(state: CreateChannelsState, action: CreateChannelsAction): Creat
     }
 }
 
+/**
+ * The useCreateChannel hook.
+ */
 export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler] {
     const [state, dispatch] = useReducer(reduce, makeInitialState())
     const service = useContext(CreateChannelsServiceContext)

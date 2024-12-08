@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import {useImagePicker} from "./ImagePickerProvider";
 
+/**
+ * The image type.
+ */
 type Image = {
     id: number;
     src: string;
 }
 
+/**
+ * The list of images.
+ */
 const imagesList: Image[] = [
     { id: 1, src: '/defaultIcons/icon1.jpg' },
     { id: 2, src: '/defaultIcons/icon2.jpg' },
@@ -29,6 +35,9 @@ const imagesList: Image[] = [
     { id: 20, src: '/defaultIcons/icon20.png' },
 ];
 
+/**
+ * The image picker.
+ */
 const ImagePicker = () => {
     const { isOpen, close, selectImage, save } = useImagePicker();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);

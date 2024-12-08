@@ -152,6 +152,7 @@ class ChannelController(
     }
 
     @DeleteMapping(CHANNEL_ID_URL)
+    @ChannelSwaggerConfig.DeleteChannel
     fun deleteChannel(
         @PathVariable @Range(min = 1) cId: UInt,
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
@@ -162,6 +163,7 @@ class ChannelController(
         }
 
     @PutMapping(CHANNEL_ID_URL)
+    @ChannelSwaggerConfig.UpdateChannel
     fun updateChannel(
         @PathVariable @Range(min = 1) cId: UInt,
         @Valid @RequestBody channel: UpdateChannelInputModel,
@@ -214,6 +216,7 @@ class ChannelController(
     }
 
     @PutMapping(CHANNEL_INVITATION_URL)
+    @ChannelSwaggerConfig.JoinChannel
     fun joinChannel(
         @RequestBody invitation: JoinChannelInputModel,
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
@@ -230,6 +233,7 @@ class ChannelController(
     }
 
     @GetMapping(PUBLIC)
+    @ChannelSwaggerConfig.GetPublicChannels
     fun getPublicChannels(
         @RequestParam offset: UInt = OFFSET,
         @RequestParam limit: UInt = LIMIT,
@@ -246,6 +250,7 @@ class ChannelController(
         }
 
     @GetMapping(PUBLIC_BY_NAME)
+    @ChannelSwaggerConfig.GetPublicChannelsByName
     fun getPublicChannelsByName(
         @PathVariable name: String,
         @RequestParam offset: UInt = OFFSET,
@@ -263,6 +268,7 @@ class ChannelController(
         }
 
     @GetMapping(MY_CHANNELS)
+    @ChannelSwaggerConfig.GetMyChannels
     fun getMyChannels(
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
         @RequestParam offset: UInt = OFFSET,
@@ -279,6 +285,7 @@ class ChannelController(
         }
 
     @GetMapping(MY_CHANNELS_BY_NAME)
+    @ChannelSwaggerConfig.GetMyChannelsByName
     fun getMyChannelsWithName(
         @PathVariable name: String,
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
@@ -296,6 +303,7 @@ class ChannelController(
         }
 
     @GetMapping(ACCESS_CONTROL)
+    @ChannelSwaggerConfig.GetAccessControl
     fun getAccessControl(
         @PathVariable cId: UInt,
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,

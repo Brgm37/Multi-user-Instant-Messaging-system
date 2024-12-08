@@ -9,6 +9,9 @@ import {PublicChannel} from "../../model/PublicChannel";
 import {InfiniteScrollContext} from "../components/infiniteScroll/InfiniteScrollContext";
 import InputBar from "./components/SearchBar/SearchBarFindChannels";
 
+/**
+ * The find channels view.
+ */
 export function FindChannelsView(): React.JSX.Element {
     const [state, list, searchValue,handler] = useFindChannels();
 

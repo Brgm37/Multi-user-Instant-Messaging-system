@@ -6,8 +6,14 @@ import {FindChannelsServiceContext} from "./FindChannelsServiceContext";
 import {jsonToPublicChannel} from "../../model/Channel";
 import {PublicChannel} from "../../model/PublicChannel";
 
+/**
+ * The URL for the channel.
+ */
 const baseUrl = urlBuilder("/channels")
 
+/**
+ * The find channels service provider.
+ */
 export function FindChannelsServiceProvider({children}: { children: React.ReactNode }): React.JSX.Element {
     const signal = useSignal()
 

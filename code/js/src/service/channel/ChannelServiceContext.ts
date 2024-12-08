@@ -7,6 +7,9 @@ import {Context, createContext} from "react";
  * The context for the channel service.
  *
  * @method loadChannel
+ * @method loadMore
+ * @method sendMsg
+ * @method leaveOrDelete
  */
 export interface ChannelServiceContext {
     /**

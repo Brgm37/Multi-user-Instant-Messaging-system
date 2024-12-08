@@ -10,6 +10,9 @@ import {SseCommunicationServiceContext} from "../../../service/sse/SseCommunicat
 import {UseChannelHandler} from "./handler/UseChannelHandler";
 import {AuthUserContext} from "../../session/AuthUserContext";
 
+/**
+ * The default values.
+ */
 const LIST_SIZE = envConfig.messages_limit
 const DEFAULT_LIMIT = envConfig.default_messages_limit
 let limit = DEFAULT_LIMIT

@@ -1,6 +1,9 @@
 import React from "react";
 import InfiniteScroll from "../../components/infiniteScroll/InfiniteScroll";
 
+/**
+ * The find channels navigating view.
+ */
 export function FindChannelsNavigatingView(): React.JSX.Element {
     return (
         <div>

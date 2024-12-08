@@ -19,6 +19,9 @@ export interface LoginServiceContext {
     ): Promise<Either<AuthInfo, string>>
 }
 
+/**
+ * The default login service context.
+ */
 const defaultLoginServiceContext: LoginServiceContext = {
     login: () => {
         return new Promise<Either<AuthInfo, string>>((resolve, reject) => {
@@ -27,5 +30,8 @@ const defaultLoginServiceContext: LoginServiceContext = {
     }
 }
 
+/**
+ * The context for the login service.
+ */
 export const LoginServiceContext:Context<LoginServiceContext> =
     createContext<LoginServiceContext>(defaultLoginServiceContext)

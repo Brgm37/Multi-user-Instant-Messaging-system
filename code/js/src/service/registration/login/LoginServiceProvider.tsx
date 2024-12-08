@@ -20,6 +20,9 @@ const usernameHeader = "username"
  */
 const passwordHeader = "password"
 
+/**
+ * The login service provider.
+ */
 export function LoginServiceProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
     const signal = useSignal()
     const service : LoginServiceContext = {

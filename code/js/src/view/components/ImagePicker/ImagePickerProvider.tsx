@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
+/**
+ * The context for the image picker.
+ */
 type ImagePickerContextType = {
     isOpen: boolean;
     image: string | undefined;
@@ -9,8 +12,16 @@ type ImagePickerContextType = {
     save: () => void;
 };
 
+/**
+ * The image picker context.
+ */
 const ImagePickerContext = createContext<ImagePickerContextType | undefined>(undefined);
 
+/**
+ * The image picker provider.
+ *
+ * @param children the children
+ */
 export const ImagePickerProvider = ({ children }: { children: ReactNode }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [image, setImage] = useState<string | undefined>(undefined);
@@ -36,6 +47,9 @@ export const ImagePickerProvider = ({ children }: { children: ReactNode }) => {
     );
 };
 
+/**
+ * The use image picker.
+ */
 export const useImagePicker = () => {
     const context = useContext(ImagePickerContext);
     if (!context) {

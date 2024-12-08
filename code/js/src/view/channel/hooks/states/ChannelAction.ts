@@ -11,8 +11,17 @@ import {ChannelState} from "./ChannelState";
  * - sendMessage: Send a message.
  * - sendSuccess: Send a message successfully.
  * - sendError: Send a message with an error.
+ * - receiving-sse: Receiving server-sent events.
+ * - reload: Reload the channel.
  * - go-back: Go back to the previous state.
- * - receiving-sse: Receiving messages from the server.
+ * - reset: Reset the channel.
+ * - error: An error occurred.
+ *
+ * @type ChannelAction
+ * @prop tag The type of the action.
+ * @prop at The position to load more messages.
+ * @prop error The error message.
+ * @prop previous The previous state of the channel.
  */
 export type ChannelAction =
     { tag: "init" } |

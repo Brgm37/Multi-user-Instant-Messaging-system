@@ -2,7 +2,6 @@ import {ChangeEvent, createContext} from "react";
 
 /**
  * The context for the input.
- *
  */
 export interface InputContext {
     value: string;
@@ -11,6 +10,9 @@ export interface InputContext {
     validate: (value: string) => void;
 }
 
+/**
+ * The default context for the input.
+ */
 const defaultContext: InputContext = {
     onChange(): void {
         throw new Error("onChange not implemented")
@@ -22,4 +24,7 @@ const defaultContext: InputContext = {
     error: false
 };
 
+/**
+ * The context for the input.
+ */
 export const InputLabelContext = createContext(defaultContext);

@@ -1,25 +1,42 @@
-import {useEffect, useReducer} from "react";
+import {useReducer} from "react";
 
+/**
+ * The state of the useScroll hook.
+ */
 export type HasMore = {
     head: boolean,
     tail: boolean
 }
 
+/**
+ * The state of the useScroll hook.
+ */
 export type UseScrollState<T> = {
     list: T[],
     max: number,
     hasMore: HasMore,
 }
 
+/**
+ * The handler of the useScroll hook.
+ */
 export type UseScrollHandler<T> = {
     addItems: (items: T[], type: "head" | "tail", hasMore: HasMore) => void
     reset: (items: T[], hasMore: HasMore) => void
 }
 
+/**
+ *  The action of the useScroll hook.
+ */
 type UseScrollAction<T> =
     { type: "addItems", items: T[], hasMore: HasMore } |
     { type: "reset", items: T[], hasMore: HasMore }
 
+/**
+ * The reducer of the useScroll hook.
+ * @param state
+ * @param action
+ */
 function reduce<T>(state: UseScrollState<T>, action: UseScrollAction<T>): UseScrollState<T> {
     switch (action.type) {
         case "addItems":
@@ -31,6 +48,10 @@ function reduce<T>(state: UseScrollState<T>, action: UseScrollAction<T>): UseScr
     }
 }
 
+/**
+ * The useScroll hook.
+ * @param maxSize
+ */
 export default function <T>(
     maxSize: number,
 ): [UseScrollState<T>, UseScrollHandler<T>] {

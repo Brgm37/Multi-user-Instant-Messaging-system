@@ -5,16 +5,27 @@ import {InputBar} from "../../components/InputBar";
 import {UseCreateChannelHandler} from "../hooks/handler/UseCreateChannelHandler";
 import {useImagePicker} from "../../components/ImagePicker/ImagePickerProvider";
 
+/**
+ * The access control options.
+ */
 const accessControlOptions = [
     "READ_ONLY",
     "READ_WRITE"
 ]
 
+/**
+ * The visibility options.
+ */
 const visibilityOptions = [
     "PUBLIC",
     "PRIVATE"
 ]
 
+/**
+ * The create channels base view.
+ * @param handler
+ * @param state
+ */
 export function CreateChannelsBaseView(
     {handler, state}: {
         handler: UseCreateChannelHandler,

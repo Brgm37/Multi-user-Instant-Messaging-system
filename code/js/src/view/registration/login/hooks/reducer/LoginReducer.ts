@@ -7,8 +7,6 @@ import {LoginAction} from "../states/LoginAction";
  *
  * @param state The current state of the login form.
  * @param action The action to be performed.
- *
- * @returns The new state of the login form.
  */
 export default function (state: LoginState, action: LoginAction): LoginState {
     switch (state.tag) {

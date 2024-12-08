@@ -39,6 +39,9 @@ import EditChannelView from "../view/editChannel/EditChannelView";
 import {JoinChannelServiceProvider} from "../service/joinChannel/JoinChannelServiceProvider";
 import {JoinChannelView} from "../view/joinChannels/JoinChannelView";
 
+/**
+ * @description The main router of the application.
+ */
 const router = createBrowserRouter(
     [
         {
