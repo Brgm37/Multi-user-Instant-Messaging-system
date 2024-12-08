@@ -8,6 +8,7 @@ import envConfig from "../../../../envConfig.json";
 import reduce from "./reducer/Reducer";
 import {SseCommunicationServiceContext} from "../../../service/sse/SseCommunicationService";
 import {UseChannelHandler} from "./handler/UseChannelHandler";
+import {AuthUserContext} from "../../session/AuthUserContext";
 
 const LIST_SIZE = envConfig.messages_limit
 const DEFAULT_LIMIT = envConfig.default_messages_limit
@@ -84,6 +85,7 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
     const {messages, consumeMessage} = useContext(SseCommunicationServiceContext)
     const service = useContext(ChannelServiceContext)
     const {id} = useParams()
+    const authContext = useContext(AuthUserContext)
     const [list, listHandler] = useScroll<Message>(LIST_SIZE)
     const [state, dispatch] = useReducer(reduce, {tag: "idle"})
     const isInitialMount = useRef(true);
@@ -97,9 +99,6 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
         }
     }, [id]);
 
-    // useEffect(() => {
-    //     console.log("state", state)
-    // }, [state]);
 
     useEffect(() => {
         if (state.tag !== "loading") return
@@ -115,7 +114,7 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
         messages.forEach(msg => {
             if (msg.channel == id) {
                 consumed.push(msg)
-                if (!list.list.some(it => it.id === msg.id)) {
+                if (!list.list.some(it => it.id === msg.id) && Number(authContext.id) !== Number(msg.owner.id)) {
                     if (first) {
                         first = false
                         dispatch({tag: "receiving-sse"})
@@ -147,7 +146,7 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
         },
         loadMore(at: "head" | "tail"): void {
             if (state.tag !== "messages") return
-            if (at === "head" && list.hasMore.head || at === "tail" && list.hasMore.tail) return
+            if (at === "head" && !list.hasMore.head || at === "tail" && !list.hasMore.tail) return
             const timestamp = at === "head" ? list.list[0].timestamp : list.list[list.list.length - 1].timestamp
             const befAft = at === "head" ? "after" : "before"
             service
