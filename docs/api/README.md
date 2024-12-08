@@ -30,7 +30,7 @@ Detailed [UML diagrams](../Conceptual_Module/README.md) represent the main entit
 
 The [physical model](../../code/jvm/repository_jdbc/src/sql/create.sql) is depicted in the following diagram:
 
-<img src="../../code/jvm/repository_jdbc/src/sql/ChIMP-scheme.svg">
+<img src="../../code/jvm/repository_jdbc/src/sql/ChIMP-scheme.svg" alt="physical model diagram">
 
 ## Key Aspects
 
@@ -53,6 +53,8 @@ The [physical model](../../code/jvm/repository_jdbc/src/sql/create.sql) is depic
         - **visibility**: Visibility status of the channel.
         - **owner**: Unique identifier of the user who owns the channel.
         - **accessControl**: Access control settings of the channel.
+        - **description**: Description of the channel.
+        - **icon**: Icon of the channel.
     - **messages**:
         - **id**: Unique identifier of the message.
         - **channel**: Unique identifier of the channel.
