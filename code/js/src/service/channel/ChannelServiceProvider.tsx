@@ -30,6 +30,20 @@ const channelHeaders = "channel"
 
 export function ChannelServiceProvider({children}: { children: React.ReactNode }): React.JSX.Element {
     const signal = useSignal()
+
+    React.useEffect(() => {
+        const handleAbort = () => {
+            console.log("Request aborted");
+            // Do nothing
+        };
+
+        signal.addEventListener("abort", handleAbort);
+
+        return () => {
+            signal.removeEventListener("abort", handleAbort);
+        };
+    }, [signal]);
+
     const service: ChannelServiceContext = {
         async loadChannel(cId: string): Promise<Either<Channel, string>> {
             const url = channelApiUrl + "/" + cId

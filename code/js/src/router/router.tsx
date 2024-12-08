@@ -74,7 +74,6 @@ const router = createBrowserRouter(
             "element":
                 <AuthValidator>
                     <ChannelsServicesProvider>
-                        <Navigate to={"/channels/findChannels"} replace/>
                         <ChannelsView/>
                     </ChannelsServicesProvider>
                 </AuthValidator>,

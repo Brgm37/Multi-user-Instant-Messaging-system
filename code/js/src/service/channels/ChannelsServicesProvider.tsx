@@ -22,6 +22,20 @@ export function ChannelsServicesProvider(
     const signal = useSignal()
     const navigate = useNavigate()
     const getInit: RequestInit = {method: "GET", credentials: "include", signal}
+
+    React.useEffect(() => {
+        const handleAbort = () => {
+            console.log("Request aborted");
+            // Do nothing
+        };
+
+        signal.addEventListener("abort", handleAbort);
+
+        return () => {
+            signal.removeEventListener("abort", handleAbort);
+        };
+    }, [signal]);
+
     const service: ChannelsServiceContext = {
         async logout(): Promise<void> {
             const url = userUrlBase + "/logout"

@@ -53,7 +53,6 @@ export default function (): [ChannelsState, UseScrollState<Channel>, ChannelsHan
     const [state, dispatch] = useReducer(reduce, initialState)
     const {findChannels} = useContext(ChannelsServiceContext)
 
-
     useEffect(() => {
         if (state.tag === "idle") return
         if (state.tag === "scrolling") return

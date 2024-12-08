@@ -8,9 +8,23 @@ import {PublicChannel} from "../../model/PublicChannel";
 
 const baseUrl = urlBuilder("/channels")
 
-export function FindChannelsServiceProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
+export function FindChannelsServiceProvider({children}: { children: React.ReactNode }): React.JSX.Element {
     const signal = useSignal()
-    const service : FindChannelsServiceContext = {
+
+    React.useEffect(() => {
+        const handleAbort = () => {
+            console.log("Request aborted");
+            // Do nothing
+        };
+
+        signal.addEventListener("abort", handleAbort);
+
+        return () => {
+            signal.removeEventListener("abort", handleAbort);
+        };
+    }, [signal]);
+
+    const service: FindChannelsServiceContext = {
         async getChannelsByPartialName(partialName: string, offset: number, limit: number): Promise<Either<PublicChannel[], string>> {
             const init: RequestInit = {
                 method: "GET",
@@ -54,7 +68,7 @@ export function FindChannelsServiceProvider({ children }: { children: React.Reac
                 signal,
                 credentials: "include"
             }
-            const response = await fetch(baseUrl + '/public' +'?offset=' + offset + '&limit=' + limit, init);
+            const response = await fetch(baseUrl + '/public' + '?offset=' + offset + '&limit=' + limit, init);
             if (response.ok) {
                 const channels = await response.json()
                 return success(
