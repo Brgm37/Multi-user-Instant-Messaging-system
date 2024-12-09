@@ -71,8 +71,4 @@ create table if not exists messages
     foreign key (author) references users (id)
 );
 
-INSERT INTO users (name, password)
-VALUES ('Maryy124', 'Pass123@Isel');
-
-
 commit;
