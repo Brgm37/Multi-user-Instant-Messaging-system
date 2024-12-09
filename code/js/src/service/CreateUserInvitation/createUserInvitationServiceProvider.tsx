@@ -10,7 +10,7 @@ import React from "react";
 const baseUrl = urlBuilder("/users")
 
 /**
- * The create user invitation service provider.
+ * The creation user invitation service provider.
  */
 export function CreateUserInvitationServiceProvider(
     {children}: { children: React.ReactNode }

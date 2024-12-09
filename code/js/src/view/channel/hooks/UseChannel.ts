@@ -102,7 +102,6 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
         }
     }, [id]);
 
-
     useEffect(() => {
         if (state.tag !== "loading") return
         if (state.at === "sending") dispatch({tag: "sendSuccess"})

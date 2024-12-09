@@ -17,7 +17,7 @@ const urlBase = urlBuilder("/channels")
 const defaultIconSrc = "/defaultIcons/default.png"
 
 /**
- * The create channel service provider.
+ * The creation channel service provider.
  */
 export function CreateChannelServiceProvider(
     {children}: { children: React.ReactNode }
@@ -58,7 +58,13 @@ export function CreateChannelServiceProvider(
 
         findChannelByName: async (name: string): Promise<Either<Channel, string>> => {
             const url = urlBase + `/my/${name}`
-            const response = await fetch(url)
+            const init: RequestInit = {
+                method: "GET",
+                headers: {"Content-Type": "application/json"},
+                signal,
+                credentials: "include"
+            }
+            const response = await fetch(url, init)
             if (response.ok) {
                 const channels = await response.json()
                 const channelsIOwn = channels.filter((c: any) =>

@@ -57,7 +57,6 @@ export default function BasicChannelView(
         leaveOrDelete(id).then(response => {
             if (response.tag === "success") {
                 navigation("/channels")
-                window.location.reload()
             }
             else onError(response.value)
         })
