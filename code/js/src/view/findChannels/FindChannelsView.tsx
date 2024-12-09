@@ -20,6 +20,7 @@ export function FindChannelsView(): React.JSX.Element {
         return <Navigate to={"/channels/" + channelId} replace={true}/>
     }
 
+
     if (state.tag === "idle") {
         handler.onInit()
         return <FindChannelsLoadingView/>

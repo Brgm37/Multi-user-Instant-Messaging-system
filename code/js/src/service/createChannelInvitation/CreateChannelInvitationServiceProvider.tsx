@@ -11,7 +11,7 @@ import { CreateChannelInvitationServiceContext } from "./CreateChannelInvitation
 const baseUrl = urlBuilder("/channels")
 
 /**
- * The create channel invitation service provider.
+ * The creation channel invitation service provider.
  */
 export function CreateChannelInvitationServiceProvider(props: { children: ReactNode }): React.JSX.Element {
     const signal = useSignal()
