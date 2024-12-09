@@ -222,8 +222,8 @@ class ChannelServices(
         description: String?,
         icon: String?,
     ): Either<ChannelError, Channel> {
-        val args = arrayOf(name, accessControl, visibility, icon)
-        args.all { it.isNullOrBlank() }
+        val args = arrayOf(name, accessControl, visibility, icon, description)
+        if (args.all(String?::isNullOrBlank)) return failure(InvalidChannelInfo)
         accessControl?.let { if (!AccessControl.validate(it)) return failure(InvalidChannelAccessControl) }
         visibility?.let { if (!Visibility.validate(it)) return failure(InvalidChannelVisibility) }
         val upperCaseAccessControl = accessControl?.uppercase()
@@ -236,7 +236,7 @@ class ChannelServices(
                         channel.copy(
                             name = name?.let { ChannelName(it, channel.owner.username) } ?: channel.name,
                             accessControl =
-                                upperCaseAccessControl?.let { AccessControl.valueOf(it) }
+                                upperCaseAccessControl?.let(AccessControl::valueOf)
                                     ?: channel.accessControl,
                             description = description ?: channel.description,
                             icon = icon ?: channel.icon,
@@ -247,9 +247,9 @@ class ChannelServices(
                         channel.copy(
                             name = name?.let { ChannelName(it, channel.owner.username) } ?: channel.name,
                             accessControl =
-                                upperCaseAccessControl?.let { AccessControl.valueOf(it) }
+                                upperCaseAccessControl?.let(AccessControl::valueOf)
                                     ?: channel.accessControl,
-                            description = channel.description,
+                            description = description ?: channel.description,
                             icon = icon ?: channel.icon,
                         )
                     }

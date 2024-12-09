@@ -168,7 +168,7 @@ class ChannelController(
         @PathVariable @Range(min = 1) cId: UInt,
         @Valid @RequestBody channel: UpdateChannelInputModel,
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
-    ): ResponseEntity<*> {
+    ): ResponseEntity<*> =
         channelService
             .updateChannel(
                 id = cId,
@@ -188,7 +188,6 @@ class ChannelController(
                     }
                 }
             }
-    }
 
     @PostMapping(CHANNEL_INVITATION_URL)
     @ChannelSwaggerConfig.CreateChannelInvitation
