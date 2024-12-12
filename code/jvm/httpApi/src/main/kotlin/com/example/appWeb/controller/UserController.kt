@@ -55,7 +55,7 @@ class UserController(
             is Success -> {
                 val auth = response.value
                 val cookie = Cookie(AUTH_COOKIE, auth.token.toString())
-                cookie.path = "/api"
+                cookie.path = COOKIE_PATH
                 cookie.isHttpOnly = true
                 cookie.maxAge = auth.expirationDateInInt
                 res.addCookie(cookie)
@@ -100,7 +100,7 @@ class UserController(
             is Success -> {
                 val auth = response.value
                 val cookie = Cookie(AUTH_COOKIE, auth.token.toString())
-                cookie.path = "/api"
+                cookie.path = COOKIE_PATH
                 cookie.isHttpOnly = true
                 cookie.maxAge = auth.expirationDateInInt
                 res.addCookie(cookie)
@@ -140,9 +140,15 @@ class UserController(
     @UserSwaggerConfig.Logout
     fun logout(
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+        res: HttpServletResponse,
     ): ResponseEntity<*> =
         when (val response = userService.logout(authenticated.token, authenticated.uId)) {
             is Success -> {
+                val cookie = Cookie(AUTH_COOKIE, null)
+                cookie.path = COOKIE_PATH
+                cookie.isHttpOnly = true
+                cookie.maxAge = 0
+                res.addCookie(cookie)
                 ResponseEntity.ok().build<Any>()
             }
 
@@ -187,6 +193,14 @@ class UserController(
          */
         const val LOGOUT_URL = "/logout"
 
+        /**
+         * The name of the cookie that will be used to store the token.
+         */
         const val AUTH_COOKIE = "auth-token"
+
+        /**
+         * The path for the cookie.
+         */
+        const val COOKIE_PATH = "/api"
     }
 }
