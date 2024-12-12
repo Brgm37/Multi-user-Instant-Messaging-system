@@ -9,6 +9,7 @@ import {MdDelete, MdEdit} from "react-icons/md";
 import {FaPersonRunning} from "react-icons/fa6";
 import {IoMdPersonAdd} from "react-icons/io";
 import {IoSend} from "react-icons/io5";
+import {ChannelCommunicationContext} from "../../../service/channel/communication/ChannelCommunicationContext";
 
 /**
  * The basic channel view.
@@ -27,6 +28,7 @@ export default function BasicChannelView(
     const {loadChannel, leaveOrDelete} = useContext(ChannelServiceContext)
     const userContext = useContext(AuthUserContext)
     const navigation = useNavigate()
+    const communication = useContext(ChannelCommunicationContext)
 
     useEffect(() => {
         loadChannel(id).then(response => {
@@ -34,6 +36,20 @@ export default function BasicChannelView(
             else navigation("/channels")
         })
     }, [id])
+
+    useEffect(() => {
+        if (communication.isToReload) {
+            loadChannel(id).then(response => {
+                if (response.tag === "success") {
+                    setChannel(response.value)
+                    communication.toggleReload()
+                }
+                else {
+                    navigation("/channels")
+                }
+            })
+        }
+    }, [communication.isToReload]);
 
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => setMessage(event.target.value)
 
