@@ -38,7 +38,7 @@ export function FindChannelsServiceProvider({children}: { children: React.ReactN
                 signal,
                 credentials: "include"
             }
-            const url = baseUrl + '/public/' + partialName + `?offset=${offset}&limit=${limit}`
+            const url = `${baseUrl}/public/${encodeURIComponent(partialName)}?offset=${offset}&limit=${limit}`;
             const response = await fetch(url, init);
             if (response.ok) {
                 const channels = await response.json()
