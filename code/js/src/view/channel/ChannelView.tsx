@@ -6,7 +6,7 @@ import {Message} from "../../model/Message";
 import BasicChannelView from "./components/BasicChannelView";
 import {InfiniteMessageScrollContext} from "./components/messageInfiniteScroll/InfiniteMessageScrollContext";
 import {AuthUserContext} from "../session/AuthUserContext";
-import {useContext} from "react";
+import {useContext, useEffect} from "react";
 
 /**
  * The default avatar.

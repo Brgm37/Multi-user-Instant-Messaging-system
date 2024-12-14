@@ -39,9 +39,14 @@ export default function (
     const firstObserver = useRef<IntersectionObserver>();
     const recordedElementRef = useRef<HTMLElement>();
     const beginOfListRef = useRef<HTMLDivElement>(null);
+    const mounted = useRef<boolean>(false);
 
     const lastItemRef = useCallback((node: HTMLElement) => {
         if (isLoading !== false) return;
+        if (!mounted.current) {
+            mounted.current = true;
+            return;
+        }
         if (lastObserver.current) lastObserver.current.disconnect();
         lastObserver.current = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting && items.hasMore.tail) {
@@ -52,7 +57,7 @@ export default function (
             }
         });
         if (node) lastObserver.current.observe(node);
-    }, [isLoading, items.hasMore.tail, items.list.length, items.max]);
+    }, [isLoading, items.hasMore.tail, items.list.length, items.max, mounted.current]);
 
     const firstItemRef = useCallback((node: HTMLElement) => {
         if (isLoading !== false) return;
