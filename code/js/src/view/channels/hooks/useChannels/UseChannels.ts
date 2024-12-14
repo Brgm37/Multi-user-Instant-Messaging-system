@@ -82,6 +82,7 @@ export default function (): [ChannelsState, UseScrollState<Channel>, ChannelsHan
     const handler: ChannelsHandler = {
         reload(): void {
             if (state.tag !== "scrolling") return
+            limit = DEFAULT_LIMIT
             findChannels(0, HAS_MORE)
                 .then(result => {
                     if (result.tag === "success") resetList(listHandler, result.value)
@@ -95,6 +96,7 @@ export default function (): [ChannelsState, UseScrollState<Channel>, ChannelsHan
         },
         loadChannels(): void {
             if (state.tag !== "idle") return
+            limit = DEFAULT_LIMIT
             findChannels(0, HAS_MORE)
                 .then(result => {
                     if (result.tag === "success") resetList(listHandler, result.value)
