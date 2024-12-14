@@ -16,11 +16,10 @@ export function JoinChannelView(): React.JSX.Element {
 
     useEffect(() => {
         if (state.tag === "UseJoinSuccess") {
-            console.log("JoinChannelView: UseJoinSuccess")
             communication.toggleReload()
             navigate("/channels/" + state.id)
         }
-    }, [state, communication, navigate]);
+    }, [state]);
 
     const view = ((state: JoinChannelStates) => {
         switch (state.tag) {

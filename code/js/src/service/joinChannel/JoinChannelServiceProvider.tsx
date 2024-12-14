@@ -34,7 +34,7 @@ export function JoinChannelServiceProvider(
             const response = await fetch(url, init);
             if (response.ok) {
                 const data = await response.json()
-                return success(data.id) as Either<{ id: string }, string>
+                return success({id: data.id}) as Either<{ id: string }, string>
             } else {
                 return failure(await response.text()) as Either<{ id: string }, string>
             }
