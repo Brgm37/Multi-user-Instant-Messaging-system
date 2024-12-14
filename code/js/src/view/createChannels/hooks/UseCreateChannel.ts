@@ -34,6 +34,16 @@ function reduce(state: CreateChannelsState, action: CreateChannelsAction): Creat
                     const input = { ...state.input, description: action.inputValue };
                     return { tag: "editing", input: input };
                 }
+                case "validated": {
+                    const input = {
+                        name: state.input.name,
+                        visibility: state.input.visibility,
+                        access: state.input.access,
+                        description: state.input.description,
+                        icon: state.input.icon
+                    }
+                    return { tag: "editing", input: input };
+                }
                 case "validation": {
                     if (action.name === state.input.name) {
                         const input = {...state.input, name: action.name};
