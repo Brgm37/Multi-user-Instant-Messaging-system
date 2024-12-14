@@ -31,7 +31,7 @@ export function CreateChannelsView(): React.JSX.Element {
                 <h1 className="text-xl font-bold">Create a New Channel</h1>
                 <div className={"p-5 ml-auto"}></div>
             </header>
-            <div className="container mx-auto p-8">
+            <div className="mx-auto p-8">
             {view(state)}
             </div>
         </div>

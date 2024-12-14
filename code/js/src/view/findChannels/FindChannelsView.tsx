@@ -72,7 +72,7 @@ export function FindChannelsView(): React.JSX.Element {
                 <h1 className="text-xl font-bold">Find Channels</h1>
                 <InputBar handleChange={handler.onSearchChange}/>
             </header>
-            <div className={"h-myscreen overflow-y-auto scrollbar-hidden"}>
+            <div className={"max-h-screen overflow-y-auto scrollbar-hidden"}>
                 <main className={"p-8"}>
                     {state.tag === "scrolling" && searchValue === "" && (
                         <section className="text-center mb-8">
