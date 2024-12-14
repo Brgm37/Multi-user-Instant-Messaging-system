@@ -256,7 +256,7 @@ class ChannelController(
         @RequestParam limit: UInt = LIMIT,
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
-        when (val response = channelService.getPublicByName(authenticated.uId, decodeName(name), offset, limit)) {
+        when (val response = channelService.getPublicByName(authenticated.uId, name, offset, limit)) {
             is Success -> {
                 ResponseEntity.ok(response.value.map(ChannelListOutputModel::fromDomain))
             }
