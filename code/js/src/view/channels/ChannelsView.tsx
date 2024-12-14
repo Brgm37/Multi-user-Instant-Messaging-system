@@ -4,13 +4,24 @@ import {InfiniteScrollContext} from "../components/infiniteScroll/InfiniteScroll
 import {Channel} from "../../model/Channel";
 import BasicChannelsView from "./components/BasicChannelsView";
 import {Link} from "react-router-dom";
+import {useContext, useEffect} from "react";
+import {ChannelsCommunicationContext} from "../../service/channels/communication/ChannelsCommunicationContext";
 
 /**
  * The channels view.
  */
 export function ChannelsView(): React.JSX.Element {
     const [state, channels, handler] = useChannels()
+    const communication = useContext(ChannelsCommunicationContext)
     if (state.tag === "idle") handler.loadChannels()
+
+    useEffect(() => {
+        if (communication.isToReload) {
+            handler.reload()
+            communication.toggleReload()
+        }
+    }, [communication.isToReload]);
+
     const provider: InfiniteScrollContext<Channel> = {
         isLoading: state.tag !== "loading" || state.at === "both" ? false : state.at,
         items: channels,

@@ -80,6 +80,15 @@ export default function (): [ChannelsState, UseScrollState<Channel>, ChannelsHan
     }, [list]);
 
     const handler: ChannelsHandler = {
+        reload(): void {
+            if (state.tag !== "scrolling") return
+            findChannels(0, HAS_MORE)
+                .then(result => {
+                    if (result.tag === "success") resetList(listHandler, result.value)
+                    else dispatch({tag: "loadError", message: result.value, previous: state})
+                })
+            dispatch({tag: "reload"})
+        },
         goBack(): void {
             if (state.tag !== "error") return
             dispatch({tag: "goBack"})

@@ -57,8 +57,7 @@ export function ChannelsServicesProvider(
             const response = await fetch(url, init)
             if (!response.ok) {
                 throw new Error(await response.text())
-            }
-            else {
+            } else {
                 removeCookie(auth_cookie)
                 navigate("/register")
             }
