@@ -92,7 +92,7 @@ task<Exec>("buildImageJvm") {
     )
 }
 
-task<Copy>("copyWebApp"){
+task<Copy>("copyWebApp") {
     from("../../js/dist")
     from("../../js/public")
     into("deploy/nginx/public")

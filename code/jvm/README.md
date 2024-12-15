@@ -10,7 +10,7 @@
 * `./gradlew buildImageJvm` - builds the JVM image with the Chimp backend HTTP API
 * `./gradlew buildImagePostgres` - builds the Postgres image used by the backend
 * `./gradlew buildImageNginx` - builds the Nginx image
-* `./gradlew buildImageAll` - builds all images
+* `./gradlew allImages` - builds all images
 
 
 ## Start, scale, and stop services
