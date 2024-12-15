@@ -1,0 +1,30 @@
+services:
+  chimp-postgres:
+    container_name: chimp-postgres
+    image: chimp-postgres
+    environment:
+        - POSTGRES_USER=chimp
+        - POSTGRES_PASSWORD=chimp
+        - POSTGRES_DB=chimp
+    ports:
+      - "5433:5432"
+
+  chimp-jvm:
+    image: chimp-jvm
+    hostname: chimp-jvm
+    environment:
+      - PORT=8081
+      - DB_URL=jdbc:postgresql://chimp-postgres:5432/chimp?user=chimp&password=chimp
+      - AES_KEY=123456789 #TODO: Remove this line
+      - DB_PASSWORD=chimp
+      - DB_USER=chimp
+      - DB_POOL_SIZE=15
+
+  nginx:
+    container_name: chimp-nginx
+    image: chimp-nginx
+    ports:
+      - "8080:8080"
+      - "8000:8000"
+    depends_on:
+      - chimp-jvm

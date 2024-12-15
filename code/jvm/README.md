@@ -3,20 +3,23 @@
 - This directory contains the source code for the JVM implementation of the DAW project.
 
 ## Requirements
-- The following environment variables must be set:
-    - `DB_URL`: The URL of the database.
-    - `DB_USER`: The username to access the database.
-    - `DB_PASSWORD`: The password to access the database.
-    - `DB_POOL_SIZE`: The size of the database connection pool.
+- To build and run this project, you need to first follow the instructions in the [js](../js/README.md) directory to build and run the frontend.
 
-## Build
-- To build the project, run the following command:
-```bash
-./gradlew build
-```
+## Build images
+- To build the project images, run the following command:
+* `./gradlew buildImageJvm` - builds the JVM image with the Chimp backend HTTP API
+* `./gradlew buildImagePostgres` - builds the Postgres image used by the backend
+* `./gradlew buildImageNginx` - builds the Nginx image
+* `./gradlew buildImageAll` - builds all images
 
-## Run
-- To run the project, run the following command:
-```bash
-./gradlew bootRun
-```
+
+## Start, scale, and stop services
+* `./gradlew allUp` - starts all services.
+* `./gradlew allDown` - stops all services.
+* On the `host` folder, `docker compose up -d --scale chimp-jvm=N` - scales the dynamic JVM service. Replace `N` with the number of instances you want to run.
+
+
+## Notes
+- The JVM service by default is available at `http://localhost:8080`.
+- The Chimp API is stated with the following users:
+  - `admin` with password `@dmin123Chimp`
