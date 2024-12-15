@@ -102,7 +102,6 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
         }
     }, [id]);
 
-
     useEffect(() => {
         if (state.tag !== "loading") return
         if (state.at === "sending") dispatch({tag: "sendSuccess"})
@@ -117,7 +116,10 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
         messages.forEach(msg => {
             if (msg.channel == id) {
                 consumed.push(msg)
-                if (!list.list.some(it => it.id === msg.id) && Number(authContext.id) !== Number(msg.owner.id)) {
+                if (
+                    !list.list.some(it => it.id === msg.id) &&
+                    Number(authContext.id) !== Number(msg.owner.id)
+                ) {
                     if (first) {
                         first = false
                         dispatch({tag: "receiving-sse"})

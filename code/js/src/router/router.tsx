@@ -38,6 +38,8 @@ import {EditChannelServiceProvider} from "../service/editChannel/editChannelServ
 import EditChannelView from "../view/editChannel/EditChannelView";
 import {JoinChannelServiceProvider} from "../service/joinChannel/JoinChannelServiceProvider";
 import {JoinChannelView} from "../view/joinChannels/JoinChannelView";
+import {ChannelCommunicationProvider} from "../service/channel/communication/ChannelCommunicationProvider";
+import {ChannelsCommunicationProvider} from "../service/channels/communication/ChannelsCommunicationProvider";
 
 /**
  * @description The main router of the application.
@@ -77,7 +79,9 @@ const router = createBrowserRouter(
             "element":
                 <AuthValidator>
                     <ChannelsServicesProvider>
-                        <ChannelsView/>
+                        <ChannelsCommunicationProvider>
+                            <ChannelsView/>
+                        </ChannelsCommunicationProvider>
                     </ChannelsServicesProvider>
                 </AuthValidator>,
             "children": [
@@ -86,7 +90,9 @@ const router = createBrowserRouter(
                     "element":
                         <SseCommunicationServiceProvider>
                             <ChannelServiceProvider>
-                                <ChannelView/>
+                                <ChannelCommunicationProvider>
+                                    <ChannelView/>
+                                </ChannelCommunicationProvider>
                             </ChannelServiceProvider>
                         </SseCommunicationServiceProvider>,
                     children: [

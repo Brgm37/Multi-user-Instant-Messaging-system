@@ -10,6 +10,7 @@ type InputBarProps = {
     placeholder?: string;
 };
 
+
 /**
  * An input bar component.
  * @param value The value of the input bar.

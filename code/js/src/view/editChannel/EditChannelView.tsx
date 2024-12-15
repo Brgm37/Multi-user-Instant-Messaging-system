@@ -1,10 +1,13 @@
 import * as React from 'react';
 import {useEditChannel} from "./hooks/UseEditChannel";
-import {Navigate, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {EditChannelState} from "./hooks/states/EditChannelState";
 import {EditChannelErrorView} from "./components/EditChannelErrorView";
 import {EditChannelLoadingView} from "./components/EditChannelLoadingView";
 import {EditChannelEditingVIew} from "./components/EditChannelEditingVIew";
+import {ChannelCommunicationContext} from "../../service/channel/communication/ChannelCommunicationContext";
+import {useEffect} from "react";
+import {ChannelsCommunicationContext} from "../../service/channels/communication/ChannelsCommunicationContext";
 
 /**
  * The edit channel view.
@@ -12,13 +15,22 @@ import {EditChannelEditingVIew} from "./components/EditChannelEditingVIew";
 export default function (): React.JSX.Element {
     const [state, handler] = useEditChannel()
     const navigate = useNavigate()
+    const channelCommunication = React.useContext(ChannelCommunicationContext)
+    const channelsCommunication = React.useContext(ChannelsCommunicationContext)
+
+    useEffect(() => {
+        if (state.tag === "redirect") {
+            channelCommunication.toggleReload();
+            channelsCommunication.toggleReload();
+            navigate("/channels/" + state.cId);
+        }
+    }, [state]);
+
     if (state.tag === "idle") {
         handler.loadChannel()
         return (<EditChannelLoadingView/>)
     }
-    if (state.tag === "redirect") {
-        return <Navigate to={"/channels/" + state.cId}/>
-    }
+
     const switchState = (state: EditChannelState) => {
         switch (state.tag) {
             case "error":

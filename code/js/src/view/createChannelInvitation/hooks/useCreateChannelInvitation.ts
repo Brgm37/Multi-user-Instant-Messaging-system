@@ -2,9 +2,6 @@ import {CreateChannelInvitationState} from "./states/CreateChannelInvitationStat
 import {CreateChannelInvitationAction} from "./states/CreateChannelInvitationAction";
 import {UseCreateChannelInvitationHandler} from "./handler/UseCreateChannelInvitationHandler";
 import {useContext, useReducer} from "react";
-import {
-    CreateChannelInvitationMockServiceContext
-} from "../../../service/createChannelInvitation/mock/CreateChannelInvitationMockServiceContext";
 import {isFailure} from "../../../model/Either";
 import {
     CreateChannelInvitationServiceContext

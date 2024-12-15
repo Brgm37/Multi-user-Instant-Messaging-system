@@ -1,8 +1,9 @@
-import React from "react";
-import {Navigate} from "react-router-dom";
+import React, {useContext, useEffect} from "react";
+import {Navigate, useNavigate} from "react-router-dom";
 import {useJoinChannel} from "./hooks/UseJoinChannel";
 import {UseJoinChannelHandler} from "./hooks/handler/UseJoinChannelHandler";
 import {JoinChannelStates} from "./hooks/states/JoinChannelStates";
+import {ChannelsCommunicationContext} from "../../service/channels/communication/ChannelsCommunicationContext";
 
 /**
  * The join channel view.
@@ -10,6 +11,15 @@ import {JoinChannelStates} from "./hooks/states/JoinChannelStates";
 export function JoinChannelView(): React.JSX.Element {
     const [state, handler]: [JoinChannelStates, UseJoinChannelHandler] = useJoinChannel()
     const [token, setToken] = React.useState("")
+    const communication = useContext(ChannelsCommunicationContext)
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (state.tag === "UseJoinSuccess") {
+            communication.toggleReload()
+            navigate("/channels/" + state.id)
+        }
+    }, [state]);
 
     const view = ((state: JoinChannelStates) => {
         switch (state.tag) {
@@ -37,8 +47,6 @@ export function JoinChannelView(): React.JSX.Element {
                 )
             case "UseJoinError":
                 return <div>Error: {state.message}</div>
-            case "UseJoinSuccess":
-                return <Navigate to={"/channels/findChannels"}/>
             case "UseJoinClose":
                 return <Navigate to={"/channels/findChannels"} />
         }

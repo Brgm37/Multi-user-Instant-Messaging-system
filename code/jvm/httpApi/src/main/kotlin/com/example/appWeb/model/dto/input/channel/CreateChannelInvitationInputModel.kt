@@ -1,5 +1,6 @@
 package com.example.appWeb.model.dto.input.channel
 
+import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.AssertTrue
 import jakarta.validation.constraints.Pattern
 import model.channels.AccessControl
@@ -23,5 +24,6 @@ data class CreateChannelInvitationInputModel(
     val accessControl: String? = null,
 ) {
     @AssertTrue(message = "Invalid access control")
+    @Schema(hidden = true)
     fun isValidAccessControl(): Boolean = accessControl == null || AccessControl.validate(accessControl)
 }

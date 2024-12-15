@@ -6,7 +6,7 @@ import {Channel} from "../../../../model/Channel";
 import {Link, useNavigate} from "react-router-dom";
 import {IoIosAdd} from "react-icons/io";
 import {IoInformationCircleSharp, IoLogOutOutline} from "react-icons/io5";
-import {FaSearch, FaUsers} from "react-icons/fa";
+import {FaCompass, FaSearch} from "react-icons/fa";
 import {RiUserAddFill} from "react-icons/ri";
 import {TbDoorEnter} from "react-icons/tb";
 import {IconType} from "react-icons";
@@ -87,7 +87,7 @@ export function Sidebar(): React.JSX.Element {
 
                 {renderLink("/channels/createUserInvitation", RiUserAddFill, "Create User Invitation")}
                 {renderLink("/channels/joinChannel", TbDoorEnter, "Join Channel")}
-                {renderLink("/channels/findChannels", FaUsers, "Find Channels")}
+                {renderLink("/channels/findChannels", FaCompass, "Find Channels")}
                 {renderLink("/channels/createChannel", IoIosAdd, "Create Channel")}
 
                 <div className="relative group cursor-pointer">

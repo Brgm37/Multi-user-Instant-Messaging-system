@@ -9,6 +9,8 @@ import {MdDelete, MdEdit} from "react-icons/md";
 import {FaPersonRunning} from "react-icons/fa6";
 import {IoMdPersonAdd} from "react-icons/io";
 import {IoSend} from "react-icons/io5";
+import {ChannelCommunicationContext} from "../../../service/channel/communication/ChannelCommunicationContext";
+import {ChannelsCommunicationContext} from "../../../service/channels/communication/ChannelsCommunicationContext";
 
 /**
  * The basic channel view.
@@ -27,6 +29,8 @@ export default function BasicChannelView(
     const {loadChannel, leaveOrDelete} = useContext(ChannelServiceContext)
     const userContext = useContext(AuthUserContext)
     const navigation = useNavigate()
+    const channelCommunication = useContext(ChannelCommunicationContext)
+    const channelsCommunication = useContext(ChannelsCommunicationContext)
 
     useEffect(() => {
         loadChannel(id).then(response => {
@@ -34,6 +38,20 @@ export default function BasicChannelView(
             else navigation("/channels")
         })
     }, [id])
+
+    useEffect(() => {
+        if (channelCommunication.isToReload) {
+            loadChannel(id).then(response => {
+                if (response.tag === "success") {
+                    setChannel(response.value)
+                    channelCommunication.toggleReload()
+                }
+                else {
+                    navigation("/channels")
+                }
+            })
+        }
+    }, [channelCommunication.isToReload]);
 
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => setMessage(event.target.value)
 
@@ -56,8 +74,8 @@ export default function BasicChannelView(
     const handleLeaveOrDelete = () => {
         leaveOrDelete(id).then(response => {
             if (response.tag === "success") {
-                navigation("/channels")
-                window.location.reload()
+                channelsCommunication.toggleReload()
+                navigation("/channels/findChannels")
             }
             else onError(response.value)
         })

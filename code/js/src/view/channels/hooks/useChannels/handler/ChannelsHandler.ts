@@ -13,4 +13,5 @@ export type ChannelsHandler = {
     loadChannels: () => void
     loadMore: (offset:number, at: "head" | "tail") => void
     goBack: () => void
+    reload: () => void
 }
