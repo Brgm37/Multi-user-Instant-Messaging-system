@@ -3,6 +3,7 @@ package com.example.appWeb.swagger
 import com.example.appWeb.model.dto.output.message.MessageOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.MessageProblem
+import com.example.appWeb.model.problem.UserProblem
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -142,4 +143,40 @@ object MessageSwaggerConfig {
         example = "Bearer 123e4567-e89b-12d3-a456-426614174000",
     )
     annotation class GetChannelMessages
+
+    @Operation(summary = "Get messages event stream")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Message event stream started successfully",
+                content = [
+                    Content(
+                        mediaType = "text/event-stream",
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Invalid request",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = MessageProblem::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "User not found",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = UserProblem::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    annotation class GetMessageEventStream
 }

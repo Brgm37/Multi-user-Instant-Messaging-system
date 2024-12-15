@@ -95,6 +95,8 @@ sealed interface Channel {
 
         /**
          * Converts a public channel to a private channel.
+         *
+         * @param channel The public channel to convert.
          */
         fun publicToPrivate(channel: Public): Private =
             Private(
@@ -109,6 +111,8 @@ sealed interface Channel {
 
         /**
          * Converts a private channel to a public channel.
+         *
+         * @param channel The private channel to convert.
          */
         fun privateToPublic(channel: Private): Public =
             Public(

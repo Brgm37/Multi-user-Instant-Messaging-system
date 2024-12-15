@@ -6,7 +6,11 @@ interface Channel
     + name: ChannelName
     + accessControl: AccessControl
     + messages: List<Message>
+    + description: String?
+    + icon : String?
     + createChannel(...): Channel
+    + publicToPrivate(): Private
+    + privateToPublic(...): Public
 }
 
 namespace users {

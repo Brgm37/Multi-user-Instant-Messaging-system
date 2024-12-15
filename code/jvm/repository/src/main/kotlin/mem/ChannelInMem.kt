@@ -7,6 +7,7 @@ import model.channels.ChannelInvitation
 
 /**
  * In-memory implementation of the channel repository
+ *
  */
 class ChannelInMem : ChannelRepositoryInterface {
     private val channels = mutableListOf<Channel>()
