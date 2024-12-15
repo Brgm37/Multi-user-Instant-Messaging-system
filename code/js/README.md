@@ -15,5 +15,6 @@
 - The JS service is a static server that serves the frontend application.
 - The JS service is configured to proxy requests to the JVM service at `http://localhost:8080`.
 - The JS service is started with the following users:
-  - `admin` with password `@dmin123Chimp`
+  - `Admin` with password `@dmin123Chimp`
+  - `User` with password `Us&r123Chimp`
 

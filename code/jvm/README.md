@@ -10,7 +10,7 @@
 * `./gradlew buildImageJvm` - builds the JVM image with the Chimp backend HTTP API
 * `./gradlew buildImagePostgres` - builds the Postgres image used by the backend
 * `./gradlew buildImageNginx` - builds the Nginx image
-* `./gradlew buildImageAll` - builds all images
+* `./gradlew buildAllImages` - builds all images
 
 
 ## Start, scale, and stop services
@@ -21,5 +21,6 @@
 
 ## Notes
 - The JVM service by default is available at `http://localhost:8080`.
-- The Chimp API is stated with the following users:
-  - `admin` with password `@dmin123Chimp`
+- The Chimp API is started with the following users:
+  - `Admin` with password `@dmin123Chimp`
+  - `User` with password `Us&r123Chimp`

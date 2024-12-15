@@ -21,6 +21,8 @@ repositories {
 
 dependencies {
     api(project(":service"))
+    api(project(":domain"))
+    api(project(":repository"))
     implementation("org.springframework:spring-webmvc:6.1.13")
     implementation("jakarta.servlet:jakarta.servlet-api:6.1.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")

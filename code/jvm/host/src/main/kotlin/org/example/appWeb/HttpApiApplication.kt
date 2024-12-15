@@ -17,7 +17,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import pipeline.AuthenticatedUserArgumentResolver
 import pipeline.AuthenticationInterceptor
-import utils.encryption.AESEncrypt
 import utils.encryption.DummyEncrypt
 import utils.encryption.Encrypt
 import javax.sql.DataSource
@@ -42,13 +41,6 @@ class HttpApiApplication {
     @Bean
     @Profile("hikari")
     fun cs(): ConnectionSource = HikariConnectionSource()
-
-    @Bean
-    @Profile("aes")
-    fun aesEncryption(): Encrypt {
-        val key = System.getenv("AES_KEY") ?: throw Exception("Missing env var AES_KEY")
-        return AESEncrypt(key)
-    }
 
     @Bean
     @Profile("no-encryption")
