@@ -86,7 +86,6 @@ export function useFindChannels(): [FindChannelState, UseScrollState<PublicChann
         if (state.tag === "error") return
         limit = DEFAULT_LIMIT
         if (searchValue === "") {
-            limit = DEFAULT_LIMIT
             getPublicChannels(0, HAS_MORE)
                 .then((response) => {
                     if (response.tag === "success") resetList(listHandler, response.value)
@@ -109,6 +108,7 @@ export function useFindChannels(): [FindChannelState, UseScrollState<PublicChann
 
     const onInit = () => {
         if (state.tag != "idle") return
+        limit = DEFAULT_LIMIT
         dispatch({type: "init"})
         getPublicChannels(0, HAS_MORE)
             .then((response) => {
