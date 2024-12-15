@@ -11,7 +11,7 @@ module.exports = {
       {
         context: ['/api'],
         target: 'http://localhost:8080',
-        onProxyRes: (proxyRes, req, res) => {
+        onProxyRes: (proxyRes, _, res) => {
           console.log('onProxyRes');
           proxyRes.on('close', () => {
             console.log('on proxyRes close');

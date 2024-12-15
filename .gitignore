@@ -119,3 +119,6 @@ dist
 
 ### DataBase Config file ###
 dataBase/src/main/resources/appllication.properties
+
+### Deploy ###
+code/jvm/host/deploy/nginx/public

@@ -14,15 +14,19 @@ repositories {
 }
 
 dependencies {
-    implementation("org.postgresql:postgresql:42.7.2")
     implementation(project(":httpApi"))
     implementation(project(":http_pipeline"))
     api(project(":repository_jdbc"))
+
+    implementation("org.postgresql:postgresql:42.7.2")
     implementation("com.zaxxer:HikariCP:5.1.0")
+
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("javax.servlet:javax.servlet-api:4.0.1")
+
     testImplementation(kotlin("test"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -56,6 +60,81 @@ tasks.test {
     )
     dependsOn(":repository_jdbc:dbTestWait")
     finalizedBy(":repository_jdbc:dbTestDown")
+}
+
+task<Copy>("extractUberJar") {
+    dependsOn("assemble")
+    from(
+        zipTree(
+            layout.buildDirectory
+                .file("libs/host-$version.jar")
+                .get()
+                .toString(),
+        ),
+    )
+    into("build/dependency")
+}
+
+val dockerImageJvm = "chimp-jvm"
+val dockerImageNginx = "chimp-nginx"
+val dockerImagePostgres = "chimp-postgres"
+
+task<Exec>("buildImageJvm") {
+    dependsOn("extractUberJar")
+    commandLine(
+        "docker",
+        "build",
+        "-t",
+        dockerImageJvm,
+        "-f",
+        "deploy/Dockerfile-jvm",
+        ".",
+    )
+}
+
+task<Copy>("copyWebApp"){
+    from("../../js/dist")
+    from("../../js/public")
+    into("deploy/nginx/public")
+}
+
+task<Exec>("buildImageNginx") {
+    dependsOn("copyWebApp")
+    commandLine(
+        "docker",
+        "build",
+        "-t",
+        dockerImageNginx,
+        "-f",
+        "deploy/Dockerfile-nginx",
+        ".",
+    )
+}
+
+task<Exec>("buildImagePostgres") {
+    commandLine(
+        "docker",
+        "build",
+        "-t",
+        dockerImagePostgres,
+        "-f",
+        "deploy/Dockerfile-postgres",
+        ".",
+    )
+}
+
+task("allImages") {
+    dependsOn("buildImageJvm")
+    dependsOn("buildImageNginx")
+    dependsOn("buildImagePostgres")
+}
+
+task<Exec>("allUp") {
+    commandLine("docker", "compose", "up", "--force-recreate", "-d")
+}
+
+task<Exec>("allDown") {
+    commandLine("docker", "compose", "down")
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {

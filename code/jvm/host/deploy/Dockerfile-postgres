@@ -1,0 +1,27 @@
+FROM postgres
+
+LABEL authors="arthuroliveira"
+
+USER postgres
+
+WORKDIR /app
+
+COPY deploy/sql/create.sql /docker-entrypoint-initdb.d/1_create.sql
+
+COPY deploy/sql/view.sql /docker-entrypoint-initdb.d/2_view.sql
+
+COPY deploy/sql/trigger.sql /docker-entrypoint-initdb.d/3_trigger.sql
+
+COPY deploy/sql/index.sql /docker-entrypoint-initdb.d/4_index.sql
+
+COPY deploy/sql/functions.sql /docker-entrypoint-initdb.d/5_functions.sql
+
+COPY deploy/sql/insert.sql /docker-entrypoint-initdb.d/6_insert.sql
+
+COPY --chown=postgres:postgres deploy/sql/script/wait-for-postgres.sh ./bin/wait-for-postgres.sh
+
+RUN chmod +x ./bin/wait-for-postgres.sh
+
+VOLUME /var/lib/postgresql/data
+
+EXPOSE 5432
