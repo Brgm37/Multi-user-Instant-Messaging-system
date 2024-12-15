@@ -21,5 +21,6 @@
 
 ## Notes
 - The JVM service by default is available at `http://localhost:8080`.
-- The Chimp API is stated with the following users:
-  - `admin` with password `@dmin123Chimp`
+- The Chimp API is started with the following users:
+  - `Admin` with password `@dmin123Chimp`
+  - `User` with password `Us&r123Chimp`
