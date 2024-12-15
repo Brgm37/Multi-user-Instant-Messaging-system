@@ -123,7 +123,7 @@ task<Exec>("buildImagePostgres") {
     )
 }
 
-task("allImages") {
+task("buildAllImages") {
     dependsOn("buildImageJvm")
     dependsOn("buildImageNginx")
     dependsOn("buildImagePostgres")
