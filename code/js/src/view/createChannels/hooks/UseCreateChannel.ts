@@ -133,7 +133,7 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
         },
 
         onDescriptionChange(description: string) {
-            if (state.tag !== "editing") return;
+            if (state.tag !== "editing" && state.tag !== "validating") return;
             dispatch({ type: "editDescription", inputValue: description });
         },
         onSubmit(channel: ChannelInput) {
