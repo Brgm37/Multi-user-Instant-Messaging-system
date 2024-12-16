@@ -3,7 +3,6 @@ import {Message} from "../../model/Message";
 
 /**
  * The context for the server-sent event communication service.
- *
  */
 export interface SseCommunicationService {
     messages: Message[]

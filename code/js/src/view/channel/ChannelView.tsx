@@ -18,11 +18,11 @@ const defaultAvatar = "/defaultIcons/blank-default-pfp.webp"
  */
 export function ChannelView(): React.JSX.Element {
     const [state, messages, handler] = useChannel();
-    const { id } = useContext(AuthUserContext);
+    const {id} = useContext(AuthUserContext);
 
     if (state.tag === "idle") {
         handler.initChannel();
-        return <InitLoadingView />;
+        return <InitLoadingView/>;
     }
 
     const provider: InfiniteScrollContext<Message> = {
@@ -69,15 +69,15 @@ export function ChannelView(): React.JSX.Element {
         }
     };
 
-    const onMessage: InfiniteMessageScrollContext = {
-        onNewMessage() {
+    const popUpHandler: InfiniteMessageScrollContext = {
+        popUpClick() {
             handler.reset();
         }
     };
 
     return (
         <InfiniteScrollContext.Provider value={provider}>
-            <InfiniteMessageScrollContext.Provider value={onMessage}>
+            <InfiniteMessageScrollContext.Provider value={popUpHandler}>
                 <BasicChannelView
                     error={state.tag === "error" ? state.message : undefined}
                     errorDismiss={handler.goBack}

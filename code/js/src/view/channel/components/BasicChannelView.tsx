@@ -11,6 +11,7 @@ import {ChannelCommunicationContext} from "../../../service/channel/communicatio
 import {ChannelsCommunicationContext} from "../../../service/channels/communication/ChannelsCommunicationContext";
 import {Channel} from "../../../model/Channel";
 import MessageInfiniteScroll from "./messageInfiniteScroll/ChannelMessageInfiniteScroll";
+import {InfiniteScrollContext} from "../../components/infiniteScroll/InfiniteScrollContext";
 
 export default function BasicChannelView(
     {error, errorDismiss, onSend, onError}: { error?: string, errorDismiss?: () => void, onSend(msg: string): void, onError(err: string): void }
@@ -23,6 +24,7 @@ export default function BasicChannelView(
     const navigation = useNavigate()
     const channelCommunication = useContext(ChannelCommunicationContext)
     const channelsCommunication = useContext(ChannelsCommunicationContext)
+    const {isLoading} = useContext(InfiniteScrollContext)
 
     useEffect(() => {
         loadChannel(id).then(response => {
@@ -48,7 +50,7 @@ export default function BasicChannelView(
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => setMessage(event.target.value)
 
     const sendMessage = () => {
-        if (message === "") return
+        if (message === "" || isLoading !== false) return
         onSend(message)
         setMessage("")
     }
@@ -149,13 +151,10 @@ export default function BasicChannelView(
                         </div>
                     </div>
                 </header>
-
-                <React.Suspense fallback={<div>Loading...</div>}>
-                    <MessageInfiniteScroll
-                        className={"flex-1 bg-gray-800 p-4 overflow-y-auto flex-col-reverse custom-scrollbar"}
-                        scrollStyle={"flex-1 bg-gray-800  overflow-y-auto flex flex-col-reverse"}
-                    />
-                </React.Suspense>
+                <MessageInfiniteScroll
+                    className={"flex-1 bg-gray-800 p-4 overflow-y-auto flex-col-reverse custom-scrollbar"}
+                    scrollStyle={"flex-1 bg-gray-800  overflow-y-auto flex flex-col-reverse"}
+                />
                 {error && (
                     <div className="bg-red-500 text-white p-2 rounded">
                         {error}

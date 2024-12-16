@@ -111,7 +111,19 @@ task<Exec>("buildImageNginx") {
     )
 }
 
+task<Copy>("copySqlScripts") {
+    from("../repository_jdbc/src/sql")
+    into("deploy/sql")
+}
+
+task<Copy>("copyScripts") {
+    dependsOn("copySqlScripts")
+    from("../repository_jdbc/connection/script")
+    into("deploy/sql/script")
+}
+
 task<Exec>("buildImagePostgres") {
+    dependsOn("copyScripts")
     commandLine(
         "docker",
         "build",

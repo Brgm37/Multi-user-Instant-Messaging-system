@@ -51,6 +51,11 @@ private const val OFFSET = 0u
 private const val LIMIT = 100u
 
 /**
+ * The default timeout for the message list.
+ */
+private const val DEFAULT_TIMEOUT = 1000000L
+
+/**
  * Represents the controller for the message
  *
  * @property messageService The message service
@@ -62,7 +67,7 @@ class MessageController(
     private val sseServices: SseServiceInterface,
 ) {
     @Value("\${sse.connection.timeout}")
-    private val timeout: Long = 0
+    private val timeout: Long = DEFAULT_TIMEOUT
     private val listeners = mutableMapOf<AuthenticatedUserInputModel, MutableSharedFlow<Message>>()
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -92,7 +97,7 @@ class MessageController(
                 }
             }
 
-    fun lastEventIdUpdate(
+    private fun lastEventIdUpdate(
         authenticated: AuthenticatedUserInputModel,
         flow: MutableSharedFlow<Message>,
         lastId: UInt,

@@ -126,13 +126,8 @@ export default function (
     }, [items.list, at]);
 
     const handlePopupClick = () => {
-        if (items.hasMore.head) {
-            context.onNewMessage();
-        } else {
-            if (beginOfListRef.current) {
-                beginOfListRef.current.scrollIntoView({ behavior: "smooth" });
-            }
-        }
+        if (items.hasMore.head) context.popUpClick();
+        else if (beginOfListRef.current) beginOfListRef.current.scrollIntoView({ behavior: "smooth" });
         setPop(false);
     };
 
