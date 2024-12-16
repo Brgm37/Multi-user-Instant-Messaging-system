@@ -1,7 +1,5 @@
 import * as React from "react";
 import {Outlet, useNavigate, useParams} from "react-router-dom";
-import MessageInfiniteScroll from "./messageInfiniteScroll/ChannelMessageInfiniteScroll";
-import {Channel} from "../../../model/Channel";
 import {useContext, useEffect} from "react";
 import {ChannelServiceContext} from "../../../service/channel/ChannelServiceContext";
 import {AuthUserContext} from "../../session/AuthUserContext";
@@ -11,15 +9,9 @@ import {IoMdPersonAdd} from "react-icons/io";
 import {IoSend} from "react-icons/io5";
 import {ChannelCommunicationContext} from "../../../service/channel/communication/ChannelCommunicationContext";
 import {ChannelsCommunicationContext} from "../../../service/channels/communication/ChannelsCommunicationContext";
+import {Channel} from "../../../model/Channel";
+import MessageInfiniteScroll from "./messageInfiniteScroll/ChannelMessageInfiniteScroll";
 
-/**
- * The basic channel view.
- *
- * @param error
- * @param errorDismiss
- * @param onSend
- * @param onError
- */
 export default function BasicChannelView(
     {error, errorDismiss, onSend, onError}: { error?: string, errorDismiss?: () => void, onSend(msg: string): void, onError(err: string): void }
 ): React.JSX.Element {
@@ -139,7 +131,7 @@ export default function BasicChannelView(
                             <button
                                 className="w-12 h-12 bg-black overflow-hidden rounded-full transition-transform duration-300 ease-in-out transform hover:scale-110 hover:shadow-lg cursor-pointer flex items-center justify-center"
                                 onClick={handleLeaveOrDelete}
-                                disabled={message !== "" || message !== undefined}
+                                disabled={error !== "" && error !== undefined}
                             >
                                 {isOwner ? (
                                     <MdDelete className="w-6 h-6 text-red-800"/>
@@ -158,10 +150,12 @@ export default function BasicChannelView(
                     </div>
                 </header>
 
-                <MessageInfiniteScroll
-                    className={"flex-1 bg-gray-800 p-4 overflow-y-auto flex-col-reverse custom-scrollbar"}
-                    scrollStyle={"flex-1 bg-gray-800  overflow-y-auto flex flex-col-reverse"}
-                />
+                <React.Suspense fallback={<div>Loading...</div>}>
+                    <MessageInfiniteScroll
+                        className={"flex-1 bg-gray-800 p-4 overflow-y-auto flex-col-reverse custom-scrollbar"}
+                        scrollStyle={"flex-1 bg-gray-800  overflow-y-auto flex flex-col-reverse"}
+                    />
+                </React.Suspense>
                 {error && (
                     <div className="bg-red-500 text-white p-2 rounded">
                         {error}
@@ -185,7 +179,7 @@ export default function BasicChannelView(
                             <button
                                 className="w-10 h-10 bg-gray-900 overflow-hidden rounded-lg cursor-pointer flex items-center justify-center"
                                 onClick={handleSend}
-                                disabled={message !== "" || message !== undefined}
+                                disabled={message === ""}
                             >
                                 <IoSend className="w-6 h-6"/>
                             </button>
