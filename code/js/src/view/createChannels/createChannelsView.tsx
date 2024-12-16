@@ -2,7 +2,7 @@ import * as React from "react";
 import {useCreateChannel} from "./hooks/UseCreateChannel";
 import {CreateChannelsState} from "./hooks/states/createChannelsState";
 import {UseCreateChannelHandler} from "./hooks/handler/UseCreateChannelHandler";
-import {Navigate, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {CreateChannelsBaseView} from "./components/CreateChannelsBaseView";
 import {useContext, useEffect} from "react";
 import {ChannelsCommunicationContext} from "../../service/channels/communication/ChannelsCommunicationContext";

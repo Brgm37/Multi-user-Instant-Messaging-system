@@ -1,9 +1,10 @@
-import {ChannelInput, CreateChannelsState, Visibility} from "../hooks/states/createChannelsState";
+import {ChannelInput, CreateChannelsState} from "../hooks/states/createChannelsState";
 import React from "react";
 import {AccessControl} from "../../../model/AccessControl";
 import {InputBar} from "../../components/InputBar";
 import {UseCreateChannelHandler} from "../hooks/handler/UseCreateChannelHandler";
 import {useImagePicker} from "../../components/ImagePicker/ImagePickerProvider";
+import {ChannelVisibility} from "../../../model/ChannelVisibility";
 
 /**
  * The access control options.
@@ -36,7 +37,7 @@ export function CreateChannelsBaseView(
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        const visibility = (document.querySelector("select[title=visibility]") as HTMLSelectElement).value as Visibility;
+        const visibility = (document.querySelector("select[title=visibility]") as HTMLSelectElement).value as ChannelVisibility;
         const accessControl = (document.querySelector("select[title=accessControl]") as HTMLSelectElement).value as AccessControl;
         const channel: ChannelInput = {
             name: state.input.name,

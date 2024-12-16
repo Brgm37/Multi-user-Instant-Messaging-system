@@ -1,16 +1,12 @@
 import {AccessControl} from "../../../../model/AccessControl";
-
-/**
- * The visibility.
- */
-export type Visibility = "public" | "private"
+import {ChannelVisibility} from "../../../../model/ChannelVisibility";
 
 /**
  * The channel input.
  */
 export type ChannelInput = {
     name: string,
-    visibility: Visibility,
+    visibility: ChannelVisibility,
     access: AccessControl,
     isValid?: boolean,
     description?: string,
@@ -47,7 +43,7 @@ export function makeInitialState(): CreateChannelsState {
         tag: "editing",
         input: {
             name: "",
-            visibility: "public",
+            visibility: "PUBLIC",
             access: "READ_ONLY",
         },
     }
