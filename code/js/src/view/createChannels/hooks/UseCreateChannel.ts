@@ -3,7 +3,6 @@ import reduce from "./reducer/CreateChannelReducer";
 import {useContext, useEffect, useReducer} from "react";
 import {CreateChannelsServiceContext} from "../../../service/createChannels/CreateChannelsServiceContext";
 import {UseCreateChannelHandler} from "./handler/UseCreateChannelHandler";
-import {ChannelVisibility} from "../../../model/ChannelVisibility";
 
 /**
  * The delay for debounce.
@@ -52,8 +51,7 @@ export function useCreateChannel(): [CreateChannelsState, UseCreateChannelHandle
         onSubmit(channel: ChannelInput) {
             if (state.tag !== "validating" && state.tag !== "editing") return;
             if (!state.input.isValid) return;
-            const visibility: ChannelVisibility = channel.visibility === "public" ? "PUBLIC" : "PRIVATE";
-            service.createChannel(channel.name, visibility, channel.access, channel.description, channel.icon)
+            service.createChannel(channel.name, channel.visibility, channel.access, channel.description, channel.icon)
                 .then(response => {
                     if (response.tag === "success") dispatch({type: "success", input: state.input});
                     else dispatch({type: "error", message: ERROR_MESSAGE});
