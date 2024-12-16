@@ -2,6 +2,22 @@
 
 - This directory contains the source code for the JavaScript implementation of the DAW project.
 
+## Requirements
+- file **envConfig.json** in the root directory with the following content:
+```json
+{
+  "expiration_date": 1,
+  "session": "session",
+  "saltRounds": 4,
+  "channels_limit": 100,
+  "messages_limit": 150,
+  "default_messages_limit": 50,
+  "default_limit": 13,
+  "default_offset": 0,
+  "public_channels_limit": 100
+}
+```
+
 ## Build
 - To build the project, run the following command:
 * `npm install` - installs the project dependencies.
