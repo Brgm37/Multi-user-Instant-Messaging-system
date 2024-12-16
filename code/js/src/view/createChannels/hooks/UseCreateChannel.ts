@@ -1,5 +1,5 @@
 import {ChannelInput, CreateChannelsState, makeInitialState} from "./states/createChannelsState";
-import {CreateChannelsAction} from "./states/createChannelsAction";
+import reduce from "./reducer/CreateChannelReducer";
 import {useContext, useEffect, useReducer} from "react";
 import {CreateChannelsServiceContext} from "../../../service/createChannels/createChannelsServiceContext";
 import {UseCreateChannelHandler} from "./handler/UseCreateChannelHandler";
@@ -13,97 +13,6 @@ const DEBOUNCE_DELAY = 500;
  * The error message.
  */
 const ERROR_MESSAGE = "An error occurred while creating the channel. Please try again later.";
-
-/**
- * Reduces the state.
- *
- * @param state
- * @param action
- */
-function reduce(state: CreateChannelsState, action: CreateChannelsAction): CreateChannelsState {
-    switch (state.tag) {
-        case "editing":
-            switch (action.type) {
-                case "editName": {
-                    const input = {
-                        name: action.inputValue,
-                        visibility: state.input.visibility,
-                        access: state.input.access,
-                        description: state.input.description,
-                        icon: state.input.icon
-                    }
-                    return { tag: "editing", input: input };
-                }
-                case "editDescription": {
-                    const input = { ...state.input, description: action.inputValue };
-                    return { tag: "editing", input: input };
-                }
-                case "validated": {
-                    const input = {
-                        name: state.input.name,
-                        visibility: state.input.visibility,
-                        access: state.input.access,
-                        description: state.input.description,
-                        icon: state.input.icon
-                    }
-                    return { tag: "editing", input: input };
-                }
-                case "validation": {
-                    if (action.name === state.input.name) {
-                        const input = {...state.input, name: action.name};
-                        return {tag: "validating", input: input};
-                    }
-                    return state;
-                }
-                case "submit": {
-                    return { tag: "submitting", input: state.input };
-                }
-                default:
-                    throw Error("Invalid action" + action.type);
-            }
-        case "submitting":
-            switch (action.type) {
-                case "success":
-                    return { tag: "redirecting", input: state.input };
-                case "error":
-                    return { tag: "error", message: action.message, input: state.input };
-                default:
-                    throw Error("Invalid action");
-            }
-        case "error":
-            throw Error("Already in final State 'redirecting' and should not reduce to any other State.");
-        case "validating":
-            switch (action.type) {
-                case "editName": {
-                    const input = {
-                        name: action.inputValue,
-                        visibility: state.input.visibility,
-                        access: state.input.access,
-                        description: state.input.description,
-                        icon: state.input.icon
-                    }
-                    return { tag: "editing", input: input };
-                }
-                case "editDescription": {
-                    const input = { ...state.input, description: action.inputValue };
-                    return { tag: "editing", input: input };
-                }
-                case "validated": {
-                    const input = { ...state.input, isValid: action.isValidInput };
-                    return { tag: "validating", input: input };
-                }
-                case "submit": {
-                    return { tag: "submitting", input: state.input };
-                }
-                default:
-                    throw Error("Invalid action");
-            }
-        case "redirecting":
-            throw Error("Already in final State 'redirecting' and should not reduce to any other State.");
-        default:
-            throw Error("Invalid state");
-    }
-}
 
 /**
  * The useCreateChannel hook.

@@ -2,14 +2,14 @@ import React, {useContext, useEffect} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
 import {useJoinChannel} from "./hooks/UseJoinChannel";
 import {UseJoinChannelHandler} from "./hooks/handler/UseJoinChannelHandler";
-import {JoinChannelStates} from "./hooks/states/JoinChannelStates";
+import {JoinChannelState} from "./hooks/states/JoinChannelState";
 import {ChannelsCommunicationContext} from "../../service/channels/communication/ChannelsCommunicationContext";
 
 /**
  * The join channel view.
  */
 export function JoinChannelView(): React.JSX.Element {
-    const [state, handler]: [JoinChannelStates, UseJoinChannelHandler] = useJoinChannel()
+    const [state, handler]: [JoinChannelState, UseJoinChannelHandler] = useJoinChannel()
     const [token, setToken] = React.useState("")
     const communication = useContext(ChannelsCommunicationContext)
     const navigate = useNavigate()
@@ -21,7 +21,7 @@ export function JoinChannelView(): React.JSX.Element {
         }
     }, [state]);
 
-    const view = ((state: JoinChannelStates) => {
+    const view = ((state: JoinChannelState) => {
         switch (state.tag) {
             case "UseJoin":
                 return (
