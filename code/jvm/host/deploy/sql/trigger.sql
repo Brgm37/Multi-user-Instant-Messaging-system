@@ -132,3 +132,17 @@ create or replace trigger tr_channel_members_delete
     on channels
     for each row
 execute function delete_channel_members();
+
+create or replace function delete_channels_invitations() returns trigger as
+$$
+begin
+    delete from channels_invitations where channel_id = old.id;
+    return old;
+end;
+$$ language plpgsql;
+
+create or replace trigger tr_channels_invitations_delete
+    before delete
+    on channels
+    for each row
+execute function delete_channels_invitations();
