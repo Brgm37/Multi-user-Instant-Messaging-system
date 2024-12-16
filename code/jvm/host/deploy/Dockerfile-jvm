@@ -1,7 +1,5 @@
 FROM openjdk:21
 
-LABEL authors="arthuroliveira"
-
 ARG DEPENDENCY=build/dependency
 
 COPY ${DEPENDENCY}/BOOT-INF/lib /app/lib

@@ -1,7 +1,5 @@
 FROM postgres
 
-LABEL authors="arthuroliveira"
-
 USER postgres
 
 WORKDIR /app

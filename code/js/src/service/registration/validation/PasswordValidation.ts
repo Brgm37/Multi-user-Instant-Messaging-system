@@ -28,5 +28,8 @@ export function passwordValidation(password: string): string | true {
     if (!specialCharacter.test(password)) {
         return "The password should have at least one special character."
     }
+    if (password.length < 8) {
+        return "The password should have at least 8 characters."
+    }
     return true
 }

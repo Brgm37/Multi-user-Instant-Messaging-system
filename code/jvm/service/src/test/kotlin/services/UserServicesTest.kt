@@ -218,20 +218,6 @@ class UserServicesTest {
         assertEquals(UserError.UserNotFound, result.value)
     }
 
-//    @ParameterizedTest
-//    @MethodSource("transactionManagers")
-//    fun isValidTokenTest(manager: TransactionManager) {
-//        val userServices = UserServices(manager)
-//        val user = checkNotNull(ChannelServicesTest.makeUser(manager))
-//        val token = userServices.login(user.username, validPassword) as Success<UserToken>
-//        val result = userServices.isValidToken(token.value.token.toString())
-//        val result2 = userServices.isValidToken("0f7ed58e-89c0-4331-b22d-0d075b356317")
-//        assertIs<Success<Boolean>>(result)
-//        assertEquals(true, result.value)
-//        assertIs<Success<Boolean>>(result2)
-//        assertEquals(false, result2.value)
-//    }
-
     @ParameterizedTest
     @MethodSource("transactionManagers")
     fun `getting an invitation by valid invitation code should return the invitation`(manager: TransactionManager) {

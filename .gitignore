@@ -122,3 +122,4 @@ dataBase/src/main/resources/appllication.properties
 
 ### Deploy ###
 code/jvm/host/deploy/nginx/public
+code/jvm/host/deploy/sql
