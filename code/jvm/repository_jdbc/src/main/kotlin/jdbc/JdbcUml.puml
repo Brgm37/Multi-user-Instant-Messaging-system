@@ -1,0 +1,29 @@
+@startuml
+
+class ChannelJDBC
+class MessageJDBC
+class UserJDBC
+
+namespace domain.utils.encrypt {}
+
+namespace repository {
+    interface ChannelRepositoryInterface
+    interface MessageRepositoryInterface
+    interface UserRepositoryInterface
+}
+
+ChannelJDBC --|> repository.ChannelRepositoryInterface
+MessageJDBC --|> repository.MessageRepositoryInterface
+UserJDBC --|> repository.UserRepositoryInterface
+
+domain.utils.encrypt ...> ChannelJDBC
+domain.utils.encrypt ...> MessageJDBC
+domain.utils.encrypt ...> UserJDBC
+
+Connection ..> ChannelJDBC
+Connection ..> MessageJDBC
+Connection ..> UserJDBC
+
+
+
+@enduml

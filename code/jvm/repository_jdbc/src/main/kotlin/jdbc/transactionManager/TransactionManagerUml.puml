@@ -1,0 +1,26 @@
+@startuml
+
+class TransactionManager
+class Transaction
+
+namespace repository {
+    interface TransactionManager
+    interface Transaction
+}
+
+TransactionManager <|-- repository.TransactionManager
+Transaction <|-- repository.Transaction
+
+TransactionManager "1" *-- "0.*" Transaction
+
+namespace domain.utils.encrypt {
+    interface Encrypt
+}
+
+TransactionManager <.. DataSource
+TransactionManager <... Encrypt
+
+Transaction <... Encrypt
+Transaction <.. Connection
+
+@enduml

@@ -104,7 +104,6 @@ dist
 .tern-port
 
 # Gradle
-
 .gradle
 /build/
 !gradle/wrapper/gradle-wrapper.jar
@@ -117,3 +116,10 @@ dist
 **/out
 **/bin
 **/build
+
+### DataBase Config file ###
+dataBase/src/main/resources/appllication.properties
+
+### Deploy ###
+code/jvm/host/deploy/nginx/public
+code/jvm/host/deploy/sql

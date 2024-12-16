@@ -1,0 +1,31 @@
+FROM postgres
+# set the base image for the container.
+
+USER postgres
+# set the user to run the following commands.
+
+WORKDIR /app
+
+COPY ../src/sql/create.sql /docker-entrypoint-initdb.d/1_create.sql
+# copy the file create.sql to the container.
+
+COPY ../src/sql/view.sql /docker-entrypoint-initdb.d/2_view.sql
+# copy the file view.sql to the container.
+
+COPY ../src/sql/trigger.sql /docker-entrypoint-initdb.d/3_trigger.sql
+# copy the file trigger.sql to the container.
+
+COPY ../src/sql/index.sql /docker-entrypoint-initdb.d/4_index.sql
+# copy the file index.sql to the container.
+
+COPY ../src/sql/functions.sql /docker-entrypoint-initdb.d/5_functions.sql
+
+COPY --chown=postgres:postgres ../connection/script/wait-for-postgres.sh ./bin/wait-for-postgres.sh
+# copy the file wait-for-postgres.sh to the container.
+
+
+RUN chmod +x ./bin/wait-for-postgres.sh
+# give the file wait-for-postgres.sh the permission to execute.
+
+EXPOSE 5432
+# expose the port 5432 to the host machine.

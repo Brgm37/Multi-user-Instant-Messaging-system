@@ -1,0 +1,29 @@
+@startuml
+class Message
+{
+    + msgId: UInt?
+    + msg: String
+    + user: UserInfo
+    + channel: ChannelInfo
+    + timestamp: Timestamp
+}
+
+class MessageInfo
+{
+    + msgId: UInt
+    + msg: String
+    + creationTime: Timestamp
+}
+
+namespace users {
+    class UserInfo
+}
+
+namespace channels {
+    class ChannelInfo
+}
+
+Message ..> UserInfo
+Message ..> ChannelInfo
+
+@enduml

@@ -1,0 +1,13 @@
+services:
+  db-test:
+    container_name: db-test
+    build:
+      context: .
+      dockerfile: ./connection/Dockerfile-db-test
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=daw_test
+      - POSTGRES_MAX_CONNECTIONS=200
+    ports:
+      - "5433:5432"

@@ -1,0 +1,60 @@
+@startuml
+
+interface ChannelServicesInterface
+{
+    + createChannel(...): Either<ChannelError, Channel>
+    + deleteChannel(id: UInt): Either<ChannelError, Unit>
+    + getChannel(id: UInt): Either<ChannelError, Channel>
+    + getChannels(user: UInt, offset: UInt, limit: UInt): Either<ChannelError, List<Channel>>
+    + getChannels(offset: UInt, limit: UInt): Either<ChannelError, List<Channel>>
+    + createChannelInvitation(...): Either<ChannelError, ChannelInvitation>
+    + getPublicByName(name: String): Either<ChannelError, Channel>
+    + getPublicByName(uId: UInt, name: String, offset: UInt, limit: UInt): Either<ChannelError, List<Channel>>
+    + getByName(userId: UInt, name: String, offset: UInt, limit: UInt): Either<ChannelError, List<Channel>>
+    + getByName(name: String, offset: UInt, limit: UInt): Either<ChannelError, List<Channel>>
+    + updateChannel(id: UInt, name: String?, accessControl: String?, visibility: String?, description: String?, icon: String?): Either<ChannelError, Channel>
+    + getAccessControl(uId: UInt, cId: UInt): Either<ChannelError, AccessControl?>
+    + joinChannel(uId: UInt, cId: UInt?, invitationCode: String?): Either<ChannelError, Channel>
+    + getPublic(uId: UInt, offset: UInt, limit: UInt): Either<ChannelError, List<Channel>>
+    + deleteOrLeaveChannel(uId: UInt, cId: UInt): Either<ChannelError, Unit>
+}
+
+interface MessagesServiceInterface
+{
+    + createMessage(...): Either<ChannelError, Message>
+    + deleteMessage(...): Either<ChannelError, Unit>
+    + getMessages(...): Either<ChannelError, List<Message>>
+    + latestMessages(...): Either<ChannelError, List<Message>>
+}
+
+interface UserServiceInterface
+{
+    + createUser(...): Either<UserError, User>
+    + deleteUser(id: UInt): Either<UserError, Unit>
+    + getUser(id: UInt): Either<UserError, User>
+    + getInvitation(...): Either<UserError, UserInvitation>
+    + login(...): Either<UserError, UserToken>
+    + logout(...): Either<UserError, Unit>
+    + createInvitation(...): Either<UserError, UserInvitation>
+}
+
+interface AuthServicesInterface
+{
+    + getUserByToken(token: String): Either<UserError, UserToken>
+}
+
+interface SseServicesInterface
+{
+    + isUserInChannel(cId: UInt, uId: UInt): Either<ChannelError, Unit>
+    + emitAllMessages(uId: UInt, lastEventId: UInt, emitter: (Message) -> Unit): Either<ChannelError, Unit>
+}
+
+namespace model.channel {}
+namespace model.message {}
+namespace model.user {}
+
+ChannelServicesInterface o-- model.channel
+MessagesServiceInterface o-- model.message
+UserServiceInterface o-- model.user
+
+@enduml

@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes spin {
+    0% {transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
+}
+
+body {
+    @apply font-sans custom-scrollbar min-h-screen  m-0;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+.container {
+    @apply min-h-screen;
+}
+
+.card:hover {
+    @apply transform scale-105 transition-transform duration-300;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    @apply w-2;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-800;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded;
+}
+
+@layer utilities {
+    .scrollbar-hidden::-webkit-scrollbar {
+        @apply hidden;
+    }
+
+    .scrollbar-hidden {
+        @apply scrollbar-none;
+    }
+
+    .scrollbar-none {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .scrollbar-none::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.popup {
+    @apply absolute top-1/2 left-0 transform -translate-y-1/2 z-50 bg-black text-white text-xxs font-bold p-1 rounded opacity-0 pointer-events-none transition-opacity duration-300 w-full text-center;
+}
+
+.popup-new-message {
+    @apply fixed bottom-5 right-5 bg-gray-800 text-white p-2 rounded shadow-lg;
+}
+
+.group:hover .popup {
+    @apply opacity-100 pointer-events-auto;
+}
+
+.scroll-container {
+    @apply overflow-y-auto h-screen flex flex-col;
+}
+
+.scroll-style {
+    @apply flex flex-col;
+}
+
+.scrollable-sidebar {
+    @apply flex flex-col max-h-screen overflow-y-auto overflow-x-hidden scrollbar-hidden;
+}
+
+.text-xxs {
+    @apply text-xs;
+}

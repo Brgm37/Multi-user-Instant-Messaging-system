@@ -1,0 +1,44 @@
+@startuml
+
+class User
+{
+    + uId: UInt?
+    + username: String
+    + password: Password
+}
+
+class Password
+{
+    + value: String
+    + matches(password: String): Boolean
+    - PASSWORD_MIN_LENGTH: Int
+    - PASSWORD_PATTERN: String
+    + isValidPassword(password: String): Boolean
+}
+
+class UserInfo
+{
+    + uId: UInt
+    + username: String
+}
+
+class UserInvitation
+{
+    + inviterId: UInt
+    + expirationDate: Timestamp
+    + invitationCode: UUID
+    + isExpired: Boolean
+}
+
+class UserToken
+{
+    + userId: UInt
+    + token: UUID
+    + creationDate: Timestamp
+    + expirationDate: Timestamp
+    + isExpired(): Boolean
+}
+
+User ..> Password
+
+@enduml
