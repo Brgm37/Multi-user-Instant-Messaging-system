@@ -25,7 +25,13 @@ function reduce(state: CreateChannelsState, action: CreateChannelsAction): Creat
         case "editing":
             switch (action.type) {
                 case "editName": {
-                    const input = { ...state.input, name: action.inputValue };
+                    const input = {
+                        name: action.inputValue,
+                        visibility: state.input.visibility,
+                        access: state.input.access,
+                        description: state.input.description,
+                        icon: state.input.icon
+                    }
                     return { tag: "editing", input: input };
                 }
                 case "editDescription": {
@@ -48,6 +54,9 @@ function reduce(state: CreateChannelsState, action: CreateChannelsAction): Creat
                         return {tag: "validating", input: input};
                     }
                     return state;
+                }
+                case "submit": {
+                    return { tag: "submitting", input: state.input };
                 }
                 default:
                     throw Error("Invalid action" + action.type);
@@ -76,14 +85,7 @@ function reduce(state: CreateChannelsState, action: CreateChannelsAction): Creat
                     return { tag: "editing", input: input };
                 }
                 case "editDescription": {
-                    const input = {
-                        name: state.input.name,
-                        visibility: state.input.visibility,
-                        access: state.input.access,
-                        description: action.inputValue,
-                        icon: state.input.icon,
-                        isValid: state.input.isValid
-                    }
+                    const input = { ...state.input, description: action.inputValue };
                     return { tag: "editing", input: input };
                 }
                 case "validated": {
@@ -138,7 +140,7 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
             dispatch({ type: "editDescription", inputValue: description });
         },
         onSubmit(channel: ChannelInput) {
-            if (state.tag !== "validating") return;
+            if (state.tag !== "validating" && state.tag !== "editing") return;
             if (!state.input.isValid) return;
             service.createChannel(channel.name, channel.visibility, channel.access, channel.description, channel.icon)
                 .then(response => {
