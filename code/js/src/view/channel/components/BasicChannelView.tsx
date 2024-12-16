@@ -136,9 +136,10 @@ export default function BasicChannelView(
                             </div>
                         )}
                         <div className="relative group">
-                            <div
+                            <button
                                 className="w-12 h-12 bg-black overflow-hidden rounded-full transition-transform duration-300 ease-in-out transform hover:scale-110 hover:shadow-lg cursor-pointer flex items-center justify-center"
                                 onClick={handleLeaveOrDelete}
+                                disabled={message !== "" || message !== undefined}
                             >
                                 {isOwner ? (
                                     <MdDelete className="w-6 h-6 text-red-800"/>
@@ -146,7 +147,7 @@ export default function BasicChannelView(
                                     <FaPersonRunning className="w-6 h-6 text-red-800"/>
                                 )
                                 }
-                            </div>
+                            </button>
                             <div
                                 className="absolute left-1/2 top-full transform -translate-x-1/2 mt-2 z-50 bg-black text-white text-sm font-bold px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 tooltip-arrow pointer-events-none group-hover:pointer-events-auto"
                                 style={{width: "max-content"}}
@@ -181,12 +182,13 @@ export default function BasicChannelView(
                                 onChange={handleInput}
                                 onKeyDown={handleKeyDown}/>
 
-                            <div
+                            <button
                                 className="w-10 h-10 bg-gray-900 overflow-hidden rounded-lg cursor-pointer flex items-center justify-center"
                                 onClick={handleSend}
+                                disabled={message !== "" || message !== undefined}
                             >
                                 <IoSend className="w-6 h-6"/>
-                            </div>
+                            </button>
                         </>
                     )}
                 </footer>
