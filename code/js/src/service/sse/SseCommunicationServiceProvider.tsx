@@ -57,7 +57,7 @@ export function SseCommunicationServiceProvider(
             sse.close();
             clearInterval(pingInterval);
         };
-    });
+    }, []);
 
     const service: SseCommunicationService = {
         messages: messages,
