@@ -1,7 +1,7 @@
 import {ChannelInput, CreateChannelsState, makeInitialState} from "./states/createChannelsState";
 import reduce from "./reducer/CreateChannelReducer";
 import {useContext, useEffect, useReducer} from "react";
-import {CreateChannelsServiceContext} from "../../../service/createChannels/createChannelsServiceContext";
+import {CreateChannelsServiceContext} from "../../../service/createChannels/CreateChannelsServiceContext";
 import {UseCreateChannelHandler} from "./handler/UseCreateChannelHandler";
 
 /**

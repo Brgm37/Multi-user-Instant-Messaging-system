@@ -2,13 +2,13 @@ import {Either} from "../../model/Either";
 import {Context, createContext} from "react";
 
 /**
- * The context for the create user invitation service.
+ * The context for the createUser invitation service.
  *
  * @method createUserInvitation
  */
 export interface CreateUserInvitationServiceContext {
     /**
-     * CreateUserInvitation creates a user invitation.
+     * createUserInvitation creates a user invitation.
      *
      * @param expirationDate The expiration date for the invitation.
      * @returns The invitation code.
@@ -22,15 +22,13 @@ export interface CreateUserInvitationServiceContext {
  * The default create user invitation service context.
  */
 const defaultCreateUserInvitationServiceContext: CreateUserInvitationServiceContext = {
-    createUserInvitation: (expirationDate) => {
-        return new Promise<Either<{invitationCode: string}, string>>((_, reject) => {
-            reject(new Error("Not implemented"))
-        })
+    createUserInvitation: () => {
+        throw new Error("Not implemented")
     }
 }
 
 /**
- * The context for the create user invitation service.
+ * The context for the createUser invitation service.
  */
 export const CreateUserInvitationServiceContext: Context<CreateUserInvitationServiceContext> =
     createContext(defaultCreateUserInvitationServiceContext)

@@ -1,7 +1,7 @@
 import {urlBuilder} from "../utils/UrlBuilder";
 import useSignal from "../utils/hooks/useSignal/useSignal";
 import {Either, failure, success} from "../../model/Either";
-import {CreateUserInvitationServiceContext} from "./createUserInvitationServiceContext";
+import {CreateUserInvitationServiceContext} from "./CreateUserInvitationServiceContext";
 import React from "react";
 
 /**
@@ -43,5 +43,4 @@ export function CreateUserInvitationServiceProvider(
             {children}
         </CreateUserInvitationServiceContext.Provider>
     )
-
 }

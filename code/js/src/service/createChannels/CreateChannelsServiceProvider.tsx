@@ -1,10 +1,12 @@
 import {urlBuilder} from "../utils/UrlBuilder";
 import React, {useContext} from "react";
-import {CreateChannelsServiceContext} from "./createChannelsServiceContext";
+import {CreateChannelsServiceContext} from "./CreateChannelsServiceContext";
 import {Either, failure, success} from "../../model/Either";
 import {Channel, jsonToChannel} from "../../model/Channel";
 import {AuthUserContext} from "../../view/session/AuthUserContext";
 import useSignal from "../utils/hooks/useSignal/useSignal";
+import {ChannelVisibility} from "../../model/ChannelVisibility";
+import {AccessControl} from "../../model/AccessControl";
 
 /**
  * The URL for the channel.
@@ -28,8 +30,8 @@ export function CreateChannelServiceProvider(
 
         async createChannel(
             name: string,
-            visibility: string,
-            accessControl: string,
+            visibility: ChannelVisibility,
+            accessControl: AccessControl,
             description: string | undefined = "",
             icon: string = defaultIconSrc
         ): Promise<Either<Channel, string>> {

@@ -1,10 +1,11 @@
 import * as React from 'react';
 import {ReactNode} from "react";
 import useSignal from "../utils/hooks/useSignal/useSignal";
-import {EditChannelServiceContext} from "./editChannelServiceContext";
+import {EditChannelServiceContext} from "./EditChannelServiceContext";
 import {Either, success} from "../../model/Either";
 import {urlBuilder} from "../utils/UrlBuilder";
 import {Channel, jsonToChannel} from "../../model/Channel";
+import {ChannelVisibility} from "../../model/ChannelVisibility";
 
 /**
  * The URL for the channel.
@@ -37,7 +38,7 @@ export function EditChannelServiceProvider(
         async editChannel(
             id: string,
             description?: string,
-            visibility?: string,
+            visibility?: ChannelVisibility,
             icon?: string
         ): Promise<Either<void, string>> {
             const body: any = {}
@@ -56,7 +57,6 @@ export function EditChannelServiceProvider(
             else return success(await response.text()) as Either<void, string>
         }
     }
-
     return (
         <EditChannelServiceContext.Provider value={service}>
             {children}

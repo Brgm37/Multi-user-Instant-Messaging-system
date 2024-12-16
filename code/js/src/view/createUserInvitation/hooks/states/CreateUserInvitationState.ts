@@ -1,5 +1,5 @@
 /**
- * Represents the state of the CreateUserInvitation component.
+ * Represents the state of the createUserInvitation component.
  *
  * The state can be in one of the following states:
  * - editingInvitationCode: The state where the user is editing the invitation code.

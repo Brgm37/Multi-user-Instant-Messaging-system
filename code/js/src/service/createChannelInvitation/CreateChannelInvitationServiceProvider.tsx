@@ -3,7 +3,7 @@ import {Either, failure, success} from "../../model/Either";
 import useSignal from "../utils/hooks/useSignal/useSignal";
 import {AccessControl} from "../../model/AccessControl";
 import {urlBuilder} from "../utils/UrlBuilder";
-import { CreateChannelInvitationServiceContext } from "./CreateChannelInvitationServiceContext";
+import {CreateChannelInvitationServiceContext} from "./CreateChannelInvitationServiceContext";
 
 /**
  * The URL for the channel.
@@ -13,7 +13,9 @@ const baseUrl = urlBuilder("/channels")
 /**
  * The creation channel invitation service provider.
  */
-export function CreateChannelInvitationServiceProvider(props: { children: ReactNode }): React.JSX.Element {
+export function CreateChannelInvitationServiceProvider(
+    {children}: { children: ReactNode }
+): React.JSX.Element {
     const signal = useSignal()
     const service = {
         async createChannelInvitation(
@@ -21,7 +23,7 @@ export function CreateChannelInvitationServiceProvider(props: { children: ReactN
             maxUses: number,
             accessControl: AccessControl,
             cId: string
-        ): Promise<Either<{invitationCode: string}, string>> {
+        ): Promise<Either<{ invitationCode: string }, string>> {
             const channelId = Number(cId)
             const init: RequestInit = {
                 method: "POST",
@@ -34,16 +36,16 @@ export function CreateChannelInvitationServiceProvider(props: { children: ReactN
             const response = await fetch(url, init);
             if (response.ok) {
                 const invCode = await response.json()
-               const invitationCode = invCode.invitationCode
-                return success({invitationCode}) as Either<{invitationCode: string}, string>
+                const invitationCode = invCode.invitationCode
+                return success({invitationCode}) as Either<{ invitationCode: string }, string>
             } else {
-                return failure(await response.text()) as Either<{invitationCode: string}, string>
+                return failure(await response.text()) as Either<{ invitationCode: string }, string>
             }
         }
-        }
+    }
     return (
         <CreateChannelInvitationServiceContext.Provider value={service}>
-            {props.children}
+            {children}
         </CreateChannelInvitationServiceContext.Provider>
     )
 }

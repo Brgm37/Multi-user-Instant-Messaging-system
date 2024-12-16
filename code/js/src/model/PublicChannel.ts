@@ -13,4 +13,3 @@ export type PublicChannel = {
     description: string,
     icon: string,
 }
-

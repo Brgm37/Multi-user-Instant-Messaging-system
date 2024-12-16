@@ -2,7 +2,7 @@ import {CreateUserInvitationAction} from "../states/CreateUserInvitationAction";
 import {CreateUserInvitationState} from "../states/CreateUserInvitationState";
 
 /**
- * Reducer function for the CreateUserInvitation component.
+ * Reducer function for the createUserInvitation component.
  *
  * @param state The current state of the component.
  * @param action The action to perform.
@@ -49,4 +49,5 @@ export default function (state: CreateUserInvitationState, action: CreateUserInv
         default:
             throw Error("Invalid state")
     }
+
 }

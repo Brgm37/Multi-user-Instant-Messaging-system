@@ -1,6 +1,7 @@
 import {Context, createContext} from "react";
 import {Either} from "../../model/Either";
 import {Channel} from "../../model/Channel";
+import {ChannelVisibility} from "../../model/ChannelVisibility";
 
 /**
  * The context for the edit channel service.
@@ -19,7 +20,7 @@ export interface EditChannelServiceContext {
     editChannel(
         id: string,
         description?: string,
-        visibility?: string,
+        visibility?: ChannelVisibility,
         icon?: string,
     ): Promise<Either<void, string>>
 

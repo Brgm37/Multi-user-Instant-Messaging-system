@@ -1,5 +1,5 @@
 /**
- * Action to send a CreateUserInvitation
+ * Action to send a createUserInvitation
  *
  * The action can be of the following types:
  * - create: Create a new invitation.

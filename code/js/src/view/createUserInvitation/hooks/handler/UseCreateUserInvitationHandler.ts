@@ -1,8 +1,8 @@
 
 /**
- * The handler is used to interact with the CreateUserInvitation component.
+ * The handler is used to interact with the createUserInvitation component.
  *
- * The handler is used to interact with the CreateUserInvitation component.
+ * The handler is used to interact with the createUserInvitation component.
  * It provides methods to create an app invitation token, close the component, and close the error message.
  *
  * @method onCreate Create an app invitation token.

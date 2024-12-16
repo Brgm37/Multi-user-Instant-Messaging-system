@@ -21,9 +21,7 @@ export interface JoinChannelServiceContext {
  */
 const defaultJoinChannelServiceContext: JoinChannelServiceContext = {
     joinChannel: () => {
-        return new Promise<Either<{ id: string }, string>>((resolve, reject) => {
-            reject(new Error("Not implemented"))
-        })
+        throw new Error("Not implemented")
     }
 }
 

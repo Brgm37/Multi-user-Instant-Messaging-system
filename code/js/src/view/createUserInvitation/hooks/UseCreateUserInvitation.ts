@@ -4,11 +4,11 @@ import {UseCreateUserInvitationHandler} from "./handler/UseCreateUserInvitationH
 import {useContext, useReducer} from "react";
 import {
     CreateUserInvitationServiceContext
-} from "../../../service/CreateUserInvitation/createUserInvitationServiceContext";
+} from "../../../service/createUserInvitation/CreateUserInvitationServiceContext";
 import {isFailure} from "../../../model/Either";
 
 /**
- * The initial state of the CreateUserInvitation component.
+ * The initial state of the createUserInvitation component.
  */
 const initialState: CreateUserInvitationState = { tag: "editingInvitationCode" }
 
