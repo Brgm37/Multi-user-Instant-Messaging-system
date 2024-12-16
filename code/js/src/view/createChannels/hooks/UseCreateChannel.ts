@@ -3,6 +3,7 @@ import reduce from "./reducer/CreateChannelReducer";
 import {useContext, useEffect, useReducer} from "react";
 import {CreateChannelsServiceContext} from "../../../service/createChannels/CreateChannelsServiceContext";
 import {UseCreateChannelHandler} from "./handler/UseCreateChannelHandler";
+import {ChannelVisibility} from "../../../model/ChannelVisibility";
 
 /**
  * The delay for debounce.
@@ -17,7 +18,7 @@ const ERROR_MESSAGE = "An error occurred while creating the channel. Please try 
 /**
  * The useCreateChannel hook.
  */
-export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler] {
+export function useCreateChannel(): [CreateChannelsState, UseCreateChannelHandler] {
     const [state, dispatch] = useReducer(reduce, makeInitialState())
     const service = useContext(CreateChannelsServiceContext)
 
@@ -25,12 +26,12 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
         const timeout = setTimeout(() => {
             if (state.tag !== "editing") return;
             if (state.input.name === "") return;
-            dispatch({ type: "validation", name: state.input.name });
+            dispatch({type: "validation", name: state.input.name});
             service.findChannelByName(state.input.name).then(response => {
                 if (response.tag === "success") {
-                    dispatch({ type: "validated", isValidInput: false });
-                }else{
-                    dispatch({ type: "validated", isValidInput: true });
+                    dispatch({type: "validated", isValidInput: false});
+                } else {
+                    dispatch({type: "validated", isValidInput: true});
                 }
             })
 
@@ -41,22 +42,22 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
     const handler: UseCreateChannelHandler = {
         onNameChange(name: string) {
             if (state.tag !== "editing" && state.tag !== "validating") return;
-            dispatch({ type: "editName", inputValue: name })
+            dispatch({type: "editName", inputValue: name})
         },
 
         onDescriptionChange(description: string) {
             if (state.tag !== "editing" && state.tag !== "validating") return;
-            dispatch({ type: "editDescription", inputValue: description });
+            dispatch({type: "editDescription", inputValue: description});
         },
         onSubmit(channel: ChannelInput) {
             if (state.tag !== "validating" && state.tag !== "editing") return;
             if (!state.input.isValid) return;
-            service.createChannel(channel.name, channel.visibility, channel.access, channel.description, channel.icon)
+            service.createChannel(channel.name, channel.visibility.toUpperCase() as ChannelVisibility, channel.access, channel.description, channel.icon)
                 .then(response => {
-                    if (response.tag === "success") dispatch({ type: "success", input: state.input });
-                    else dispatch({ type: "error", message: ERROR_MESSAGE});
+                    if (response.tag === "success") dispatch({type: "success", input: state.input});
+                    else dispatch({type: "error", message: ERROR_MESSAGE});
                 });
-            dispatch({ type: "submit" });
+            dispatch({type: "submit"});
         }
     };
     return [state, handler]

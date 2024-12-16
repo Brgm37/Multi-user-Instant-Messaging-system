@@ -6,7 +6,7 @@ import {useContext, useEffect} from "react";
 import {InputFormContext} from "../components/InputFormContext";
 import {usernameValidation} from "../../../service/registration/validation/UsernameValidation";
 import {LoginBaseView} from "./components/LoginBaseView";
-import {RegisterCommunicationContext} from "../../../service/registration/communication/RegisterCommunicationProvider";
+import {RegisterCommunicationContext} from "../../../service/registration/communication/RegisterCommunicationContext";
 
 /**
  * The login view.

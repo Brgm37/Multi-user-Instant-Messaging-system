@@ -7,7 +7,7 @@ import {useInput} from "../components/input/useInput";
 import {usernameValidation} from "../../../service/registration/validation/UsernameValidation";
 import {passwordValidation} from "../../../service/registration/validation/PasswordValidation";
 import {useEffect} from "react";
-import {RegisterCommunicationContext} from "../../../service/registration/communication/RegisterCommunicationProvider";
+import {RegisterCommunicationContext} from "../../../service/registration/communication/RegisterCommunicationContext";
 
 /**
  * The register view.
