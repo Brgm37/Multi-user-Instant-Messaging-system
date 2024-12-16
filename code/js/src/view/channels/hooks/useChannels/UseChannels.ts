@@ -73,10 +73,8 @@ export default function (): [ChannelsState, UseScrollState<Channel>, ChannelsHan
     const {findChannels} = useContext(ChannelsServiceContext)
 
     useEffect(() => {
-        if (state.tag === "idle") return
-        if (state.tag === "scrolling") return
-        if (state.tag === "error") return
-        if (state.tag === "loading") dispatch({tag: "loadSuccess"})
+        if (state.tag !== "loading") return
+        dispatch({tag: "loadSuccess"})
     }, [list]);
 
     const handler: ChannelsHandler = {
