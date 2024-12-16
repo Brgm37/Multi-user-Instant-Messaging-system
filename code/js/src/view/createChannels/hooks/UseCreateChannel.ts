@@ -81,7 +81,8 @@ function reduce(state: CreateChannelsState, action: CreateChannelsAction): Creat
                         visibility: state.input.visibility,
                         access: state.input.access,
                         description: action.inputValue,
-                        icon: state.input.icon
+                        icon: state.input.icon,
+                        isValid: state.input.isValid
                     }
                     return { tag: "editing", input: input };
                 }
@@ -133,7 +134,7 @@ export function useCreateChannel(): [CreateChannelsState,UseCreateChannelHandler
         },
 
         onDescriptionChange(description: string) {
-            if (state.tag !== "editing") return;
+            if (state.tag !== "editing" && state.tag !== "validating") return;
             dispatch({ type: "editDescription", inputValue: description });
         },
         onSubmit(channel: ChannelInput) {
