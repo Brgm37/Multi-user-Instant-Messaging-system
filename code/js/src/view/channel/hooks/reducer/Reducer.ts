@@ -41,6 +41,8 @@ export default function (state: ChannelState, action: ChannelAction): ChannelSta
                     return state.previous
                 case "reset":
                     return {tag: "idle"}
+                case "error":
+                    return {tag: "error", message: action.error, previous: state.previous}
                 default:
                     throw new Error(`Invalid action ${action.tag} for state ${state.tag}`)
             }

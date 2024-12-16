@@ -20,10 +20,8 @@ export interface JoinChannelServiceContext {
  * The default join channel service context.
  */
 const defaultJoinChannelServiceContext: JoinChannelServiceContext = {
-    joinChannel: (invitationToken) => {
-        return new Promise<Either<{ id: string }, string>>((resolve, reject) => {
-            reject(new Error("Not implemented"))
-        })
+    joinChannel: () => {
+        throw new Error("Not implemented")
     }
 }
 

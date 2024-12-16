@@ -1,6 +1,8 @@
 import * as React from 'react';
 import {useEffect, useState} from "react";
 
+const TIMEOUT = 500;
+
 /**
  * The search bar for finding channels.
  * @param handleChange The function to call when the search value changes.
@@ -13,7 +15,7 @@ export default function (
     useEffect(() => {
         const timeout = setTimeout(() => {
             handleChange(searchValue)
-        });
+        }, TIMEOUT);
         return () => clearTimeout(timeout);
     }, [searchValue]);
 

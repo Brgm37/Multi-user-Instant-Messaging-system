@@ -114,7 +114,7 @@ export function CreateChannelsBaseView(
                     type={"submit"}
                     onClick={handleSubmit}
                     className="w-full p-2 bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
-                    disabled={!state.input.isValid || state.tag !== "validating"}
+                    disabled={state.input.isValid === false}
                 >
                     Create Channel
                 </button>

@@ -30,7 +30,7 @@ export interface ChannelsServiceContext {
     /**
      * Logout.
      */
-    logout(): void
+    logout(): Promise<Either<void, string>>
 }
 
 /**

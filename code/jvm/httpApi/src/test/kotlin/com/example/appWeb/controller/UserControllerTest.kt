@@ -299,7 +299,7 @@ class UserControllerTest {
         val token = makeToken(manager, userId).token.toString()
         val authenticated = AuthenticatedUserInputModel(userId, token)
 
-        val response = userController.logout(authenticated)
+        val response = userController.logout(authenticated, MockHttpServletResponse())
         assertEquals(HttpStatus.OK, response.statusCode)
         assertNull(response.body)
     }
@@ -313,7 +313,11 @@ class UserControllerTest {
         val user = checkNotNull(makeUser(manager))
         val userId = checkNotNull(user.uId)
 
-        val response = userController.logout(AuthenticatedUserInputModel(userId, "invalidToken"))
+        val response =
+            userController.logout(
+                AuthenticatedUserInputModel(userId, "invalidToken"),
+                MockHttpServletResponse(),
+            )
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
         assertIs<UserProblem.TokenNotFound>(response.body)
         assertEquals(response.body, UserProblem.TokenNotFound)
@@ -329,7 +333,11 @@ class UserControllerTest {
         val userId = checkNotNull(user.uId)
         val token = makeToken(manager, userId).token.toString()
 
-        val response = userController.logout(AuthenticatedUserInputModel(0u, token))
+        val response =
+            userController.logout(
+                AuthenticatedUserInputModel(0u, token),
+                MockHttpServletResponse(),
+            )
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
         assertIs<UserProblem.UserNotFound>(response.body)
         assertEquals(response.body, UserProblem.UserNotFound)

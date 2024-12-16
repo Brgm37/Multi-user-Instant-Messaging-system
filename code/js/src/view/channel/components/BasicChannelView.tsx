@@ -1,7 +1,5 @@
 import * as React from "react";
 import {Outlet, useNavigate, useParams} from "react-router-dom";
-import MessageInfiniteScroll from "./messageInfiniteScroll/ChannelMessageInfiniteScroll";
-import {Channel} from "../../../model/Channel";
 import {useContext, useEffect} from "react";
 import {ChannelServiceContext} from "../../../service/channel/ChannelServiceContext";
 import {AuthUserContext} from "../../session/AuthUserContext";
@@ -9,15 +7,11 @@ import {MdDelete, MdEdit} from "react-icons/md";
 import {FaPersonRunning} from "react-icons/fa6";
 import {IoMdPersonAdd} from "react-icons/io";
 import {IoSend} from "react-icons/io5";
+import {ChannelCommunicationContext} from "../../../service/channel/communication/ChannelCommunicationContext";
+import {ChannelsCommunicationContext} from "../../../service/channels/communication/ChannelsCommunicationContext";
+import {Channel} from "../../../model/Channel";
+import MessageInfiniteScroll from "./messageInfiniteScroll/ChannelMessageInfiniteScroll";
 
-/**
- * The basic channel view.
- *
- * @param error
- * @param errorDismiss
- * @param onSend
- * @param onError
- */
 export default function BasicChannelView(
     {error, errorDismiss, onSend, onError}: { error?: string, errorDismiss?: () => void, onSend(msg: string): void, onError(err: string): void }
 ): React.JSX.Element {
@@ -27,6 +21,8 @@ export default function BasicChannelView(
     const {loadChannel, leaveOrDelete} = useContext(ChannelServiceContext)
     const userContext = useContext(AuthUserContext)
     const navigation = useNavigate()
+    const channelCommunication = useContext(ChannelCommunicationContext)
+    const channelsCommunication = useContext(ChannelsCommunicationContext)
 
     useEffect(() => {
         loadChannel(id).then(response => {
@@ -34,6 +30,20 @@ export default function BasicChannelView(
             else navigation("/channels")
         })
     }, [id])
+
+    useEffect(() => {
+        if (channelCommunication.isToReload) {
+            loadChannel(id).then(response => {
+                if (response.tag === "success") {
+                    setChannel(response.value)
+                    channelCommunication.toggleReload()
+                }
+                else {
+                    navigation("/channels")
+                }
+            })
+        }
+    }, [channelCommunication.isToReload]);
 
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => setMessage(event.target.value)
 
@@ -56,7 +66,8 @@ export default function BasicChannelView(
     const handleLeaveOrDelete = () => {
         leaveOrDelete(id).then(response => {
             if (response.tag === "success") {
-                navigation("/channels")
+                channelsCommunication.toggleReload()
+                navigation("/channels/findChannels")
             }
             else onError(response.value)
         })
@@ -117,9 +128,10 @@ export default function BasicChannelView(
                             </div>
                         )}
                         <div className="relative group">
-                            <div
+                            <button
                                 className="w-12 h-12 bg-black overflow-hidden rounded-full transition-transform duration-300 ease-in-out transform hover:scale-110 hover:shadow-lg cursor-pointer flex items-center justify-center"
                                 onClick={handleLeaveOrDelete}
+                                disabled={error !== "" && error !== undefined}
                             >
                                 {isOwner ? (
                                     <MdDelete className="w-6 h-6 text-red-800"/>
@@ -127,7 +139,7 @@ export default function BasicChannelView(
                                     <FaPersonRunning className="w-6 h-6 text-red-800"/>
                                 )
                                 }
-                            </div>
+                            </button>
                             <div
                                 className="absolute left-1/2 top-full transform -translate-x-1/2 mt-2 z-50 bg-black text-white text-sm font-bold px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 tooltip-arrow pointer-events-none group-hover:pointer-events-auto"
                                 style={{width: "max-content"}}
@@ -138,10 +150,12 @@ export default function BasicChannelView(
                     </div>
                 </header>
 
-                <MessageInfiniteScroll
-                    className={"flex-1 bg-gray-800 p-4 overflow-y-auto flex-col-reverse custom-scrollbar"}
-                    scrollStyle={"flex-1 bg-gray-800  overflow-y-auto flex flex-col-reverse"}
-                />
+                <React.Suspense fallback={<div>Loading...</div>}>
+                    <MessageInfiniteScroll
+                        className={"flex-1 bg-gray-800 p-4 overflow-y-auto flex-col-reverse custom-scrollbar"}
+                        scrollStyle={"flex-1 bg-gray-800  overflow-y-auto flex flex-col-reverse"}
+                    />
+                </React.Suspense>
                 {error && (
                     <div className="bg-red-500 text-white p-2 rounded">
                         {error}
@@ -162,12 +176,13 @@ export default function BasicChannelView(
                                 onChange={handleInput}
                                 onKeyDown={handleKeyDown}/>
 
-                            <div
+                            <button
                                 className="w-10 h-10 bg-gray-900 overflow-hidden rounded-lg cursor-pointer flex items-center justify-center"
                                 onClick={handleSend}
+                                disabled={message === ""}
                             >
                                 <IoSend className="w-6 h-6"/>
-                            </div>
+                            </button>
                         </>
                     )}
                 </footer>

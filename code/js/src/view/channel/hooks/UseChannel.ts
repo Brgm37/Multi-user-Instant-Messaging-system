@@ -97,7 +97,6 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
         if (isInitialMount.current) isInitialMount.current = false;
         else {
             if (state.tag === "idle") return
-            limit = DEFAULT_LIMIT
             dispatch({tag: "reset"})
         }
     }, [id]);
@@ -116,7 +115,10 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
         messages.forEach(msg => {
             if (msg.channel == id) {
                 consumed.push(msg)
-                if (!list.list.some(it => it.id === msg.id) && Number(authContext.id) !== Number(msg.owner.id)) {
+                if (
+                    !list.list.some(it => it.id === msg.id) &&
+                    Number(authContext.id) !== Number(msg.owner.id)
+                ) {
                     if (first) {
                         first = false
                         dispatch({tag: "receiving-sse"})
@@ -138,6 +140,7 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
         },
         initChannel(): void {
             if (state.tag !== "idle") return
+            limit = DEFAULT_LIMIT
             service
                 .loadMore(id, "0", HAS_MORE, "before")
                 .then(response => {

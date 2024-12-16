@@ -1,0 +1,7 @@
+FROM nginx
+
+LABEL authors="arthuroliveira"
+
+COPY /deploy/nginx/nginx.conf /etc/nginx
+
+COPY /deploy/nginx/public /usr/share/nginx/html

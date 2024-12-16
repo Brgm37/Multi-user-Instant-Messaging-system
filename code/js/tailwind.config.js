@@ -6,9 +6,6 @@ export default {
   ],
   theme: {
     extend: {
-      height: {
-        'myscreen': '90vh',
-      },
     },
   },
   plugins: [],

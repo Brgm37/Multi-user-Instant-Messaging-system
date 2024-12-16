@@ -1,6 +1,5 @@
 import {Either} from "../../model/Either";
 import {Context, createContext} from "react";
-import {Channel} from "../../model/Channel";
 import {PublicChannel} from "../../model/PublicChannel";
 
 
@@ -48,20 +47,14 @@ export interface FindChannelsServiceContext {
  * Default FindChannels service context.
  */
 const defaultFindChannelsServiceContext: FindChannelsServiceContext = {
-    getChannelsByPartialName: (partialName, offset, limit) => {
-        return new Promise<Either<PublicChannel[], string>>((resolve, reject) => {
-            reject(new Error("Not implemented"))
-        })
+    getChannelsByPartialName: () => {
+        throw new Error("Not implemented")
     },
-    joinChannel: (cId) => {
-        return new Promise<Either<void, string>>((resolve, reject) => {
-            reject(new Error("Not implemented"))
-        })
+    joinChannel: () => {
+        throw new Error("Not implemented")
     },
-    getPublicChannels: (offset, limit) => {
-        return new Promise<Either<PublicChannel[], string>>((resolve, reject) => {
-            reject(new Error("Not implemented"))
-        })
+    getPublicChannels: () => {
+        throw new Error("Not implemented")
     }
 }
 

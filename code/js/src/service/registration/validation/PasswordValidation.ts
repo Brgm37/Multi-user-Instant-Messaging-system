@@ -1,5 +1,3 @@
-import zxcvbn from 'zxcvbn'
-import {ZXCVBNResult} from "zxcvbn";
 
 /**
  * Password validation patterns
@@ -29,10 +27,6 @@ export function passwordValidation(password: string): string | true {
     }
     if (!specialCharacter.test(password)) {
         return "The password should have at least one special character."
-    }
-    const result:ZXCVBNResult = zxcvbn(password)
-    if (result.score < 2) {
-        return result.feedback.warning
     }
     return true
 }

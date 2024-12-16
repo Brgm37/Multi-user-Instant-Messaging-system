@@ -29,6 +29,8 @@ export default function (state: ChannelsState, action: ChannelsAction): Channels
             switch (action.tag) {
                 case "loadMore":
                     return {tag: "loading", at: action.at}
+                case "reload":
+                    return {tag: "loading", at: "both"}
                 default:
                     throw Error(`Action ${action.tag} is not allowed in state ${state.tag}`)
             }

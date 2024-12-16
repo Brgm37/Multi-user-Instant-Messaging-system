@@ -1,64 +1,14 @@
 import {CreateUserInvitationState} from "./states/CreateUserInvitationState";
-import {CreateUserInvitationAction} from "./states/CreateUserInvitationAction";
+import reduce from "./reducer/CreateUserInvitationReducer";
 import {UseCreateUserInvitationHandler} from "./handler/UseCreateUserInvitationHandler";
 import {useContext, useReducer} from "react";
 import {
     CreateUserInvitationServiceContext
-} from "../../../service/CreateUserInvitation/createUserInvitationServiceContext";
+} from "../../../service/createUserInvitation/CreateUserInvitationServiceContext";
 import {isFailure} from "../../../model/Either";
 
 /**
- * Reducer function for the CreateUserInvitation component.
- *
- * @param state The current state of the component.
- * @param action The action to perform.
- * @returns The new state of the component.
- */
-export function reduce(state: CreateUserInvitationState, action: CreateUserInvitationAction): CreateUserInvitationState {
-    switch (state.tag) {
-        case "editingInvitationCode":
-            switch (action.type) {
-                case "create":
-                    return { tag: "creating" }
-                case "close":
-                    return { tag: "closing" }
-                case "error":
-                    return { tag: "error", message: action.message }
-                default:
-                    throw Error("Invalid action")
-            }
-        case "showingInvitationCode":
-            switch (action.type) {
-                case "close":
-                    return { tag: "closing" }
-                default:
-                    throw Error("Invalid action")
-            }
-        case "creating":
-            switch (action.type) {
-                case "success":
-                    return { tag: "showingInvitationCode", invitationCode: action.invitationCode }
-                case "error":
-                    return { tag: "error", message: action.message }
-                default:
-                    throw Error("Invalid action")
-            }
-        case "error":
-            switch (action.type) {
-                case "close":
-                    return { tag: "closing" }
-                default:
-                    throw Error("Invalid action")
-            }
-        case "closing":
-            throw Error("Already in final State 'redirecting' and should not reduce to any other State.")
-        default:
-            throw Error("Invalid state")
-    }
-}
-
-/**
- * The initial state of the CreateUserInvitation component.
+ * The initial state of the createUserInvitation component.
  */
 const initialState: CreateUserInvitationState = { tag: "editingInvitationCode" }
 

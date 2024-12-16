@@ -3,11 +3,7 @@ import {createRoot} from "react-dom/client"
 import '../../public/index.css'
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-import {
-    createBrowserRouter,
-    Navigate, Outlet,
-    RouterProvider,
-} from "react-router-dom"
+import {createBrowserRouter, Navigate, Outlet, RouterProvider} from "react-router-dom"
 import {LoginView} from "../view/registration/login/LoginView";
 import {RegisterView} from "../view/registration/register/RegisterView";
 import {LoginServiceProvider} from "../service/registration/login/LoginServiceProvider";
@@ -21,23 +17,21 @@ import {ChannelsView} from "../view/channels/ChannelsView";
 import {ChannelsServicesProvider} from "../service/channels/ChannelsServicesProvider";
 import {CreateChannelInvitationView} from "../view/createChannelInvitation/CreateChannelInvitation";
 import {SseCommunicationServiceProvider} from "../service/sse/SseCommunicationServiceProvider";
-import {
-    RegisterCommunicationServiceProvider
-} from "../service/registration/communication/RegisterCommunicationProvider";
+import {RegisterCommunicationServiceProvider} from "../service/registration/communication/RegisterCommunicationProvider";
 import {ChannelView} from "../view/channel/ChannelView";
 import {FindChannelsServiceProvider} from "../service/findChannels/FindChannelsServiceProvider";
-import {
-    CreateChannelInvitationServiceProvider
-} from "../service/createChannelInvitation/CreateChannelInvitationServiceProvider";
-import {CreateChannelServiceProvider} from "../service/createChannels/createChannelsServiceProvider";
+import {CreateChannelInvitationServiceProvider} from "../service/createChannelInvitation/CreateChannelInvitationServiceProvider";
+import {CreateChannelServiceProvider} from "../service/createChannels/CreateChannelsServiceProvider";
 import {ImagePickerProvider} from "../view/components/ImagePicker/ImagePickerProvider";
 import ImagePicker from "../view/components/ImagePicker/ImagePicker";
 import {CreateUserInvitationView} from "../view/createUserInvitation/CreateUserInvitationView";
-import {CreateUserInvitationServiceProvider} from "../service/CreateUserInvitation/createUserInvitationServiceProvider";
-import {EditChannelServiceProvider} from "../service/editChannel/editChannelServiceProvider";
+import {CreateUserInvitationServiceProvider} from "../service/createUserInvitation/CreateUserInvitationServiceProvider";
+import {EditChannelServiceProvider} from "../service/editChannel/EditChannelServiceProvider";
 import EditChannelView from "../view/editChannel/EditChannelView";
 import {JoinChannelServiceProvider} from "../service/joinChannel/JoinChannelServiceProvider";
 import {JoinChannelView} from "../view/joinChannels/JoinChannelView";
+import {ChannelCommunicationProvider} from "../service/channel/communication/ChannelCommunicationProvider";
+import {ChannelsCommunicationProvider} from "../service/channels/communication/ChannelsCommunicationProvider";
 
 /**
  * @description The main router of the application.
@@ -77,7 +71,9 @@ const router = createBrowserRouter(
             "element":
                 <AuthValidator>
                     <ChannelsServicesProvider>
-                        <ChannelsView/>
+                        <ChannelsCommunicationProvider>
+                            <ChannelsView/>
+                        </ChannelsCommunicationProvider>
                     </ChannelsServicesProvider>
                 </AuthValidator>,
             "children": [
@@ -86,7 +82,9 @@ const router = createBrowserRouter(
                     "element":
                         <SseCommunicationServiceProvider>
                             <ChannelServiceProvider>
-                                <ChannelView/>
+                                <ChannelCommunicationProvider>
+                                    <ChannelView/>
+                                </ChannelCommunicationProvider>
                             </ChannelServiceProvider>
                         </SseCommunicationServiceProvider>,
                     children: [

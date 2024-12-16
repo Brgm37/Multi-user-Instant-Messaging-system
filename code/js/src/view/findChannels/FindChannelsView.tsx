@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useFindChannels} from "./hooks/UseFindChannels";
-import {Navigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {FindChannelState} from "./hooks/states/FindChannelsState";
 import {FindChannelsErrorView} from "./components/FindChannelsErrorView";
 import {FindChannelsNavigatingView} from "./components/FindChannelsNavigatingView";
@@ -8,18 +8,23 @@ import {FindChannelsLoadingView} from "./components/FindChannelsLoadingView";
 import {PublicChannel} from "../../model/PublicChannel";
 import {InfiniteScrollContext} from "../components/infiniteScroll/InfiniteScrollContext";
 import InputBar from "./components/SearchBar/SearchBarFindChannels";
+import {useContext, useEffect} from "react";
+import {ChannelsCommunicationContext} from "../../service/channels/communication/ChannelsCommunicationContext";
 
 /**
  * The find channels view.
  */
 export function FindChannelsView(): React.JSX.Element {
     const [state, list, searchValue,handler] = useFindChannels();
+    const communication = useContext(ChannelsCommunicationContext)
+    const navigate = useNavigate()
 
-    if (state.tag === "redirect") {
-        const channelId = state.channelId
-        return <Navigate to={"/channels/" + channelId} replace={true}/>
-    }
-
+    useEffect(() => {
+        if (state.tag === "redirect") {
+            communication.toggleReload()
+            navigate("/channels/" + state.channelId)
+        }
+    }, [state, navigate]);
 
     if (state.tag === "idle") {
         handler.onInit()
@@ -73,7 +78,7 @@ export function FindChannelsView(): React.JSX.Element {
                 <h1 className="text-xl font-bold">Find Channels</h1>
                 <InputBar handleChange={handler.onSearchChange}/>
             </header>
-            <div className={"h-myscreen overflow-y-auto scrollbar-hidden"}>
+            <div className={"max-h-screen overflow-y-auto scrollbar-hidden"}>
                 <main className={"p-8"}>
                     {state.tag === "scrolling" && searchValue === "" && (
                         <section className="text-center mb-8">

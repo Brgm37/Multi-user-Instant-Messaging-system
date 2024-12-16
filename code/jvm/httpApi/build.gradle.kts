@@ -21,14 +21,18 @@ repositories {
 
 dependencies {
     api(project(":service"))
+    api(project(":domain"))
+    api(project(":repository"))
     implementation("org.springframework:spring-webmvc:6.1.13")
+    implementation("jakarta.servlet:jakarta.servlet-api:6.1.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
-    implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+
     testImplementation(project(":repository_jdbc"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin")

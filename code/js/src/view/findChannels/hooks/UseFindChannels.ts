@@ -84,6 +84,7 @@ export function useFindChannels(): [FindChannelState, UseScrollState<PublicChann
         }
         if (state.tag === "idle") return
         if (state.tag === "error") return
+        limit = DEFAULT_LIMIT
         if (searchValue === "") {
             getPublicChannels(0, HAS_MORE)
                 .then((response) => {
@@ -97,17 +98,17 @@ export function useFindChannels(): [FindChannelState, UseScrollState<PublicChann
                     else dispatch({type: "error", error: response.value})
                 })
         }
+        dispatch({type: "loadMore", at: "head"})
     }, [searchValue]);
 
     useEffect(() => {
-        if (state.tag === "idle") return
-        if (state.tag === "error") return
-        if (state.tag === "scrolling") return
-        if (state.tag === "loading") dispatch({type: "success"})
+        if (state.tag !== "loading") return
+        dispatch({type: "success"})
     }, [list]);
 
     const onInit = () => {
         if (state.tag != "idle") return
+        limit = DEFAULT_LIMIT
         dispatch({type: "init"})
         getPublicChannels(0, HAS_MORE)
             .then((response) => {
@@ -160,7 +161,7 @@ export function useFindChannels(): [FindChannelState, UseScrollState<PublicChann
         onSearchChange,
         onFetchMore,
         onErrorClose,
-        onJoin
+        onJoin,
     }
 
     return [state, list, searchValue,handler]

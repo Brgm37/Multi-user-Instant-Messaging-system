@@ -22,3 +22,4 @@ export type ChannelsAction =
     | { tag: "loadSuccess" }
     | { tag: "loadError", message: string, previous: ChannelsState }
     | { tag: "goBack" }
+    | { tag: "reload" }

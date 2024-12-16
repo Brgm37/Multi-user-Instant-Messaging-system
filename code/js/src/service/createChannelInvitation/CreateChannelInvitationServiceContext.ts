@@ -1,8 +1,9 @@
 import {Either} from "../../model/Either";
 import {createContext} from "react";
+import {AccessControl} from "../../model/AccessControl";
 
 /**
- * The context for the create channel invitation service.
+ * The context for the createChannel invitation service.
  *
  * @method createChannelInvitation
  */
@@ -20,7 +21,7 @@ export interface CreateChannelInvitationServiceContext {
     createChannelInvitation(
         expirationDate: string,
         maxUses: number,
-        accessControl: "READ_ONLY" | "READ_WRITE",
+        accessControl: AccessControl,
         channelId: string
     ): Promise<Either<{invitationCode: string}, string>>
 }
@@ -29,7 +30,7 @@ export interface CreateChannelInvitationServiceContext {
  * The default create channel invitation service context.
  */
 const defaultCreateChannelInvitationServiceContext: CreateChannelInvitationServiceContext = {
-    createChannelInvitation: (expirationDate, maxUses, accessControl, channelId) => {
+    createChannelInvitation: () => {
         return new Promise<Either<{invitationCode: string}, string>>((resolve, reject) => {
             reject(new Error("Not implemented"))
         })
@@ -37,7 +38,7 @@ const defaultCreateChannelInvitationServiceContext: CreateChannelInvitationServi
 }
 
 /**
- * The context for the create channel invitation service.
+ * The context for the createChannel invitation service.
  */
 export const CreateChannelInvitationServiceContext =
     createContext<CreateChannelInvitationServiceContext>(defaultCreateChannelInvitationServiceContext)

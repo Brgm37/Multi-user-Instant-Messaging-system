@@ -18,7 +18,7 @@ export type ChannelInput = {
 }
 
 /**
- * The create channels state.
+ * The creation channels state.
  *
  * The states are:
  * - editing: The channel is being edited.

@@ -47,7 +47,7 @@ export function ChannelsServicesProvider(
     }, [signal]);
 
     const service: ChannelsServiceContext = {
-        async logout(): Promise<void> {
+        async logout(): Promise<Either<void, string>> {
             const url = userUrlBase + "/logout"
             const init: RequestInit = {
                 method: "DELETE",
@@ -56,11 +56,11 @@ export function ChannelsServicesProvider(
             }
             const response = await fetch(url, init)
             if (!response.ok) {
-                throw new Error(await response.text())
-            }
-            else {
+                return failure(await response.text()) as Either<void, string>
+            } else {
                 removeCookie(auth_cookie)
                 navigate("/register")
+                return success(undefined) as Either<void, string>
             }
         },
         findChannels: async (offset: number, limit: number): Promise<Either<Channel[], string>> => {

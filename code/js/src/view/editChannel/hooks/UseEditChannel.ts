@@ -1,6 +1,6 @@
 import {EditChannelState} from "./states/EditChannelState";
 import {EditChannelHandler} from "./handler/EditChannelHandler";
-import {EditChannelServiceContext} from "../../../service/editChannel/editChannelServiceContext";
+import {EditChannelServiceContext} from "../../../service/editChannel/EditChannelServiceContext";
 import {useContext, useReducer} from "react";
 import reduce from "./reducer/EditChannelReducer";
 import {useParams} from "react-router-dom";
