@@ -24,9 +24,7 @@ export interface LoginServiceContext {
  */
 const defaultLoginServiceContext: LoginServiceContext = {
     login: () => {
-        return new Promise<Either<AuthInfo, string>>((resolve, reject) => {
-            reject(new Error("Not implemented"))
-        })
+        throw new Error("Not implemented")
     }
 }
 
