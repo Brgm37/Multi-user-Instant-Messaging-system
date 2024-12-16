@@ -23,4 +23,4 @@ The application should allow the user to:
 ## Documentation
 
 - [Project API Documentation](docs/api/README.md)
-- [Project WebApp Documentation](docs/webapp/README.md)
+- [Project WebApp Documentation](docs/webApp/README.md)
