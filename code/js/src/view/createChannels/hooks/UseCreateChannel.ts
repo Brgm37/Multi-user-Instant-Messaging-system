@@ -52,7 +52,8 @@ export function useCreateChannel(): [CreateChannelsState, UseCreateChannelHandle
         onSubmit(channel: ChannelInput) {
             if (state.tag !== "validating" && state.tag !== "editing") return;
             if (!state.input.isValid) return;
-            service.createChannel(channel.name, channel.visibility.toUpperCase() as ChannelVisibility, channel.access, channel.description, channel.icon)
+            const visibility: ChannelVisibility = channel.visibility === "public" ? "PUBLIC" : "PRIVATE";
+            service.createChannel(channel.name, visibility, channel.access, channel.description, channel.icon)
                 .then(response => {
                     if (response.tag === "success") dispatch({type: "success", input: state.input});
                     else dispatch({type: "error", message: ERROR_MESSAGE});
