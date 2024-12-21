@@ -14,9 +14,12 @@ import interfaces.MessageServicesInterface
 import interfaces.SseServiceInterface
 import io.swagger.v3.oas.annotations.Parameter
 import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
@@ -36,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import utils.Failure
 import utils.Success
+import java.io.IOException
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import java.sql.Timestamp
@@ -54,6 +58,11 @@ private const val LIMIT = 100u
  * The default timeout for the message list.
  */
 private const val DEFAULT_TIMEOUT = 1000000L
+
+/**
+ * The keep alive timeout for the message list.
+ */
+private const val KEEP_ALIVE_TIMEOUT = 5000L
 
 /**
  * Represents the controller for the message
@@ -143,38 +152,73 @@ class MessageController(
     fun getMessageEventStream(
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
         request: HttpServletRequest,
+        response: HttpServletResponse,
     ): SseEmitter {
         val emitter = SseEmitter(timeout)
         val lastId = request.getHeader(MESSAGE_SSE_LAST_EVENT_ID)?.toUIntOrNull()
         val flow = MutableSharedFlow<Message>()
         listeners[authenticated] = flow
-        val scope =
+        var isClosed = false
+        val job =
             scope
                 .launch {
                     flow
                         .onEach {
-                            emitter.send(
-                                SseEmitter
-                                    .event()
-                                    .name("message")
-                                    .id(it.msgId.toString())
-                                    .data(MessageOutputModel.fromDomain(it)),
-                            )
+                            try {
+                                emitter.send(
+                                    SseEmitter
+                                        .event()
+                                        .name(MESSAGE)
+                                        .id(it.msgId.toString())
+                                        .data(MessageOutputModel.fromDomain(it)),
+                                )
+                            } catch (e: IOException) {
+                                emitter.complete()
+                            }
                         }.collect()
                 }
+
+        val keepAlive =
+            scope
+                .launch {
+                    while (!isClosed) {
+                        try {
+                            delay(KEEP_ALIVE_TIMEOUT)
+                            emitter
+                                .send(
+                                    SseEmitter
+                                        .event()
+                                        .name(MESSAGE_SSE_KEEP_ALIVE)
+                                        .data(PING),
+                                )
+                        } catch (e: IOException) {
+                            emitter.complete()
+                        }
+                    }
+                }
+
         if (lastId != null) lastEventIdUpdate(authenticated, flow, lastId)
         emitter.onCompletion {
             listeners.remove(authenticated)
-            scope.cancel()
+            job.cancel()
+            isClosed = true
+            keepAlive.cancel()
         }
         emitter.onTimeout {
             listeners.remove(authenticated)
-            scope.cancel()
+            job.cancel()
+            isClosed = true
+            keepAlive.cancel()
         }
         emitter.onError {
             listeners.remove(authenticated)
-            scope.cancel()
+            job.cancel()
+            isClosed = true
+            keepAlive.cancel()
         }
+        response.setHeader("Cache-Control", "no-store")
+        response.setHeader("Connection", "keep-alive")
+        response.setHeader("Content-Type", "text/event-stream")
         return emitter
     }
 
@@ -238,5 +282,8 @@ class MessageController(
         const val MESSAGE_TIMESTAMP_URL = "/channel/{channelId}/timestamp"
         const val MESSAGE_SSE_URL = "/sse"
         private const val MESSAGE_SSE_LAST_EVENT_ID = "Last-Event-ID"
+        private const val MESSAGE_SSE_KEEP_ALIVE = "keep-alive"
+        private const val PING = "ping"
+        private const val MESSAGE = "message"
     }
 }

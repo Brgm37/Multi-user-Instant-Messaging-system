@@ -45,6 +45,7 @@ export function SseCommunicationServiceProvider(
             clearInterval(pingInterval);
         };
         newSseMsg.onmessage = (event) => {
+            console.log("message", event.data);
             const msg = jsonToMessage(JSON.parse(event.data));
             setMessages((prevMessages) => [...prevMessages, msg]);
         };

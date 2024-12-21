@@ -62,7 +62,7 @@ export function EditChannelEditingVIew(
                     </select>
                 </div>
                 <div className="mb-4 justify-center flex">
-                    <img src={image ? image : "/defaultIcons/default.png"} alt="icon"
+                    <img src={image ? image : "/defaultIcons/default_icon.png"} alt="icon"
                          className="w-[328px] h-[128px] object-cover rounded-lg overflow-hidden mb-2 cursor-pointer"
                          onClick={open}/>
                 </div>

@@ -16,7 +16,7 @@ const urlBase = urlBuilder("/channels")
 /**
  * The default icon source.
  */
-const defaultIconSrc = "/defaultIcons/default.png"
+const defaultIconSrc = "/defaultIcons/default_icon.png"
 
 /**
  * The creation channel service provider.

@@ -18,9 +18,20 @@ import errors.ChannelError.InvalidChannelInfo
 import errors.ChannelError.InvalidChannelVisibility
 import errors.ChannelError.UserNotFound
 import interfaces.ChannelServicesInterface
+import interfaces.ChannelSseInterface
 import io.swagger.v3.oas.annotations.Parameter
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import model.channels.Channel
 import org.hibernate.validator.constraints.Range
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
@@ -33,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import utils.Failure
 import utils.Success
 import java.net.URLDecoder
@@ -49,6 +61,11 @@ private const val LIMIT = 10u
 private const val OFFSET = 0u
 
 /**
+ * The default timeout for the channel sse communication.
+ */
+private const val DEFAULT_TIMEOUT = 1000000L
+
+/**
  * Represents the controller for the channel
  *
  * @property channelService The channel service
@@ -57,7 +74,42 @@ private const val OFFSET = 0u
 @RequestMapping(ChannelController.CHANNEL_BASE_URL)
 class ChannelController(
     private val channelService: ChannelServicesInterface,
+    private val sseService: ChannelSseInterface,
 ) {
+    private class SseChannelType(
+        val joinOrUpdateChannel: MutableSharedFlow<Channel>,
+        val leaveOrDeleteChannel: MutableSharedFlow<UInt>,
+    )
+
+    /**
+     * The timeout for the channel sse communication.
+     */
+    @Value("\${sse.connection.timeout}")
+    private val timeout = DEFAULT_TIMEOUT
+    private val listeners = mutableMapOf<AuthenticatedUserInputModel, SseChannelType>()
+    private val scope = CoroutineScope(Dispatchers.IO)
+
+    private suspend fun sendJoinOrUpdateToAll(channel: Channel) {
+        listeners
+            .forEach { (user, sseChannelType) ->
+                val cId = checkNotNull(channel.cId) { "Channel id must not be null" }
+                if (sseService.isUserInChannel(user.uId, cId)) {
+                    sseChannelType.joinOrUpdateChannel.emit(channel)
+                }
+            }
+    }
+
+    private suspend fun sendDeleteOrLeaveToAll(cId: UInt) {
+        listeners
+            .forEach { (user, sseChannelType) ->
+                if (!sseService.isUserInChannel(user.uId, cId)) sseChannelType.leaveOrDeleteChannel.emit(cId)
+            }
+//            .values
+//            .forEach {
+//                it.leaveOrDeleteChannel.emit(cId)
+//            }
+    }
+
     /**
      * Decodes the name of the channel.
      *
@@ -158,7 +210,11 @@ class ChannelController(
         @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
     ): ResponseEntity<*> =
         when (channelService.deleteOrLeaveChannel(authenticated.uId, cId)) {
-            is Success -> ResponseEntity.ok(Unit)
+            is Success -> {
+                scope.launch { sendDeleteOrLeaveToAll(cId) }
+                ResponseEntity.ok(Unit)
+            }
+
             is Failure -> ChannelProblem.ChannelNotFound.response(NOT_FOUND)
         }
 
@@ -180,6 +236,7 @@ class ChannelController(
             ).let { response ->
                 return when (response) {
                     is Success -> {
+                        scope.launch { sendJoinOrUpdateToAll(response.value) }
                         ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
                     }
 
@@ -226,7 +283,11 @@ class ChannelController(
             val response =
                 channelService.joinChannel(authenticated.uId, invitation.cId, invitation.invitationCode)
         ) {
-            is Success -> ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
+            is Success -> {
+                scope.launch { listeners[authenticated]?.joinOrUpdateChannel?.emit(response.value) }
+                ResponseEntity.ok(ChannelOutputModel.fromDomain(response.value))
+            }
+
             is Failure -> ChannelProblem.UnableToJoinChannel.response(BAD_REQUEST)
         }
     }
@@ -312,6 +373,92 @@ class ChannelController(
             is Failure -> ChannelProblem.AccessControlNotFound.response(NOT_FOUND)
         }
 
+    @GetMapping(CHANNEL_SSE_URL)
+    fun getChannelEventStream(
+        @Parameter(hidden = true) authenticated: AuthenticatedUserInputModel,
+        response: HttpServletResponse,
+    ): SseEmitter {
+        val emitter = SseEmitter(timeout)
+        val joinOrUpdateFlow = MutableSharedFlow<Channel>()
+        val deleteOrLeaveFlow = MutableSharedFlow<UInt>()
+        listeners[authenticated] = SseChannelType(joinOrUpdateFlow, deleteOrLeaveFlow)
+        var isComplete = false
+        val joinOrUpdateJob =
+            scope
+                .launch {
+                    joinOrUpdateFlow
+                        .onEach {
+                            try {
+                                emitter
+                                    .send(
+                                        SseEmitter
+                                            .event()
+                                            .name(JOIN_OR_UPDATE_MESSAGE)
+                                            .data(ChannelOutputModel.fromDomain(it)),
+                                    )
+                            } catch (e: Exception) {
+                                emitter.complete()
+                            }
+                        }.collect()
+                }
+
+        val deleteOrLeaveJob =
+            scope
+                .launch {
+                    deleteOrLeaveFlow
+                        .onEach {
+                            try {
+                                emitter
+                                    .send(
+                                        SseEmitter
+                                            .event()
+                                            .name(DELETE_OR_LEAVE_MESSAGE)
+                                            .data(it.toString()),
+                                    )
+                            } catch (e: Exception) {
+                                emitter.complete()
+                            }
+                        }.collect()
+                }
+
+        val keepAlive =
+            scope
+                .launch {
+                    while (!isComplete) {
+                        try {
+                            delay(5000)
+                            emitter
+                                .send(
+                                    SseEmitter
+                                        .event()
+                                        .name(KEEP_ALIVE)
+                                        .data(PING),
+                                )
+                        } catch (e: Exception) {
+                            emitter.complete()
+                        }
+                    }
+                }
+
+        emitter.onCompletion {
+            isComplete = true
+            joinOrUpdateJob.cancel()
+            deleteOrLeaveJob.cancel()
+            keepAlive.cancel()
+            listeners.remove(authenticated)
+        }
+        emitter.onTimeout {
+            emitter.complete()
+        }
+        emitter.onError {
+            emitter.complete()
+        }
+        response.setHeader("Cache-Control", "no-store")
+        response.setHeader("Connection", "keep-alive")
+        response.setHeader("Content-Type", "text/event-stream")
+        return emitter
+    }
+
     companion object {
         /**
          * The base URL for the channel endpoints.
@@ -357,5 +504,18 @@ class ChannelController(
          * The URL for the access control of a user in a channel.
          */
         const val ACCESS_CONTROL = "/accessControl/{cId}"
+
+        const val JOIN_OR_UPDATE_MESSAGE = "joinOrUpdate"
+
+        const val DELETE_OR_LEAVE_MESSAGE = "deleteOrLeave"
+
+        const val KEEP_ALIVE = "keep-alive"
+
+        const val PING = "ping"
+
+        /**
+         * The URL for the server-sent events.
+         */
+        const val CHANNEL_SSE_URL = "/sse"
     }
 }

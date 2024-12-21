@@ -108,6 +108,24 @@ export function useChannel(): [ChannelState, UseScrollState<Message>, UseChannel
     }, [list]);
 
     useEffect(() => {
+        // if (messages.length === 0) return
+        // if (state.tag === "idle" || state.tag === "loading") return
+        // const consumed: Message[] = []
+        // let first: boolean = true
+        // const consumed =
+        //     messages
+        //         .filter(msg => msg.channel === id)
+        //         .map(msg => {
+        //             if (!list.list.some(it => it.id === msg.id) && Number(authContext.id) !== Number(msg.owner.id)) {
+        //                 if (first) {
+        //                     first = false
+        //                     dispatch({tag: "receiving-sse"})
+        //                 }
+        //                 addMessage(listHandler, list, msg)
+        //             }
+        //             return msg
+        //         })
+        // consumeMessage(consumed)
         if (messages.length === 0) return
         if (state.tag === "idle" || state.tag === "loading") return
         const consumed: Message[] = []

@@ -29,7 +29,7 @@ services:
       - "8000:8000"
     depends_on:
       - chimp-jvm
-        
+
 volumes:
   chimp-postgres-data:
     driver: local
