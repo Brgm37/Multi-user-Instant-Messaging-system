@@ -9,6 +9,6 @@ export default function ():AbortSignal {
         return () => {
             controller.abort("Component unmounted")
         }
-    });
+    }, []);
     return controller.signal
 }

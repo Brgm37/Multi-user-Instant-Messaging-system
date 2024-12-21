@@ -1,9 +1,10 @@
-import {ChannelInput, CreateChannelsState, Visibility} from "../hooks/states/createChannelsState";
+import {ChannelInput, CreateChannelsState} from "../hooks/states/createChannelsState";
 import React from "react";
 import {AccessControl} from "../../../model/AccessControl";
 import {InputBar} from "../../components/InputBar";
 import {UseCreateChannelHandler} from "../hooks/handler/UseCreateChannelHandler";
 import {useImagePicker} from "../../components/ImagePicker/ImagePickerProvider";
+import {ChannelVisibility} from "../../../model/ChannelVisibility";
 
 /**
  * The access control options.
@@ -36,7 +37,7 @@ export function CreateChannelsBaseView(
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        const visibility = (document.querySelector("select[title=visibility]") as HTMLSelectElement).value as Visibility;
+        const visibility = (document.querySelector("select[title=visibility]") as HTMLSelectElement).value as ChannelVisibility;
         const accessControl = (document.querySelector("select[title=accessControl]") as HTMLSelectElement).value as AccessControl;
         const channel: ChannelInput = {
             name: state.input.name,
@@ -105,7 +106,7 @@ export function CreateChannelsBaseView(
             <label className="block text-sm font-medium mb-2" htmlFor="icon">Channel Icon</label>
 
             <div className="mb-4 justify-center flex">
-                <img src={image ? image : "/defaultIcons/default.png"} alt="icon"
+                <img src={image ? image : "/defaultIcons/default_icon.png"} alt="icon"
                      className="w-[328px] h-[128px] object-cover rounded-lg overflow-hidden mb-2 cursor-pointer" onClick={open}/>
             </div>
 

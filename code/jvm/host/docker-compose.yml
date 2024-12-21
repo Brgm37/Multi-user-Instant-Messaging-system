@@ -6,6 +6,8 @@ services:
         - POSTGRES_USER=chimp
         - POSTGRES_PASSWORD=chimp
         - POSTGRES_DB=chimp
+    volumes:
+      - chimp-postgres-data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
 
@@ -27,3 +29,7 @@ services:
       - "8000:8000"
     depends_on:
       - chimp-jvm
+
+volumes:
+  chimp-postgres-data:
+    driver: local

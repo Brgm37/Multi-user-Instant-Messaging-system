@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useImagePicker} from "../../components/ImagePicker/ImagePickerProvider";
-import {Visibility} from "../../createChannels/hooks/states/createChannelsState";
+import {ChannelVisibility} from "../../../model/ChannelVisibility";
 
 /**
  * The visibility options.
@@ -14,17 +14,17 @@ const visibilityOptions = [
  * The edit channel editing view.
  * @param initDescription the initial description
  * @param initVisibility the initial visibility
- * @param handleSubmit the function to handle the submit
+ * @param handleSubmit the function to handle submit
  */
 export function EditChannelEditingVIew(
-    {initDescription, initVisibility, handleSubmit}: {initDescription: string, initVisibility: string, handleSubmit: (d: string, v: string, i: string) => void}
+    {initDescription, initVisibility, handleSubmit}: {initDescription: string, initVisibility: string, handleSubmit: (d: string, v: ChannelVisibility, i: string) => void}
 ): React.JSX.Element {
     const [description, setDescription] = React.useState(initDescription)
     const {open, image} = useImagePicker()
     const descriptionHandler = (e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)
 
     const handler = () => {
-        const visibility = (document.querySelector("select[title=visibility]") as HTMLSelectElement).value as Visibility;
+        const visibility = (document.querySelector("select[title=visibility]") as HTMLSelectElement).value as ChannelVisibility;
         if (visibility === initVisibility && description === initDescription && image === undefined) return
         handleSubmit(description, visibility, image)
     }
@@ -62,7 +62,7 @@ export function EditChannelEditingVIew(
                     </select>
                 </div>
                 <div className="mb-4 justify-center flex">
-                    <img src={image ? image : "/defaultIcons/default.png"} alt="icon"
+                    <img src={image ? image : "/defaultIcons/default_icon.png"} alt="icon"
                          className="w-[328px] h-[128px] object-cover rounded-lg overflow-hidden mb-2 cursor-pointer"
                          onClick={open}/>
                 </div>

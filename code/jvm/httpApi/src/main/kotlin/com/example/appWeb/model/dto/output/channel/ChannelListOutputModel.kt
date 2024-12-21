@@ -1,5 +1,6 @@
 package com.example.appWeb.model.dto.output.channel
 
+import model.channels.AccessControl
 import model.channels.Channel
 
 /**
@@ -16,6 +17,7 @@ data class ChannelListOutputModel(
     val id: UInt,
     val owner: OwnerOutputModel,
     val description: String? = null,
+    val accessControl: AccessControl,
     val icon: String? = null,
 ) {
     companion object {
@@ -27,6 +29,7 @@ data class ChannelListOutputModel(
                 owner = OwnerOutputModel.fromDomain(channel.owner),
                 description = channel.description,
                 icon = channel.icon,
+                accessControl = channel.accessControl,
             )
         }
     }

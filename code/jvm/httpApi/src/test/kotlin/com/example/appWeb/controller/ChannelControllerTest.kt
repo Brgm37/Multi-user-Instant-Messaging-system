@@ -10,6 +10,7 @@ import com.example.appWeb.model.dto.output.channel.ChannelListOutputModel
 import com.example.appWeb.model.dto.output.channel.ChannelOutputModel
 import com.example.appWeb.model.problem.ChannelProblem
 import com.example.appWeb.model.problem.UserProblem
+import interfaces.ChannelSseInterface
 import jdbc.transactionManager.TransactionManagerJDBC
 import mem.TransactionManagerInMem
 import model.channels.AccessControl.READ_WRITE
@@ -78,10 +79,17 @@ class ChannelControllerTest {
             manager: TransactionManager,
             block: ChannelController.(AuthenticatedUserInputModel, ChannelServices) -> Unit,
         ) {
+            val dummy =
+                object : ChannelSseInterface {
+                    override fun isUserInChannel(
+                        uId: UInt,
+                        cId: UInt,
+                    ): Boolean = true
+                }
             val owner = makeUser(manager)
             val ownerId = checkNotNull(owner?.uId) { "Owner id is null" }
             val channelServices = ChannelServices(manager)
-            val channelController = ChannelController(channelServices)
+            val channelController = ChannelController(channelServices, dummy)
             val u = manager.run { userRepo.findById(ownerId) }
             checkNotNull(u) { "User not found" }
             val authenticated = AuthenticatedUserInputModel(ownerId, makeToken(manager, ownerId).token.toString())
